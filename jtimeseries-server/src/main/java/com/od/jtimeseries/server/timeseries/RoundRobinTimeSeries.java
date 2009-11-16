@@ -54,14 +54,9 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
         this.maxSize = maxSize;
     }
 
-    /**
-     * When deserializing a timeseries from disk we need to add appended items
-     * to bring the series in sync to reflect changes in local write behind cache,
-     * without triggering events on the event notification thread - otherwise
-     * listeners added shortly afterwards may receive phantom events
-     */
+
     public synchronized void addWithoutFiringEvent(Collection<TimeSeriesItem> i) {
-        getInternalList().addAll(i);
+        addAllWithoutFiringEvents(i);
     }
 
     public synchronized boolean add(TimeSeriesItem i) {

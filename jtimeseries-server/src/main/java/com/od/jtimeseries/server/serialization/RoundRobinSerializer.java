@@ -36,11 +36,15 @@ import java.util.Properties;
  * User: nick
  * Date: 17-May-2009
  * Time: 22:14:28
- * To change this template use File | Settings | File Templates.
+ *
+ * Handles reading and writing time series data to/from the filesystem
  *
  * There is currently a single lock for both read and write operations
- * This does effectively hamstring performance by limiting both read/write to a single thread, but performance is sufficient at the moment
- * Time allowing it would be better to allow multiple concurrent reads and concurrent writes on different files
+ * This does effectively hamstring performance by limiting both read/write to a single thread, but performance
+ * is 'sufficient' at the moment. (our current production server is managing 12000 time series with 30s intervals and
+ * there are no problems currently). Memory caching and delayed write for time series appends does help here.
+ * Development time allowing it would be better to allow concurrent reads and concurrent writes on different files,
+ * or perhaps make use of ReentrantReadWriteLock
  */
 public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownListener {
 

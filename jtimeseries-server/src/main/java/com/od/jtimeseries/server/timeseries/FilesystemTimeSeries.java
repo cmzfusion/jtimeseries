@@ -43,6 +43,16 @@ import java.util.concurrent.TimeUnit;
  * User: Nick Ebbutt
  * Date: 18-May-2009
  * Time: 13:10:01
+ *
+ * A series which represents time series data stored on disk.
+ * The actual serialization is carried out by RoundRobinSerializer
+ *
+ * TimeSeriesItem appended using s.append() can be stored in a local cache, and a delayed write performed, to avoid having
+ * to keep all the data for the timeseries in memory at all times. It is expected that the number of appends will vastly
+ * outnumber all other operations. Other operations (e.g. iterator) in general require the time series to be deserialized).
+ *
+ * TODO - getLatestItem should probably make use of the cached values where available, instead of kicking off
+ * deserialization. There may be other functions we can optimize in this way but need to add tests when we do it.
  */
 public class FilesystemTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, ListTimeSeries {
 
@@ -94,11 +104,21 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
     }
 
+    /**
+     * Note, appending data does not require deserialization of the filesystem timeseries, thus preventing the
+     * peformance overhead of having to deserialize to add items. If the series is not already in memory we will append
+     * the item to our write behind cache only (eventually the item will get persisted, depending on the cache flush
+     * scheduling)
+     */
     public synchronized boolean append(TimeSeriesItem i) {
         return doAppend(i);
     }
 
     private boolean doAppend(final TimeSeriesItem i) {
+        //if the round robin series is in memory, we add the item to the series, but we also add the item to cache's list
+        //this is because the round robin series is our primary source for the series data while in memory, but it is soft
+        //referenced and it may be gc'd at any time. If this happens we still need a record of the items which were added
+        //since it was last persisted.
         boolean result = false;
         if ( i.getTimestamp() >= lastTimestamp) {
             writeBehindCache.addItemForAppend(i);
@@ -327,6 +347,9 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public synchronized int hashCode() {
+        //it may seem a bit odd to deserialize for this, but a ListTimeseries is a List of TimeSeriesItem, and the
+        //contract of List requires us to base hashcode on each element. In practise, it is unlikely that we will
+        //need to compute a hashcode for FilesystemTimeSeries frequently
         return getRoundRobinSeries().hashCode();
     }
 
@@ -376,8 +399,15 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             try {
                 s = roundRobinSerializer.deserialize(fileHeader);
 
-                //there may be appended items in our cache we need to add to
-                //bring the filesystem series into sync
+                //there may be items in our cache we need to add to
+                //bring the filesystem series into sync. We will have to call a special
+                //method to add the items in the local cache to the deserialized series without firing
+                //events. This is because once it is in memory we are adding a listener to the deserialized series
+                //to propagate events to our listeners whenever an item is added, and events for the items in the local
+                //cache have already been fired to our listeners.
+                //Due to the asynchronous event firing, when we call s.add() we could end
+                //up firing duplicate events when we add these items, even though our propagating listener has not yet
+                //been added - we will probably not receive the events back until the listener has been added.
                 s.addWithoutFiringEvent(writeBehindCache.getItems());
 
                 s.addTimeSeriesListener(timeSeriesEventHandler);
@@ -425,8 +455,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         public synchronized void flush() {
             try {
                 if ( roundRobinSeries != null) {
-                        roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
+                    //we have a local series which contains other changes, as well as possibly some appends
+                    roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
                 } else {
+                    //only changes are appends
                     roundRobinSerializer.append(fileHeader, items);
                 }
 

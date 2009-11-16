@@ -34,7 +34,7 @@ import java.util.ListIterator;
  * A wrapper around a RandomAccessDeque which prevents items from being inserted in the wrong
  * order by timestamp
  */
-public class OrderValidatingRandomAccessDeque implements List<TimeSeriesItem> {
+class OrderValidatingRandomAccessDeque implements List<TimeSeriesItem> {
 
     private RandomAccessDeque<TimeSeriesItem> wrappedDeque;
 

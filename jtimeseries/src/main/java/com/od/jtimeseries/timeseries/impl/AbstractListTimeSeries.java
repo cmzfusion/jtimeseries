@@ -425,7 +425,10 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         );
     }
 
-    protected synchronized List<TimeSeriesItem> getInternalList() {
-        return series;
+    //sometimes it is helpful to be able to add items without firing events to listeners.
+    //(e.g. this might be as a performance optimization after construction and before any listners
+    //have been added.)
+    protected synchronized void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
+        series.addAll(c);
     }
 }

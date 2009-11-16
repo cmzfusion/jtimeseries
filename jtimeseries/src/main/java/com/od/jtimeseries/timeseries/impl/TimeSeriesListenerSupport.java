@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TimeSeriesListenerSupport {
+class TimeSeriesListenerSupport {
 
     private final List<TimeSeriesListener> timeSeriesListeners = Collections.synchronizedList(new ArrayList<TimeSeriesListener>());
 

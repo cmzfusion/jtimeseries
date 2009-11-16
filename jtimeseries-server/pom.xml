@@ -1,0 +1,64 @@
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>od</groupId>
+		<artifactId>jtimeseries-parent</artifactId>
+		<version>1.0.9-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>od</groupId>
+	<artifactId>jtimeseries-server</artifactId>
+	<name>jtimeseries-server</name>
+	<description>JTimeSeries Server</description>
+	<packaging>jar</packaging>
+	<build>
+    <plugins>
+        <plugin>
+	        <artifactId>maven-assembly-plugin</artifactId>
+	        <configuration>
+					<descriptors>
+            <descriptor>src/assemble/with-dependencies.xml</descriptor>
+          </descriptors>
+	        </configuration>
+        </plugin>
+    </plugins>
+  </build> 
+	
+  <dependencies>
+      <dependency>
+          <groupId>od</groupId>
+          <artifactId>jtimeseries</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+      <dependency>
+          <groupId>jfree</groupId>
+          <artifactId>jfreechart</artifactId>
+          <version>1.0.9</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jdmk</groupId>
+        <artifactId>jmxtools</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+      <dependency>
+          <scope>test</scope>
+          <groupId>org.jmock</groupId>
+          <artifactId>jmock</artifactId>
+          <version>2.5.0</version>
+      </dependency>
+      <dependency>
+        <scope>test</scope>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.5</version>
+      </dependency>
+      <dependency>
+          <groupId>od</groupId>
+          <artifactId>jtimeseries</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+      </dependency>
+  </dependencies>
+
+</project>

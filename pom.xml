@@ -1,0 +1,46 @@
+
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 C:\maven\maven-2.0.2\maven-v4.xsd">
+    <modelVersion>4.0.0</modelVersion>
+	<groupId>od</groupId>
+	<version>1.0.9-SNAPSHOT</version>
+	<artifactId>od-jtimeseries</artifactId>
+	<packaging>pom</packaging>
+	<name>JTimeseries Project</name>
+	<modules>
+    <module>jtimeseries-parent</module>        
+		<module>jtimeseries</module>
+		<module>jtimeseries-server</module>
+	</modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <header>src/etc/header.txt</header>
+                    <includes>
+                        <include>src/main/java/**</include>
+                    </includes>
+                    <properties>
+                        <year>2009</year>
+                    </properties>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mc-release</id>
+            <name>Local Maven repository of releases</name>
+            <url>http://mc-repo.googlecode.com/svn/maven2/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
+</project>

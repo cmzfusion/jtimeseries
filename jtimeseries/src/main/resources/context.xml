@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="/context.xsl"?>
+<timeSeriesContext>
+	<contextTree>
+		<context contextUrl="/" id="JTimeSeries" description="JTimeSeries Root Context">
+			<context contextUrl="/Wibble+Context/" id="Wibble Context" description="A context for wibble"/>
+			<context contextUrl="/Squonk+Context/" id="Squonk Context" description="A context for squonk"/>
+			<context contextUrl="/Foo+Context/" id="Foo Context" description="A context for foo">
+				<context contextUrl="/Foo+Context/Bar/" id="Bar" description="A context for bar"/>
+			</context>
+			<context contextUrl="/Remote/" id="Remote" description="Remote time series" selected="true"/>
+		</context>
+	</contextTree>
+	<selectedContext id="Remote" description="Remote time series">
+		<timeSeries>
+			<series id="Id" description="Description" seriesUrl="/Remote/Id.series" chartImage="Id-chart.png"/>
+		</timeSeries>
+	</selectedContext>
+</timeSeriesContext>

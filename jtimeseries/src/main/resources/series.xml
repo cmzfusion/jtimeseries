@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="/jTimeSeriesSeries.xsl"?>
+<timeSeries>
+    <series id="Repaint Event Duration (Mean)" description="Length of time taken by each screen repainting operation in ms - lower is better. Anything more than 50ms will result in noticible sluggishness." captureFunction="(Mean) every 30 s" seriesUrl="/Repaint+Event+Duration+%28Mean%29.series" chartImage="Repaint+Event+Duration+%28Mean%29-chart.png"/>
+    <seriesItems>
+        <seriesItem timestamp="1231432373362" datetime="2009/01/08 16:32:53" value="8" />
+        <seriesItem timestamp="1231432403362" datetime="2009/01/08 16:33:23" value="32" />
+    </seriesItems>
+</timeSeries>

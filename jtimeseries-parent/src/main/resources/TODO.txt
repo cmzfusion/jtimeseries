@@ -1,0 +1,10 @@
+Administration functions on timeseries-server to allow for deletion of series from mbean pages or deletion by reg exp match
+Show series age and size and stats on client download dialog
+Rename download dialog 'synchronize'
+Enable linking series with same id/parent node to share scales on chart
+Size display name dialog properly
+Enforce lower case for context paths?
+Support create local aggregated series in client ui
+New tables implementation for client ui
+Add full set of right click functions to tree.
+Check/Fix server deletion of old series by series time stamp.

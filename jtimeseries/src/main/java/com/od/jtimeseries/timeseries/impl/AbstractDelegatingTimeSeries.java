@@ -42,131 +42,131 @@ public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
         wrappedTimeSeries.addTimeSeriesListener(eventHandler);        
     }
 
-    public void addTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
         eventHandler.addTimeSeriesListener(l);
     }
 
-    public void removeTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
         eventHandler.removeTimeSeriesListener(l);
     }
 
-    public boolean append(TimeSeriesItem item) {
+    public synchronized boolean append(TimeSeriesItem item) {
         return wrappedTimeSeries.append(item);
     }
 
-    public boolean prepend(TimeSeriesItem item) {
+    public synchronized boolean prepend(TimeSeriesItem item) {
         return wrappedTimeSeries.prepend(item);
     }
 
-    public Collection<TimeSeriesItem> getSnapshot() {
+    public synchronized Collection<TimeSeriesItem> getSnapshot() {
         return wrappedTimeSeries.getSnapshot();
     }
 
-    public TimeSeriesItem getLatestItem() {
+    public synchronized TimeSeriesItem getLatestItem() {
         return wrappedTimeSeries.getLatestItem();
     }
 
-    public long getLatestTimestamp() {
+    public synchronized long getLatestTimestamp() {
         return wrappedTimeSeries.getLatestTimestamp();
     }
 
-    public TimeSeriesItem removeLatestItem() {
+    public synchronized TimeSeriesItem removeLatestItem() {
         return wrappedTimeSeries.removeLatestItem();
     }
 
-    public TimeSeriesItem getEarliestItem() {
+    public synchronized TimeSeriesItem getEarliestItem() {
         return wrappedTimeSeries.getEarliestItem();
     }
 
-    public long getEarliestTimestamp() {
+    public synchronized long getEarliestTimestamp() {
         return wrappedTimeSeries.getEarliestTimestamp();
     }
 
-    public TimeSeriesItem removeEarliestItem() {
+    public synchronized TimeSeriesItem removeEarliestItem() {
         return wrappedTimeSeries.removeEarliestItem();
     }
 
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return wrappedTimeSeries.isEmpty();
     }
 
-    public int size() {
+    public synchronized int size() {
         return wrappedTimeSeries.size();
     }
 
-    public void clear() {
+    public synchronized void clear() {
         wrappedTimeSeries.clear();
     }
 
-    public boolean remove(Object o) {
+    public synchronized boolean remove(Object o) {
         return wrappedTimeSeries.remove(o);
     }
 
-    public boolean add(TimeSeriesItem timeSeriesItem) {
+    public synchronized boolean add(TimeSeriesItem timeSeriesItem) {
         return wrappedTimeSeries.add(timeSeriesItem);
     }
 
-    public boolean retainAll(Collection<?> c) {
+    public synchronized boolean retainAll(Collection<?> c) {
         return wrappedTimeSeries.retainAll(c);
     }
 
-    public boolean removeAll(Collection<?> c) {
+    public synchronized boolean removeAll(Collection<?> c) {
         return wrappedTimeSeries.removeAll(c);
     }
 
-    public boolean addAll(Collection<? extends TimeSeriesItem> c) {
+    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> c) {
         return wrappedTimeSeries.addAll(c);
     }
 
-    public boolean containsAll(Collection<?> c) {
+    public synchronized boolean containsAll(Collection<?> c) {
         return wrappedTimeSeries.containsAll(c);
     }
 
-    public Object[] toArray() {
+    public synchronized Object[] toArray() {
         return wrappedTimeSeries.toArray();
     }
 
-    public <T> T[] toArray(T[] a) {
+    public synchronized <T> T[] toArray(T[] a) {
         return wrappedTimeSeries.toArray(a);
     }
 
-    public Iterator<TimeSeriesItem> iterator() {
+    public synchronized Iterator<TimeSeriesItem> iterator() {
         return wrappedTimeSeries.iterator();
     }
 
-    public boolean contains(Object o) {
+    public synchronized boolean contains(Object o) {
         return wrappedTimeSeries.contains(o);
     }
 
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         return wrappedTimeSeries.equals(o);
     }
 
-    public int hashCode() {
+    public synchronized int hashCode() {
         return wrappedTimeSeries.hashCode();
     }
 
-    public TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
         return wrappedTimeSeries.getSubSeries(startTimestamp, endTimestamp);
     }
 
-    public TimeSeries getSubSeries(long timestamp) {
+    public synchronized TimeSeries getSubSeries(long timestamp) {
         return wrappedTimeSeries.getSubSeries(timestamp);
     }
 
-    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
         return wrappedTimeSeries.getFirstItemAtOrBefore(timestamp);
     }
 
-    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
         return wrappedTimeSeries.getFirstItemAtOrAfter(timestamp);
     }
 
-    public long getTimestampAfter(long timestamp) {
+    public synchronized long getTimestampAfter(long timestamp) {
         return wrappedTimeSeries.getTimestampAfter(timestamp);
     }
 
-    public long getTimestampBefore(long timestamp) {
+    public synchronized long getTimestampBefore(long timestamp) {
         return wrappedTimeSeries.getTimestampBefore(timestamp);
     }
 }

@@ -25,7 +25,6 @@ import java.util.Collection;
  * User: nick
  * Date: 14-Nov-2009
  * Time: 16:15:57
- * To change this template use File | Settings | File Templates.
  *
  * A TimeSeries is an ordered sequence of TimeSeriesItems, each representing a value at a point in time
  * The timepoints may or may not be equally spaced / periodic
@@ -43,6 +42,16 @@ import java.util.Collection;
  * Depending on the implementation, a TimeSeries may or may not allow more than one item with the same timestamp.
  * (Due to the lack of granularity in a system clock, an attempt to add items with a duplicate timestamp may be
  * likely, and it is probably best to let an application/implementation decide how to handle this case).
+ *
+ * Note on thread safety:
+ * 
+ * TimeSeries implementations are in general intended to be thread safe (if not, this should be documented).
+ * Furthermore, the guard used to guarantee thread safety should be the monitor/mutex of the time series instance
+ * itself rather than that of an encapsulated private lock object. This is to enable client classes to safely
+ * implement operations involving more than one method call by holding the lock on a series instance while the
+ * operation takes place. In cases where the a timeseries implementation wraps another time series instance, client
+ * classes in general should not change data of the wrapped instance directly - this should be done via the wrapper,
+ * since making direct changes in this case would violate the guard provided by the wrapper instance's mutex/lock.
  */
 public interface TimeSeries extends Collection<TimeSeriesItem> {
 
@@ -125,6 +134,7 @@ public interface TimeSeries extends Collection<TimeSeriesItem> {
     long getTimestampBefore(long timestamp);
 
     /**
+     * note, time series events are fired asynchronously on an event notification thread
      * @param l add a time series listener to receive change events from the time series
      */
     void addTimeSeriesListener(TimeSeriesListener l);

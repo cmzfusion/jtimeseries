@@ -58,127 +58,123 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         timeSeries.addTimeSeriesListener(eventHandler);
     }
 
-    public boolean prepend(TimeSeriesItem item) {
+    public synchronized boolean prepend(TimeSeriesItem item) {
         return timeSeries.prepend(item);
     }
 
-    public boolean append(TimeSeriesItem value) {
+    public synchronized boolean append(TimeSeriesItem value) {
         return timeSeries.append(value);
     }
 
-    public Collection<TimeSeriesItem> getSnapshot() {
+    public synchronized Collection<TimeSeriesItem> getSnapshot() {
         return timeSeries.getSnapshot();
     }
 
-    public TimeSeries getSubSeries(long timestamp) {
+    public synchronized TimeSeries getSubSeries(long timestamp) {
         return timeSeries.getSubSeries(timestamp);
     }
 
-    public TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
         return timeSeries.getSubSeries(startTimestamp, endTimestamp);
     }
 
-    public TimeSeriesItem getLatestItem() {
+    public synchronized TimeSeriesItem getLatestItem() {
         return timeSeries.getLatestItem();
     }
 
-    public TimeSeriesItem removeLatestItem() {
+    public synchronized TimeSeriesItem removeLatestItem() {
         return timeSeries.removeLatestItem();
     }
 
-    public long getLatestTimestamp() {
+    public synchronized long getLatestTimestamp() {
         return timeSeries.getLatestTimestamp();
     }
 
-    public TimeSeriesItem getEarliestItem() {
+    public synchronized TimeSeriesItem getEarliestItem() {
         return timeSeries.getEarliestItem();
     }
 
-    public TimeSeriesItem removeEarliestItem() {
+    public synchronized TimeSeriesItem removeEarliestItem() {
         return timeSeries.removeEarliestItem();
     }
 
-    public long getEarliestTimestamp() {
+    public synchronized long getEarliestTimestamp() {
         return timeSeries.getEarliestTimestamp();
     }
 
-    public void addTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
         eventHandler.addTimeSeriesListener(l);
     }
 
-    public void removeTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
         eventHandler.removeTimeSeriesListener(l);
     }
 
-    public int size() {
+    public synchronized int size() {
         return timeSeries.size();
     }
 
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return timeSeries.isEmpty();
     }
 
-    public boolean contains(Object o) {
+    public synchronized boolean contains(Object o) {
         return timeSeries.contains(o);
     }
 
-    public Iterator<TimeSeriesItem> iterator() {
+    public synchronized Iterator<TimeSeriesItem> iterator() {
         return timeSeries.iterator();
     }
 
-    public Object[] toArray() {
+    public synchronized Object[] toArray() {
         return timeSeries.toArray();
     }
 
-    public <T> T[] toArray(T[] a) {
+    public synchronized <T> T[] toArray(T[] a) {
         return timeSeries.toArray(a);
     }
 
-    public boolean add(TimeSeriesItem o) {
+    public synchronized boolean add(TimeSeriesItem o) {
         return timeSeries.add(o);
     }
 
-    public boolean remove(Object o) {
+    public synchronized boolean remove(Object o) {
         return timeSeries.remove(o);
     }
 
-    public boolean containsAll(Collection<?> c) {
+    public synchronized boolean containsAll(Collection<?> c) {
         return timeSeries.containsAll(c);
     }
 
-    public boolean addAll(Collection<? extends TimeSeriesItem> c) {
+    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> c) {
         return timeSeries.addAll(c);
     }
 
-    public boolean removeAll(Collection<?> c) {
+    public synchronized boolean removeAll(Collection<?> c) {
         return timeSeries.removeAll(c);
     }
 
-    public boolean retainAll(Collection<?> c) {
+    public synchronized boolean retainAll(Collection<?> c) {
         return timeSeries.retainAll(c);
     }
 
-    public void clear() {
+    public synchronized void clear() {
         timeSeries.clear();
     }
 
-    protected TimeSeries getTimeSeries() {
-        return timeSeries;
-    }
-
-    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
         return timeSeries.getFirstItemAtOrBefore(timestamp);
     }
 
-    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
         return timeSeries.getFirstItemAtOrAfter(timestamp);
     }
 
-    public long getTimestampAfter(long timestamp) {
+    public synchronized long getTimestampAfter(long timestamp) {
         return timeSeries.getTimestampAfter(timestamp);
     }
 
-    public long getTimestampBefore(long timestamp) {
+    public synchronized long getTimestampBefore(long timestamp) {
         return timeSeries.getTimestampBefore(timestamp);
     }
 

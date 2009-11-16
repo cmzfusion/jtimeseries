@@ -21,6 +21,7 @@ package com.od.jtimeseries.timeseries.aggregation;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,11 +34,11 @@ public class DefaultAggregatedIdentifiableTimeSeries extends DefaultIdentifiable
     private DefaultAggregatedTimeSeries series;
 
     public DefaultAggregatedIdentifiableTimeSeries(String id, String description, AggregateFunction aggregateFunction) {
-        super(id, description, new DefaultAggregatedTimeSeries(aggregateFunction));
-        this.series = (DefaultAggregatedTimeSeries)getTimeSeries();
+        super(id, description, new DefaultTimeSeries());
+        this.series = new DefaultAggregatedTimeSeries(this, aggregateFunction);
     }
 
-    public void addTimeSeries(TimeSeries... timeSeries) {
+    public synchronized void addTimeSeries(TimeSeries... timeSeries) {
         series.addTimeSeries(timeSeries);
     }
 

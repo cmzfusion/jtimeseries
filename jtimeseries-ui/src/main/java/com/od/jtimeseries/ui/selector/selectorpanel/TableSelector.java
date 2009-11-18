@@ -25,13 +25,18 @@ import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.jidesoft.grid.BeanTableModel;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.AutoFilterTableHeader;
+import com.jidesoft.grid.BooleanCheckBoxCellEditor;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.beans.IntrospectionException;
 
 /**
@@ -46,37 +51,58 @@ public class TableSelector extends SelectorPanel {
     private static final Color STALE_SERIES_COLOR = new Color(248,165,169);
     private TimeSeriesContext rootContext;
     private java.util.List<Action> seriesActions;
+    private String selectionText;
     private RemoteSeriesTableModel tableModel;
     private SortableTable sortableTable;
     private JPopupMenu tablePopupMenu;
+    private java.util.List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
 
-    public TableSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
+    public TableSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel,
+                         TimeSeriesContext rootContext,
+                         java.util.List<Action> seriesActions,
+                         String selectionText) {
+
         super(seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
+        this.selectionText = selectionText;
 
-        tableModel = createTableModels();
+        buildColumnList();
+        createTableModels();
         refreshSeries();
         createPopupMenu();
         createTable();
+        sizeColumns();
 
-        sortableTable.setClearSelectionOnTableDataChanges(false);
-        sortableTable.setRowResizable(true);
-        sortableTable.setVariousRowHeights(true);
-        sortableTable.setSelectInsertedRows(false);
-        sortableTable.setClickCountToStart(2);
-        sortableTable.setAutoSelectTextWhenStartsEditing(true);
-        sortableTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-        AutoFilterTableHeader _header = new AutoFilterTableHeader(sortableTable);
-        _header.setAutoFilterEnabled(true);
-        sortableTable.setTableHeader(_header);
-
-        sortableTable.addMouseListener(new PopupTriggerMouseAdapter(tablePopupMenu, sortableTable));
-
+        sortableTable.addMouseListener(
+            new PopupTriggerMouseAdapter(tablePopupMenu, sortableTable)
+        );
         setLayout(new BorderLayout());
         add(new JScrollPane(sortableTable), BorderLayout.CENTER);
         addSeriesSelectionListener();
+    }
+
+    //for each predetermined column, the bean property name RemoteChartingTimeSeries,
+    //column name to display and a preferred width. We use this to create the BeanTableModel
+    //and size the columns in ColumnModel. The underlying table model also generates some
+    //columns dynamically from the tokens in the series path
+    private void buildColumnList() {
+        columns.add(new ColumnInfo("selected", selectionText, 65));
+        columns.add(new ColumnInfo("displayName", "Display Name", 175));
+        columns.add(new ColumnInfo("id", "Id", 75));
+        columns.add(new ColumnInfo("maxDaysHistory", "Max Days", 100));
+        columns.add(new ColumnInfo("refreshTimeSeconds", "Refresh(s)", 100));
+        columns.add(new ColumnInfo("contextPath", "Path", 100));
+        columns.add(new ColumnInfo("URL", "URL", 100));
+    }
+
+    //we don't currently persist users changes to column order/sizes, but perhaps we should..
+    private void sizeColumns() {
+        TableColumnModel m = sortableTable.getColumnModel();
+        for ( int col = 0; col < columns.size(); col++) {
+            TableColumn column = m.getColumn(col);
+            column.setPreferredWidth(columns.get(col).getPreferredWidth());
+        }
     }
 
     private void createPopupMenu() {
@@ -102,29 +128,48 @@ public class TableSelector extends SelectorPanel {
                 return c;
             }
         };
+
+        sortableTable.setClearSelectionOnTableDataChanges(false);
+        sortableTable.setRowResizable(true);
+        sortableTable.setVariousRowHeights(true);
+        sortableTable.setSelectInsertedRows(false);
+        sortableTable.setClickCountToStart(2);
+        sortableTable.setAutoSelectTextWhenStartsEditing(true);
+        sortableTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        AutoFilterTableHeader header = new AutoFilterTableHeader(sortableTable);
+        header.setAutoFilterEnabled(true);
+        header.setShowFilterName(true);
+        header.setAllowMultipleValues(true);
+        header.setShowFilterNameAsToolTip(true);
+        sortableTable.setTableHeader(header);
     }
 
-    private RemoteSeriesTableModel createTableModels() {
+    private void createTableModels() {
         BeanTableModel<RemoteChartingTimeSeries> model = null;
+        String[] colConfigString = generateColumnConfigStringForBeanTableModel();
         try {
             model = new BeanTableModel<RemoteChartingTimeSeries>(
                 new ArrayList(),
                 RemoteChartingTimeSeries.class,
-                new String[] {
-                        "selected", "Selected",
-                        "displayName", "Display Name",
-                        "id", "Id",
-                        "maxDaysHistory", "Max Days",
-                        "refreshTimeSeconds", "Refresh Time (s)",
-                        "contextPath", "Path",
-                        "URL", "URL"
-                }
+                colConfigString
             );
         } catch (IntrospectionException e) {
             e.printStackTrace();
         }
         int[] editableCols = new int[] {0, 1, 3, 4};
-        return new RemoteSeriesTableModel(model, editableCols);
+        tableModel = new RemoteSeriesTableModel(model, editableCols);
+    }
+
+    //jide BeanTableModel requires the propertyNames and column display names as a String[]
+    private String[] generateColumnConfigStringForBeanTableModel() {
+        java.util.List<String> colConfigStrings = new LinkedList<String>();
+        for(ColumnInfo c : columns) {
+            colConfigStrings.add(c.getPropertyName());
+            colConfigStrings.add(c.getDisplayName());
+        }
+        String[] colConfigString = colConfigStrings.toArray(new String[colConfigStrings.size()]);
+        return colConfigString;
     }
 
     private void addSeriesSelectionListener() {
@@ -152,4 +197,27 @@ public class TableSelector extends SelectorPanel {
         tableModel.removeRowData(series.toArray(new RemoteChartingTimeSeries[series.size()]));
     }
 
+    private static class ColumnInfo {
+        private String propertyName;
+        private String displayName;
+        private int preferredWidth;
+
+        private ColumnInfo(String propertyName, String displayName, int preferredWidth) {
+            this.propertyName = propertyName;
+            this.displayName = displayName;
+            this.preferredWidth = preferredWidth;
+        }
+
+        public String getPropertyName() {
+            return propertyName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public int getPreferredWidth() {
+            return preferredWidth;
+        }
+    }
 }

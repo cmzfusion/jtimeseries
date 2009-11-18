@@ -30,6 +30,7 @@ import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
+import com.od.jtimeseries.ui.util.JTimeseriesJideLicense;
 import com.od.jtimeseries.util.logging.LogDefaults;
 import com.od.jtimeseries.util.logging.LogMethods;
 
@@ -60,9 +61,10 @@ public class TimeSeriesVisualizer extends JPanel {
     private final ChartControlPanel chartControlPanel = new ChartControlPanel();
 
     public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary) {
+        JTimeseriesJideLicense.applyLicense();
         this.remoteServerDictionary = remoteServerDictionary;
         contextTimeSeriesChart = new TimeSeriesChart(title);
-        seriesSelectionPanel = new SeriesSelectionPanel(rootContext);
+        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart");
 
         createDisplayNameAction();
         createToolbar();

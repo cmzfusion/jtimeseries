@@ -18,7 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector.selectorpanel;
 
-import com.jidesoft.grid.BeanTableModel;
+import com.jidesoft.grid.*;
+import com.jidesoft.converter.ConverterContext;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.TableModelEventParser;
 import com.od.jtimeseries.ui.util.TableEventDispatcher;
@@ -38,7 +39,7 @@ import java.util.List;
  * A simple model to show the elements of the context path as additional columns
  * More work will be needed to handle events optimally
  */
-public class RemoteSeriesTableModel extends AbstractTableModel {
+public class RemoteSeriesTableModel extends AbstractTableModel implements ContextSensitiveTableModel {
 
     private TableEventDispatcher eventDispatcher = new TableEventDispatcher(this);
     private BeanTableModel<RemoteChartingTimeSeries> wrappedModel;
@@ -57,7 +58,7 @@ public class RemoteSeriesTableModel extends AbstractTableModel {
     private void recalculate(boolean fireUpdate) {
         int oldMax = maxPathElements;
         for ( int row = 0; row < wrappedModel.getRowCount(); row++) {
-            RemoteChartingTimeSeries s = (RemoteChartingTimeSeries)wrappedModel.getObject(row);
+            RemoteChartingTimeSeries s = wrappedModel.getObject(row);
             maxPathElements = Math.max(maxPathElements, s.getPathElements().size());
         }
 
@@ -157,6 +158,18 @@ public class RemoteSeriesTableModel extends AbstractTableModel {
         for (RemoteChartingTimeSeries s : remoteChartingTimeSerieses) {
             wrappedModel.removeObject(s);    
         }
+    }
+
+    public ConverterContext getConverterContextAt(int i, int i1) {
+        return null;
+    }
+
+    public EditorContext getEditorContextAt(int rowIndex, int columnIndex) {
+        return getColumnClass(columnIndex) == Boolean.class ? BooleanCheckBoxCellEditor.CONTEXT : null;
+    }
+
+    public Class<?> getCellClassAt(int rowIndex, int columnIndex) {
+        return getColumnClass(columnIndex);
     }
 
     private class SeriesModelEventParserListener implements TableModelEventParser.TableModelEventParserListener {

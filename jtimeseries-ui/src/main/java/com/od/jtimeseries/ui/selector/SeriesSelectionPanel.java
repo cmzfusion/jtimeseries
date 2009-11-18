@@ -69,17 +69,21 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private PropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
 
     public SeriesSelectionPanel(TimeSeriesContext rootContext) {
-        this(rootContext, new SeriesSelectionList());
+        this(rootContext, "Selected");
     }
 
-    public SeriesSelectionPanel(TimeSeriesContext rootContext, SeriesSelectionList selectionList) {
+    /**
+     * @param rootContext
+     * @param selectionText, text name for boolean 'selected' column (e.g. if the selected series will be charted, this might be 'Chart')
+     */
+    public SeriesSelectionPanel(TimeSeriesContext rootContext, String selectionText) {
         this.rootContext = rootContext;
-        this.selectionList = selectionList;
+        this.selectionList = new SeriesSelectionList();
         setupTimeseries(rootContext.findAllTimeSeries().getAllMatches());
 
         List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
         treeSelector = new TreeSelector(seriesSelectionModel, rootContext, seriesActions);
-        tableSelector = new TableSelector(seriesSelectionModel, rootContext, seriesActions);
+        tableSelector = new TableSelector(seriesSelectionModel, rootContext, seriesActions, selectionText);
         createSelectorPanel();
         createTitlePanel();
         addComponents();

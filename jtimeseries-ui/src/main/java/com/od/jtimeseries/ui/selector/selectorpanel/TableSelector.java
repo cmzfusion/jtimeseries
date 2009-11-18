@@ -30,13 +30,13 @@ import com.jidesoft.grid.BooleanCheckBoxCellEditor;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.*;
 import java.beans.IntrospectionException;
 
 /**
@@ -55,7 +55,9 @@ public class TableSelector extends SelectorPanel {
     private RemoteSeriesTableModel tableModel;
     private SortableTable sortableTable;
     private JPopupMenu tablePopupMenu;
+
     private java.util.List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
+    private Map<String, Integer> columnWidthsByColumnName = new HashMap<String,Integer>();
 
     public TableSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel,
                          TimeSeriesContext rootContext,
@@ -94,14 +96,27 @@ public class TableSelector extends SelectorPanel {
         columns.add(new ColumnInfo("refreshTimeSeconds", "Refresh(s)", 100));
         columns.add(new ColumnInfo("contextPath", "Path", 100));
         columns.add(new ColumnInfo("URL", "URL", 100));
+        populateColumnWidthsMap();
     }
 
     //we don't currently persist users changes to column order/sizes, but perhaps we should..
     private void sizeColumns() {
-        TableColumnModel m = sortableTable.getColumnModel();
-        for ( int col = 0; col < columns.size(); col++) {
-            TableColumn column = m.getColumn(col);
-            column.setPreferredWidth(columns.get(col).getPreferredWidth());
+        if ( sortableTable != null) { //never apart from on creation of SortableTable
+            TableColumnModel m = sortableTable.getColumnModel();
+            Enumeration<TableColumn> e = m.getColumns();
+            while(e.hasMoreElements()) {
+                TableColumn col = e.nextElement();
+                String name = tableModel.getColumnName(col.getModelIndex());
+                if ( columnWidthsByColumnName.containsKey(name)) {
+                    col.setPreferredWidth(columnWidthsByColumnName.get(name));
+                }
+            }
+        }
+    }
+
+    private void populateColumnWidthsMap() {
+        for ( ColumnInfo c : columns) {
+            columnWidthsByColumnName.put(c.getDisplayName(), c.getPreferredWidth());
         }
     }
 
@@ -126,6 +141,11 @@ public class TableSelector extends SelectorPanel {
                     }
                 }
                 return c;
+            }
+
+            public void tableChanged(TableModelEvent e) {
+                super.tableChanged(e);
+                sizeColumns();
             }
         };
 

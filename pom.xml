@@ -9,8 +9,9 @@
 	<name>JTimeseries Project</name>
 	<modules>
     <module>jtimeseries-parent</module>        
-		<module>jtimeseries</module>
-		<module>jtimeseries-server</module>
+	<module>jtimeseries</module>
+	<module>jtimeseries-server</module>
+	<module>jtimeseries-ui</module>
 	</modules>
     <build>
         <plugins>

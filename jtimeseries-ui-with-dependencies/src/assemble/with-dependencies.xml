@@ -1,0 +1,22 @@
+<assembly>
+  <id>nojfree</id>
+  <formats>
+    <format>jar</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <unpack>true</unpack>
+      <unpackOptions>
+	      <excludes>
+	      	<exclude>Thumbs.db</exclude>
+	      </excludes>
+      </unpackOptions>
+      <scope>runtime</scope>
+      <excludes>
+          <exclude>jfree:jfreechart</exclude>
+          <exclude>jfree:jcommon</exclude>
+      </excludes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

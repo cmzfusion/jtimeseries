@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=swingcommand-2.7.jar -DgroupId=od -DartifactId=swingcommand -Dversion=2.7 -Dpackaging=jar

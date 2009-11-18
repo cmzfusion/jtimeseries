@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=jide-common-2.7.5-sources.jar -DgroupId=com.jidesoft -DartifactId=jide-common -Dversion=2.7.5 -Dpackaging=jar -Dclassifier=sources

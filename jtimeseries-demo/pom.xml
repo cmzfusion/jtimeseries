@@ -1,0 +1,23 @@
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>od</groupId>
+		<artifactId>jtimeseries-parent</artifactId>
+		<version>1.0.9-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>od</groupId>
+	<artifactId>jtimeseries-demo</artifactId>
+	<name>jtimeseries-demo</name>
+	<description>JTimeSeries demo application</description>
+	<packaging>jar</packaging>
+	<build/>
+  
+  <dependencies>
+      <dependency>
+          <groupId>od</groupId>
+          <artifactId>jtimeseries-ui</artifactId>
+          <version>${project.version}</version>
+      </dependency>
+  </dependencies>
+</project>

@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.displaypattern;
 import com.jidesoft.grid.BeanTableModel;
 import com.jidesoft.grid.SortableTable;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
@@ -51,7 +52,7 @@ public class DisplayPatternTable extends JPanel {
         createPopupMenu();
         try {
             beanTableModel = new BeanTableModel<DisplayNamePattern>(
-                    displayNamePatterns,
+                    clone(displayNamePatterns),
                     DisplayNamePattern.class,
                     new String[] {"pattern", "Pattern", "replacement", "Replacement"}
             );
@@ -59,6 +60,10 @@ public class DisplayPatternTable extends JPanel {
             e.printStackTrace();
         }
         sortableTable = new SortableTable(beanTableModel);
+        sortableTable.setClickCountToStart(2);
+        sortableTable.addMouseListener(
+            new PopupTriggerMouseAdapter(tablePopupMenu, sortableTable)
+        );
 
         JComponent buttonBar = createButtonBar();
 
@@ -106,6 +111,8 @@ public class DisplayPatternTable extends JPanel {
                 }
             }
         );
+
+
     }
 
     public List<DisplayNamePattern> getDisplayPatterns() {

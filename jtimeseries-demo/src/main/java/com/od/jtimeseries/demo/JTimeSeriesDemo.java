@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.metrics4j.demo;
+package com.od.jtimeseries.demo;
 
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.source.ValueRecorder;

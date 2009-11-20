@@ -30,4 +30,9 @@ public interface CaptureListener {
 
     void captureStateChanged(Capture source, CaptureState oldState, CaptureState newState);
 
+    /**
+     * Called when a capture has been triggered by a scheduler for
+     */
+    void captureTriggered(Capture source);
+
 }

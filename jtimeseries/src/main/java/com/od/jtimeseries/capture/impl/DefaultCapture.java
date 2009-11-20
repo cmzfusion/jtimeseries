@@ -35,12 +35,12 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 18-Dec-2008
  * Time: 11:53:28
  */
-public class DefaultCaptureFromSource extends AbstractCapture implements Capture, ValueSourceCapture {
+public class DefaultCapture extends AbstractCapture implements Capture, ValueSourceCapture {
 
     private ValueSourceListener valueSourceListener;
     private static final Object startStopLock = new Object();
 
-    public DefaultCaptureFromSource(String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
+    public DefaultCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
         super(id, "Capture to timeSeries " + timeSeries.getId() + " from " + source.getId(), timeSeries, source);
     }
 

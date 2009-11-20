@@ -18,10 +18,7 @@
  */
 package com.od.jtimeseries.capture.impl;
 
-import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureListener;
-import com.od.jtimeseries.capture.CaptureState;
-import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.capture.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -99,7 +96,7 @@ public class DefaultCaptureScheduler extends AbstractCaptureScheduler {
         }
     }
 
-    private class SchedulingCaptureListener implements CaptureListener {
+    private class SchedulingCaptureListener extends CaptureAdapter {
 
         public void captureStateChanged(Capture source, CaptureState oldState, CaptureState newState) {
             if ( newState == CaptureState.STARTING) {

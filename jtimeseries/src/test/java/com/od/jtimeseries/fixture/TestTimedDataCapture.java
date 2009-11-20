@@ -10,9 +10,12 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.JTimeSeriesTestConstants;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
+import com.od.jtimeseries.source.ValueSource;
 
 import java.util.List;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,15 +40,15 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertNotNull(eventTimer);
         assertNotNull(queueTimer);
 
+        WaitForEndOfCapturePeriodListener countDownListener = getCapturePeriodListener();
         rootContext.startScheduling().startDataCapture();
-        long sleepStart = System.currentTimeMillis();
-        sleep(JTimeSeriesTestConstants.periodToWaitForFirstScheduledTimePeriodToStart);
-
+        countDownListener.waitForAll();
         generateSourceValuesForPeriod();
-        sleepUntilCapturePeriodOver(capturePeriod, sleepStart);
 
+        countDownListener.waitForAll();
         generateSourceValuesForPeriod();
-        sleepUntilCapturePeriodOver(capturePeriod, sleepStart);
+
+        countDownListener.waitForAll();
         rootContext.stopDataCapture().stopScheduling();
 
         List<IdentifiableTimeSeries> allSeries = rootContext.findAllTimeSeries().getAllMatches();

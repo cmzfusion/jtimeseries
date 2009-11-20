@@ -8,15 +8,16 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.source.ValueRecorder;
-import com.od.jtimeseries.source.EventTimer;
-import com.od.jtimeseries.source.QueueTimer;
+import com.od.jtimeseries.source.*;
+import com.od.jtimeseries.capture.CaptureAdapter;
+import com.od.jtimeseries.capture.Capture;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,12 +29,15 @@ import java.util.Iterator;
 public abstract class AbstractSimpleCaptureFixture extends Assert {
 
     protected TimeSeriesContext rootContext;
-    protected Counter counter;
-    protected ValueRecorder valueRecorder;
-    protected EventTimer eventTimer;
-    protected QueueTimer queueTimer;
-    protected TimePeriod sleepPeriod = Time.millisecond((int)(25 * JTimeSeriesTestConstants.TOLERANCE_MULTIPLIER));
-    protected TimePeriod capturePeriod = Time.millisecond((int)(250 * JTimeSeriesTestConstants.TOLERANCE_MULTIPLIER));
+    protected TimePeriod sleepPeriod = Time.millisecond((int)(100));
+    protected TimePeriod capturePeriod = Time.millisecond((int)(500));
+
+    //sources, if adding, change also getListOfSources()
+    protected volatile Counter counter;
+    protected volatile ValueRecorder valueRecorder;
+    protected volatile EventTimer eventTimer;
+    protected volatile QueueTimer queueTimer;
+
 
     @Before
     public void setUp() {
@@ -56,6 +60,30 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         queueTimer = null;
     }
 
+    protected WaitForEndOfCapturePeriodListener getCapturePeriodListener() {
+        List<ValueSource> l = getListOfSources();
+        WaitForEndOfCapturePeriodListener w = new WaitForEndOfCapturePeriodListener(l.size());
+        for ( ValueSource v : l) {
+            rootContext.findCaptures(v).getFirstMatch().addCaptureListener(w);
+        }
+        return w;
+    }
+
+    private List<ValueSource> getListOfSources() {
+        List<ValueSource> l = new ArrayList<ValueSource>();
+        addIfNotNull(l, counter);
+        addIfNotNull(l, valueRecorder);
+        addIfNotNull(l, eventTimer);
+        addIfNotNull(l, queueTimer);
+        return l;
+    }
+
+    private void addIfNotNull(List<ValueSource> l, ValueSource v) {
+        if ( v != null) {
+            l.add(v);
+        }
+    }
+
     protected void sleep(TimePeriod timePeriod) {
         try {
             Thread.sleep(timePeriod.getLengthInMillis());
@@ -64,18 +92,21 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         }
     }
 
+    //here we are expecting the event timer to have recorded times within a given range of the actual sleep time
+    //the range is defined by JTimeSeriesTestConstants.TIMER_INACCURACY_MS
+    //it's possible, although unlikely, that this test will fail because the range is too narrow
     protected void checkRecordedSleepPeriods(TimeSeries timeSeries) {
-        assertSame(2, timeSeries.size());
+        assertEquals(2, timeSeries.size());
         Iterator<TimeSeriesItem> i = timeSeries.iterator();
         TimeSeriesItem itemOne = i.next();
         TimeSeriesItem itemTwo = i.next();
         assertTrue(
-                sleepPeriod.getLengthInMillis() - JTimeSeriesTestConstants.TIMER_INACCURACY_MS <= itemOne.longValue() &&
-                sleepPeriod.getLengthInMillis() + JTimeSeriesTestConstants.TIMER_INACCURACY_MS >=  itemOne.longValue()
+            sleepPeriod.getLengthInMillis() - JTimeSeriesTestConstants.TIMER_INACCURACY_MS <= itemOne.longValue() &&
+            sleepPeriod.getLengthInMillis() + JTimeSeriesTestConstants.TIMER_INACCURACY_MS >=  itemOne.longValue()
         );
         assertTrue(
-                sleepPeriod.getLengthInMillis() - JTimeSeriesTestConstants.TIMER_INACCURACY_MS <= itemTwo.longValue() &&
-                sleepPeriod.getLengthInMillis() + JTimeSeriesTestConstants.TIMER_INACCURACY_MS >=  itemTwo.longValue()
+            sleepPeriod.getLengthInMillis() - JTimeSeriesTestConstants.TIMER_INACCURACY_MS <= itemTwo.longValue() &&
+            sleepPeriod.getLengthInMillis() + JTimeSeriesTestConstants.TIMER_INACCURACY_MS >=  itemTwo.longValue()
         );
     }
 
@@ -90,6 +121,34 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
             Thread.sleep(timeToSleep + 10); //allow
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+     /**
+     * A mechanism which allows us to wait until the scheduler has triggered all of the
+     * timed captures for the sources we are interested in
+     */
+    protected static class WaitForEndOfCapturePeriodListener extends CaptureAdapter {
+
+        private volatile CountDownLatch countDownLatch;
+        private final int captureCount;
+
+        public WaitForEndOfCapturePeriodListener(int captureCount) {
+            this.captureCount = captureCount;
+            this.countDownLatch = new CountDownLatch(captureCount);
+        }
+
+         public void captureTriggered(Capture source) {
+            countDownLatch.countDown();
+        }
+
+        public void waitForAll() {
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            countDownLatch = new CountDownLatch(captureCount);
         }
     }
 }

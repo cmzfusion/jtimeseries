@@ -75,6 +75,21 @@ public abstract class AbstractCapture extends IdentifiableBase implements Captur
         });
     }
 
+    //Calling this will change the state and place a state change event on the event processing queue
+    //Calling this while holding a state change lock is expected - this will guarantee the order of events
+    //and doing the actual event processing on a subthread should gurantee we don't hold the lock for long
+    protected void fireTriggerEvent() {
+        Executor e = TimeSeriesExecutorFactory.getExecutorForCaptureEvents(this);
+        e.execute(new Runnable() {
+            public void run() {
+                CaptureListener[] snapshot = getListenerSnapshot();
+                for ( CaptureListener l : snapshot) {
+                    l.captureTriggered(AbstractCapture.this);
+                }
+            }
+        });
+    }
+
     private CaptureListener[] getListenerSnapshot() {
         CaptureListener[] snapshot;
         synchronized (captureListeners) {

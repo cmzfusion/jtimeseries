@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * a value source, a capture (timed or otherwise) and a time series within the context in one method call. This
  * class handles the creation of all of those items.
  */
-public class SourceCaptureAndSeriesCreator {
+class SourceCaptureAndSeriesCreator {
 
     private TimeSeriesContext timeSeriesContext;
     protected static AtomicLong captureUniqueId = new AtomicLong(0);

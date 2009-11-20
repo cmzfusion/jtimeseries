@@ -60,7 +60,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
  *   This solves the problem where we are 'started' half way through a scheduler time period, for schedulers
  *   which are already running and which group and execute together all captures with the same period
  */
-public class DefaultTimedCaptureFromSource extends AbstractCapture implements TimedCapture, ValueSourceCapture {
+public class DefaultTimedCapture extends AbstractCapture implements TimedCapture, ValueSourceCapture {
 
     private static AggregateFunction DUMMY_FUNCTION = new DummyFunction();
     private CaptureFunction captureFunction;
@@ -68,7 +68,7 @@ public class DefaultTimedCaptureFromSource extends AbstractCapture implements Ti
     private final Object functionLock = new Object();
     public ValueSourceListener valueListener;
 
-    public DefaultTimedCaptureFromSource(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
+    public DefaultTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         super(id, "Capture " + captureFunction.getDescription() + " to timeSeries " + timeSeries.getId() + " from " + source.getId() + " every " + captureFunction.getCapturePeriod(), timeSeries, source);
         this.captureFunction = captureFunction;
     }
@@ -80,7 +80,8 @@ public class DefaultTimedCaptureFromSource extends AbstractCapture implements Ti
     public void triggerCapture(long timestamp) {
         AggregateFunction oldFunctionInstance;
 
-        //hold the lock while we switch functions
+        //hold the lock while we switch functions, so that the current function becomes a new instance but we
+        //keep a reference to the old, which contains any values collected during the last period
         synchronized (functionLock) {
             oldFunctionInstance = this.function;
             function = getCaptureFunction().getFunctionInstance();
@@ -90,6 +91,9 @@ public class DefaultTimedCaptureFromSource extends AbstractCapture implements Ti
                 changeStateAndFireEvent(CaptureState.STARTED);    
             }
         }
+
+        //fire an event to tell observers this timed capture has been triggered by the scheduler
+        fireTriggerEvent();
 
         //do the aggregate calculation on the old function instance, while we are not holding the functionlock
         //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed

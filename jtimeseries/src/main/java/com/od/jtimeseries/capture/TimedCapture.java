@@ -29,5 +29,8 @@ public interface TimedCapture extends Capture {
 
     long getCapturePeriodInMilliseconds();
 
+    /**
+     * Called by the scheduler when the Capture is in STARTING or STARTED state
+     */
     void triggerCapture(long timestamp);
 }

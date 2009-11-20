@@ -1,11 +1,11 @@
 package com.od.jtimeseries.fixture;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.util.JTimeSeriesTestConstants;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.capture.impl.DefaultCaptureScheduler;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
+import com.od.jtimeseries.source.ValueSource;
 
 import org.junit.Test;
 
@@ -20,6 +20,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
     
     private TimeSeriesContext childContext;
     private TimeSeriesContext childContext2;
+
 
     protected void doExtraSetUp() {
         childContext = rootContext.createChildContext("child1");
@@ -44,7 +45,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
         //the new scheduler should now own the eventTimer capture
         assertTrue(childContext2.getScheduler().containsCapture(
-                childContext2.findCaptures(eventTimer).getFirstMatch())
+            childContext2.findCaptures(eventTimer).getFirstMatch())
         );
 
         testCapture();
@@ -52,23 +53,26 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
 
     private void testCapture() {
+        WaitForEndOfCapturePeriodListener countDownListener = getCapturePeriodListener();
         rootContext.startScheduling().startDataCapture();
-        long startTime = System.currentTimeMillis();
-        sleep(JTimeSeriesTestConstants.periodToWaitForFirstScheduledTimePeriodToStart);
 
+        //wait for each capture to trigger, so that we are in the first capture period, and record some values
+        countDownListener.waitForAll();
         counter.incrementCount();
         valueRecorder.newValue(10);
         eventTimer.startEventTimer();
         sleep(sleepPeriod);
         eventTimer.stopEventTimer();
-        sleepUntilCapturePeriodOver(capturePeriod, startTime);
 
+        //wait for the next capture period to start (after which the values we recorded in the first period
+        //should have been committed and then stop the scheduling
+        countDownListener.waitForAll();
         rootContext.stopDataCapture().stopScheduling();
 
+        //we should then have recorded one value in each series
         for ( IdentifiableTimeSeries s : rootContext.findAllTimeSeries().getAllMatches()) {
             assertEquals(1, s.size());
         }
     }
-
 
 }

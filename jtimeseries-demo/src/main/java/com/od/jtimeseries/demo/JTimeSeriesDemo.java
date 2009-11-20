@@ -54,7 +54,7 @@ public class JTimeSeriesDemo {
 
     private static void demo1() throws IOException {
         
-        SwingbenchMainFrame frame = new SwingbenchMainFrame();
+        DemoMainFrame frame = new DemoMainFrame();
 
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
 
@@ -136,9 +136,10 @@ public class JTimeSeriesDemo {
         }).start();
     }
 
-    public static class SwingbenchMainFrame extends JFrame {
+    public static class DemoMainFrame extends JFrame {
 
-        public SwingbenchMainFrame() {
+        public DemoMainFrame() {
+            super("JTimeseries Demo");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         }
 

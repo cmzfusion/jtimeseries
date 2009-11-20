@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.timeseries;
+package com.od.jtimeseries.util;
+
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 
 import java.lang.ref.WeakReference;
 

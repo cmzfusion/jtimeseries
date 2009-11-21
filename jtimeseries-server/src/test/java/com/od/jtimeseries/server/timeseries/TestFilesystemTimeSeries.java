@@ -1,9 +1,10 @@
-package com.od.jtimeseries.server;
+package com.od.jtimeseries.server.timeseries;
 
 import com.od.jtimeseries.timeseries.impl.AbstractListTimeSeriesTest;
 import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
+import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.util.time.Time;
 

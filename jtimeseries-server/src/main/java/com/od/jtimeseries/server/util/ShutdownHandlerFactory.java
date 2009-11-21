@@ -22,7 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.HttpHandler;
 import com.od.jtimeseries.net.httpd.NanoHTTPD;
 import com.od.jtimeseries.net.httpd.TimeSeriesContextHandlerFactory;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ import java.util.Properties;
  */
 public class ShutdownHandlerFactory extends TimeSeriesContextHandlerFactory {
 
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(ShutdownHandlerFactory.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(ShutdownHandlerFactory.class);
     private List<ShutdownListener> shutdownListeners = Collections.synchronizedList(new ArrayList<ShutdownListener>());
     private ShutdownListener finalListener;
 
@@ -120,7 +120,7 @@ public class ShutdownHandlerFactory extends TimeSeriesContextHandlerFactory {
      */
     public static class SystemExitShutdownListener implements ShutdownListener {
 
-        private LogMethods logMethods = LogDefaults.getDefaultLogMethods(ShutdownHandlerFactory.class);
+        private LogMethods logMethods = LogUtils.getLogMethods(ShutdownHandlerFactory.class);
 
         public void shutdownNow() {
             logMethods.logInfo("Shutdown complete");

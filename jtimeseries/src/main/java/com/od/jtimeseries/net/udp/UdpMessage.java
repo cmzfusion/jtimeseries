@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.net.InetAddress;
@@ -37,7 +37,7 @@ public class UdpMessage extends Properties {
     public static final String MESSAGE_TYPE_PROPERTY = "MESSAGE_TYPE";
     public static final String SOURCE_INETADDRESS_KEY = "INETADDRESS";
     public static final String SOURCE_HOSTNAME_KEY = "INETHOST";
-    private static LogMethods logMethods = LogDefaults.getDefaultLogMethods(UdpMessage.class);
+    private static LogMethods logMethods = LogUtils.getLogMethods(UdpMessage.class);
 
     public UdpMessage(Properties p) {
         putAll(p);

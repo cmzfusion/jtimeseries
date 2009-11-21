@@ -19,7 +19,7 @@
 package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.TimePeriod;
 
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class UdpClient {
 
-    private final LogMethods logMethods = LogDefaults.getDefaultLogMethods(UdpClient.class);
+    private final LogMethods logMethods = LogUtils.getLogMethods(UdpClient.class);
     private final LimitedErrorLogger limitedLogger = new LimitedErrorLogger(logMethods, 5, 100);
     private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 

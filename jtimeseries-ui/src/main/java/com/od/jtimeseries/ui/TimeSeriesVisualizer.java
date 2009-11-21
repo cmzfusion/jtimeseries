@@ -31,7 +31,7 @@ import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JTimeseriesJideLicense;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import javax.swing.*;
@@ -55,7 +55,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private SeriesSelectionPanel seriesSelectionPanel;
     private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
     private RemoteServerDictionary remoteServerDictionary;
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(TimeSeriesVisualizer.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesVisualizer.class);
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     private final ChartControlPanel chartControlPanel = new ChartControlPanel();

@@ -21,7 +21,7 @@ package com.od.jtimeseries.server.serialization;
 import com.od.jtimeseries.server.timeseries.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -48,10 +48,10 @@ import java.util.Properties;
  */
 public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownListener {
 
-    private File rootDirectory;
-    private String timeSeriesFileSuffix;
+    private final File rootDirectory;
+    private final String timeSeriesFileSuffix;
     private final int BYTES_IN_HEADER_START = 20;
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(RoundRobinSerializer.class);
+    private final LogMethods logMethods = LogUtils.getLogMethods(RoundRobinSerializer.class);
     private final Object writeLock = new Object();
     private volatile boolean shutdown;
 
@@ -244,6 +244,10 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
         synchronized (writeLock) {
             shutdown = true;
         }
+    }
+
+    public File getRootDirectory() {
+        return rootDirectory;
     }
 
     private void doUpdateHeader(FileHeader fileHeader, File f) throws SerializationException {

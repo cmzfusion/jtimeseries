@@ -24,7 +24,7 @@ import com.od.jtimeseries.net.udp.RemoteHttpServer;
 import com.od.jtimeseries.net.udp.RemoteServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
@@ -61,7 +61,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private JTextField serverTextField = new JTextField();
     private ListSelectionActionModel<RemoteHttpServer> listSelectionActionModel = new ListSelectionActionModel<RemoteHttpServer>();
     private JButton downloadButton = new JButton(new DownloadAction());
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(SelectServerPanel.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(SelectServerPanel.class);
     private LoadSelectedSeriesCommand loadSelectedSeriesCommand = new LoadSelectedSeriesCommand();
     private TimeSeriesContext remoteSeriesContext;
     private DisplayNameCalculator displayNameCalculator;

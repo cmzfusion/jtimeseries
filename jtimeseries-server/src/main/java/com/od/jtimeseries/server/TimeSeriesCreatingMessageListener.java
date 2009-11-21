@@ -23,7 +23,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpMessage;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.util.HashSet;
@@ -40,7 +40,7 @@ class TimeSeriesCreatingMessageListener implements UdpServer.UdpMessageListener 
 
     private Set<String> contextPath = new HashSet<String>();
 
-    private LogMethods logMethod = LogDefaults.getDefaultLogMethods(TimeSeriesCreatingMessageListener.class);
+    private LogMethods logMethod = LogUtils.getLogMethods(TimeSeriesCreatingMessageListener.class);
     private TimeSeriesContext rootContext;
 
     public TimeSeriesCreatingMessageListener(TimeSeriesContext rootContext) {

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.server.util;
 
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.io.File;
@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FileReaper {
 
-    private static final LogMethods log = LogDefaults.getDefaultLogMethods(FileReaper.class);
+    private static final LogMethods log = LogUtils.getLogMethods(FileReaper.class);
     private static AtomicInteger id = new AtomicInteger();
 
     private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
@@ -105,25 +105,39 @@ public class FileReaper {
 
             File[] files = getFilesByModifiedDate();
 
-            long cumulativeSize = 0, reapCount = 0, reapFail = 0, matches = 0;
+            long currentFileLength = 0, cumulativeSize = 0, reapCount = 0, reapFail = 0, sizeDeletes = 0, ageDeletes = 0, countDeletes = 0, matches = 0;
             File currentFile;
             for ( int fileCount=0; fileCount < files.length; fileCount ++ ) {
                 currentFile = files[fileCount];
                 if ( pattern.matcher(currentFile.getName()).matches()) {
                     matches++;
                     log.logDebug("FileReaper " + name + "checking matching file " + currentFile);
-                    cumulativeSize += currentFile.length();
-                    if ( shouldDeleteFile(currentFile, fileCount, cumulativeSize)) {
+                    currentFileLength = currentFile.length();
+                    cumulativeSize += currentFileLength;
+                    ReaperAction a = shouldDeleteFile(currentFile, fileCount, cumulativeSize);
+                    if ( a != ReaperAction.NO_DELETE ) {
                         if ( currentFile.delete() ) {
                             reapCount++;
+                            switch(a) {
+                                case SIZE_DELETE : sizeDeletes ++; break;
+                                case AGE_DELETE : ageDeletes ++; break;
+                                case COUNT_DELETE : countDeletes ++ ; break;
+                            }
+                            //since we deleted the file, remove it from the cumulative size otherwise others
+                            //may get deleted unnecessarily.
+                            cumulativeSize -= currentFileLength;
                         } else {
                             reapFail++;
                         }
+
                     }
                 }
             }
 
             log.logInfo("FileReaper " + name + " deleted " + reapCount + " files out of " + matches + " matching candidates, failed to delete " + reapFail);
+            if ( reapCount > 0 )  {
+                log.logInfo("FileReaper " + name + " deleted " + sizeDeletes + " files due to exceeding cumulative file size " + maxCumulativeSize + ", " + ageDeletes + " due to timestamp more than " + maxAgeInMillis + " millis old, and " + countDeletes + " due to the max count of " + maxFileCount + " being exceeded");
+            }
         }
     }
 
@@ -139,11 +153,12 @@ public class FileReaper {
         return files;
     }
 
-    private boolean shouldDeleteFile(File file, int currentFileIndex, long cumulativeSize) {
-        boolean delete = (isDeleteByCumulativeFileSize() && cumulativeSize > maxCumulativeSize);
-        delete |= isDeleteByMaxCount() && currentFileIndex >= maxFileCount;
-        delete |= isDeleteByMaxAge() && System.currentTimeMillis() - file.lastModified() > maxAgeInMillis;
-        return delete;
+    private ReaperAction shouldDeleteFile(File file, int currentFileIndex, long cumulativeSize) {
+        ReaperAction result = ReaperAction.NO_DELETE;
+        result = (isDeleteByCumulativeFileSize() && cumulativeSize > maxCumulativeSize) ? ReaperAction.SIZE_DELETE : result;
+        result = isDeleteByMaxCount() && currentFileIndex >= maxFileCount ? ReaperAction.COUNT_DELETE : result;
+        result = isDeleteByMaxAge() && System.currentTimeMillis() - file.lastModified() > maxAgeInMillis ? ReaperAction.AGE_DELETE : result;
+        return result;
     }
 
     private boolean isDeleteByCumulativeFileSize() {
@@ -156,6 +171,13 @@ public class FileReaper {
 
     private boolean isDeleteByMaxCount() {
         return maxFileCount > 0;
+    }
+
+    private static enum ReaperAction {
+        NO_DELETE,
+        SIZE_DELETE,
+        AGE_DELETE,
+        COUNT_DELETE
     }
 
 }

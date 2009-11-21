@@ -27,7 +27,7 @@ import com.od.jtimeseries.timeseries.impl.WrappedTimeSeriesEventHandler;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.TimePeriod;
 
@@ -67,7 +67,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private WriteBehindCache writeBehindCache = new WriteBehindCache();
     private long lastTimestamp = -1;
     private long flushScheduled = Long.MAX_VALUE;
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(FilesystemTimeSeries.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
 
     public FilesystemTimeSeries(Identifiable parent, String id, String description, RoundRobinSerializer roundRobinSerializer, FileHeader fileHeader, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(parent, id, description);

@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server;
+package com.od.jtimeseries.server.serialization;
 
 import junit.framework.TestCase;
 
@@ -30,11 +30,15 @@ public class TestRoundRobinSerializer extends TestCase {
 
     private RoundRobinSerializer serializer;
     private FileHeader f = new FileHeader("test.path", "test series", 10000);
+    private boolean deleteScheduled;
 
     public void setUp() throws SerializationException {
         serializer = createTestSerializer();
         RoundRobinTimeSeries r = createTestSeries();
         serializer.serialize(f, r);
+
+        serializer.getFile(f).deleteOnExit();
+        serializer.getRootDirectory().deleteOnExit();        
     }
 
     public void testDeserialization() throws SerializationException {
@@ -180,6 +184,7 @@ public class TestRoundRobinSerializer extends TestCase {
                 throw new SerializationException("Failed to create test dir");
             }
         }
+        tmpDir.deleteOnExit();
         return new RoundRobinSerializer(tmpDir, ServerProperties.DEFAULT_TIMESERIES_SUFFIX);
     }
 

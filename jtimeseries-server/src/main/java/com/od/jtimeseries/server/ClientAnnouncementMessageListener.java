@@ -22,7 +22,7 @@ import com.od.jtimeseries.net.udp.ClientAnnouncementMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpMessage;
 import com.od.jtimeseries.net.udp.UdpServer;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.net.InetAddress;
@@ -38,7 +38,7 @@ import java.net.UnknownHostException;
 public class ClientAnnouncementMessageListener implements UdpServer.UdpMessageListener {
 
     private UdpClient clientToSendUdpServerAnnouncePings;
-    private LogMethods logMethod = LogDefaults.getDefaultLogMethods(ClientAnnouncementMessageListener.class);
+    private LogMethods logMethod = LogUtils.getLogMethods(ClientAnnouncementMessageListener.class);
 
     public ClientAnnouncementMessageListener(UdpClient clientToSendUdpServerAnnouncePings) {
         this.clientToSendUdpServerAnnouncePings = clientToSendUdpServerAnnouncePings;

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.server.util;
 
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class ServerProperties implements TimeSeriesServerConfig {
 
-    private static final LogMethods logMethods = LogDefaults.getDefaultLogMethods(ServerProperties.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(ServerProperties.class);
     private static final String DEFAULT_PROPERTY_FILE_PATH_PROPERTY = "PROPERTIES_FILE_PATH";
     private static final String DEFAULT_PROPERTY_FILE_PATH = "/jtimeseries-server.properties";
 

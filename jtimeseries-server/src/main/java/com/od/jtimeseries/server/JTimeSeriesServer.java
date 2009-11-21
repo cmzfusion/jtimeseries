@@ -32,7 +32,7 @@ import com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory;
 import com.od.jtimeseries.server.util.ServerProperties;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
@@ -53,16 +53,16 @@ public class JTimeSeriesServer {
 
     private static TimeSeriesServerConfig config;
 
-    //this log methods needs to be non-static so that we can configure the logging statically before it's created
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(JTimeSeriesServer.class);
-    private File seriesDirectory;
-    private UdpClient udpClient;
-
     static {
         //Load the properties for this server instance
         config = new ServerProperties();
         configureLogging();
     }
+
+    //this log methods needs to be non-static so that we can configure the logging statically before it's created
+    private LogMethods logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
+    private File seriesDirectory;
+    private UdpClient udpClient;
 
     public JTimeSeriesServer() throws IOException {
         startup();
@@ -150,13 +150,13 @@ public class JTimeSeriesServer {
             File logFile = new File(f, config.getLogFileName());
 
             //set the Logging up to use java util logging with log file handler
-            LogDefaults.setLogMethodFactory(
+            LogUtils.setLogMethodFactory(
                 new JavaUtilLoggingLogMethodsFactory(
-                    logFile, config.getLogLevel(), config.getMaxLogFileSizeBytes(), config.getMaxFileCount()
+                    logFile, config.getLogLevel(), config.getMaxLogFileSizeBytes(), config.getMaxLogFileCount()
                 )
             );
         } else {
-            LogDefaults.getDefaultLogMethods(JTimeSeriesServer.class).logInfo(
+            LogUtils.getLogMethods(JTimeSeriesServer.class).logInfo(
                     "Cannot write to directory for logfile path " + f.getAbsolutePath() +
                     ". Will log to standard out"
             );

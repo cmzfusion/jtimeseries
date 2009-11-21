@@ -23,8 +23,14 @@ package com.od.jtimeseries.util.logging;
  * User: Nick Ebbutt
  * Date: 12-Jan-2009
  * Time: 10:30:43
+ *
+ * JTimeseries classes get a LogMethods instance through LogUtils, to decouple them from any specific logging implementation
+ *
+ * In general, applications using jtimeseries library may wish the logging to be done via their usual logging provider (e.g. log4j)
+ * To accomplish this you need to set the LogMethodsFactory on this class on application startup, and make it create/return approprite
+ * LogMethods implementations, which delegate to your logger utilities implementation.
  */
-public class LogDefaults {
+public class LogUtils {
 
     private static volatile LogMethods defaultLogMethods = new StandardOutputLogMethods();
 
@@ -34,16 +40,16 @@ public class LogDefaults {
         }
     };
 
-    public static LogMethods getDefaultLogMethods(Class c) {
-        return LogDefaults.logMethodsFactory.getLogMethods(c);
+    public static LogMethods getLogMethods(Class c) {
+        return LogUtils.logMethodsFactory.getLogMethods(c);
     }
 
     public static void setDefaultLogMethods(LogMethods defaultLogMethods) {
-        LogDefaults.defaultLogMethods = defaultLogMethods;
+        LogUtils.defaultLogMethods = defaultLogMethods;
     }
 
     public static void setLogMethodFactory(LogMethodsFactory logMethodFactory) {
-        LogDefaults.logMethodsFactory = logMethodFactory;
+        LogUtils.logMethodsFactory = logMethodFactory;
     }
 
     public static LogMethodsFactory getLogMethodsFactory() {

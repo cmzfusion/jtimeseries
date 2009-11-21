@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.query;
 
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.XMLReader;
@@ -35,7 +35,7 @@ import java.net.URL;
 public abstract class AbstractRemoteQuery {
 
     private URL url;
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(AbstractRemoteQuery.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(AbstractRemoteQuery.class);
 
     public URL getQueryUrl() {
         return url;

@@ -20,7 +20,7 @@ package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 
@@ -38,7 +38,7 @@ import java.util.concurrent.Executor;
  */
 abstract class AbstractListTimeSeries implements ListTimeSeries {
 
-    private static final LogMethods logMethods = LogDefaults.getDefaultLogMethods(AbstractListTimeSeries.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractListTimeSeries.class);
     private final OrderValidatingRandomAccessDeque series;
     private final TimeSeriesListenerSupport timeSeriesListenerSupport = new TimeSeriesListenerSupport();
 

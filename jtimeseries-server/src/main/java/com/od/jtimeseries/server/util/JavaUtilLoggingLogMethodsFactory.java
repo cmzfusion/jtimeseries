@@ -106,6 +106,7 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
             logger.setLevel(logLevel);
             if ( fileHandler != null) {
                 logger.addHandler(fileHandler);
+                logger.setUseParentHandlers(false);
             }
         }
 

@@ -19,7 +19,7 @@
 package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.io.ByteArrayInputStream;
@@ -54,7 +54,7 @@ public class UdpServer {
     private Thread receiveThread;
 
     public UdpServer(int port) {
-        this(LogDefaults.getDefaultLogMethods(UdpServer.class), port);
+        this(LogUtils.getLogMethods(UdpServer.class), port);
     }
 
     public UdpServer(LogMethods log, int port) {

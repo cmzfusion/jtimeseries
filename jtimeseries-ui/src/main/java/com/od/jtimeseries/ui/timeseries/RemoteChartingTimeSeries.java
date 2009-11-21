@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.ui.query.DownloadRemoteTimeSeriesDataQuery;
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -61,7 +61,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
     private int MIN_REFRESH_TIME_SECONDS = 10;
     private URL timeSeriesUrl;
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(RemoteChartingTimeSeries.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(RemoteChartingTimeSeries.class);
     private boolean selected;
     private List<String> pathElements;
     private long startOfDay = calcStartOfDay();

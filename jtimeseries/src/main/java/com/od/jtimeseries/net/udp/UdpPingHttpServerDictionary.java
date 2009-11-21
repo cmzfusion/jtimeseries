@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
-import com.od.jtimeseries.util.logging.LogDefaults;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.net.UnknownHostException;
@@ -33,7 +33,7 @@ import java.util.*;
 public class UdpPingHttpServerDictionary implements RemoteServerDictionary, UdpServer.UdpMessageListener {
 
     private final Set<RemoteHttpServer> serverSet = Collections.synchronizedSet(new TreeSet<RemoteHttpServer>());
-    private LogMethods logMethods = LogDefaults.getDefaultLogMethods(UdpPingHttpServerDictionary.class);
+    private LogMethods logMethods = LogUtils.getLogMethods(UdpPingHttpServerDictionary.class);
 
     public List<RemoteHttpServer> getKnownTimeSeriesServer() {
         ArrayList<RemoteHttpServer> servers = new ArrayList<RemoteHttpServer>();

@@ -73,7 +73,7 @@ public class TestFileReaper extends TestCase {
     }
 
     public void testReaperDeleteByTimestampAllFilesNew() throws IOException {
-        FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 100);
+        FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 1000);
         r.reap();
         assertEquals(10, getFileCount());
     }
@@ -174,8 +174,18 @@ public class TestFileReaper extends TestCase {
             ra.seek(size - 1);
             ra.write(1);
             ra.close();
+            assertTrue(f.exists());
             assertEquals(f.length(), size);
             filesToCleanUp.add(f);
+
+            //here we need to add a sleep becuase otherwise the files may end up with the same
+            //last modified timestamp due to lack of granularity with the system clock
+            //Our tests depend on ordering of timestamps
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         filesToCleanUp.add(reaperTestDir);
     }

@@ -55,10 +55,12 @@ public class StandardOutputLogMethods implements LogMethods {
     }
 
     public void logError(String s) {
+        System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);        
         System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
     }
 
     public void logError(String s, Throwable t) {
+        System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
         System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
         t.printStackTrace();
     }

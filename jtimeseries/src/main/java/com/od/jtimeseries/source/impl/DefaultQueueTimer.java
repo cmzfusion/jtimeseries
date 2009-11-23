@@ -72,8 +72,8 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.getParentPath();
     }
 
-    public String getContextPath() {
-        return timingSource.getContextPath();
+    public String getPath() {
+        return timingSource.getPath();
     }
 
     public Identifiable getParent() {

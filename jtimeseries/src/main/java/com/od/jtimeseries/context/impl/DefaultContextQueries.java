@@ -222,7 +222,7 @@ public class DefaultContextQueries implements ContextQueries {
         Pattern p = Pattern.compile(searchPattern);
         List<E> result = new ArrayList<E>();
         for ( E i : identifiables) {
-            if ( p.matcher(i.getContextPath()).find() ) {
+            if ( p.matcher(i.getPath()).find() ) {
                 result.add(i);
             }
         }

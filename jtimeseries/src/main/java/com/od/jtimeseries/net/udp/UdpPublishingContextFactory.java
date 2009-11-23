@@ -81,7 +81,7 @@ public class UdpPublishingContextFactory extends DefaultContextFactory {
             long time = System.currentTimeMillis();
             if ( e.getItems().size() == 1 && (time - lastSentTime) > MIN_DATAGRAM_SEND_INTERVAL) {
                 udpClient.sendMessage(new TimeSeriesValueMessage(
-                        i.getContextPath(),
+                        i.getPath(),
                         i.getDescription(),
                         e.getItems().get(0)
                 ));

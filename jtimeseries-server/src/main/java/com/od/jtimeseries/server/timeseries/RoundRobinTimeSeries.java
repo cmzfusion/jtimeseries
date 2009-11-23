@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
@@ -37,6 +38,9 @@ import java.util.Collection;
  * items to drop off.
  */
 public class RoundRobinTimeSeries extends DefaultTimeSeries {
+
+    //count maintained to show how many series have been released for gc
+    public static volatile Counter garbageCollectionCounter;
 
     private int maxSize;
 
@@ -106,5 +110,22 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
 
     public int getMaxSize() {
         return maxSize;
+    }
+
+    public static void setGarbageCollectionCounter(Counter c) {
+        garbageCollectionCounter = c;
+    }
+
+    public void finalize() throws Throwable {
+        super.finalize();
+        try {
+            if ( garbageCollectionCounter != null) {
+                garbageCollectionCounter.incrementCount();
+            }
+        } catch (Throwable t) {
+            //to be double safe, catch all throwable here, since we don't ever want to risk
+            //preventing gc
+            t.printStackTrace();
+        }
     }
 }

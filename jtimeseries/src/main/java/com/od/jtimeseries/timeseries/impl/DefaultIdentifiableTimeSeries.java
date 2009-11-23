@@ -179,7 +179,7 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
     }
 
     public String toString() {
-        return "TimeSeries " + getContextPath();
+        return "TimeSeries " + getPath();
     }
 
 }

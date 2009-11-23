@@ -32,6 +32,7 @@ import com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory;
 import com.od.jtimeseries.server.util.ServerProperties;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
+import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
@@ -85,6 +86,10 @@ public class JTimeSeriesServer {
         seriesDirectoryManager.removeOldTimeseriesFiles();
         seriesDirectoryManager.loadExistingSeries();
 
+        logMethods.logInfo("Setting up server metrics series");
+        ServerMetricInitializer s = new ServerMetricInitializer(config, rootContext, roundRobinSerializer);
+        s.initializeServerMetrics();
+
         logMethods.logInfo("Creating UDP client");
         udpClient = new UdpClient();
 
@@ -110,6 +115,9 @@ public class JTimeSeriesServer {
 
         logMethods.logInfo("Starting JMX Interface");
         startJmx();
+
+        //start scheduling for any series (e.g server metrics) which require it
+        rootContext.startScheduling().startDataCapture();
 
         config.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
         logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + config.getSecondsToStartServer() + " seconds");

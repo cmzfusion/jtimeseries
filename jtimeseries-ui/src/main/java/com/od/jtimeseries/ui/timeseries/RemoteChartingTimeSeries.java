@@ -114,7 +114,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
     public String getDisplayName() {
         if ( displayName == null ) {
-            setDisplayName(getContextPath());
+            setDisplayName(getPath());
         }
         return displayName;
     }

@@ -63,13 +63,13 @@ public class IdentifiableBase implements Identifiable {
             if ( parent == null) {
                 result = ""; //root context has no id in namespace path
             } else {
-                result = parent.getContextPath();
+                result = parent.getPath();
             }
             return result;
         }
     }
 
-    public String getContextPath() {
+    public String getPath() {
         synchronized (getTreeLock()) {
             StringBuilder path = new StringBuilder(getParentPath());
             if ( path.length() > 0) {

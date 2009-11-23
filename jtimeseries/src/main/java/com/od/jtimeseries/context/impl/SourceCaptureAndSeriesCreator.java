@@ -124,7 +124,7 @@ class SourceCaptureAndSeriesCreator {
 
     private IdentifiableTimeSeries createTimeSeries(String id, String description, CaptureFunction f) {
         return timeSeriesContext.getTimeSeriesFactory().createTimeSeries(
-                timeSeriesContext.getContextPath(),
+                timeSeriesContext.getPath(),
                 id + " " + f.getDescription(),
                 description + " " + f.getDescription() + " every " + f.getCapturePeriod()
         );
@@ -132,7 +132,7 @@ class SourceCaptureAndSeriesCreator {
 
     private IdentifiableTimeSeries creatRawValuesTimeSeries(String id, String description) {
         return timeSeriesContext.getTimeSeriesFactory().createTimeSeries(
-                timeSeriesContext.getContextPath(),
+                timeSeriesContext.getPath(),
                 id,
                 description
         );

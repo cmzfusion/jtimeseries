@@ -62,8 +62,8 @@ public class DefaultCounter implements Counter {
         return simpleSource.getParentPath();
     }
 
-    public String getContextPath() {
-        return simpleSource.getContextPath();
+    public String getPath() {
+        return simpleSource.getPath();
     }
 
     public String getDescription() {

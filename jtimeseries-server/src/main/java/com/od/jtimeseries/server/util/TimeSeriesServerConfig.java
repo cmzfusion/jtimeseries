@@ -129,6 +129,11 @@ public interface TimeSeriesServerConfig {
     
     String getLogLevel();
 
+    /**
+     * @return a path for the context used to store the jtimeseries-server's own metrics
+     */
+    String getServerMetricsContextPath();
+
 
     void writeAllConfigPropertiesToLog(LogMethods logMethods);
 }

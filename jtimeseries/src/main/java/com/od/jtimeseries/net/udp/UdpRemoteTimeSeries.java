@@ -59,7 +59,7 @@ public class UdpRemoteTimeSeries extends DefaultIdentifiableTimeSeries {
             lastTimestamp = value.getTimestamp();
             result = true;
             udpClient.sendMessage(
-                    new TimeSeriesValueMessage(getContextPath(), getDescription(), value)
+                    new TimeSeriesValueMessage(getPath(), getDescription(), value)
             );
         }
         return result;

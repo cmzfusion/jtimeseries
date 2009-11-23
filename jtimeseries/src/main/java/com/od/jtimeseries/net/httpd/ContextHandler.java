@@ -90,7 +90,7 @@ public class ContextHandler extends AbstractHandler {
         builder.append("\n<").append(ElementName.context);
         builder.append(" ").append(AttributeName.contextUrl).append("=\"").append(createUrlForIdentifiable(c)).append("\"");
         builder.append(" ").append(AttributeName.id).append("=\"").append(encodeXml(c.getId())).append("\"");
-        builder.append(" ").append(AttributeName.contextPath).append("=\"").append(encodeXml(c.getContextPath())).append("\"");
+        builder.append(" ").append(AttributeName.contextPath).append("=\"").append(encodeXml(c.getPath())).append("\"");
         builder.append(" ").append(AttributeName.description).append("=\"").append(encodeXml(c.getDescription())).append("\"");
         if ( c == contextForRequest) {
             builder.append(" ").append(AttributeName.selected).append("=\"true\"");

@@ -20,6 +20,7 @@ package com.od.jtimeseries.server.util;
 
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogMethodsFactory;
+import com.od.jtimeseries.util.logging.StandardOutputLogMethods;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,6 +101,7 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
     private class JavaUtilLoggingLogMethod implements LogMethods {
 
         private Logger logger;
+        private LogMethods standardOutMethods = new StandardOutputLogMethods();
 
         public JavaUtilLoggingLogMethod(String className) {
             logger = Logger.getLogger(className);
@@ -111,30 +113,37 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         }
 
         public void logInfo(String s) {
+            standardOutMethods.logInfo(s);
             logger.log(Level.INFO, s);
         }
 
         public void logDebug(String s) {
+            standardOutMethods.logDebug(s);
             logger.log(Level.FINEST, s);
         }
 
         public void logDebug(String s, Throwable t) {
+            standardOutMethods.logDebug(s, t);
             logger.log(Level.FINEST, s, t);
         }
 
         public void logWarning(String s) {
+            standardOutMethods.logWarning(s);
             logger.log(Level.WARNING, s);
         }
 
         public void logWarning(String s, Throwable t) {
+            standardOutMethods.logWarning(s, t);
             logger.log(Level.WARNING, s, t);
         }
 
         public void logError(String s) {
+            standardOutMethods.logError(s);
             logger.log(Level.SEVERE, s);
         }
 
         public void logError(String s, Throwable t) {
+            standardOutMethods.logError(s, t);
             logger.log(Level.SEVERE, s, t);
         }
     }

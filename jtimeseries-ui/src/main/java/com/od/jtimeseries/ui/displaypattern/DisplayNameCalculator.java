@@ -49,7 +49,7 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
     }
 
     public void setDisplayName(RemoteChartingTimeSeries s) {
-        String path = s.getContextPath();
+        String path = s.getPath();
         String displayName = s.getId();
         for (DisplayNamePattern p : patternMap.keySet()) {
             Matcher m = patternMap.get(p).matcher(path);

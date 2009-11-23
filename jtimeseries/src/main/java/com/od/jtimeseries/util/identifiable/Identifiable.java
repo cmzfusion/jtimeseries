@@ -36,7 +36,7 @@ public interface Identifiable {
     /**
      * @return fully qualified namespace and id
      */
-    String getContextPath();
+    String getPath();
 
     void setDescription(String description);
 

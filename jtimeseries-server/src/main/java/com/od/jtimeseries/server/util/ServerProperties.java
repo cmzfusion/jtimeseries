@@ -99,6 +99,9 @@ public class ServerProperties implements TimeSeriesServerConfig {
     private static final String LOG_LEVEL_PROPERTY = "LOG_LEVEL";
     private static final String DEFAULT_LOG_LEVEL = "INFO";
 
+    private static final String SERVER_METRICS_CONTEXT_PATH_PROPERTY = "SERVER_CONTEXT_PATH";
+    private static final String DEFAULT_SERVER_METRICS_CONTEXT_PATH = "jtimeseries-server";
+
     private static int secondsToStartServer;
 
     //set the default properties when class loaded
@@ -137,6 +140,7 @@ public class ServerProperties implements TimeSeriesServerConfig {
         checkSetProperty(MAX_LOG_FILE_SIZE_BYTES_PROPERTY, DEFAULT_MAX_LOG_FILE_SIZE_BYTES);
         checkSetProperty(MAX_LOG_FILE_COUNT_PROPERTY, DEFAULT_MAX_LOG_FILE_COUNT);
         checkSetProperty(LOG_LEVEL_PROPERTY, DEFAULT_LOG_LEVEL);
+        checkSetProperty(SERVER_METRICS_CONTEXT_PATH_PROPERTY, DEFAULT_SERVER_METRICS_CONTEXT_PATH);
     }
 
     private static void checkSetProperty(String property, String value) {
@@ -237,6 +241,10 @@ public class ServerProperties implements TimeSeriesServerConfig {
 
     public String getLogLevel() {
         return System.getProperty(LOG_LEVEL_PROPERTY.toUpperCase());
+    }
+
+    public String getServerMetricsContextPath() {
+        return System.getProperty(SERVER_METRICS_CONTEXT_PATH_PROPERTY);
     }
 
     private static String getHostname() {

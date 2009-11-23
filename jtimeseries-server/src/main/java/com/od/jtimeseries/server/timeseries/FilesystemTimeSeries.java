@@ -68,6 +68,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private long lastTimestamp = -1;
     private long flushScheduled = Long.MAX_VALUE;
     private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
+    private volatile boolean persistenceStopped = false;
 
     public FilesystemTimeSeries(Identifiable parent, String id, String description, RoundRobinSerializer roundRobinSerializer, FileHeader fileHeader, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(parent, id, description);
@@ -102,6 +103,20 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         } else {
             return true;
         }
+    }
+
+    /**
+     * Stop persistence for this Filesystem times series
+     */
+    public synchronized void stopPersistence() {
+        persistenceStopped = true;
+    }
+
+    /**
+     * @return is persistence stopped
+     */
+    public boolean isPersistenceStopped() {
+        return persistenceStopped;
     }
 
     /**
@@ -385,6 +400,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return getRoundRobinSeries().getFirstItemAtOrAfter(timestamp);
     }
 
+    public FileHeader getFileHeader() {
+        return fileHeader;
+    }
+
     public void addTimeSeriesListener(TimeSeriesListener l) {
         timeSeriesEventHandler.addTimeSeriesListener(l);
     }
@@ -453,23 +472,25 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
 
         public synchronized void flush() {
-            try {
-                if ( roundRobinSeries != null) {
-                    //we have a local series which contains other changes, as well as possibly some appends
-                    roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
-                } else {
-                    //only changes are appends
-                    roundRobinSerializer.append(fileHeader, items);
+            if ( ! persistenceStopped) {
+                try {
+                    if ( roundRobinSeries != null) {
+                        //we have a local series which contains other changes, as well as possibly some appends
+                        roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
+                    } else {
+                        //only changes are appends
+                        roundRobinSerializer.append(fileHeader, items);
+                    }
+
+                    //clear cache if no exception / write succeeded
+                    //otherwise hold on to changes until we try the write again
+                    clearCache();
+
+                } catch (Throwable t) {
+                    logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying");
+                    logMethods.logDebug("Failed to write to timeseries file " + fileHeader, t);
+                    scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
                 }
-
-                //clear cache if no exception / write succeeded
-                //otherwise hold on to changes until we try the write again
-                clearCache();
-
-            } catch (Throwable t) {
-                logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying");
-                logMethods.logDebug("Failed to write to timeseries file " + fileHeader, t);
-                scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
             }
         }
 

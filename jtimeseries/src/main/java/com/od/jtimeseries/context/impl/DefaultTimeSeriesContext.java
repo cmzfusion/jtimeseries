@@ -349,7 +349,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public IdentifiableTimeSeries createTimeSeries(String id, String description) {
         synchronized (getTreeLock()) {
-            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(getContextPath() + "." + id, id, description);
+            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(getPath() + "." + id, id, description);
             addChild(i);
             return i;
         }

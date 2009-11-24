@@ -21,6 +21,8 @@ package com.od.jtimeseries.server.util;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -136,4 +138,7 @@ public interface TimeSeriesServerConfig {
 
 
     void writeAllConfigPropertiesToLog(LogMethods logMethods);
+
+
+    ScheduledExecutorService getServerMaintenanceExecutor();
 }

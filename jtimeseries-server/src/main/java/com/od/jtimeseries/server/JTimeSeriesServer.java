@@ -29,7 +29,7 @@ import com.od.jtimeseries.server.jmx.ServerConfigJmx;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory;
 import com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory;
-import com.od.jtimeseries.server.util.ServerProperties;
+import com.od.jtimeseries.server.util.DefaultServerConfig;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
 import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
@@ -56,7 +56,7 @@ public class JTimeSeriesServer {
 
     static {
         //Load the properties for this server instance
-        config = new ServerProperties();
+        config = new DefaultServerConfig();
         configureLogging();
     }
 
@@ -95,7 +95,7 @@ public class JTimeSeriesServer {
 
         logMethods.logInfo("Starting UDP Server");
         UdpServer udpServer = new UdpServer(config.getUdpServerPort());
-        udpServer.addUdpMessageListener(new TimeSeriesCreatingMessageListener(rootContext));
+        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext, config.getServerMaintenanceExecutor()));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
 
         logMethods.logInfo("Starting TimeSeries HTTPD Daemon");

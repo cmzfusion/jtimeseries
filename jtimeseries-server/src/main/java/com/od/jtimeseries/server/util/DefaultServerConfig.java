@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,9 +38,9 @@ import java.util.Map;
  * Time: 18:45:46
  * To change this template use File | Settings | File Templates.
  */
-public class ServerProperties implements TimeSeriesServerConfig {
+public class DefaultServerConfig implements TimeSeriesServerConfig {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(ServerProperties.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultServerConfig.class);
     private static final String DEFAULT_PROPERTY_FILE_PATH_PROPERTY = "PROPERTIES_FILE_PATH";
     private static final String DEFAULT_PROPERTY_FILE_PATH = "/jtimeseries-server.properties";
 
@@ -104,6 +106,8 @@ public class ServerProperties implements TimeSeriesServerConfig {
 
     private static int secondsToStartServer;
 
+    private ScheduledExecutorService serverMaintenanceExecutor = Executors.newSingleThreadScheduledExecutor();
+
     //set the default properties when class loaded
     static {
         //set the path for properties file if not already set
@@ -151,7 +155,7 @@ public class ServerProperties implements TimeSeriesServerConfig {
     }
 
     private static void loadPropertiesFromFile(String propertyFilePath) {
-        InputStream propertyStream = ServerProperties.class.getResourceAsStream(propertyFilePath);
+        InputStream propertyStream = DefaultServerConfig.class.getResourceAsStream(propertyFilePath);
         if (propertyStream != null) {
             try {
                 System.getProperties().load(propertyStream);
@@ -192,7 +196,7 @@ public class ServerProperties implements TimeSeriesServerConfig {
     }
 
     public void setSecondsToStartServer(int seconds) {
-        ServerProperties.secondsToStartServer = seconds;
+        DefaultServerConfig.secondsToStartServer = seconds;
     }
 
     public int getSecondsToStartServer() {
@@ -262,5 +266,9 @@ public class ServerProperties implements TimeSeriesServerConfig {
         for ( Map.Entry entry : System.getProperties().entrySet()) {
             logMethods.logInfo(entry.getKey() + "=" + entry.getValue());
         }
+    }
+
+    public ScheduledExecutorService getServerMaintenanceExecutor() {
+        return serverMaintenanceExecutor;
     }
 }

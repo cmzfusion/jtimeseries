@@ -17,7 +17,7 @@ import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.timeseries.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
-import com.od.jtimeseries.server.util.ServerProperties;
+import com.od.jtimeseries.server.util.DefaultServerConfig;
 
 /**
  * Created by IntelliJ IDEA.
@@ -185,7 +185,7 @@ public class TestRoundRobinSerializer extends TestCase {
             }
         }
         tmpDir.deleteOnExit();
-        return new RoundRobinSerializer(tmpDir, ServerProperties.DEFAULT_TIMESERIES_SUFFIX);
+        return new RoundRobinSerializer(tmpDir, DefaultServerConfig.DEFAULT_TIMESERIES_SUFFIX);
     }
 
     private void addNewItemsForTimestamps(List<TimeSeriesItem> s, long... timestampsForItems) {

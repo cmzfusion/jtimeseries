@@ -6,14 +6,12 @@ import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -32,15 +30,16 @@ public class ServerMetricInitializer {
     private RoundRobinSerializer roundRobinSerializer;
     private TimeSeriesContext metricsContext;
 
-    private ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
     private String metricsContextPath;
 
-    private List<ServerMetric> tasks = new ArrayList<ServerMetric>();
+    private List<ServerMetric> metrics = new ArrayList<ServerMetric>();
+    private ScheduledExecutorService scheduledExecutor;
 
     public ServerMetricInitializer(TimeSeriesServerConfig serverProperties, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer) {
         this.rootContext = rootContext;
         this.roundRobinSerializer = roundRobinSerializer;
         this.metricsContextPath = serverProperties.getServerMetricsContextPath();
+        this.scheduledExecutor = serverProperties.getServerMaintenanceExecutor();
         metricsContext = rootContext.getOrCreateContextForPath(metricsContextPath);
     }
 
@@ -50,11 +49,15 @@ public class ServerMetricInitializer {
     }
 
     private void createMetrics() {
-        tasks.add(new GarbageCollectedSeriesMetric());
+        metrics.add(new GarbageCollectedSeriesMetric());
+        metrics.add(new LiveSeriesMetric());
+        metrics.add(new UpdatesReceivedMetric());
+        metrics.add(new TotalSeriesCountMetric(rootContext));
+        metrics.add(new ServerMemoryMetric());
     }
 
     private void setupMetrics() {
-        for (ServerMetric t : tasks) {
+        for (ServerMetric t : metrics) {
             setupMetric(t);
             scheduleMetric(t);
         }

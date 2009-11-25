@@ -25,6 +25,8 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 
@@ -46,9 +48,10 @@ import java.util.concurrent.TimeUnit;
 */
 public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListener {
 
-    private static final int DELAY_BEFORE_SERIES_CONSIDERED_STALE = 1000 * 60 * 60; //one hour
-    private static volatile Counter seriesUpdateMessagesReceived;
-    private static volatile ValueRecorder liveSeriesValueRecorder;
+    public static final TimePeriod STALE_SERIES_DELAY = Time.hours(1);
+
+    private static volatile Counter updateMessagesReceivedCounter;
+    private static volatile ValueRecorder liveSeriesTotalValueRecorder;
 
     private final Map<String, Long> liveSeriesLastUpdateMap = new HashMap<String, Long>();
 
@@ -69,14 +72,14 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
                     Iterator<Map.Entry<String, Long>> i = liveSeriesLastUpdateMap.entrySet().iterator();
                     while(i.hasNext()) {
                         Map.Entry<String, Long> e = i.next();
-                        if ( currentTime - e.getValue() > DELAY_BEFORE_SERIES_CONSIDERED_STALE ) {
+                        if ( currentTime - e.getValue() > STALE_SERIES_DELAY.getLengthInMillis() ) {
                             logMethod.logInfo("Series " + e.getKey() + " has received no updates for one hour, " +
                                     "it is likely this series is no longer being published");
                             i.remove();
                         }
                     }
-                    if ( liveSeriesValueRecorder != null) {
-                        liveSeriesValueRecorder.newValue(liveSeriesLastUpdateMap.size());
+                    if ( liveSeriesTotalValueRecorder != null) {
+                        liveSeriesTotalValueRecorder.newValue(liveSeriesLastUpdateMap.size());
                     }
                 }
             }
@@ -95,8 +98,8 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
             TimeSeries s = rootContext.getOrCreateTimeSeriesForPath(v.getContextPath(), v.getDescription());
             s.append(v.getTimeSeriesItem());
 
-            if ( seriesUpdateMessagesReceived != null) {
-                seriesUpdateMessagesReceived.incrementCount();
+            if ( updateMessagesReceivedCounter != null) {
+                updateMessagesReceivedCounter.incrementCount();
             }
 
             synchronized (liveSeriesLastUpdateMap) {
@@ -112,11 +115,11 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
         }
     }
 
-    public static void setSeriesUpdateMessagesReceived(Counter seriesUpdateMessagesReceived) {
-        AppendToSeriesMessageListener.seriesUpdateMessagesReceived = seriesUpdateMessagesReceived;
+    public static void setUpdateMessagesReceivedCounter(Counter updateMessagesReceivedCounter) {
+        AppendToSeriesMessageListener.updateMessagesReceivedCounter = updateMessagesReceivedCounter;
     }
 
-    public static void setLiveSeriesValueRecorder(ValueRecorder liveSeriesValueRecorder) {
-        AppendToSeriesMessageListener.liveSeriesValueRecorder = liveSeriesValueRecorder;
+    public static void setLiveSeriesTotalValueRecorder(ValueRecorder liveSeriesTotalValueRecorder) {
+        AppendToSeriesMessageListener.liveSeriesTotalValueRecorder = liveSeriesTotalValueRecorder;
     }
 }

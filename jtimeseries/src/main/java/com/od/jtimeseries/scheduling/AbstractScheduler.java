@@ -16,10 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.capture.impl;
+package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureScheduler;
+import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
@@ -34,32 +33,32 @@ import java.util.concurrent.TimeUnit;
  * Date: 19-Feb-2009
  * Time: 16:13:01
  */
-public abstract class AbstractCaptureScheduler extends IdentifiableBase implements CaptureScheduler {
+public abstract class AbstractScheduler extends IdentifiableBase implements Scheduler {
 
-    private Set<TimedCapture> captures = Collections.synchronizedSet(new HashSet<TimedCapture>());
+    private Set<Triggerable> captures = Collections.synchronizedSet(new HashSet<Triggerable>());
     private boolean isStarted;
     private ScheduledExecutorService captureTimer;
     private int threadCount;
 
-    public AbstractCaptureScheduler(String id, String description, int threadCount) {
+    public AbstractScheduler(String id, String description, int threadCount) {
         super(id, description);
         this.threadCount = threadCount;
     }
 
-    public synchronized boolean addCapture(TimedCapture c) {
+    public synchronized boolean addTriggerable(Triggerable c) {
         return captures.add(c);
     }
 
-    public synchronized boolean removeCapture(TimedCapture c) {
+    public synchronized boolean removeTriggerable(Triggerable c) {
         return captures.remove(c);
     }
 
-    public boolean containsCapture(Capture c) {
-        return captures.contains(c);
+    public boolean containsTriggerable(Object c) {
+        return c instanceof Triggerable && captures.contains((Triggerable)c);
     }
 
-    public synchronized List<TimedCapture> getCaptures() {
-        return new ArrayList<TimedCapture>(captures);
+    public synchronized List<Triggerable> getTriggerables() {
+        return new ArrayList<Triggerable>(captures);
     }
 
     public synchronized boolean isStarted() {
@@ -103,7 +102,7 @@ public abstract class AbstractCaptureScheduler extends IdentifiableBase implemen
 
     private class CancelTimerTask implements Runnable {
         public void run() {
-            synchronized ( AbstractCaptureScheduler.this ) {
+            synchronized ( AbstractScheduler.this ) {
                 setStarted(false);
                 getScheduledExecutorService().shutdownNow();
             }

@@ -19,7 +19,7 @@
 package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
-import com.od.jtimeseries.capture.impl.DefaultCaptureScheduler;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -79,8 +79,8 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
         return new DefaultTimeSeriesFactory();
     }
 
-    protected DefaultCaptureScheduler createRootScheduler() {
-        return new DefaultCaptureScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler");
+    protected DefaultScheduler createRootScheduler() {
+        return new DefaultScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler");
     }
 
     protected DefaultContextFactory createRootContextFactory() {

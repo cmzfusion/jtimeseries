@@ -20,7 +20,7 @@ package com.od.jtimeseries.context;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
-import com.od.jtimeseries.capture.CaptureScheduler;
+import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
@@ -59,9 +59,9 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     Capture getCapture(String id);
 
-    CaptureScheduler getScheduler();
+    Scheduler getScheduler();
 
-    TimeSeriesContext setScheduler(CaptureScheduler captureScheduler);
+    TimeSeriesContext setScheduler(Scheduler scheduler);
 
     boolean isSchedulerStarted();
 

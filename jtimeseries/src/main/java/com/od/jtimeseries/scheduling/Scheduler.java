@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.capture;
+package com.od.jtimeseries.scheduling;
 
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.capture.Capture;
 
 import java.util.List;
 
@@ -28,18 +30,21 @@ import java.util.List;
  * Date: 18-Dec-2008
  * Time: 15:16:47
  */
-public interface CaptureScheduler extends Identifiable {
+public interface Scheduler extends Identifiable {
 
-    boolean addCapture(TimedCapture c);
+    boolean addTriggerable(Triggerable c);
 
-    boolean removeCapture(TimedCapture c);
+    boolean removeTriggerable(Triggerable c);
 
-    boolean containsCapture(Capture c);
+    /**
+     * @return true, if t implements Triggerable and is currently managed by the scheduler
+     */
+    boolean containsTriggerable(Object t);
 
     /**
      * @return a snapshot of the captures managed by this scheduler
      */
-    List<TimedCapture> getCaptures();
+    List<Triggerable> getTriggerables();
 
     boolean isStarted();
 

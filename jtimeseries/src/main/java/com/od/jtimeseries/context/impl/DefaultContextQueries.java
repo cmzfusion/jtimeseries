@@ -19,14 +19,14 @@
 package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureScheduler;
-import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.scheduling.Scheduler;
+import com.od.jtimeseries.scheduling.Triggerable;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -184,22 +184,22 @@ public class DefaultContextQueries implements ContextQueries {
         return new DefaultQueryResult<ValueSource>(valueSources);
     }
 
-    public QueryResult<CaptureScheduler> findAllSchedulers() {
-        List<CaptureScheduler> schedulers = new ArrayList<CaptureScheduler>();
-        addAllIdentifiableMatchingClassRecursive(schedulers, timeSeriesContext, CaptureScheduler.class);
-        return new DefaultQueryResult<CaptureScheduler>(schedulers);
+    public QueryResult<Scheduler> findAllSchedulers() {
+        List<Scheduler> schedulers = new ArrayList<Scheduler>();
+        addAllIdentifiableMatchingClassRecursive(schedulers, timeSeriesContext, Scheduler.class);
+        return new DefaultQueryResult<Scheduler>(schedulers);
     }
 
-    public QueryResult<CaptureScheduler> findSchedulers(String searchPattern) {
-        return new DefaultQueryResult<CaptureScheduler>(
+    public QueryResult<Scheduler> findSchedulers(String searchPattern) {
+        return new DefaultQueryResult<Scheduler>(
             findAllMatchingSearchPattern(searchPattern, findAllSchedulers().getAllMatches())
         );
     }
 
-    public QueryResult<CaptureScheduler> findSchedulers(TimedCapture capture) {
-        QueryResult<CaptureScheduler> result = findAllSchedulers();
-        for (CaptureScheduler c : result.getAllMatches()) {
-            if ( ! c.containsCapture(capture) ) {
+    public QueryResult<Scheduler> findSchedulers(Triggerable capture) {
+        QueryResult<Scheduler> result = findAllSchedulers();
+        for (Scheduler c : result.getAllMatches()) {
+            if ( ! c.containsTriggerable(capture) ) {
                 result.removeFromResults(c);
             }
         }

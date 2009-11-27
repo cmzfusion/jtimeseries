@@ -20,13 +20,13 @@ package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
-import com.od.jtimeseries.capture.CaptureScheduler;
-import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.scheduling.Scheduler;
+import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
@@ -91,8 +91,8 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         synchronized (getTreeLock()) {
             checkIdCharacters(identifiables);
             for ( Identifiable i : identifiables) {
-                if ( i instanceof CaptureScheduler ) {
-                    doSetScheduler((CaptureScheduler)i);
+                if ( i instanceof Scheduler) {
+                    doSetScheduler((Scheduler)i);
                 }
                 if ( i instanceof ValueSourceFactory) {
                     removeUniqueChildInstance(ValueSourceFactory.class);
@@ -106,8 +106,8 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
                 if ( i instanceof TimeSeriesFactory) {
                     removeUniqueChildInstance(TimeSeriesFactory.class);
                 }
-                if ( i instanceof TimedCapture ) {
-                    getScheduler().addCapture((TimedCapture)i);
+                if ( i instanceof Triggerable ) {
+                    getScheduler().addTriggerable((Triggerable)i);
                 }
                 if ( i instanceof Capture ) {
                     if (Boolean.parseBoolean(findProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY))) {
@@ -131,27 +131,27 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    private void doSetScheduler(CaptureScheduler captureScheduler) {
+    private void doSetScheduler(Scheduler scheduler) {
         synchronized (getTreeLock()) {
             if ( isSchedulerStarted() ) {
                 throw new UnsupportedOperationException("Cannot setScheduler while the existing scheduler is running");
             } else {
-                CaptureScheduler oldSchedulerForThisContext = removeUniqueChildInstance(CaptureScheduler.class);
+                Scheduler oldSchedulerForThisContext = removeUniqueChildInstance(Scheduler.class);
                 if (oldSchedulerForThisContext == null) {
                     oldSchedulerForThisContext = getScheduler();  //this context was using the parent scheduler
                 }
-                moveCapturesFromOldToNewScheduler(oldSchedulerForThisContext, captureScheduler);
+                moveTriggerablesFromOldToNewScheduler(oldSchedulerForThisContext, scheduler);
             }
         }
     }
 
     //If any capture from this context in the hierarchy downwards is assoicated with the old scheduler, remove it
     //and add it to the new scheduler
-    private void moveCapturesFromOldToNewScheduler(CaptureScheduler oldScheduler, CaptureScheduler newScheduler) {
-        for ( Capture c : findAllChildren(TimedCapture.class).getAllMatches()) {
-            if ( oldScheduler != null && oldScheduler.containsCapture(c)) {
-                oldScheduler.removeCapture((TimedCapture)c);
-                newScheduler.addCapture((TimedCapture)c);
+    private void moveTriggerablesFromOldToNewScheduler(Scheduler oldScheduler, Scheduler newScheduler) {
+        for ( Triggerable t : findAllChildren(Triggerable.class).getAllMatches()) {
+            if ( oldScheduler != null && oldScheduler.containsTriggerable(t)) {
+                oldScheduler.removeTriggerable(t);
+                newScheduler.addTriggerable(t);
             }
         }
     }
@@ -214,9 +214,9 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public CaptureScheduler getScheduler() {
+    public Scheduler getScheduler() {
         synchronized (getTreeLock()) {
-            CaptureScheduler result = getUniqueChild(CaptureScheduler.class);
+            Scheduler result = getUniqueChild(Scheduler.class);
             if ( result == null && ! isRoot() ) {
                 result = getParent().getScheduler();
             }
@@ -224,8 +224,8 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public TimeSeriesContext setScheduler(CaptureScheduler captureScheduler) {
-        addChild(captureScheduler);
+    public TimeSeriesContext setScheduler(Scheduler scheduler) {
+        addChild(scheduler);
         return this;
     }
 
@@ -238,7 +238,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public TimeSeriesContext startScheduling() {
         synchronized (getTreeLock()) {
-            for (CaptureScheduler s : findAllSchedulers().getAllMatches()) {
+            for (Scheduler s : findAllSchedulers().getAllMatches()) {
                 s.start();
             }
             return this;
@@ -247,7 +247,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public TimeSeriesContext stopScheduling() {
         synchronized (getTreeLock()) {
-            for (CaptureScheduler s : findAllSchedulers().getAllMatches()) {
+            for (Scheduler s : findAllSchedulers().getAllMatches()) {
                 s.stop();
             }
             return this;
@@ -499,21 +499,21 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public QueryResult<CaptureScheduler> findAllSchedulers() {
+    public QueryResult<Scheduler> findAllSchedulers() {
         synchronized (getTreeLock()) {
             return contextQueries.findAllSchedulers();
         }
     }
 
-    public QueryResult<CaptureScheduler> findSchedulers(String searchPattern) {
+    public QueryResult<Scheduler> findSchedulers(String searchPattern) {
         synchronized (getTreeLock()) {
             return contextQueries.findSchedulers(searchPattern);
         }
     }
 
-    public QueryResult<CaptureScheduler> findSchedulers(TimedCapture capture) {
+    public QueryResult<Scheduler> findSchedulers(Triggerable triggerable) {
         synchronized (getTreeLock()) {
-            return contextQueries.findSchedulers(capture);
+            return contextQueries.findSchedulers(triggerable);
         }
     }
 

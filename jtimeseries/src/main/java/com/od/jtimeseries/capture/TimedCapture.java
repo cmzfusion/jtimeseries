@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.capture;
 
+import com.od.jtimeseries.scheduling.Triggerable;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -25,12 +27,6 @@ package com.od.jtimeseries.capture;
  * Time: 22:36:11
  * To change this template use File | Settings | File Templates.
  */
-public interface TimedCapture extends Capture {
+public interface TimedCapture extends Capture, Triggerable {
 
-    long getCapturePeriodInMilliseconds();
-
-    /**
-     * Called by the scheduler when the Capture is in STARTING or STARTED state
-     */
-    void triggerCapture(long timestamp);
 }

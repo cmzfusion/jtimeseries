@@ -1,7 +1,7 @@
 package com.od.jtimeseries.context;
 
 import com.od.jtimeseries.capture.function.CaptureFunctions;
-import com.od.jtimeseries.capture.impl.DefaultCaptureScheduler;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.Counter;
@@ -42,57 +42,57 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewCapturesAreAssignedToRootScheduler() {
-        assertTrue(rootContext.getScheduler().containsCapture(rootContext.findCaptures(counter).getFirstMatch()));
-        assertTrue(rootContext.getScheduler().containsCapture(rootContext.findCaptures(childcounter).getFirstMatch()));
-        assertTrue(rootContext.getScheduler().containsCapture(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
+        assertTrue(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(counter).getFirstMatch()));
+        assertTrue(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(childcounter).getFirstMatch()));
+        assertTrue(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
     }
 
     @Test
     public void testNewSchedulerForGrandchildPicksUpTheGrandchildCaptures() {
-        grandchildContext.setScheduler(new DefaultCaptureScheduler("test", "test"));
+        grandchildContext.setScheduler(new DefaultScheduler("test", "test"));
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
-        assertFalse(rootContext.getScheduler().containsCapture(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
-        assertTrue(grandchildContext.getScheduler().containsCapture(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
+        assertFalse(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
+        assertTrue(grandchildContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
     }
 
     @Test
     public void testNewSchedulerForChildPicksUpTheChildAndGrandchildCapturesIfGranchildDoesNotHaveItsOwnScheduler() {
-        childContext.setScheduler(new DefaultCaptureScheduler("test", "test"));
+        childContext.setScheduler(new DefaultScheduler("test", "test"));
 
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
 
-        assertEquals(1, rootContext.getScheduler().getCaptures().size());
-        assertEquals(2, childContext.getScheduler().getCaptures().size());
-        assertEquals(2, grandchildContext.getScheduler().getCaptures().size());
+        assertEquals(1, rootContext.getScheduler().getTriggerables().size());
+        assertEquals(2, childContext.getScheduler().getTriggerables().size());
+        assertEquals(2, grandchildContext.getScheduler().getTriggerables().size());
 
-        assertTrue(rootContext.getScheduler().containsCapture(rootContext.findCaptures(counter).getFirstMatch()));
-        assertTrue(childContext.getScheduler().containsCapture(rootContext.findCaptures(childcounter).getFirstMatch()));
-        assertTrue(childContext.getScheduler().containsCapture(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
+        assertTrue(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(counter).getFirstMatch()));
+        assertTrue(childContext.getScheduler().containsTriggerable(rootContext.findCaptures(childcounter).getFirstMatch()));
+        assertTrue(childContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
     }
 
     @Test
     public void testSettingNewSchedulerForChildDoesNotPickUpGrandchildCapturesIfGrandchildHasItsOwnScheduler() {
-        grandchildContext.setScheduler(new DefaultCaptureScheduler("grandchildsched", "grandchildsched"));
-        childContext.setScheduler(new DefaultCaptureScheduler("childsched", "childsched"));
+        grandchildContext.setScheduler(new DefaultScheduler("grandchildsched", "grandchildsched"));
+        childContext.setScheduler(new DefaultScheduler("childsched", "childsched"));
 
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
         assertNotSame(grandchildContext.getScheduler(), childContext.getScheduler());
 
-        assertEquals(1, rootContext.getScheduler().getCaptures().size());
-        assertEquals(1, childContext.getScheduler().getCaptures().size());
-        assertEquals(1, grandchildContext.getScheduler().getCaptures().size());
+        assertEquals(1, rootContext.getScheduler().getTriggerables().size());
+        assertEquals(1, childContext.getScheduler().getTriggerables().size());
+        assertEquals(1, grandchildContext.getScheduler().getTriggerables().size());
 
-        assertTrue(rootContext.getScheduler().containsCapture(rootContext.findCaptures(counter).getFirstMatch()));
-        assertTrue(childContext.getScheduler().containsCapture(childContext.findCaptures(childcounter).getFirstMatch()));
-        assertTrue(grandchildContext.getScheduler().containsCapture(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
+        assertTrue(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(counter).getFirstMatch()));
+        assertTrue(childContext.getScheduler().containsTriggerable(childContext.findCaptures(childcounter).getFirstMatch()));
+        assertTrue(grandchildContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
     }
 
    @Test
     public void testStartAndStoppingSchedulingAffectsLocalSchedulerAndThoseForChildNodes() {
-        grandchildContext.setScheduler(new DefaultCaptureScheduler("grandchildsched", "grandchildsched"));
-        childContext.setScheduler(new DefaultCaptureScheduler("childsched", "childsched"));
+        grandchildContext.setScheduler(new DefaultScheduler("grandchildsched", "grandchildsched"));
+        childContext.setScheduler(new DefaultScheduler("childsched", "childsched"));
         childContext.startScheduling();
 
         assertFalse(rootContext.getScheduler().isStarted());

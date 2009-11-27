@@ -16,10 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.capture.impl;
-
-import com.od.jtimeseries.capture.CaptureState;
-import com.od.jtimeseries.capture.TimedCapture;
+package com.od.jtimeseries.scheduling;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -30,81 +27,81 @@ import java.util.concurrent.TimeUnit;
  * Date: 20-Jan-2009
  * Time: 13:59:32
  *
- * A scheduler which groups captures by capture period, so that all captures with the same period are executed togeter.
+ * A scheduler which groups by scheduling period, so that all triggerables with the same period are executed togeter.
  *
  * This may mean that captures added or started after the scheduler is running do not trigger immediately, leading to a delay
  * before values start to be recorded. This is becuase other captures in the same group by capture period may already be running,
  * and the timer for that group may be in mid-period.
  */
-public class GroupByCapturePeriodScheduler extends AbstractCaptureScheduler {
+public class GroupByPeriodScheduler extends AbstractScheduler {
 
-    private Map<Long, CaptureTimerTask> tasksByPeriod = Collections.synchronizedMap(new HashMap<Long,CaptureTimerTask>());
+    private Map<Long, TriggerableGroupTimerTask> tasksByPeriod = Collections.synchronizedMap(new HashMap<Long, TriggerableGroupTimerTask>());
 
-    public GroupByCapturePeriodScheduler(String id, String description) {
+    public GroupByPeriodScheduler(String id, String description) {
         this(id, description, 1);
     }
 
-    public GroupByCapturePeriodScheduler(String id, String description, int threadCount) {
+    public GroupByPeriodScheduler(String id, String description, int threadCount) {
         super(id, description, threadCount);
     }
 
-    public synchronized boolean addCapture(TimedCapture c) {
-        boolean added = super.addCapture(c);
+    public synchronized boolean addTriggerable(Triggerable t) {
+        boolean added = super.addTriggerable(t);
         if ( added) {
-            addToCaptureTimerTask(c);
+            addToCaptureTimerTask(t);
         }
         return added;
     }
 
-    public synchronized boolean removeCapture(TimedCapture c) {
-        boolean removed = super.removeCapture(c);
+    public synchronized boolean removeTriggerable(Triggerable t) {
+        boolean removed = super.removeTriggerable(t);
         if ( removed) {
-            removeFromCaptureTimerTask(c);
+            removeFromCaptureTimerTask(t);
         }
         return removed;
     }
 
     protected void doStart() {
-        for ( CaptureTimerTask t : tasksByPeriod.values()) {
+        for ( TriggerableGroupTimerTask t : tasksByPeriod.values()) {
             scheduleCaptureTask(t);
         }
     }
 
-    private void addToCaptureTimerTask(TimedCapture c) {
-        CaptureTimerTask t = tasksByPeriod.get(c.getCapturePeriodInMilliseconds());
-        if ( t == null ) {
-            t = new CaptureTimerTask(c.getCapturePeriodInMilliseconds());
-            tasksByPeriod.put(c.getCapturePeriodInMilliseconds(), t);
+    private void addToCaptureTimerTask(Triggerable t) {
+        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTriggerPeriod().getLengthInMillis());
+        if ( task == null ) {
+            task = new TriggerableGroupTimerTask(t.getTriggerPeriod().getLengthInMillis());
+            tasksByPeriod.put(t.getTriggerPeriod().getLengthInMillis(), task);
             if ( isStarted() ) {
-                scheduleCaptureTask(t);
+                scheduleCaptureTask(task);
             }
         }
-        t.addTimedCapture(c);
+        task.addTimedCapture(t);
     }
 
-    private void removeFromCaptureTimerTask(TimedCapture c) {
-        CaptureTimerTask t = tasksByPeriod.get(c.getCapturePeriodInMilliseconds());
-        t.removeTimedCapture(c);
+    private void removeFromCaptureTimerTask(Triggerable t) {
+        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTriggerPeriod().getLengthInMillis());
+        task.removeTimedCapture(t);
     }
 
-    private void scheduleCaptureTask(CaptureTimerTask t) {
+    private void scheduleCaptureTask(TriggerableGroupTimerTask t) {
         getScheduledExecutorService().scheduleAtFixedRate(t, 0, t.getPeriod(), TimeUnit.MILLISECONDS);
     }
 
-    private class CaptureTimerTask implements Runnable  {
+    private class TriggerableGroupTimerTask implements Runnable  {
 
-        private List<TimedCapture> captures = Collections.synchronizedList(new ArrayList<TimedCapture>());
+        private List<Triggerable> captures = Collections.synchronizedList(new ArrayList<Triggerable>());
         private Long period;
 
-        public CaptureTimerTask(Long period) {
+        public TriggerableGroupTimerTask(Long period) {
             this.period = period;
         }
 
-        public void addTimedCapture(TimedCapture t) {
+        public void addTimedCapture(Triggerable t) {
             captures.add(t);
         }
 
-        public void removeTimedCapture(TimedCapture t) {
+        public void removeTimedCapture(Triggerable t) {
             captures.remove(t);
         }
 
@@ -114,10 +111,8 @@ public class GroupByCapturePeriodScheduler extends AbstractCaptureScheduler {
 
         public void run() {
             long timestamp = System.currentTimeMillis();
-            for (TimedCapture t: captures) {
-                if ( t.getState() == CaptureState.STARTED || t.getState() == CaptureState.STARTING) {
-                    t.triggerCapture(timestamp);
-                }
+            for (Triggerable t: captures) {
+                t.triggerCapture(timestamp);
             }
         }
 

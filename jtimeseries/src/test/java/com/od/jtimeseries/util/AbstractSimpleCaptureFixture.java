@@ -29,8 +29,8 @@ import java.util.concurrent.CountDownLatch;
 public abstract class AbstractSimpleCaptureFixture extends Assert {
 
     protected TimeSeriesContext rootContext;
-    protected TimePeriod sleepPeriod = Time.millisecond((int)(100));
-    protected TimePeriod capturePeriod = Time.millisecond((int)(500));
+    protected TimePeriod sleepPeriod = Time.milliseconds((int)(100));
+    protected TimePeriod capturePeriod = Time.milliseconds((int)(500));
 
     //sources, if adding, change also getListOfSources()
     protected volatile Counter counter;

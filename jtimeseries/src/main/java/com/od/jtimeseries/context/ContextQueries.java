@@ -19,8 +19,8 @@
 package com.od.jtimeseries.context;
 
 import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureScheduler;
-import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.scheduling.Scheduler;
+import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -72,11 +72,11 @@ public interface ContextQueries {
     QueryResult<ValueSource> findAllValueSources();
 
 
-    QueryResult<CaptureScheduler> findAllSchedulers();
+    QueryResult<Scheduler> findAllSchedulers();
 
-    QueryResult<CaptureScheduler> findSchedulers(String searchPattern);
+    QueryResult<Scheduler> findSchedulers(String searchPattern);
     
-    QueryResult<CaptureScheduler> findSchedulers(TimedCapture capture);
+    QueryResult<Scheduler> findSchedulers(Triggerable triggerable);
 
 
     <E extends Identifiable> QueryResult<E> findAllChildren(Class<E> assignableToClass);

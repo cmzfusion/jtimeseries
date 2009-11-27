@@ -1,7 +1,8 @@
-package com.od.jtimeseries.capture.impl;
+package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.capture.CaptureScheduler;
-import com.od.jtimeseries.capture.impl.GroupByCapturePeriodScheduler;
+import com.od.jtimeseries.scheduling.Scheduler;
+import com.od.jtimeseries.scheduling.GroupByPeriodScheduler;
+import com.od.jtimeseries.util.time.TimePeriod;
 import org.junit.Test;
 
 /**
@@ -11,20 +12,20 @@ import org.junit.Test;
  * Time: 19:28:30
  * To change this template use File | Settings | File Templates.
  */
-public class TestGroupByCapturePeriodScheduler extends AbstractTestCaptureScheduler {
+public class TestGroupByPeriodScheduler extends AbstractSchedulerTest {
 
     private volatile boolean testPassed = true;
     private long firstGroupCaptureTime;
 
-    protected CaptureScheduler createCaptureScheduler() {
-        return new GroupByCapturePeriodScheduler("TestId", "TestDescription");
+    protected Scheduler createCaptureScheduler() {
+        return new GroupByPeriodScheduler("TestId", "TestDescription");
     }
 
     @Test
     //n.b. there is also an assumption here that the captures in the group by period are triggered in the order they
     //are added to the scheduler
     public void testGroupByCapturePeriodSchedulerTriggersCaptureGroupsAtTheSameTimepoint() {
-        scheduler.addCapture(new DummyTimedCapture() {{
+        scheduler.addTriggerable(new DummyTimedCapture() {{
                 start();
             }
 
@@ -32,12 +33,12 @@ public class TestGroupByCapturePeriodScheduler extends AbstractTestCaptureSchedu
                 firstGroupCaptureTime = timestamp;
             }
 
-            public long getCapturePeriodInMilliseconds() {
+            public TimePeriod getTriggerPeriod() {
                 return CAPTURE_PERIOD_MILLIS;
             }
         });
 
-        scheduler.addCapture(new DummyTimedCapture() {{
+        scheduler.addTriggerable(new DummyTimedCapture() {{
                 start();
             }
 
@@ -47,7 +48,7 @@ public class TestGroupByCapturePeriodScheduler extends AbstractTestCaptureSchedu
                 }
             }
 
-            public long getCapturePeriodInMilliseconds() {
+            public TimePeriod getTriggerPeriod() {
                 return CAPTURE_PERIOD_MILLIS;
             }
         });

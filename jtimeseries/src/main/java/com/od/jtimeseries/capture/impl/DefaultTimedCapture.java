@@ -28,6 +28,7 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.
@@ -73,38 +74,39 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
         this.captureFunction = captureFunction;
     }
 
-    public long getCapturePeriodInMilliseconds() {
-        return getCaptureFunction().getCapturePeriod().getLengthInMillis();
+    public TimePeriod getTriggerPeriod() {
+        return getCaptureFunction().getCapturePeriod();
     }
 
     public void triggerCapture(long timestamp) {
-        AggregateFunction oldFunctionInstance;
+        if ( getState() == CaptureState.STARTED || getState() == CaptureState.STARTING) {
+            AggregateFunction oldFunctionInstance;
 
-        //hold the lock while we switch functions, so that the current function becomes a new instance but we
-        //keep a reference to the old, which contains any values collected during the last period
-        synchronized (functionLock) {
-            oldFunctionInstance = this.function;
-            function = getCaptureFunction().getFunctionInstance();
-            if ( oldFunctionInstance == DUMMY_FUNCTION) {
-                //this was the first trigger, we are now writing into a real function instance
-                //which means we can transition from STARTING to STARTED
-                changeStateAndFireEvent(CaptureState.STARTED);    
+            //hold the lock while we switch functions, so that the current function becomes a new instance but we
+            //keep a reference to the old, which contains any values collected during the last period
+            synchronized (functionLock) {
+                oldFunctionInstance = this.function;
+                function = getCaptureFunction().getFunctionInstance();
+                if ( oldFunctionInstance == DUMMY_FUNCTION) {
+                    //this was the first trigger, we are now writing into a real function instance
+                    //which means we can transition from STARTING to STARTED
+                    changeStateAndFireEvent(CaptureState.STARTED);
+                }
+            }
+
+            //fire an event to tell observers this timed capture has been triggered by the scheduler
+            fireTriggerEvent();
+
+            //do the aggregate calculation on the old function instance, while we are not holding the functionlock
+            //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
+            //this would be very bad, since that thread may be very performance sensitive
+            //this way the source is free to update the new function instance while the calculation takes place on the timer thread
+            if ( oldFunctionInstance != DUMMY_FUNCTION ) {
+                getTimeSeries().append(
+                   new TimeSeriesItem(timestamp, oldFunctionInstance.calculateAggregateValue())
+                );
             }
         }
-
-        //fire an event to tell observers this timed capture has been triggered by the scheduler
-        fireTriggerEvent();
-
-        //do the aggregate calculation on the old function instance, while we are not holding the functionlock
-        //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
-        //this would be very bad, since that thread may be very performance sensitive
-        //this way the source is free to update the new function instance while the calculation takes place on the timer thread
-        if ( oldFunctionInstance != DUMMY_FUNCTION ) {
-            getTimeSeries().append(
-               new TimeSeriesItem(timestamp, oldFunctionInstance.calculateAggregateValue())
-            );
-        }
-
     }
 
     public void start() {

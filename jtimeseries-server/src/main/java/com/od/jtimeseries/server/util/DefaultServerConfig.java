@@ -216,11 +216,11 @@ public class DefaultServerConfig implements TimeSeriesServerConfig {
     }
 
     public TimePeriod getFileAppendDelayMillis() {
-        return Time.millisecond(Integer.parseInt(System.getProperty(FILE_WRITE_DELAY_FOR_APPEND_PROPERTY)));
+        return Time.milliseconds(Integer.parseInt(System.getProperty(FILE_WRITE_DELAY_FOR_APPEND_PROPERTY)));
     }
 
     public TimePeriod getFileRewriteDelayMillis() {
-        return Time.millisecond(Integer.parseInt(System.getProperty(FILE_WRITE_DELAY_FOR_REWRITE_PROPERTY)));
+        return Time.milliseconds(Integer.parseInt(System.getProperty(FILE_WRITE_DELAY_FOR_REWRITE_PROPERTY)));
     }
 
     public int getMaxItemsInTimeseries() {

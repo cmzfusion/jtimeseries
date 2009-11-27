@@ -8,7 +8,7 @@ import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.capture.impl.DefaultCaptureScheduler;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
@@ -209,7 +209,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     public void testCannotChangesSchedulerIfSchedulerStarted() {
         rootContext.startScheduling();
         try {
-            rootContext.setScheduler(new DefaultCaptureScheduler("test", "test"));
+            rootContext.setScheduler(new DefaultScheduler("test", "test"));
             fail("Should not be able to set scheduler");
         } catch (RuntimeException r) {
         }

@@ -29,7 +29,7 @@ public class Time {
     /**
      * @return number of milliseconds in the given number of seconds
      */
-    public static TimePeriod millisecond(int millis) {
+    public static TimePeriod milliseconds(int millis) {
         return new Millisecond(millis);
     }
 

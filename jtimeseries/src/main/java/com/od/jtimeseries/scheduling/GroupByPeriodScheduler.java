@@ -68,10 +68,10 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
     }
 
     private void addToCaptureTimerTask(Triggerable t) {
-        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTriggerPeriod().getLengthInMillis());
+        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTimePeriod().getLengthInMillis());
         if ( task == null ) {
-            task = new TriggerableGroupTimerTask(t.getTriggerPeriod().getLengthInMillis());
-            tasksByPeriod.put(t.getTriggerPeriod().getLengthInMillis(), task);
+            task = new TriggerableGroupTimerTask(t.getTimePeriod().getLengthInMillis());
+            tasksByPeriod.put(t.getTimePeriod().getLengthInMillis(), task);
             if ( isStarted() ) {
                 scheduleCaptureTask(task);
             }
@@ -80,7 +80,7 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
     }
 
     private void removeFromCaptureTimerTask(Triggerable t) {
-        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTriggerPeriod().getLengthInMillis());
+        TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTimePeriod().getLengthInMillis());
         task.removeTimedCapture(t);
     }
 
@@ -112,7 +112,7 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
         public void run() {
             long timestamp = System.currentTimeMillis();
             for (Triggerable t: captures) {
-                t.triggerCapture(timestamp);
+                t.trigger(timestamp);
             }
         }
 

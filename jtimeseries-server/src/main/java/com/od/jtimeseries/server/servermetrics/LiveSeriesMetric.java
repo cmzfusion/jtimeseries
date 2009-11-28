@@ -2,7 +2,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.capture.impl.DefaultCapture;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.server.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;

@@ -21,6 +21,7 @@ package com.od.jtimeseries.server.timeseries;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
+import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.TimeSeriesOrderingException;
 import com.od.jtimeseries.timeseries.impl.WrappedTimeSeriesEventHandler;

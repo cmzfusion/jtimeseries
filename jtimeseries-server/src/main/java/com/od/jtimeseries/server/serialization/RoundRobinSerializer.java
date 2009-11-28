@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.server.serialization;
 
-import com.od.jtimeseries.server.timeseries.RoundRobinTimeSeries;
+import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.logging.LogUtils;

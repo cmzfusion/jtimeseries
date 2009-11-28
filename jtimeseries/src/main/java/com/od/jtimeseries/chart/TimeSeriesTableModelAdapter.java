@@ -21,7 +21,7 @@ package com.od.jtimeseries.chart;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.WeakReferenceTimeSeriesListener;
+import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;

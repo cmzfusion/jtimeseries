@@ -14,8 +14,8 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
-import javax.management.JMX;
+//import javax.management.ObjectName;
+//import javax.management.JMX;
 import java.lang.management.MemoryMXBean;
 
 /**
@@ -67,7 +67,7 @@ public class ServerMemoryMetric extends ServerMetric {
                 JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + port + "/jmxrmi");
                 JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
                 MBeanServerConnection m = jmxc.getMBeanServerConnection();
-                remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);
+//                remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);
 
                 //
                 //            System.out.println("\nDomains:");

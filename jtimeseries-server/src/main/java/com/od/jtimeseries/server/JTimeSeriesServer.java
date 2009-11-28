@@ -33,6 +33,8 @@ import com.od.jtimeseries.server.util.DefaultServerConfig;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
 import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
+import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.sun.jdmk.comm.HtmlAdaptorServer;

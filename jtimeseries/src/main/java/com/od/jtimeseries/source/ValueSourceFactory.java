@@ -19,19 +19,22 @@
 package com.od.jtimeseries.source;
 
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 public interface ValueSourceFactory extends Identifiable {
-    
-
-       ValueRecorder createValueRecorder(String id, String description);
 
 
-       QueueTimer createQueueTimer(String id, String description);
+    ValueRecorder createValueRecorder(String id, String description);
 
 
-       Counter createCounter(String id, String description);
+    QueueTimer createQueueTimer(String id, String description);
 
 
-       EventTimer createEventTimer(String id, String description);
+    Counter createCounter(String id, String description);
 
+
+    EventTimer createEventTimer(String id, String description);
+
+
+    TimedValueSource createTimedValueSource(String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

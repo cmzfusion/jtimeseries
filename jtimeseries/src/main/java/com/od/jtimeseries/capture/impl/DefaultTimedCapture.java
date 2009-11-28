@@ -74,11 +74,11 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
         this.captureFunction = captureFunction;
     }
 
-    public TimePeriod getTriggerPeriod() {
+    public TimePeriod getTimePeriod() {
         return getCaptureFunction().getCapturePeriod();
     }
 
-    public void triggerCapture(long timestamp) {
+    public void trigger(long timestamp) {
         if ( getState() == CaptureState.STARTED || getState() == CaptureState.STARTING) {
             AggregateFunction oldFunctionInstance;
 

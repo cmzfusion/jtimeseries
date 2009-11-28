@@ -21,11 +21,11 @@ package com.od.jtimeseries.context;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.scheduling.Scheduler;
-import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.context.impl.ContextMetricCreator;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import java.util.List;
  * Date: 17-Dec-2008
  * Time: 17:25:10
  */
-public interface TimeSeriesContext extends Identifiable, ContextQueries {
+public interface TimeSeriesContext extends Identifiable, ContextQueries, ContextMetricCreator {
 
     TimeSeriesContext getParent();
 
@@ -102,14 +102,6 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
     TimeSeriesContext createChildContext(String id);
 
     TimeSeriesContext createChildContext(String id, String description);
-
-    ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunction);
-
-    QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunction);
-
-    Counter createCounter(String id, String description, CaptureFunction... captureFunction);
-
-    EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunction);
 
     /**
      * @return a new time series with the given id and description, provided a timeseries with this id does not already exist

@@ -32,6 +32,7 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.util.*;
 
@@ -46,7 +47,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
     private final List<Identifiable> children = Collections.synchronizedList(new ArrayList<Identifiable>());
     private final Map<String, Identifiable> childrenById = Collections.synchronizedMap(new HashMap<String, Identifiable>());
     private ContextQueries contextQueries = new DefaultContextQueries(this);
-    private SourceCaptureAndSeriesCreator sourceCaptureAndSeriesCreator = new SourceCaptureAndSeriesCreator(this);
+    private DefaultMetricCreator defaultMetricCreator = new DefaultMetricCreator(this);
 
     public DefaultTimeSeriesContext(TimeSeriesContext parentContext, String id, String description) {
         super(parentContext, id, description);
@@ -399,26 +400,30 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return sourceCaptureAndSeriesCreator.createValueRecorder(id, description, captureFunctions);
+            return defaultMetricCreator.createValueRecorder(id, description, captureFunctions);
         }
     }
 
     public QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return sourceCaptureAndSeriesCreator.createQueueTimer(id, description, captureFunctions);
+            return defaultMetricCreator.createQueueTimer(id, description, captureFunctions);
         }
     }
 
     public Counter createCounter(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return sourceCaptureAndSeriesCreator.createCounter(id, description, captureFunctions);
+            return defaultMetricCreator.createCounter(id, description, captureFunctions);
         }
     }
 
     public EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return sourceCaptureAndSeriesCreator.createEventTimer(id, description, captureFunctions);
+            return defaultMetricCreator.createEventTimer(id, description, captureFunctions);
         }
+    }
+
+    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        return defaultMetricCreator.createTimedValueSource(id, description, valueSupplier, timePeriod);
     }
 
     public QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {
@@ -517,13 +522,13 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public <E extends Identifiable> QueryResult<E> findAllChildren(Class<E> assignableToClass) {
+    public <E> QueryResult<E> findAllChildren(Class<E> assignableToClass) {
         synchronized (getTreeLock()) {
             return contextQueries.findAllChildren(assignableToClass);
         }
     }
 
-    public <E extends Identifiable> QueryResult<E> findAllChildren(String searchPattern, Class<E> assignableToClass) {
+    public <E> QueryResult<E> findAllChildren(String searchPattern, Class<E> assignableToClass) {
         synchronized (getTreeLock()) {
             return contextQueries.findAllChildren(searchPattern, assignableToClass);
         }

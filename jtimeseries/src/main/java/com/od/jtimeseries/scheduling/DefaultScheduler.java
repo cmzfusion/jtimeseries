@@ -79,7 +79,7 @@ public class DefaultScheduler extends AbstractScheduler {
             TriggerableTimerTask task = new TriggerableTimerTask(t);
             tasks.put(t, task);
             getScheduledExecutorService().scheduleAtFixedRate(
-                task, 0, t.getTriggerPeriod().getLengthInMillis(), TimeUnit.MILLISECONDS
+                task, 0, t.getTimePeriod().getLengthInMillis(), TimeUnit.MILLISECONDS
             );
         }
     }
@@ -109,7 +109,7 @@ public class DefaultScheduler extends AbstractScheduler {
         }
 
         private void triggerCapture(Triggerable t) {
-            t.triggerCapture(System.currentTimeMillis());
+            t.trigger(System.currentTimeMillis());
         }
 
         public void cancel() {

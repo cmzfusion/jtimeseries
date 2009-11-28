@@ -39,7 +39,7 @@ public abstract class AbstractSchedulerTest extends Assert {
         triggerCount.set(0);
 
         triggerCountingCapture = new DummyTimedCapture() {
-            public void triggerCapture(long time) {
+            public void trigger(long time) {
                 triggerCount.incrementAndGet();
             }
         };
@@ -92,11 +92,11 @@ public abstract class AbstractSchedulerTest extends Assert {
             return null;
         }
 
-        public TimePeriod getTriggerPeriod() {
+        public TimePeriod getTimePeriod() {
             return CAPTURE_PERIOD_MILLIS;
         }
 
-        public void triggerCapture(long timestamp) {
+        public void trigger(long timestamp) {
             if ( getState() != CaptureState.STARTED) {
                 changeStateAndFireEvent(CaptureState.STARTED);
             }

@@ -25,6 +25,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,12 +35,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * User: Nick Ebbutt
  * Date: 05-Nov-2009
  * Time: 16:59:43
- *
- * TimeSeriesContext has several convenience methods such as createValueRecorder() which allow the user to create
- * a value source, a capture (timed or otherwise) and a time series within the context in one method call. This
- * class handles the creation of all of those items.
  */
-class SourceCaptureAndSeriesCreator {
+class DefaultMetricCreator implements ContextMetricCreator {
 
     private TimeSeriesContext timeSeriesContext;
     protected static AtomicLong captureUniqueId = new AtomicLong(0);
@@ -49,7 +46,7 @@ class SourceCaptureAndSeriesCreator {
     private static String SOURCE_PREFIX = "Source_";
     private static String CAPTURE_PREFIX = "Capture_";
 
-    public SourceCaptureAndSeriesCreator(TimeSeriesContext timeSeriesContext) {
+    public DefaultMetricCreator(TimeSeriesContext timeSeriesContext) {
         this.timeSeriesContext = timeSeriesContext;
     }
 
@@ -75,6 +72,12 @@ class SourceCaptureAndSeriesCreator {
         EventTimer m = timeSeriesContext.getValueSourceFactory().createEventTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, m, captureFunctions);
         return m;
+    }
+
+    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSource s = timeSeriesContext.getValueSourceFactory().createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
+        createSeriesAndCapturesForSource(id, description, s);
+        return s;
     }
 
     private void createSeriesAndCapturesForSource(String id, String description, ValueSource source, CaptureFunction... captureFunctions) {

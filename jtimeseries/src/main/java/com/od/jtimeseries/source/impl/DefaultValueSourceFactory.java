@@ -20,6 +20,7 @@ package com.od.jtimeseries.source.impl;
 
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 public class DefaultValueSourceFactory extends IdentifiableBase implements ValueSourceFactory {
 
@@ -45,6 +46,10 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
 
     public EventTimer createEventTimer(String id, String description) {
         return new DefaultEventTimer(id, description);
+    }
+
+    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        return new DefaultTimedValueSource(id, description, valueSupplier, timePeriod);
     }
 
 }

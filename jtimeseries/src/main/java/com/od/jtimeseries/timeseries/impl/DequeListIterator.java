@@ -29,8 +29,7 @@ import java.util.NoSuchElementException;
  * Time: 16:43:19
  * To change this template use File | Settings | File Templates.
  *
- * If you suspected this was a shameless clipboard lift of the iterator logic which has protected access in AbstractList,
- * you'd probably be on the right track.
+ * iterator logic which has protected access in AbstractList
  */
 class DequeListIterator<E> implements ListIterator<E> {
 

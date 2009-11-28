@@ -3,7 +3,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.capture.impl.DefaultTimedCapture;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.server.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;

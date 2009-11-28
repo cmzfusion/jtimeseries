@@ -25,7 +25,6 @@ import java.util.List;
 * User: nick
 * Date: 01-Mar-2009
 * Time: 14:40:07
-* To change this template use File | Settings | File Templates.
 */
 interface ModCountList<E> extends List<E> {
     int getModCount();

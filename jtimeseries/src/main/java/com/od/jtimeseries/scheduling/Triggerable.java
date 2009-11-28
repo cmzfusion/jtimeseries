@@ -12,10 +12,10 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface Triggerable extends Identifiable {
 
-    TimePeriod getTriggerPeriod();
+    TimePeriod getTimePeriod();
 
     /**
      * Called by the scheduler when the Capture is in STARTING or STARTED state
      */
-    void triggerCapture(long timestamp);
+    void trigger(long timestamp);
 }

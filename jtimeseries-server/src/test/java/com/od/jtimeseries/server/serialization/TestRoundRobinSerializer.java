@@ -15,7 +15,7 @@ import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.timeseries.RoundRobinTimeSeries;
+import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.DefaultServerConfig;
 

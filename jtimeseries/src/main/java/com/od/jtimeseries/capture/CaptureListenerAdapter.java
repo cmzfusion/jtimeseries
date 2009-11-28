@@ -9,7 +9,7 @@ package com.od.jtimeseries.capture;
  *
  * Subclasses can extend this if they don't want to provide an implementation for both methods
  */
-public class CaptureAdapter implements CaptureListener {
+public class CaptureListenerAdapter implements CaptureListener {
 
     public void captureStateChanged(Capture source, CaptureState oldState, CaptureState newState) {
     }

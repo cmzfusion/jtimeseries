@@ -35,7 +35,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 18-Dec-2008
  * Time: 11:53:28
  */
-public class DefaultCapture extends AbstractCapture implements Capture, ValueSourceCapture {
+public class DefaultCapture extends AbstractCapture implements ValueSourceCapture {
 
     private ValueSourceListener valueSourceListener;
     private static final Object startStopLock = new Object();

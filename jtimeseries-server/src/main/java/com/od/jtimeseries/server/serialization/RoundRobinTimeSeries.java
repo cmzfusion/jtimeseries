@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.server.timeseries;
+package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.ListTimeSeries;

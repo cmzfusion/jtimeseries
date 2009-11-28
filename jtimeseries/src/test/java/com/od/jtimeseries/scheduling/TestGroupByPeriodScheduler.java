@@ -29,7 +29,7 @@ public class TestGroupByPeriodScheduler extends AbstractSchedulerTest {
                 start();
             }
 
-            public void triggerCapture(long timestamp) {
+            public void trigger(long timestamp) {
                 firstGroupCaptureTime = timestamp;
             }
 
@@ -42,7 +42,7 @@ public class TestGroupByPeriodScheduler extends AbstractSchedulerTest {
                 start();
             }
 
-            public void triggerCapture(long timestamp) {
+            public void trigger(long timestamp) {
                 if ( timestamp != firstGroupCaptureTime) {
                     testPassed = false;
                 }

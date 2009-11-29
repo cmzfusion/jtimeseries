@@ -37,6 +37,7 @@ import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogMethodsFactory;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -44,6 +45,9 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import java.io.File;
 import java.io.IOException;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,9 +61,12 @@ public class JTimeSeriesServer {
     private static TimeSeriesServerConfig config;
 
     static {
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        setupLogging(ctx);
+
         //Load the properties for this server instance
         config = new DefaultServerConfig();
-        configureLogging();
+        //configureLogging();
     }
 
     //this log methods needs to be non-static so that we can configure the logging statically before it's created
@@ -151,6 +158,20 @@ public class JTimeSeriesServer {
 
     public static void main(String[] args) throws IOException {
         new JTimeSeriesServer();
+    }
+    
+    private static void setupLogging(ApplicationContext ctx) {
+        JavaUtilLoggingLogMethodsFactory f = (JavaUtilLoggingLogMethodsFactory)ctx.getBean("logMethodsFactory", LogMethodsFactory.class);
+
+        boolean logFileOk = f.isLogFileWritable();
+        if ( logFileOk ) {
+            LogUtils.setLogMethodFactory(f);
+        } else {
+            LogUtils.getLogMethods(JTimeSeriesServer.class).logInfo(
+                    "Cannot write to directory for logfile path " + f.getLogFile().getAbsolutePath() +
+                    ". Will log to standard out"
+            );
+        }
     }
 
     private static void configureLogging() {

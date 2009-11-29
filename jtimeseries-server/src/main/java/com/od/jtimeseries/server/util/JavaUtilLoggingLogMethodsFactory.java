@@ -58,6 +58,14 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         createHandler();
     }
 
+    public boolean isLogFileWritable() {
+        return ( logFile.getParentFile().canWrite() && ! logFile.isDirectory() && (! logFile.exists() || logFile.canWrite()));
+    }
+
+    public File getLogFile() {
+        return logFile;
+    }
+
     private void setLevel(String logLevel) {
         try {
             this.logLevel = Level.parse(logLevel);

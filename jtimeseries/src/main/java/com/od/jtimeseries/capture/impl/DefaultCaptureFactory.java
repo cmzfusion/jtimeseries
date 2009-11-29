@@ -43,11 +43,11 @@ public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFa
         super(id, description);
     }
 
-    public Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
+    public Capture createCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
         return new DefaultCapture(id, source, timeSeries);
     }
 
-    public TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
+    public TimedCapture createTimedCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         return new DefaultTimedCapture(id, source, timeSeries, captureFunction);
     }
 }

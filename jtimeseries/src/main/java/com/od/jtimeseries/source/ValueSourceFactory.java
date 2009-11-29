@@ -23,18 +23,28 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 public interface ValueSourceFactory extends Identifiable {
 
+    /**
+     * @param path, full context path including id
+     */
+    ValueRecorder createValueRecorder(String path, String id, String description);
 
-    ValueRecorder createValueRecorder(String id, String description);
+    /**
+     * @param path, full context path including id
+     */
+    QueueTimer createQueueTimer(String path, String id, String description);
 
+    /**
+     * @param path, full context path including id
+     */
+    Counter createCounter(String path, String id, String description);
 
-    QueueTimer createQueueTimer(String id, String description);
+    /**
+     * @param path, full context path including id
+     */
+    EventTimer createEventTimer(String path, String id, String description);
 
-
-    Counter createCounter(String id, String description);
-
-
-    EventTimer createEventTimer(String id, String description);
-
-
-    TimedValueSource createTimedValueSource(String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    /**
+     * @param path, full context path including id
+     */
+    TimedValueSource createTimedValueSource(String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

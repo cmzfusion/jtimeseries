@@ -20,11 +20,9 @@ package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
+import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
-import com.od.jtimeseries.context.ContextFactory;
-import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.context.ContextQueries;
-import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.*;
@@ -350,9 +348,65 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public IdentifiableTimeSeries createTimeSeries(String id, String description) {
         synchronized (getTreeLock()) {
-            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(getPath() + "." + id, id, description);
+            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(getPath() + NAMESPACE_SEPARATOR + id, id, description);
             addChild(i);
             return i;
+        }
+    }
+
+    public Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
+        synchronized (getTreeLock()) {
+            Capture c = getCaptureFactory().createCapture(getPath() + NAMESPACE_SEPARATOR + id, id, source, series);
+            addChild(c);
+            return c;
+        }
+    }
+
+    public TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
+        synchronized (getTreeLock()) {
+            TimedCapture c = getCaptureFactory().createTimedCapture(getPath() + NAMESPACE_SEPARATOR + id, id, source, series, captureFunction);
+            addChild(c);
+            return c;
+        }
+    }
+
+    public ValueRecorder createValueRecorderOnly(String id, String description) {
+        synchronized (getTreeLock()) {
+            ValueRecorder v = getValueSourceFactory().createValueRecorder(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            addChild(v);
+            return v;
+        }
+    }
+
+    public QueueTimer createQueueTimerOnly(String id, String description) {
+        synchronized (getTreeLock()) {
+            QueueTimer q = getValueSourceFactory().createQueueTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            addChild(q);
+            return q;
+        }
+    }
+
+    public Counter createCounterOnly(String id, String description) {
+        synchronized (getTreeLock()) {
+            Counter c = getValueSourceFactory().createCounter(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            addChild(c);
+            return c;
+        }
+    }
+
+    public EventTimer createEventTimerOnly(String id, String description) {
+        synchronized (getTreeLock()) {
+            EventTimer e = getValueSourceFactory().createEventTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            addChild(e);
+            return e;
+        }
+    }
+
+    public TimedValueSource createTimedValueSourceOnly(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        synchronized (getTreeLock()) {
+            TimedValueSource t = getValueSourceFactory().createTimedValueSource(getPath() + NAMESPACE_SEPARATOR + id, id, description, valueSupplier, timePeriod);
+            addChild(t);
+            return t;
         }
     }
 
@@ -561,13 +615,6 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
                 }
                 identifiable.setParent(this);
             }
-        }
-    }
-
-    private static class AlreadyExistsException extends RuntimeException {
-
-        private AlreadyExistsException(String message) {
-            super(message);
         }
     }
 

@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.util.identifiable;
 
+import com.od.jtimeseries.util.JTimeSeriesConstants;
+
 import java.util.*;
 
 /**
@@ -35,6 +37,7 @@ public class IdentifiableBase implements Identifiable {
      */
     private static final Object TREE_LOCK = new Object();
 
+    protected static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
     protected static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
     private volatile String id;
     private volatile String description;

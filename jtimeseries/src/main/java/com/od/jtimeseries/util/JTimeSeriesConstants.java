@@ -27,7 +27,7 @@ package com.od.jtimeseries.util;
 public class JTimeSeriesConstants {
 
     public static final String DEFAULT_ROOT_CONTEXT_ID = "Root Context";
-
+    public static final String NAMESPACE_SEPARATOR = ".";
 
 }
 

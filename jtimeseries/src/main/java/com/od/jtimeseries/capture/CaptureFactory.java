@@ -31,9 +31,24 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  * To change this template use File | Settings | File Templates.
  */
 public interface CaptureFactory extends Identifiable {
-    
-    Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries);
 
-    TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction);
+    /**
+     * @param path, full context path including the id
+     * @param id, context id for this capture
+     * @param source, source from which to listen for values
+     * @param timeSeries, series to capture values
+     * @return new Capture
+     */
+    Capture createCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries);
+
+     /**
+     * @param path, full context path including the id
+     * @param id, context id for this capture
+     * @param source, source from which to listen for values
+     * @param timeSeries, series to capture values
+     * @param captureFunction, function and time period to process source values
+     * @return new TimedCapture
+     */
+    TimedCapture createTimedCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction);
 
 }

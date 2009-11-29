@@ -18,16 +18,12 @@
  */
 package com.od.jtimeseries.context.impl;
 
-import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -35,6 +31,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * User: Nick Ebbutt
  * Date: 05-Nov-2009
  * Time: 16:59:43
+ *
+ * The logic for creating all the sources, captures and series and binding them together if the user calls
+ * ContextMetricCreator methods on the context. In general it is expected that there will not already by
+ * sources and/or captures with the id specified, and if there are,  this will result in an AlreadyExistsException
+ *
+ * For TimeSeries, if an existing series is found, it will be assumed that the user wants to bind the source and capture
+ * to the existing series. This is because there are many cases where persisted series are loaded by an application on startup,
+ * but the app still needs to generate ValueRecorders and Captures etc which bind to those series, so that new values can be
+ * recorded. So it is a big help in this case if we can simply bind the recorders/captures to the reloaded series, without
+ * having to have special logic to check if they already exist and adjust behaviour accordingly.
  */
 class DefaultMetricCreator implements ContextMetricCreator {
 
@@ -51,94 +57,65 @@ class DefaultMetricCreator implements ContextMetricCreator {
     }
 
     public ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
-        ValueRecorder v = timeSeriesContext.getValueSourceFactory().createValueRecorder(SOURCE_PREFIX + id, description);
+        ValueRecorder v = timeSeriesContext.createValueRecorderOnly(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, v, captureFunctions);
         return v;
     }
 
     public QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
-        QueueTimer q = timeSeriesContext.getValueSourceFactory().createQueueTimer(SOURCE_PREFIX + id, description);
+        QueueTimer q = timeSeriesContext.createQueueTimerOnly(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, q, captureFunctions);
         return q;
     }
 
     public Counter createCounter(String id, String description, CaptureFunction... captureFunctions) {
-        Counter c = timeSeriesContext.getValueSourceFactory().createCounter(SOURCE_PREFIX + id, description);
+        Counter c = timeSeriesContext.createCounterOnly(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, c, captureFunctions);
         return c;
     }
 
     public EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunctions) {
-        EventTimer m = timeSeriesContext.getValueSourceFactory().createEventTimer(SOURCE_PREFIX + id, description);
+        EventTimer m = timeSeriesContext.createEventTimerOnly(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, m, captureFunctions);
         return m;
     }
 
     public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSource s = timeSeriesContext.getValueSourceFactory().createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
+        TimedValueSource s = timeSeriesContext.createTimedValueSourceOnly(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
         createSeriesAndCapturesForSource(id, description, s);
         return s;
     }
 
     private void createSeriesAndCapturesForSource(String id, String description, ValueSource source, CaptureFunction... captureFunctions) {
-        List<Capture> captures = new ArrayList<Capture>();
         if (captureFunctions.length == 0) {
-            IdentifiableTimeSeries series = creatRawValuesTimeSeries(id, description);
+            IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, null);
             String captureId = getNextCaptureId(id);
-            captures.add(timeSeriesContext.getCaptureFactory().createCapture(captureId, source, series));
+            timeSeriesContext.createCapture(captureId, source, series);
         } else {
             for (CaptureFunction captureFunction : captureFunctions) {
-                IdentifiableTimeSeries series = createTimeSeries(id, description, captureFunction);
+                IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, captureFunction);
                 String captureId = getNextCaptureId(id);
-                captures.add(timeSeriesContext.getCaptureFactory().createTimedCapture(captureId, source, series, captureFunction));
+                timeSeriesContext.createTimedCapture(captureId, source, series, captureFunction);
             }
         }
-        addIdentifiables(captures);
+    }
+
+    private IdentifiableTimeSeries createTimeSeriesIfNotPresent(String id, String description, CaptureFunction captureFunction) {
+        //if there is a function we use this to create the id and description for the timeseries
+        if ( captureFunction != null) {
+            id = id + " " + captureFunction.getDescription();
+            description = description + " " + captureFunction.getDescription() + " every " + captureFunction.getCapturePeriod();
+        }
+
+        IdentifiableTimeSeries series = timeSeriesContext.getTimeSeries(id);
+        if ( series == null) {
+            series = timeSeriesContext.createTimeSeries(id, description);
+        }
+        return series;
     }
 
     private String getNextCaptureId(String id) {
         return CAPTURE_PREFIX + id + "_" + captureUniqueId.incrementAndGet();
-    }
-
-
-    //just in case the same Identifiable implements both Capture and ListTimeSeries for example,
-    //add the set of identifiables from the capture
-    private void addIdentifiables(List<Capture> captures) {
-        Set<Identifiable> s = new HashSet<Identifiable>();
-        for (Capture c : captures) {
-            s.addAll(getAllIdentifiables(c));
-        }
-
-        for (Identifiable i : s) {
-            timeSeriesContext.addChild(i);
-        }
-    }
-
-
-    private Collection<Identifiable> getAllIdentifiables(Capture capture) {
-        Set<Identifiable> s = new HashSet<Identifiable>();
-        s.add(capture);
-        s.add(capture.getTimeSeries());
-        if (capture instanceof ValueSourceCapture) {
-            s.add(((ValueSourceCapture) capture).getValueSource());
-        }
-        return s;
-    }
-
-    private IdentifiableTimeSeries createTimeSeries(String id, String description, CaptureFunction f) {
-        return timeSeriesContext.getTimeSeriesFactory().createTimeSeries(
-                timeSeriesContext.getPath(),
-                id + " " + f.getDescription(),
-                description + " " + f.getDescription() + " every " + f.getCapturePeriod()
-        );
-    }
-
-    private IdentifiableTimeSeries creatRawValuesTimeSeries(String id, String description) {
-        return timeSeriesContext.getTimeSeriesFactory().createTimeSeries(
-                timeSeriesContext.getPath(),
-                id,
-                description
-        );
     }
 
 }

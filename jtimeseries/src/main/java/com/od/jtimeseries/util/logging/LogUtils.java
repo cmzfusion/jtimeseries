@@ -38,6 +38,10 @@ public class LogUtils {
         public LogMethods getLogMethods(Class c) {
             return defaultLogMethods;
         }
+
+        public boolean isUsable() {
+            return true;
+        }
     };
 
     public static LogMethods getLogMethods(Class c) {

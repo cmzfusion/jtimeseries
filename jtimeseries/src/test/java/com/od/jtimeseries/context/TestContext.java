@@ -1,8 +1,6 @@
 package com.od.jtimeseries.context;
 
 import org.junit.Test;
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;

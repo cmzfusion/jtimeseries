@@ -48,43 +48,4 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
         return new DefaultTimeSeriesContext(parent, id, description);
     }
 
-    /**
-     *  The root context creation differs because we need to set up factories and properties which
-     *  other child contexts will inherit, unless they provide a local factory which overrides the root's default
-     */
-    public TimeSeriesContext createRootContext(String description) {
-        TimeSeriesContext c = createContext(null, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID, description);
-        c.setContextFactory(createRootContextFactory());
-        c.setScheduler(createRootScheduler());
-        c.setTimeSeriesFactory(createRootTimeSeriesFactory());
-        c.setValueSourceFactory(createRootValueSourceFactory());
-        c.setCaptureFactory(createRootCaptureFactory());
-        setRootStartCapturesImmediatelyProperty(c);
-        return c;
-    }
-
-    protected void setRootStartCapturesImmediatelyProperty(TimeSeriesContext c) {
-        c.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
-    }
-
-    protected DefaultCaptureFactory createRootCaptureFactory() {
-        return new DefaultCaptureFactory();
-    }
-
-    protected DefaultValueSourceFactory createRootValueSourceFactory() {
-        return new DefaultValueSourceFactory();
-    }
-
-    protected DefaultTimeSeriesFactory createRootTimeSeriesFactory() {
-        return new DefaultTimeSeriesFactory();
-    }
-
-    protected DefaultScheduler createRootScheduler() {
-        return new DefaultScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler");
-    }
-
-    protected DefaultContextFactory createRootContextFactory() {
-        return this;
-    }
-
 }

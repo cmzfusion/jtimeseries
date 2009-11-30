@@ -29,6 +29,4 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 public interface ContextFactory extends Identifiable {
 
     TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description);
-
-    TimeSeriesContext createRootContext(String description);
 }

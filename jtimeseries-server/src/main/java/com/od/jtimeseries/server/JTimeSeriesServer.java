@@ -19,8 +19,10 @@
 package com.od.jtimeseries.server;
 
 import com.od.jtimeseries.JTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
+import com.od.jtimeseries.net.httpd.NanoHTTPD;
 import com.od.jtimeseries.net.udp.AnnouncementMessage;
 import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
@@ -28,7 +30,6 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.server.jmx.ServerConfigJmx;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory;
-import com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory;
 import com.od.jtimeseries.server.util.DefaultServerConfig;
 import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
@@ -59,19 +60,19 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class JTimeSeriesServer {
 
     private static TimeSeriesServerConfig config;
+    private static LogMethods logMethods;
 
     static {
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        setupLogging(ctx);
+        //First read the logging configuration and set this up before other classes are loaded, since other classes in JTimeSeriesServer will
+        //initialize their static loggers when they are first loaded, and the logging subsystem needs to be set up first.
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("logContext.xml");
+        configureLogging(ctx);
+        logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
 
         //Load the properties for this server instance
         config = new DefaultServerConfig();
-        //configureLogging();
     }
 
-    //this log methods needs to be non-static so that we can configure the logging statically before it's created
-    private LogMethods logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
-    private File seriesDirectory;
     private UdpClient udpClient;
 
     public JTimeSeriesServer() throws IOException {
@@ -83,15 +84,15 @@ public class JTimeSeriesServer {
         config.writeAllConfigPropertiesToLog(logMethods);
         logMethods.logInfo("Starting JTimeSeriesServer");
 
-        checkAndSetSeriesDirectory();
-        RoundRobinSerializer roundRobinSerializer = new RoundRobinSerializer(seriesDirectory, config.getTimeSeriesFileSuffix());
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        RoundRobinSerializer roundRobinSerializer = (RoundRobinSerializer)ctx.getBean("fileSerializer");
 
         logMethods.logInfo("Starting Time Series Context");
-        TimeSeriesContext rootContext = JTimeSeries.createRootContext("TimeSeriesServer");
-        rootContext.setTimeSeriesFactory(new FilesystemTimeSeriesFactory(roundRobinSerializer, config.getFileAppendDelayMillis(), config.getFileRewriteDelayMillis(), config.getMaxItemsInTimeseries()));
+        TimeSeriesContext rootContext = (TimeSeriesContext)ctx.getBean("rootContext");
 
         logMethods.logInfo("Starting Series Directory Manager");
-        SeriesDirectoryManager seriesDirectoryManager = new SeriesDirectoryManager(seriesDirectory, roundRobinSerializer, rootContext, config);
+        SeriesDirectoryManager seriesDirectoryManager = (SeriesDirectoryManager)ctx.getBean("seriesDirectoryManager");
         seriesDirectoryManager.removeOldTimeseriesFiles();
         seriesDirectoryManager.loadExistingSeries();
 
@@ -99,16 +100,14 @@ public class JTimeSeriesServer {
         ServerMetricInitializer s = new ServerMetricInitializer(config, rootContext, roundRobinSerializer);
         s.initializeServerMetrics();
 
-        logMethods.logInfo("Creating UDP client");
-        udpClient = new UdpClient();
+        udpClient = (UdpClient)ctx.getBean("udpClient");
+        UdpServer udpServer = (UdpServer)ctx.getBean("udpServer");
 
-        logMethods.logInfo("Starting UDP Server");
-        UdpServer udpServer = new UdpServer(config.getUdpServerPort());
-        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext, config.getServerMaintenanceExecutor()));
+        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
 
-        logMethods.logInfo("Starting TimeSeries HTTPD Daemon");
-        JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(config.getHttpdDaemonPort(), rootContext);
+        JTimeSeriesHttpd httpd = (JTimeSeriesHttpd)ctx.getBean("httpdServer");
+
         //this handler enables the TimeSeriesServer to be shutdown from an http call
         //the plan is to add extra shutdown listeners to cleanly shut the server down (e.g. stop file writing and services first)
         ShutdownHandlerFactory shutdownFactory = new ShutdownHandlerFactory(rootContext, new ShutdownHandlerFactory.SystemExitShutdownListener());
@@ -148,47 +147,18 @@ public class JTimeSeriesServer {
         }
     }
 
-    private void checkAndSetSeriesDirectory() {
-        seriesDirectory = new File(config.getSeriesDirectoryPath());
-        if (! seriesDirectory.exists()) {
-            throw new RuntimeException("Cannot start, series directory " + config.getSeriesDirectoryPath() + " does not exist");
-        }
-    }
-
-
     public static void main(String[] args) throws IOException {
         new JTimeSeriesServer();
     }
     
-    private static void setupLogging(ApplicationContext ctx) {
-        JavaUtilLoggingLogMethodsFactory f = (JavaUtilLoggingLogMethodsFactory)ctx.getBean("logMethodsFactory", LogMethodsFactory.class);
-
-        boolean logFileOk = f.isLogFileWritable();
-        if ( logFileOk ) {
+    private static void configureLogging(ApplicationContext ctx) {
+        LogMethodsFactory f = (LogMethodsFactory)ctx.getBean("logMethodsFactory", LogMethodsFactory.class);
+        boolean logMethodsOk = f.isUsable();
+        if ( logMethodsOk ) {
             LogUtils.setLogMethodFactory(f);
         } else {
             LogUtils.getLogMethods(JTimeSeriesServer.class).logInfo(
-                    "Cannot write to directory for logfile path " + f.getLogFile().getAbsolutePath() +
-                    ". Will log to standard out"
-            );
-        }
-    }
-
-    private static void configureLogging() {
-        File f = new File(config.getLogFilePath());
-        if ( f.isDirectory() && f.canWrite()) {
-
-            File logFile = new File(f, config.getLogFileName());
-
-            //set the Logging up to use java util logging with log file handler
-            LogUtils.setLogMethodFactory(
-                new JavaUtilLoggingLogMethodsFactory(
-                    logFile, config.getLogLevel(), config.getMaxLogFileSizeBytes(), config.getMaxLogFileCount()
-                )
-            );
-        } else {
-            LogUtils.getLogMethods(JTimeSeriesServer.class).logInfo(
-                    "Cannot write to directory for logfile path " + f.getAbsolutePath() +
+                    "Cannot write to directory for logfile path " + ((File)ctx.getBean("logFileDirectory")).getAbsolutePath() +
                     ". Will log to standard out"
             );
         }

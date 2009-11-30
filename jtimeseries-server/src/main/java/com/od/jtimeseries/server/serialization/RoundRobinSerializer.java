@@ -58,6 +58,14 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
     public RoundRobinSerializer(File rootDirectory, String timeSeriesFileSuffix) {
         this.rootDirectory = rootDirectory;
         this.timeSeriesFileSuffix = timeSeriesFileSuffix;
+        checkRootDirectory(rootDirectory);
+    }
+
+    private void checkRootDirectory(File rootDirectory) {
+        if ( ! rootDirectory.canWrite()) {
+            logMethods.logError("Cannot write to Timeseries file directory at " + rootDirectory.getAbsolutePath() + " cannot start server");
+            throw new RuntimeException("Timeseries Directory not writable");
+        }
     }
 
     public void serialize(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {

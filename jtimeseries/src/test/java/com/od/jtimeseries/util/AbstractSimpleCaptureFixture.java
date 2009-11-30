@@ -6,6 +6,7 @@ import org.junit.After;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.timeseries.TimeSeries;
@@ -41,8 +42,7 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
 
     @Before
     public void setUp() {
-        ContextFactory contextFactory = new DefaultContextFactory();
-        rootContext = contextFactory.createRootContext("Test Root Context");
+        rootContext = new DefaultTimeSeriesContext("Test Root Context", "Test Root Context");
         doExtraSetUp();
     }
 

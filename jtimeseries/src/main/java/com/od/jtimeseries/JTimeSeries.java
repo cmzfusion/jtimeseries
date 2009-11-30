@@ -19,7 +19,7 @@
 package com.od.jtimeseries;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,6 +34,6 @@ public class JTimeSeries {
     }
 
     public static TimeSeriesContext createRootContext(String description) {
-        return new DefaultContextFactory().createRootContext(description);
+        return new DefaultTimeSeriesContext("JTimeSeries", description);
     }
 }

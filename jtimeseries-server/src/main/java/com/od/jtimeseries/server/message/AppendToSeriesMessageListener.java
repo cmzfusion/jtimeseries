@@ -22,15 +22,18 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpMessage;
 import com.od.jtimeseries.net.udp.UdpServer;
-import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.util.logging.LogUtils;
-import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -58,10 +61,10 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
     private LogMethods logMethod = LogUtils.getLogMethods(AppendToSeriesMessageListener.class);
     private TimeSeriesContext rootContext;
 
-    public AppendToSeriesMessageListener(TimeSeriesContext rootContext, ScheduledExecutorService staleSeriesExecutor) {
+    public AppendToSeriesMessageListener(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
 
-        scheduleReportingAndCleanup(staleSeriesExecutor);
+        scheduleReportingAndCleanup(Executors.newSingleThreadScheduledExecutor());
     }
 
     private void scheduleReportingAndCleanup(ScheduledExecutorService staleSeriesExecutor) {

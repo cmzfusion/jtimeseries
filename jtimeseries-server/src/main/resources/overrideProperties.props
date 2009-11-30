@@ -1,6 +1,0 @@
-seriesDirectory=${user.home}${file.separator}jtimeseries-server
-logDirectory=${seriesDirectory}
-logFileName=timeseries-server.log
-logLevel=INFO
-maxLogFileSizeInBytes=1000000
-maxLogFileCount=3

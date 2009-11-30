@@ -58,7 +58,7 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         createHandler();
     }
 
-    public boolean isLogFileWritable() {
+    public boolean isUsable() {
         return ( logFile.getParentFile().canWrite() && ! logFile.isDirectory() && (! logFile.exists() || logFile.canWrite()));
     }
 

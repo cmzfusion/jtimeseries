@@ -21,16 +21,21 @@ package com.od.jtimeseries.context.impl;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.source.*;
+import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
 
 import java.util.*;
 
@@ -47,10 +52,33 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
     private ContextQueries contextQueries = new DefaultContextQueries(this);
     private DefaultMetricCreator defaultMetricCreator = new DefaultMetricCreator(this);
 
+    /**
+     * Create a context without a parent (i.e. a root context), which has its own scheduler and factories for
+     * series, value sources, captures and child contexts, and sets default context properties.
+     * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
+     */
+    public DefaultTimeSeriesContext(String id, String description) {
+        this(null, id, description);
+        setScheduler(new DefaultScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler"));
+        setTimeSeriesFactory(new DefaultTimeSeriesFactory());
+        setValueSourceFactory(new DefaultValueSourceFactory());
+        setCaptureFactory(new DefaultCaptureFactory());
+        setContextFactory(new DefaultContextFactory());
+        setDefaultContextProperties();
+    }
+
+    /**
+     * Create a context without a parent (i.e. a root context)
+     */
     public DefaultTimeSeriesContext(TimeSeriesContext parentContext, String id, String description) {
         super(parentContext, id, description);
         checkId(id);
     }
+
+    private void setDefaultContextProperties() {
+        setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
+    }
+
 
     public TimeSeriesContext getRoot() {
         synchronized (getTreeLock()) {

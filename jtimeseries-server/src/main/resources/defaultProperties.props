@@ -1,0 +1,22 @@
+seriesDirectory=${user.home}${file.separator}jtimeseries-server
+logDirectory=${seriesDirectory}
+logFileName=timeseries-server.log
+logLevel=INFO
+maxLogFileSizeInBytes=1000000
+maxLogFileCount=3
+seriesFileSuffix=.TIMESERIES
+rootContextId=JTimeSeriesServer
+rootContextDescription=Root Context for Time Series Data
+fileAppendDelayMillis=300000
+fileRewriteDelayMillis=10000
+maxSeriesSize=10000
+maxSeriesCount=20000
+maxDiskSpaceForSeriesInMB=250
+maxSeriesFileAgeDays=31
+rootContextName=TimeSeriesServer Root Context
+rootContextDescription=TimeSeriesServer Root Context
+httpdDaemonPort=18080
+udpServerPort=18081
+
+
+

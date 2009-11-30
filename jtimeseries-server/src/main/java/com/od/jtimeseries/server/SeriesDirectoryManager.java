@@ -44,27 +44,33 @@ public class SeriesDirectoryManager {
     private File seriesDirectory;
     private RoundRobinSerializer roundRobinSerializer;
     private TimeSeriesContext rootContext;
-    private TimeSeriesServerConfig timeSeriesServerConfig;
+    private String seriesFileSuffix;
+    private int maxFileCount;
+    private int maxDiskSpaceForSeriesMb;
+    private int maxSeriesFileAgeDays;
     private int loadCount;
     private FileReaper reaper;
 
-    public SeriesDirectoryManager(File seriesDirectory, RoundRobinSerializer roundRobinSerializer, TimeSeriesContext rootContext, TimeSeriesServerConfig timeSeriesServerConfig) {
+    public SeriesDirectoryManager(File seriesDirectory, RoundRobinSerializer roundRobinSerializer, TimeSeriesContext rootContext, String seriesFileSuffix, int maxFileCount, int maxDiskSpaceForSeriesMb, int maxSeriesFileAgeDays) {
         this.seriesDirectory = seriesDirectory;
         this.roundRobinSerializer = roundRobinSerializer;
         this.rootContext = rootContext;
-        this.timeSeriesServerConfig = timeSeriesServerConfig;
+        this.seriesFileSuffix = seriesFileSuffix;
+        this.maxFileCount = maxFileCount;
+        this.maxDiskSpaceForSeriesMb = maxDiskSpaceForSeriesMb;
+        this.maxSeriesFileAgeDays = maxSeriesFileAgeDays;
 
-        createFileReaper(seriesDirectory, timeSeriesServerConfig);
+        createFileReaper(seriesDirectory, seriesFileSuffix);
     }
 
-    private void createFileReaper(File seriesDirectory, TimeSeriesServerConfig timeSeriesServerConfig) {
+    private void createFileReaper(File seriesDirectory, String seriesFileSuffix) {
         this.reaper = new FileReaper(
                 "Timeseries File Reaper",
                 seriesDirectory,
-                ".*" + timeSeriesServerConfig.getTimeSeriesFileSuffix(),
-                timeSeriesServerConfig.getMaxFileCount(),
-                timeSeriesServerConfig.getMaxDiskSpaceForTimeseriesMb() * 1024000,
-                Time.days(timeSeriesServerConfig.getMaxTimeseriesFileAgeDays()).getLengthInMillis()
+                ".*" + seriesFileSuffix,
+                maxFileCount,
+                maxDiskSpaceForSeriesMb * 1000000,
+                Time.days(maxSeriesFileAgeDays).getLengthInMillis()
         );
     }
 
@@ -103,9 +109,8 @@ public class SeriesDirectoryManager {
 
     private File[] getCandidateSeriesFiles() {
         return seriesDirectory.listFiles(new FilenameFilter() {
-            String seriesExtension = timeSeriesServerConfig.getTimeSeriesFileSuffix();
             public boolean accept(File dir, String name) {
-                return name.endsWith(seriesExtension);
+                return name.endsWith(seriesFileSuffix);
             }
         });
     }

@@ -27,4 +27,12 @@ package com.od.jtimeseries.util.logging;
 public interface LogMethodsFactory {
 
     LogMethods getLogMethods(Class c);
+
+    /**
+     * This method should return true if this LogMethodFactory can be used,
+     * false if some condition (eg. no log directory) prevents it from being used.
+     *
+     * @return true if this LogMethodFactory can be used
+     */
+    boolean isUsable();
 }

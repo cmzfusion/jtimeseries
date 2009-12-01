@@ -5,8 +5,8 @@
 	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
-	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="/defaultProperties.props"/>
+	<bean id="propertyConfigurer" class="com.od.jtimeseries.server.util.LoggingPropertyPlaceholderConfigurer">
+        <property name="location" value="/serverConfigProperties.props"/>
     </bean>
 
     <bean id="seriesDirectory" class="java.io.File">
@@ -82,7 +82,7 @@
         <constructor-arg value="${serverName}"/>
     </bean>
 
-    <bean id ="serverConfixJmx" class="com.od.jtimeseries.server.jmx.ServerConfigJmx">
+    <bean id ="serverConfigJmx" class="com.od.jtimeseries.server.jmx.ServerConfigJmx">
         <constructor-arg ref="udpClient"/>
         <property name="serverName" value="${serverName}"/>
         <property name="httpdDaemonPort" value="${httpdDaemonPort}"/>
@@ -95,7 +95,16 @@
     </bean>
 
     <bean id="timeSeriesServer" class="com.od.jtimeseries.server.JTimeSeriesServer">
-        <property name="serverAnnouncementPingPeriodSeconds" value="${serverAnnouncementPingPeriodSeconds}"/>        
+        <property name="serverAnnouncementPingPeriodSeconds" value="${serverAnnouncementPingPeriodSeconds}"/>
+        <property name="rootContext" ref="rootContext"/>
+        <property name="httpdServer" ref="httpdServer"/>
+        <property name="udpClient" ref="udpClient"/>
+        <property name="udpServer" ref="udpServer"/>
+        <property name="fileSerializer" ref="fileSerializer"/>
+        <property name="serverAnnouncementMessage" ref="serverAnnouncementMessage"/>
+        <property name="serverConfigJmx" ref="serverConfigJmx"/>
+        <property name="serverMetricInitializer" ref="serverMetricInitializer"/>
+        <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
     </bean>
 
 </beans>

@@ -36,6 +36,7 @@ import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
@@ -54,10 +55,20 @@ import java.net.UnknownHostException;
  */
 public class JTimeSeriesServer {
 
+    public static long startTime = System.currentTimeMillis();
     private static final LogMethods logMethods;
     private static final ApplicationContext ctx;
 
     private int serverAnnouncementPingPeriodSeconds = 30;
+    private TimeSeriesContext rootContext;
+    private UdpClient udpClient;
+    private RoundRobinSerializer fileSerializer;
+    private HttpServerAnnouncementMessage serverAnnouncementMessage;
+    private ServerConfigJmx serverConfigJmx;
+    private UdpServer udpServer;
+    private ServerMetricInitializer serverMetricInitializer;
+    private HtmlAdaptorServer htmlAdaptorServer;
+    private JTimeSeriesHttpd httpdServer;
 
     static {
         //set the hostname as a system property so that it is available on startup to the spring context property placeholder configurer
@@ -68,55 +79,23 @@ public class JTimeSeriesServer {
         ApplicationContext loggingContext = new ClassPathXmlApplicationContext("logContext.xml");
         configureLogging(loggingContext);
 
-        ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
         logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
+        logMethods.logInfo("Reading Spring Application Context");
+        ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 
-    public static void main(String[] args) throws IOException {
-        JTimeSeriesServer server = (JTimeSeriesServer)ctx.getBean("timeSeriesServer");
-        server.startup();
+    public JTimeSeriesServer() {
     }
 
-    private void startup() throws IOException {
-        long startTime = System.currentTimeMillis();
-        //config.writeAllConfigPropertiesToLog(logMethods);
+    private void startup() {
         logMethods.logInfo("Starting JTimeSeriesServer");
 
-        RoundRobinSerializer roundRobinSerializer = (RoundRobinSerializer)ctx.getBean("fileSerializer");
-
-        logMethods.logInfo("Starting Time Series Context");
-        TimeSeriesContext rootContext = (TimeSeriesContext)ctx.getBean("rootContext");
-
-        logMethods.logInfo("Starting Series Directory Manager");
-        SeriesDirectoryManager seriesDirectoryManager = (SeriesDirectoryManager)ctx.getBean("seriesDirectoryManager");
-        seriesDirectoryManager.removeOldTimeseriesFiles();
-        seriesDirectoryManager.loadExistingSeries();
-
-        logMethods.logInfo("Setting up server metrics series");
-        ServerMetricInitializer s = (ServerMetricInitializer)ctx.getBean("serverMetricInitializer");
-        s.initializeServerMetrics();
-
-        UdpClient udpClient = (UdpClient) ctx.getBean("udpClient");
-        UdpServer udpServer = (UdpServer)ctx.getBean("udpServer");
-
-        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
-        udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
-
-        JTimeSeriesHttpd httpd = (JTimeSeriesHttpd)ctx.getBean("httpdServer");
-
-        //this handler enables the TimeSeriesServer to be shutdown from an http call
-        //the plan is to add extra shutdown listeners to cleanly shut the server down (e.g. stop file writing and services first)
-        ShutdownHandlerFactory shutdownFactory = new ShutdownHandlerFactory(rootContext, new ShutdownHandlerFactory.SystemExitShutdownListener());
-        shutdownFactory.addShutdownListener(roundRobinSerializer);
-        httpd.setHandlerFactory(shutdownFactory);
-
-        logMethods.logInfo("Starting Client Pings");
-        HttpServerAnnouncementMessage announceMessage = (HttpServerAnnouncementMessage)ctx.getBean("serverAnnouncementMessage");
-        udpClient.sendRepeatedMessage(announceMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
-
-        logMethods.logInfo("Starting JMX Interface");
-        ServerConfigJmx serverConfigJmx = (ServerConfigJmx)ctx.getBean("serverConfixJmx");
-        startJmx(serverConfigJmx);
+        startSeriesDirectoryManager();
+        setupServerMetrics();
+        addUdpMessageListeners();
+        addHttpdShutdownHook();
+        startServerAnnouncementPings();
+        startJmx();
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
@@ -125,14 +104,44 @@ public class JTimeSeriesServer {
         logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
     }
 
-    private void startJmx(ServerConfigJmx serverConfigJmx) {
+    private void startServerAnnouncementPings() {
+        logMethods.logInfo("Starting Server Announcement Pings");
+        udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
+    }
+
+    private void addHttpdShutdownHook() {
+        //this handler enables the TimeSeriesServer to be shutdown from an http call
+        //the plan is to add extra shutdown listeners to cleanly shut the server down (e.g. stop file writing and services first)
+        ShutdownHandlerFactory shutdownFactory = new ShutdownHandlerFactory(rootContext, new ShutdownHandlerFactory.SystemExitShutdownListener());
+        shutdownFactory.addShutdownListener(fileSerializer);
+        httpdServer.setHandlerFactory(shutdownFactory);
+    }
+
+    private void addUdpMessageListeners() {
+        logMethods.logInfo("Adding UDP message listeners");
+        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
+        udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
+    }
+
+    private void setupServerMetrics() {
+        logMethods.logInfo("Setting up server metrics series");
+        serverMetricInitializer.initializeServerMetrics();
+    }
+
+    private void startSeriesDirectoryManager() {
+        logMethods.logInfo("Starting Series Directory Manager");
+        SeriesDirectoryManager seriesDirectoryManager = (SeriesDirectoryManager)ctx.getBean("seriesDirectoryManager");
+        seriesDirectoryManager.removeOldTimeseriesFiles();
+        seriesDirectoryManager.loadExistingSeries();
+    }
+
+    private void startJmx() {
+        logMethods.logInfo("Starting JMX Interface");
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
             ObjectName configMBeanName = new ObjectName("JTimeSeriesServerConfig:name=JTimeSeriesServerConfig");
             mBeanServer.registerMBean(serverConfigJmx, configMBeanName);
-
-            HtmlAdaptorServer htmlAdaptorServer = (HtmlAdaptorServer)ctx.getBean("htmlAdaptorServer");
             mBeanServer.registerMBean(htmlAdaptorServer, new ObjectName("adaptor:protocol=HTTP"));
 
             htmlAdaptorServer.start();
@@ -143,6 +152,42 @@ public class JTimeSeriesServer {
 
     public void setServerAnnouncementPingPeriodSeconds(int serverAnnouncementPingPeriodSeconds) {
         this.serverAnnouncementPingPeriodSeconds = serverAnnouncementPingPeriodSeconds;
+    }
+
+    public void setRootContext(TimeSeriesContext rootContext) {
+        this.rootContext = rootContext;
+    }
+
+    public void setUdpClient(UdpClient udpClient) {
+        this.udpClient = udpClient;
+    }
+
+    public void setFileSerializer(RoundRobinSerializer roundRobinSerializer) {
+        this.fileSerializer = roundRobinSerializer;
+    }
+
+    public void setServerAnnouncementMessage(HttpServerAnnouncementMessage announceMessage) {
+        this.serverAnnouncementMessage = announceMessage;
+    }
+
+    public void setServerConfigJmx(ServerConfigJmx serverConfigJmx) {
+        this.serverConfigJmx = serverConfigJmx;
+    }
+
+    public void setUdpServer(UdpServer udpServer) {
+        this.udpServer = udpServer;
+    }
+
+    public void setServerMetricInitializer(ServerMetricInitializer metricInitializer) {
+        this.serverMetricInitializer = metricInitializer;
+    }
+
+    public void setHtmlAdaptorServer(HtmlAdaptorServer htmlAdaptorServer) {
+        this.htmlAdaptorServer = htmlAdaptorServer;
+    }
+
+    public void setHttpdServer(JTimeSeriesHttpd httpdServer) {
+        this.httpdServer = httpdServer;
     }
 
     private static void configureLogging(ApplicationContext ctx) {
@@ -168,4 +213,8 @@ public class JTimeSeriesServer {
         return result;
     }
 
+    public static void main(String[] args) throws IOException {
+        JTimeSeriesServer server = (JTimeSeriesServer)ctx.getBean("timeSeriesServer");
+        server.startup();
+    }
 }

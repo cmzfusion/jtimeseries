@@ -1,23 +1,18 @@
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
+import com.od.jtimeseries.server.util.ServerDefaults;
+import com.od.jtimeseries.timeseries.ListTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.time.Time;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
-import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.server.serialization.FileHeader;
-import com.od.jtimeseries.server.serialization.SerializationException;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
-import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
-import com.od.jtimeseries.server.util.DefaultServerConfig;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -185,7 +180,7 @@ public class TestRoundRobinSerializer extends TestCase {
             }
         }
         tmpDir.deleteOnExit();
-        return new RoundRobinSerializer(tmpDir, DefaultServerConfig.DEFAULT_TIMESERIES_SUFFIX);
+        return new RoundRobinSerializer(tmpDir, ServerDefaults.DEFAULT_TIMESERIES_SUFFIX);
     }
 
     private void addNewItemsForTimestamps(List<TimeSeriesItem> s, long... timestampsForItems) {

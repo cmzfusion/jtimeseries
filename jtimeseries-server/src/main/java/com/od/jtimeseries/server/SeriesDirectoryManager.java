@@ -23,9 +23,8 @@ import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.util.FileReaper;
-import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
 
 import java.io.File;

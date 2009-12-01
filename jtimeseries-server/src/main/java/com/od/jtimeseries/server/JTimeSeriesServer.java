@@ -18,73 +18,69 @@
  */
 package com.od.jtimeseries.server;
 
-import com.od.jtimeseries.JTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
-import com.od.jtimeseries.net.httpd.NanoHTTPD;
-import com.od.jtimeseries.net.udp.AnnouncementMessage;
 import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.server.jmx.ServerConfigJmx;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory;
-import com.od.jtimeseries.server.util.DefaultServerConfig;
-import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
-import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
-import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
-import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
+import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
+import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogMethodsFactory;
+import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import java.io.File;
 import java.io.IOException;
-
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 16-May-2009
  * Time: 15:32:19
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class JTimeSeriesServer {
 
-    private static TimeSeriesServerConfig config;
-    private static LogMethods logMethods;
+    private static final LogMethods logMethods;
+    private static final ApplicationContext ctx;
+
+    private int serverAnnouncementPingPeriodSeconds = 30;
 
     static {
+        //set the hostname as a system property so that it is available on startup to the spring context property placeholder configurer
+        System.setProperty("hostname", getHostname());
+
         //First read the logging configuration and set this up before other classes are loaded, since other classes in JTimeSeriesServer will
         //initialize their static loggers when they are first loaded, and the logging subsystem needs to be set up first.
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("logContext.xml");
-        configureLogging(ctx);
-        logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
+        ApplicationContext loggingContext = new ClassPathXmlApplicationContext("logContext.xml");
+        configureLogging(loggingContext);
 
-        //Load the properties for this server instance
-        config = new DefaultServerConfig();
+        ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+        logMethods = LogUtils.getLogMethods(JTimeSeriesServer.class);
     }
 
-    private UdpClient udpClient;
-
-    public JTimeSeriesServer() throws IOException {
-        startup();
+    public static void main(String[] args) throws IOException {
+        JTimeSeriesServer server = (JTimeSeriesServer)ctx.getBean("timeSeriesServer");
+        server.startup();
     }
 
     private void startup() throws IOException {
         long startTime = System.currentTimeMillis();
-        config.writeAllConfigPropertiesToLog(logMethods);
+        //config.writeAllConfigPropertiesToLog(logMethods);
         logMethods.logInfo("Starting JTimeSeriesServer");
-
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
 
         RoundRobinSerializer roundRobinSerializer = (RoundRobinSerializer)ctx.getBean("fileSerializer");
 
@@ -97,10 +93,10 @@ public class JTimeSeriesServer {
         seriesDirectoryManager.loadExistingSeries();
 
         logMethods.logInfo("Setting up server metrics series");
-        ServerMetricInitializer s = new ServerMetricInitializer(config, rootContext, roundRobinSerializer);
+        ServerMetricInitializer s = (ServerMetricInitializer)ctx.getBean("serverMetricInitializer");
         s.initializeServerMetrics();
 
-        udpClient = (UdpClient)ctx.getBean("udpClient");
+        UdpClient udpClient = (UdpClient) ctx.getBean("udpClient");
         UdpServer udpServer = (UdpServer)ctx.getBean("udpServer");
 
         udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
@@ -115,30 +111,28 @@ public class JTimeSeriesServer {
         httpd.setHandlerFactory(shutdownFactory);
 
         logMethods.logInfo("Starting Client Pings");
-        AnnouncementMessage announceMessage = new HttpServerAnnouncementMessage(
-                config.getHttpdDaemonPort(),
-                config.getServerName()
-        );
-        udpClient.sendRepeatedMessage(announceMessage, config.getPingPeriodSeconds());
+        HttpServerAnnouncementMessage announceMessage = (HttpServerAnnouncementMessage)ctx.getBean("serverAnnouncementMessage");
+        udpClient.sendRepeatedMessage(announceMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
 
         logMethods.logInfo("Starting JMX Interface");
-        startJmx();
+        ServerConfigJmx serverConfigJmx = (ServerConfigJmx)ctx.getBean("serverConfixJmx");
+        startJmx(serverConfigJmx);
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
 
-        config.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
-        logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + config.getSecondsToStartServer() + " seconds");
+        serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
+        logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
     }
 
-    private void startJmx() {
+    private void startJmx(ServerConfigJmx serverConfigJmx) {
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
             ObjectName configMBeanName = new ObjectName("JTimeSeriesServerConfig:name=JTimeSeriesServerConfig");
-            mBeanServer.registerMBean(new ServerConfigJmx(config, udpClient), configMBeanName);
+            mBeanServer.registerMBean(serverConfigJmx, configMBeanName);
 
-            HtmlAdaptorServer htmlAdaptorServer = new HtmlAdaptorServer(config.getJmxHttpdPort());
+            HtmlAdaptorServer htmlAdaptorServer = (HtmlAdaptorServer)ctx.getBean("htmlAdaptorServer");
             mBeanServer.registerMBean(htmlAdaptorServer, new ObjectName("adaptor:protocol=HTTP"));
 
             htmlAdaptorServer.start();
@@ -147,10 +141,10 @@ public class JTimeSeriesServer {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        new JTimeSeriesServer();
+    public void setServerAnnouncementPingPeriodSeconds(int serverAnnouncementPingPeriodSeconds) {
+        this.serverAnnouncementPingPeriodSeconds = serverAnnouncementPingPeriodSeconds;
     }
-    
+
     private static void configureLogging(ApplicationContext ctx) {
         LogMethodsFactory f = (LogMethodsFactory)ctx.getBean("logMethodsFactory", LogMethodsFactory.class);
         boolean logMethodsOk = f.isUsable();
@@ -162,6 +156,16 @@ public class JTimeSeriesServer {
                     ". Will log to standard out"
             );
         }
+    }
+
+    private static String getHostname() {
+        String result = "(Unknown Host)";
+        try {
+            result = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            logMethods.logError("Failed to find hostname", e);
+        }
+        return result;
     }
 
 }

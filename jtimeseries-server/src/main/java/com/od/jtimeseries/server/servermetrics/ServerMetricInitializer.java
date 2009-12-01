@@ -4,7 +4,6 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
-import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -12,6 +11,7 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -33,13 +33,12 @@ public class ServerMetricInitializer {
     private String metricsContextPath;
 
     private List<ServerMetric> metrics = new ArrayList<ServerMetric>();
-    private ScheduledExecutorService scheduledExecutor;
+    private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
-    public ServerMetricInitializer(TimeSeriesServerConfig serverProperties, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer) {
+    public ServerMetricInitializer(String metricsContextPath, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer) {
         this.rootContext = rootContext;
         this.roundRobinSerializer = roundRobinSerializer;
-        this.metricsContextPath = serverProperties.getServerMetricsContextPath();
-        this.scheduledExecutor = serverProperties.getServerMaintenanceExecutor();
+        this.metricsContextPath = metricsContextPath;
         metricsContext = rootContext.getOrCreateContextForPath(metricsContextPath);
     }
 

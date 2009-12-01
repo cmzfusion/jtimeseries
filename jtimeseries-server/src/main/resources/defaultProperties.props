@@ -1,3 +1,4 @@
+serverName=JTimeseries Server ${hostname}
 seriesDirectory=${user.home}${file.separator}jtimeseries-server
 logDirectory=${seriesDirectory}
 logFileName=timeseries-server.log
@@ -17,6 +18,9 @@ rootContextName=TimeSeriesServer Root Context
 rootContextDescription=TimeSeriesServer Root Context
 httpdDaemonPort=18080
 udpServerPort=18081
+jmxHttpdPort=18082
+serverAnnouncementPingPeriodSeconds=30
+serverMetricsContextPath=jtimeseries-server
 
 
 

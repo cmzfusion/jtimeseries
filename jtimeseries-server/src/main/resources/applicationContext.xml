@@ -62,6 +62,12 @@
 
     <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient"/>
 
+    <bean id="serverMetricInitializer" class="com.od.jtimeseries.server.servermetrics.ServerMetricInitializer">
+        <constructor-arg value="${serverMetricsContextPath}"/>
+        <constructor-arg ref="rootContext"/>
+        <constructor-arg ref="fileSerializer"/>
+    </bean>
+
     <bean id="udpServer" class="com.od.jtimeseries.net.udp.UdpServer">
         <constructor-arg value="${udpServerPort}"/>
     </bean>
@@ -71,5 +77,25 @@
         <constructor-arg ref="rootContext"/>
     </bean>
 
+    <bean id ="serverAnnouncementMessage" class="com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage">
+        <constructor-arg value="${httpdDaemonPort}"/>
+        <constructor-arg value="${serverName}"/>
+    </bean>
+
+    <bean id ="serverConfixJmx" class="com.od.jtimeseries.server.jmx.ServerConfigJmx">
+        <constructor-arg ref="udpClient"/>
+        <property name="serverName" value="${serverName}"/>
+        <property name="httpdDaemonPort" value="${httpdDaemonPort}"/>
+        <property name="jmxHttpdPort" value="${jmxHttpdPort}"/>
+        <property name="udpServerPort" value="${udpServerPort}"/>
+    </bean>
+
+    <bean id="htmlAdaptorServer" class="com.sun.jdmk.comm.HtmlAdaptorServer">
+        <constructor-arg value="${jmxHttpdPort}"/>
+    </bean>
+
+    <bean id="timeSeriesServer" class="com.od.jtimeseries.server.JTimeSeriesServer">
+        <property name="serverAnnouncementPingPeriodSeconds" value="${serverAnnouncementPingPeriodSeconds}"/>        
+    </bean>
 
 </beans>

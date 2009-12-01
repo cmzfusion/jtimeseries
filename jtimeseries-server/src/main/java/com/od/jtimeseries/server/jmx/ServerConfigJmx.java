@@ -19,7 +19,6 @@
 package com.od.jtimeseries.server.jmx;
 
 import com.od.jtimeseries.net.udp.UdpClient;
-import com.od.jtimeseries.server.util.TimeSeriesServerConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,32 +31,64 @@ import java.util.List;
  */
 public class ServerConfigJmx implements ServerConfigJmxMBean {
 
-    private TimeSeriesServerConfig timeSeriesServerConfig;
     private UdpClient udpClientForServerAnnounceMessages;
 
-    public ServerConfigJmx(TimeSeriesServerConfig timeSeriesServerConfig, UdpClient udpClientForServerAnnounceMessages) {
-        this.timeSeriesServerConfig = timeSeriesServerConfig;
+    private String serverName;
+    private int httpdDaemonPort;
+    private int jmxHttpdPort;
+    private int udpServerPort;
+    private int secondsToStartServer;
+
+    public ServerConfigJmx(UdpClient udpClientForServerAnnounceMessages) {
+        this.udpClientForServerAnnounceMessages = udpClientForServerAnnounceMessages;
+    }
+
+    public UdpClient getUdpClientForServerAnnounceMessages() {
+        return udpClientForServerAnnounceMessages;
+    }
+
+    public void setUdpClientForServerAnnounceMessages(UdpClient udpClientForServerAnnounceMessages) {
         this.udpClientForServerAnnounceMessages = udpClientForServerAnnounceMessages;
     }
 
     public String getServerName() {
-        return timeSeriesServerConfig.getServerName();
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
     }
 
     public int getHttpdDaemonPort() {
-        return timeSeriesServerConfig.getHttpdDaemonPort();
+        return httpdDaemonPort;
+    }
+
+    public void setHttpdDaemonPort(int httpdDaemonPort) {
+        this.httpdDaemonPort = httpdDaemonPort;
     }
 
     public int getJmxHttpdPort() {
-        return timeSeriesServerConfig.getJmxHttpdPort();
+        return jmxHttpdPort;
+    }
+
+    public void setJmxHttpdPort(int jmxHttpdPort) {
+        this.jmxHttpdPort = jmxHttpdPort;
     }
 
     public int getUdpServerPort() {
-        return timeSeriesServerConfig.getUdpServerPort();
+        return udpServerPort;
+    }
+
+    public void setUdpServerPort(int udpServerPort) {
+        this.udpServerPort = udpServerPort;
     }
 
     public int getSecondsToStartServer() {
-        return timeSeriesServerConfig.getSecondsToStartServer();
+        return secondsToStartServer;
+    }
+
+    public void setSecondsToStartServer(int secondsToStartServer) {
+        this.secondsToStartServer = secondsToStartServer;
     }
 
     public String[] getPingHostnames() {

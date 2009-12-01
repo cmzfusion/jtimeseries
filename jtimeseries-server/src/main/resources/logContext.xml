@@ -15,7 +15,7 @@
 	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
 	<!-- In this case we will read the properties from sys props so we don't need to specify any config files-->
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="location" value="/defaultProperties.props"/>
+        <property name="location" value="/serverConfigProperties.props"/>
     </bean>
 
     <bean id="seriesDirectory" class="java.io.File">

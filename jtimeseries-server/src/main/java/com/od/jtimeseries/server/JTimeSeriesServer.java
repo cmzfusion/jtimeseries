@@ -36,7 +36,6 @@ import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;

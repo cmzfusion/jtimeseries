@@ -40,10 +40,15 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+import javax.management.remote.JMXServiceURL;
+import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.rmi.registry.LocateRegistry;
+import java.lang.management.ManagementFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -90,6 +95,7 @@ public class JTimeSeriesServer {
         logMethods.logInfo("Starting JTimeSeriesServer");
 
         startSeriesDirectoryManager();
+        startJmxServer(4422);
         setupServerMetrics();
         addUdpMessageListeners();
         addHttpdShutdownHook();
@@ -101,6 +107,18 @@ public class JTimeSeriesServer {
 
         serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
         logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
+    }
+
+    private void startJmxServer(int port) {
+        try {
+            LocateRegistry.createRegistry(port);
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:" + port + "/jmxrmi");
+            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
+            cs.start();
+        } catch (IOException e) {
+            logMethods.logError("Error creating jmx server", e);
+        }
     }
 
     private void startServerAnnouncementPings() {

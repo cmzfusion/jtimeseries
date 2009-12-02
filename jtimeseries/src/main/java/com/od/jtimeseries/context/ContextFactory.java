@@ -28,5 +28,10 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface ContextFactory extends Identifiable {
 
+    /**
+     * @param parent, may be null in which case a root context should be created.
+     */
     TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description);
+
+    TimeSeriesContext createRootContext(String id, String description);
 }

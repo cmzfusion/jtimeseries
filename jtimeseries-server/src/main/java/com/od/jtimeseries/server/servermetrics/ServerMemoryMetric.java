@@ -13,10 +13,12 @@ import com.od.jtimeseries.capture.impl.DefaultCapture;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
-import javax.management.MBeanServerConnection;
+import javax.management.*;
+import javax.management.openmbean.CompositeDataSupport;
 //import javax.management.ObjectName;
 //import javax.management.JMX;
 import java.lang.management.MemoryMXBean;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,6 +38,7 @@ public class ServerMemoryMetric extends ServerMetric {
 
     private volatile ValueRecorder valueRecorder;
     private volatile MemoryMXBean remoteMemoryBean;
+    public MBeanServerConnection jmxConnection;
 
     public ServerMemoryMetric() {}
 
@@ -62,12 +65,12 @@ public class ServerMemoryMetric extends ServerMetric {
     private void connectJmx() {
         String port = System.getProperty("com.sun.management.jmxremote.port");
         String nonSecure = System.getProperty("com.sun.management.jmxremote.authenticate");
-        if ( port != null && nonSecure != null) {
+//        if ( port != null && nonSecure != null) {
             try {
-                JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + port + "/jmxrmi");
+                JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + 4422 + "/jmxrmi");
                 JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
-                MBeanServerConnection m = jmxc.getMBeanServerConnection();
-//                remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);
+                jmxConnection = jmxc.getMBeanServerConnection();
+                //remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);
 
                 //
                 //            System.out.println("\nDomains:");
@@ -89,15 +92,22 @@ public class ServerMemoryMetric extends ServerMetric {
             } catch ( Throwable t) {
                 logMethods.logError("Failed to start server monitoring by jmx", t);
             }
-        } else {
-            logMethods.logInfo("Not starting memory monitoring, jmxremote port not set or requires authentication");
-        }
+//        } else {
+//            logMethods.logInfo("Not starting memory monitoring, jmxremote port not set or requires authentication");
+//        }
     }
 
     public void run() {
-        if ( remoteMemoryBean != null) {
-            long memory = (remoteMemoryBean.getHeapMemoryUsage().getUsed() + remoteMemoryBean.getNonHeapMemoryUsage().getUsed()) / 1000000;
-            valueRecorder.newValue(memory);
+//        if ( remoteMemoryBean != null) {
+//            long memory = (remoteMemoryBean.getHeapMemoryUsage().getUsed() + remoteMemoryBean.getNonHeapMemoryUsage().getUsed()) / 1000000;
+//            valueRecorder.newValue(memory);
+//        }
+        if ( jmxConnection != null) {
+            try {
+                System.out.println("MEMORY " + ((CompositeDataSupport)jmxConnection.getAttribute(new ObjectName("java.lang:type=Memory"),"HeapMemoryUsage")).get("committed"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            } 
         }
     }
 }

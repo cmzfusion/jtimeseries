@@ -53,26 +53,42 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
     private DefaultMetricCreator defaultMetricCreator = new DefaultMetricCreator(this);
 
     /**
+     * Create a context without a parent (i.e. a root context), using a default id and description, which has its own
+     * scheduler and factories for series, value sources, captures and child contexts, and sets default context properties.
+     * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
+     */
+    public DefaultTimeSeriesContext() {
+        this(null, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID);
+    }
+
+    /**
      * Create a context without a parent (i.e. a root context), which has its own scheduler and factories for
      * series, value sources, captures and child contexts, and sets default context properties.
      * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
      */
     public DefaultTimeSeriesContext(String id, String description) {
         this(null, id, description);
-        setScheduler(new DefaultScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler"));
+    }
+
+    /**
+     * Create a context which is a child of the parentContext supplied
+     * @param parentContext parentContext or null, if null then a root context is created
+     */
+    public DefaultTimeSeriesContext(TimeSeriesContext parentContext, String id, String description) {
+        super(parentContext, id, description);
+        checkId(id);
+        if ( parentContext == null) {
+            createRootContextResources(id);
+        }
+    }
+
+    private void createRootContextResources(String id) {
+        setScheduler(new DefaultScheduler(id + " Scheduler", id + "Scheduler"));
         setTimeSeriesFactory(new DefaultTimeSeriesFactory());
         setValueSourceFactory(new DefaultValueSourceFactory());
         setCaptureFactory(new DefaultCaptureFactory());
         setContextFactory(new DefaultContextFactory());
         setDefaultContextProperties();
-    }
-
-    /**
-     * Create a context without a parent (i.e. a root context)
-     */
-    public DefaultTimeSeriesContext(TimeSeriesContext parentContext, String id, String description) {
-        super(parentContext, id, description);
-        checkId(id);
     }
 
     private void setDefaultContextProperties() {

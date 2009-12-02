@@ -66,6 +66,7 @@
         <constructor-arg value="${serverMetricsContextPath}"/>
         <constructor-arg ref="rootContext"/>
         <constructor-arg ref="fileSerializer"/>
+        <constructor-arg value="${jmxManagementPort}"/>
     </bean>
 
     <bean id="udpServer" class="com.od.jtimeseries.net.udp.UdpServer">
@@ -105,6 +106,7 @@
         <property name="serverConfigJmx" ref="serverConfigJmx"/>
         <property name="serverMetricInitializer" ref="serverMetricInitializer"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
+        <property name="jmxManagementPort" value="${jmxManagementPort}"/>
     </bean>
 
 </beans>

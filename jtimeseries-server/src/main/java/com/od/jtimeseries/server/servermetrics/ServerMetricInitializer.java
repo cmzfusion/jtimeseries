@@ -31,14 +31,16 @@ public class ServerMetricInitializer {
     private TimeSeriesContext metricsContext;
 
     private String metricsContextPath;
+    private int jmxManagementPort;
 
     private List<ServerMetric> metrics = new ArrayList<ServerMetric>();
     private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
-    public ServerMetricInitializer(String metricsContextPath, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer) {
+    public ServerMetricInitializer(String metricsContextPath, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer, int jmxManagementPort) {
         this.rootContext = rootContext;
         this.roundRobinSerializer = roundRobinSerializer;
         this.metricsContextPath = metricsContextPath;
+        this.jmxManagementPort = jmxManagementPort;
         metricsContext = rootContext.getOrCreateContextForPath(metricsContextPath);
     }
 
@@ -52,7 +54,7 @@ public class ServerMetricInitializer {
         metrics.add(new LiveSeriesMetric());
         metrics.add(new UpdatesReceivedMetric());
         metrics.add(new TotalSeriesCountMetric(rootContext));
-        metrics.add(new ServerMemoryMetric());
+        metrics.add(new ServerMemoryMetric(jmxManagementPort));
     }
 
     private void setupMetrics() {

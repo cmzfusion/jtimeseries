@@ -39,8 +39,11 @@ public class ServerMemoryMetric extends ServerMetric {
     private volatile ValueRecorder valueRecorder;
     private volatile MemoryMXBean remoteMemoryBean;
     public MBeanServerConnection jmxConnection;
+    private int jmxManagementPort;
 
-    public ServerMemoryMetric() {}
+    public ServerMemoryMetric(int jmxManagementPort) {
+        this.jmxManagementPort = jmxManagementPort;
+    }
 
     public TimePeriod getSchedulingPeriod() {
         return Time.seconds(15);
@@ -67,7 +70,7 @@ public class ServerMemoryMetric extends ServerMetric {
         String nonSecure = System.getProperty("com.sun.management.jmxremote.authenticate");
 //        if ( port != null && nonSecure != null) {
             try {
-                JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + 4422 + "/jmxrmi");
+                JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi");
                 JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
                 jmxConnection = jmxc.getMBeanServerConnection();
                 //remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);

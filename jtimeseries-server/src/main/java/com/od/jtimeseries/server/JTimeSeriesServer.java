@@ -64,6 +64,7 @@ public class JTimeSeriesServer {
     private static final ApplicationContext ctx;
 
     private int serverAnnouncementPingPeriodSeconds = 30;
+    private int jmxManagementPort;
     private TimeSeriesContext rootContext;
     private UdpClient udpClient;
     private RoundRobinSerializer fileSerializer;
@@ -95,7 +96,7 @@ public class JTimeSeriesServer {
         logMethods.logInfo("Starting JTimeSeriesServer");
 
         startSeriesDirectoryManager();
-        startJmxServer(4422);
+        startJmxManagementServer();
         setupServerMetrics();
         addUdpMessageListeners();
         addHttpdShutdownHook();
@@ -109,11 +110,12 @@ public class JTimeSeriesServer {
         logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
     }
 
-    private void startJmxServer(int port) {
+    private void startJmxManagementServer() {
         try {
-            LocateRegistry.createRegistry(port);
+            logMethods.logInfo("Starting JMX Management Service");
+            LocateRegistry.createRegistry(jmxManagementPort);
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:" + port + "/jmxrmi");
+            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:" + jmxManagementPort + "/jmxrmi");
             JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
             cs.start();
         } catch (IOException e) {
@@ -153,7 +155,7 @@ public class JTimeSeriesServer {
     }
 
     private void startJmx() {
-        logMethods.logInfo("Starting JMX Interface");
+        logMethods.logInfo("Starting JMX Html Adapter Interface");
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
@@ -205,6 +207,10 @@ public class JTimeSeriesServer {
 
     public void setHttpdServer(JTimeSeriesHttpd httpdServer) {
         this.httpdServer = httpdServer;
+    }
+
+    public void setJmxManagementPort(int jmxManagementPort) {
+        this.jmxManagementPort = jmxManagementPort;
     }
 
     private static void configureLogging(ApplicationContext ctx) {

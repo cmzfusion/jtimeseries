@@ -38,8 +38,11 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
 
     public Numeric calculateAggregateValue() {
         long result = total;
-        total = 0;
         return new LongNumeric(result);
+    }
+
+    public void clear() {
+        total = 0;
     }
 
     public String getDescription() {

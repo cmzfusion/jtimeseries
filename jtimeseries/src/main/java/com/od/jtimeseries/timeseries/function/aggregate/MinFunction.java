@@ -37,9 +37,11 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        Numeric result = new DoubleNumeric(min);
+        return new DoubleNumeric(min);
+    }
+
+    public void clear() {
         min = Double.NaN;
-        return result;
     }
 
     public String getDescription() {

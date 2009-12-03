@@ -76,12 +76,15 @@ public class MeanCountCaptureFunction extends AbstractCaptureFunction {
 
         public Numeric calculateAggregateValue() {
             double result = total;
-            total = 0;
             return new DoubleNumeric(result / divisor);
         }
 
         public String getDescription() {
             return doGetDescription();
+        }
+
+        public void clear() {
+            total = 0;
         }
 
         public AggregateFunction newInstance() {

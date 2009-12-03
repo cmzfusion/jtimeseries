@@ -32,6 +32,8 @@ public interface AggregateFunction {
 
     String getDescription();
 
+    void clear();
+
     /**
      * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance
      * can be used as a prototype

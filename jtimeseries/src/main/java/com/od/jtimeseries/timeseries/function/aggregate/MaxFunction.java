@@ -37,9 +37,11 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
     }
 
     public Numeric calculateAggregateValue() {
-        Numeric result = new DoubleNumeric(max);
+        return new DoubleNumeric(max);
+    }
+
+    public void clear() {
         max = Double.NaN;
-        return result;
     }
 
     public String getDescription() {

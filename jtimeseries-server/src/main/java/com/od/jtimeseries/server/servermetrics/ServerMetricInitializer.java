@@ -5,12 +5,15 @@ import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.util.time.Time;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +57,40 @@ public class ServerMetricInitializer {
         metrics.add(new LiveSeriesMetric());
         metrics.add(new UpdatesReceivedMetric());
         metrics.add(new TotalSeriesCountMetric(rootContext));
-        metrics.add(new ServerMemoryMetric(jmxManagementPort));
+        //metrics.add(new ServerMemoryMetric(jmxManagementPort));
+        JmxMetric.NameAttributeAndKey heapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "HeapMemoryUsage","used");
+        JmxMetric.NameAttributeAndKey nonHeapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "NonHeapMemoryUsage","used");
+
+        metrics.add(
+            new JmxMetric(
+                Time.seconds(15),
+                "ServerMemory",
+                "Memory usage by server in MB",
+                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
+                Arrays.asList(heapUsed, nonHeapUsed),
+                AggregateFunctions.SUM()
+            )
+        );
+
+        metrics.add(
+            new JmxMetric(
+                Time.seconds(15),
+                "ServerHeapMemory",
+                "Heap Memory usage by server in MB",
+                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
+                "java.lang:type=Memory", "HeapMemoryUsage", "used"
+            )
+        );
+
+        metrics.add(
+            new JmxMetric(
+                Time.seconds(15),
+                "ServerNonHeapMemory",
+                "Heap Memory usage by server in MB",
+                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
+                "java.lang:type=Memory", "NonHeapMemoryUsage", "used"
+            )
+        );
     }
 
     private void setupMetrics() {

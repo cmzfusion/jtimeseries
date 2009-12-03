@@ -107,7 +107,7 @@ public class ServerMemoryMetric extends ServerMetric {
 //        }
         if ( jmxConnection != null) {
             try {
-                System.out.println("MEMORY " + ((CompositeDataSupport)jmxConnection.getAttribute(new ObjectName("java.lang:type=Memory"),"HeapMemoryUsage")).get("committed"));
+                System.out.println("MEMORY " + ((CompositeDataSupport)jmxConnection.getAttribute(new ObjectName("java.lang:type=Memory"),"HeapMemoryUsage")).get("used"));
             } catch (Exception e) {
                 e.printStackTrace();
             } 

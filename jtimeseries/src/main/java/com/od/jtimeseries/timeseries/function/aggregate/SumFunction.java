@@ -37,9 +37,11 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        double result = total;
+        return new DoubleNumeric(total);
+    }
+
+    public void clear() {
         total = Double.NaN;
-        return new DoubleNumeric(result);
     }
 
     public String getDescription() {

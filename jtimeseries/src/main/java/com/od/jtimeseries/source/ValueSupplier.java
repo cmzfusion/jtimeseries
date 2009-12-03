@@ -13,5 +13,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public interface ValueSupplier {
 
+    /**
+     * @return Numeric value, or null if no value can be obtained
+     */
      Numeric getValue();
 }

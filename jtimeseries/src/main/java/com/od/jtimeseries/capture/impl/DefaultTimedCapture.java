@@ -153,6 +153,8 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             return "DummyFunction";
         }
 
+        public void clear() {}
+
         public AggregateFunction newInstance() {
             return new DummyFunction();
         }

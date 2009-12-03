@@ -43,9 +43,12 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
         if ( count > 0 ) {
             result = sum / count;
         }
+        return new DoubleNumeric(result);
+    }
+
+    public void clear() {
         sum = 0;
         count = 0;
-        return new DoubleNumeric(result);
     }
 
     public String getDescription() {

@@ -1,12 +1,10 @@
 package com.od.jtimeseries.server.servermetrics;
 
-import com.od.jtimeseries.capture.impl.DefaultCapture;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.source.ValueRecorder;
-import com.od.jtimeseries.source.impl.DefaultValueRecorder;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.source.ValueSupplier;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.numeric.LongNumeric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,42 +15,30 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public class TotalSeriesCountMetric extends ServerMetric {
 
-    public static final String TOTAL_SERIES_COUNT_ID = "TotalSeriesCount";
-    private static final String COUNT_OF_UDP_SERIES_UPDATES_DESC = "Total number of series managed by the server";
-
+    private static final String id = "TotalSeriesCount";
     private TimeSeriesContext rootContext;
-    private ValueRecorder matchesValueRecorder;
 
     public TotalSeriesCountMetric(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
     }
 
-    public TimePeriod getSchedulingPeriod() {
-        return Time.minutes(15);
-    }
-
     public String getSeriesId() {
-        return TOTAL_SERIES_COUNT_ID;
+        return id;
     }
 
-    public String getMetricDescription() {
-        return COUNT_OF_UDP_SERIES_UPDATES_DESC;
-    }
-
-    public void setupSeries(TimeSeriesContext metricContext, IdentifiableTimeSeries timeSeries) {
-        //n.b. usually we could use metricContext.createCounter() to create the counter, capture and series in one method call,
-        //but here the series is already created (may have been reloaded) so create and add the Counter and timed capture the hard way.
-        matchesValueRecorder = new DefaultValueRecorder("Source_" + getSeriesId(), "Counter for " + getSeriesId());
-        DefaultCapture t = new DefaultCapture("Capture " + getSeriesId(), matchesValueRecorder, timeSeries);
-        metricContext.addChild(matchesValueRecorder, t);
-
-        //take a first value immediately
-        run();
-    }
-
-    public void run() {
-        matchesValueRecorder.newValue(
-            rootContext.findAllTimeSeries().getNumberOfMatches()
+    public void setupSeries(TimeSeriesContext metricContext) {
+        metricContext.createTimedValueSource(
+                id,
+            "Total number of series managed by the server",
+            new TotalSeriesCountValueSupplier(),
+            Time.minutes(15)
         );
+    }
+
+    private class TotalSeriesCountValueSupplier implements ValueSupplier {
+
+        public Numeric getValue() {
+            return new LongNumeric(rootContext.findAllTimeSeries().getNumberOfMatches());
+        }
     }
 }

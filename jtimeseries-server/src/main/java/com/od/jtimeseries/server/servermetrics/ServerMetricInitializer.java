@@ -5,18 +5,12 @@ import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import com.od.jtimeseries.util.time.Time;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +31,6 @@ public class ServerMetricInitializer {
     private int jmxManagementPort;
 
     private List<ServerMetric> metrics = new ArrayList<ServerMetric>();
-    private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
     public ServerMetricInitializer(String metricsContextPath, TimeSeriesContext rootContext, RoundRobinSerializer roundRobinSerializer, int jmxManagementPort) {
         this.rootContext = rootContext;
@@ -57,58 +50,17 @@ public class ServerMetricInitializer {
         metrics.add(new LiveSeriesMetric());
         metrics.add(new UpdatesReceivedMetric());
         metrics.add(new TotalSeriesCountMetric(rootContext));
-        //metrics.add(new ServerMemoryMetric(jmxManagementPort));
-        JmxMetric.NameAttributeAndKey heapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "HeapMemoryUsage","used");
-        JmxMetric.NameAttributeAndKey nonHeapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "NonHeapMemoryUsage","used");
-
         metrics.add(
-            new JmxMetric(
-                Time.seconds(15),
-                "ServerMemory",
-                "Memory usage by server in MB",
-                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
-                Arrays.asList(heapUsed, nonHeapUsed),
-                AggregateFunctions.SUM()
-            )
-        );
-
-        metrics.add(
-            new JmxMetric(
-                Time.seconds(15),
-                "ServerHeapMemory",
-                "Heap Memory usage by server in MB",
-                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
-                "java.lang:type=Memory", "HeapMemoryUsage", "used"
-            )
-        );
-
-        metrics.add(
-            new JmxMetric(
-                Time.seconds(15),
-                "ServerNonHeapMemory",
-                "Heap Memory usage by server in MB",
-                "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
-                "java.lang:type=Memory", "NonHeapMemoryUsage", "used"
-            )
+            ServerMemoryMetric.createServerMemoryMetric(jmxManagementPort)
         );
     }
 
     private void setupMetrics() {
         for (ServerMetric t : metrics) {
             setupMetric(t);
-            scheduleMetric(t);
         }
     }
 
-    private void scheduleMetric(ServerMetric t) {
-        if ( t.getSchedulingPeriod() != null) {
-
-            //schedule the task for this metric, if it requires scheduling
-            scheduledExecutor.scheduleAtFixedRate(
-                t, t.getSchedulingPeriod().getLengthInMillis(), t.getSchedulingPeriod().getLengthInMillis(), TimeUnit.MILLISECONDS
-            );
-        }
-    }
 
     /**
      *  The server's own metrics series should have been loaded along with all the other persisted series if this is not the first startup.
@@ -132,12 +84,11 @@ public class ServerMetricInitializer {
         }
 
         logMethods.logInfo("Setting up server metrics series at " + expectedPath );
-        if ( newSeries == null) {
-            newSeries = metricsContext.createTimeSeries(metric.getSeriesId(), metric.getMetricDescription());
+        newSeries = metricsContext.getTimeSeries(metric.getSeriesId());
+        if ( newSeries != null) {
+            metric.setupSeries(metricsContext);
+            insertDataFromOldSeries(newSeries, oldSeries);
         }
-        metric.setupSeries(metricsContext, newSeries);
-
-        insertDataFromOldSeries(newSeries, oldSeries);
     }
 
     private void insertDataFromOldSeries(IdentifiableTimeSeries series, IdentifiableTimeSeries oldSeries) {

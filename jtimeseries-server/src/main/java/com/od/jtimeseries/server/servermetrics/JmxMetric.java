@@ -2,13 +2,11 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
-import com.od.jtimeseries.timeseries.function.aggregate.AbstractDoubleBasedAggregateFunction;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.source.ValueSupplier;
 
 import javax.management.remote.JMXServiceURL;
@@ -44,7 +42,7 @@ public class JmxMetric extends ServerMetric {
     private JmxValueSupplier valueSupplier = new JmxValueSupplier();
 
     public JmxMetric(TimePeriod timePeriod, String id, String description, String serviceUrl, String objectName, String attribute, String compositeDataKey ) {
-        this(timePeriod, id, description, serviceUrl, Arrays.asList(new NameAttributeAndKey(objectName, attribute, compositeDataKey)), new FinalValueAggregateFunction());
+        this(timePeriod, id, description, serviceUrl, Arrays.asList(new NameAttributeAndKey(objectName, attribute, compositeDataKey)), AggregateFunctions.MAX()); //max of 1 value is that value
     }
 
     public JmxMetric(TimePeriod timePeriod, String id, String description, String serviceUrl, List<NameAttributeAndKey> listOfNameAttributeAndKey, AggregateFunction aggregateFunction) {
@@ -56,28 +54,17 @@ public class JmxMetric extends ServerMetric {
         this.aggregateFunction = aggregateFunction;
     }
 
-    public TimePeriod getSchedulingPeriod() {
-        return timePeriod;
-    }
-
     public String getSeriesId() {
         return id;
     }
 
-    public String getMetricDescription() {
-        return description;
-    }
-
-    public void setupSeries(TimeSeriesContext metricContext, IdentifiableTimeSeries series) {
+    public void setupSeries(TimeSeriesContext metricContext) {
         try {
             url = new JMXServiceURL(serviceUrl);
         } catch (MalformedURLException e) {
             logMethods.logError("Failed to set up JMX Metric " + id + " - bad URL " + serviceUrl, e);
         }
         metricContext.createTimedValueSource(id, description, valueSupplier, timePeriod);
-    }
-
-    public void run() {
     }
 
     public void setConnectorEnvironment(Map<String, ?> connectorEnvironment) {
@@ -143,31 +130,6 @@ public class JmxMetric extends ServerMetric {
 
         public String getCompositeDataKey() {
             return compositeDataKey;
-        }
-    }
-
-    private static class FinalValueAggregateFunction extends AbstractDoubleBasedAggregateFunction {
-
-        private double value = Double.NaN;
-
-        protected void doAddValue(double d) {
-            this.value = d;
-        }
-
-        public Numeric calculateAggregateValue() {
-            return new DoubleNumeric(value);
-        }
-
-        public String getDescription() {
-            return "FinalValue";
-        }
-
-        public void clear() {
-            value = Double.NaN;
-        }
-
-        public AggregateFunction newInstance() {
-            return new FinalValueAggregateFunction();
         }
     }
 }

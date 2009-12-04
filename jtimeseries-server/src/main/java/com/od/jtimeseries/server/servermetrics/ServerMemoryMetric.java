@@ -6,6 +6,8 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;
 import com.od.jtimeseries.capture.impl.DefaultCapture;
@@ -19,6 +21,8 @@ import javax.management.openmbean.CompositeDataSupport;
 //import javax.management.JMX;
 import java.lang.management.MemoryMXBean;
 import java.io.IOException;
+import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,88 +33,23 @@ import java.io.IOException;
  *
  * Use JMX to monitor server's own memory usage
  */
-public class ServerMemoryMetric extends ServerMetric {
+public class ServerMemoryMetric extends JmxMetric {
 
-    LogMethods logMethods = LogUtils.getLogMethods(ServerMemoryMetric.class);
-
-    private String SERVER_MEMORY_ID = "ServerMemory";
-    private String SERVER_MEMORY_DESCRIPTION = "Memory usage by server in MB";
-
-    private volatile ValueRecorder valueRecorder;
-    private volatile MemoryMXBean remoteMemoryBean;
-    public MBeanServerConnection jmxConnection;
-    private int jmxManagementPort;
-
-    public ServerMemoryMetric(int jmxManagementPort) {
-        this.jmxManagementPort = jmxManagementPort;
+    private ServerMemoryMetric(TimePeriod timePeriod, String id, String description, String serviceUrl, List<NameAttributeAndKey> listOfNameAttributeAndKey, AggregateFunction aggregateFunction) {
+        super(timePeriod, id, description, serviceUrl, listOfNameAttributeAndKey, aggregateFunction);
     }
 
-    public TimePeriod getSchedulingPeriod() {
-        return Time.seconds(15);
-    }
+    public static ServerMemoryMetric createServerMemoryMetric(int jmxManagementPort) {
+        JmxMetric.NameAttributeAndKey heapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "HeapMemoryUsage","used");
+        JmxMetric.NameAttributeAndKey nonHeapUsed = new JmxMetric.NameAttributeAndKey("java.lang:type=Memory", "NonHeapMemoryUsage","used");
 
-    public String getSeriesId() {
-        return SERVER_MEMORY_ID;
-    }
-
-    public String getMetricDescription() {
-        return SERVER_MEMORY_DESCRIPTION;
-    }
-
-    public void setupSeries(TimeSeriesContext metricContext, IdentifiableTimeSeries series) {
-        valueRecorder = new DefaultValueRecorder("Source_" + getSeriesId(), "Value Recorder for " + getSeriesId());
-        DefaultCapture t = new DefaultCapture("Capture " + getSeriesId(), valueRecorder, series);
-        metricContext.addChild(valueRecorder, t);
-
-        connectJmx();
-    }
-
-    private void connectJmx() {
-        String port = System.getProperty("com.sun.management.jmxremote.port");
-        String nonSecure = System.getProperty("com.sun.management.jmxremote.authenticate");
-//        if ( port != null && nonSecure != null) {
-            try {
-                JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi");
-                JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
-                jmxConnection = jmxc.getMBeanServerConnection();
-                //remoteMemoryBean = JMX.newMXBeanProxy(m, new ObjectName("java.lang:type=Memory"), MemoryMXBean.class, false);
-
-                //
-                //            System.out.println("\nDomains:");
-                //            String domains[] = m.getDomains();
-                //            Arrays.sort(domains);
-                //            for (String domain : domains) {
-                //                System.out.println("\tDomain = " + domain);
-                //            }
-                //
-                //            System.out.println("\nMBeanServer default domain = " + m.getDefaultDomain());
-                //
-                //            System.out.println("\nMBean count = " + m.getMBeanCount());
-                //            System.out.println("\nQuery MBeanServer MBeans:");
-                //            Set<ObjectName> names =  new TreeSet<ObjectName>(m.queryNames(null, null));
-                //            for (ObjectName name : names) {
-                //                System.out.println("\tObjectName = " + name);
-                //            }
-
-            } catch ( Throwable t) {
-                logMethods.logError("Failed to start server monitoring by jmx", t);
-            }
-//        } else {
-//            logMethods.logInfo("Not starting memory monitoring, jmxremote port not set or requires authentication");
-//        }
-    }
-
-    public void run() {
-//        if ( remoteMemoryBean != null) {
-//            long memory = (remoteMemoryBean.getHeapMemoryUsage().getUsed() + remoteMemoryBean.getNonHeapMemoryUsage().getUsed()) / 1000000;
-//            valueRecorder.newValue(memory);
-//        }
-        if ( jmxConnection != null) {
-            try {
-                System.out.println("MEMORY " + ((CompositeDataSupport)jmxConnection.getAttribute(new ObjectName("java.lang:type=Memory"),"HeapMemoryUsage")).get("used"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            } 
-        }
+        return new ServerMemoryMetric(
+            Time.seconds(15),
+            "ServerMemory",
+            "Heap and NonHeap Memory usage by server in MB",
+            "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi",
+            Arrays.asList(heapUsed, nonHeapUsed),
+            AggregateFunctions.SUM()
+        );
     }
 }

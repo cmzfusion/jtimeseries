@@ -26,7 +26,7 @@ public interface CaptureFunction {
     /**
      * @return a new function instance to process values from a source
      */
-    AggregateFunction getFunctionInstance();
+    AggregateFunction nextFunctionInstance();
 
 
     String getDescription();

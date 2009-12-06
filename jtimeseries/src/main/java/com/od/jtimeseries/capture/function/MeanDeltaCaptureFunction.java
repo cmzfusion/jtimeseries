@@ -19,6 +19,7 @@
 package com.od.jtimeseries.capture.function;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -29,21 +30,27 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Date: 08-Jan-2009
  * Time: 10:46:56
  *
- * Capture, for example, the mean count per second, or the mean count per minute, over capturePeriod
+ * Capture, for example, the mean count per second, or the mean count per minute
+ *
+ * This is useful when you want to only measure an attribute infrequently, but express the value in
+ * different terms (e.g. measure once every 30 mins, but express the result in minutes)
  */
-public class MeanCountCaptureFunction extends AbstractCaptureFunction {
+public class MeanDeltaCaptureFunction extends AbstractCaptureFunction {
 
     private TimePeriod timeIntervalToExpressAverage;
     private double divisor;
+    private AggregateFunction prototype;
 
-    public MeanCountCaptureFunction(TimePeriod capturePeriod, TimePeriod timePeriodInWhichToExpressCount) {
+    public MeanDeltaCaptureFunction(TimePeriod capturePeriod, TimePeriod timePeriodInWhichToExpressCount) {
         super(capturePeriod);
         this.timeIntervalToExpressAverage = timePeriodInWhichToExpressCount;
         this.divisor = calculateDivisor();
+        prototype = new MeanDeltaFunctionImpl(divisor);
     }
 
-    public AggregateFunction getFunctionInstance() {
-        return new MeanCountFunctionImpl(divisor);
+    public AggregateFunction nextFunctionInstance() {
+        prototype = prototype.nextInstance();
+        return prototype;
     }
 
     private double calculateDivisor() {
@@ -51,31 +58,32 @@ public class MeanCountCaptureFunction extends AbstractCaptureFunction {
     }
 
     public String doGetDescription() {
-        return "Avg Count per " + timeIntervalToExpressAverage;
+        return "Delta per " + timeIntervalToExpressAverage;
     }
 
-    private class MeanCountFunctionImpl implements AggregateFunction {
-        private long total = 0;
-        private double divisor;
+    private class MeanDeltaFunctionImpl implements AggregateFunction {
 
-        public MeanCountFunctionImpl(double divisor) {
+        private double divisor;
+        private AggregateFunction d = AggregateFunctions.DELTA();
+
+        public MeanDeltaFunctionImpl(double divisor) {
             this.divisor = divisor;
         }
 
         public void addValue(Numeric value) {
-            addValue(value.doubleValue());
+            d.addValue(value);
         }
 
         public void addValue(double value) {
-            total += value;
+            d.addValue(value);
         }
 
         public void addValue(long value) {
-            addValue((double)value);
+            d.addValue(value);
         }
 
         public Numeric calculateAggregateValue() {
-            double result = total;
+            double result = d.calculateAggregateValue().doubleValue();
             return new DoubleNumeric(result / divisor);
         }
 
@@ -84,11 +92,11 @@ public class MeanCountCaptureFunction extends AbstractCaptureFunction {
         }
 
         public void clear() {
-            total = 0;
+            d.clear();
         }
 
-        public AggregateFunction newInstance() {
-            return new MeanCountFunctionImpl(divisor);
+        public AggregateFunction nextInstance() {
+            return new MeanDeltaFunctionImpl(divisor);
         }
     }
 }

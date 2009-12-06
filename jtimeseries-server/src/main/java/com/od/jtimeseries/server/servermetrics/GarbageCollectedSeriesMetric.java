@@ -4,7 +4,6 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
@@ -43,7 +42,7 @@ public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
                 "A count of the series deallocated for memory efficiency every " + countPeriod +
                 ", we would expect a heavily loaded server to regularly deallocate series data once it is no longer possible to " +
                 "maintain all series data in RAM",
-                CaptureFunctions.COUNT(countPeriod));
+                CaptureFunctions.DELTA(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
 

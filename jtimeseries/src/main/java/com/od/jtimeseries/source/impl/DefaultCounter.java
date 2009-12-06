@@ -23,6 +23,7 @@ import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +34,7 @@ import java.util.List;
 public class DefaultCounter implements Counter {
 
     private DefaultValueRecorder simpleSource;
+    private final AtomicLong currentValue = new AtomicLong();
 
     public DefaultCounter(String id, String description, ValueSourceListener... sourceDataListeners) {
         simpleSource = new DefaultValueRecorder(id, description, sourceDataListeners);
@@ -47,11 +49,15 @@ public class DefaultCounter implements Counter {
     }
 
     public void incrementCount() {
-        simpleSource.newValue(1);
+        simpleSource.newValue(currentValue.incrementAndGet());
     }
 
     public void decrementCount() {
-        simpleSource.newValue(-1);
+        simpleSource.newValue(currentValue.decrementAndGet());
+    }
+
+    public void reset() {
+        currentValue.set(0);
     }
 
     public String getId() {

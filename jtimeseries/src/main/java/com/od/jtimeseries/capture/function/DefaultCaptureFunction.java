@@ -41,7 +41,8 @@ public class DefaultCaptureFunction extends AbstractCaptureFunction {
         return prototype.getDescription();
     }
 
-    public AggregateFunction getFunctionInstance() {
-        return prototype.newInstance();
+    public AggregateFunction nextFunctionInstance() {
+        prototype = prototype.nextInstance();
+        return prototype;
     }
 }

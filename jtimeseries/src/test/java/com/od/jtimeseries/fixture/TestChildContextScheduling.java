@@ -26,7 +26,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
         childContext = rootContext.createChildContext("child1");
         childContext2 = childContext.createChildContext("child2", "child 2 description");
 
-        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.COUNT(capturePeriod));
+        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.DELTA(capturePeriod));
         valueRecorder = childContext.createValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
         eventTimer = childContext2.createEventTimer("TestEventTimer", "Test Event Timer", CaptureFunctions.MEAN(capturePeriod));
     }

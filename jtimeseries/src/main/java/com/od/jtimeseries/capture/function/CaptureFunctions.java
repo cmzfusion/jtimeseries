@@ -20,6 +20,7 @@ package com.od.jtimeseries.capture.function;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.numeric.Numeric;
 
 public class CaptureFunctions {
 
@@ -39,12 +40,25 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM());
     }
 
-    public static CaptureFunction COUNT(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT());
+    /**
+     * @return a Delta function which measures change starting from zero
+     */
+    public static CaptureFunction DELTA(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.DELTA());
     }
 
-    public static CaptureFunction MEAN_COUNT(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
-        return new MeanCountCaptureFunction(timePeriod, timeIntervalToExpressCount);
+    /**
+     * (initialValue may be Double.NaN if you want to take the initial value from the first recorded value.
+     * This sometimes makes sense if you will, for example, get a very large initial value, but are only interested in small
+     * changes thereafter)
+     * @return A Delta function which measures change starting from initialValue.
+     */
+    public static CaptureFunction DELTA(TimePeriod timePeriod, Numeric initialValue) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.DELTA(initialValue));
+    }
+
+    public static CaptureFunction MEAN_DELTA(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
+        return new MeanDeltaCaptureFunction(timePeriod, timeIntervalToExpressCount);
     }
 
 

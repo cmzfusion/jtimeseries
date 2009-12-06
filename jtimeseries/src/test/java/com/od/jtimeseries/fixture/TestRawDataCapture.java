@@ -62,7 +62,7 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         DefaultTimeSeries d = new DefaultTimeSeries(timeSeries); //create a ListTimeSeries for random access to indexes
         assertEquals(2, d.size());
         assertEquals(1, d.get(0).longValue());
-        assertEquals(-1, d.get(1).longValue());
+        assertEquals(0, d.get(1).longValue());
 
         timeSeries = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
         d = new DefaultTimeSeries(timeSeries);

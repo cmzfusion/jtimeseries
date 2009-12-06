@@ -55,7 +55,7 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
         return NAME;
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new MeanFunction();
     }
 

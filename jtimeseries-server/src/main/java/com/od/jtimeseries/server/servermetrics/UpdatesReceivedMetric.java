@@ -4,7 +4,6 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
@@ -16,6 +15,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public class UpdatesReceivedMetric extends AbstractServerMetric {
 
+    private static final String SERIES_ID = "UdpSeriesUpdateCount";
     private TimePeriod countPeriod;
     private String parentContextPath;
 
@@ -29,7 +29,7 @@ public class UpdatesReceivedMetric extends AbstractServerMetric {
     }
 
     public String getSeriesId() {
-        return "UdpSeriesUpdateCount";
+        return SERIES_ID;
     }
 
     public String getParentContextPath() {
@@ -38,9 +38,9 @@ public class UpdatesReceivedMetric extends AbstractServerMetric {
 
     public void setupSeries(TimeSeriesContext metricContext) {
         Counter counter = metricContext.createCounter(
-            "UdpSeriesUpdates",
+            SERIES_ID,
             "A count of the udp series updates received during the last " + countPeriod,
-            CaptureFunctions.COUNT(countPeriod)
+            CaptureFunctions.DELTA(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

@@ -35,11 +35,12 @@ public interface AggregateFunction {
     void clear();
 
     /**
-     * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance
-     * can be used as a prototype
+     * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance can be used
+     * as a prototype. Functions are sometimes used in sequence with the previous function providing an initial
+     * value to the next (in the case of Delta function, for example)
      *
      * @return a new instance of the AggregateFunction
      */
-    AggregateFunction newInstance();
+    AggregateFunction nextInstance();
 
 }

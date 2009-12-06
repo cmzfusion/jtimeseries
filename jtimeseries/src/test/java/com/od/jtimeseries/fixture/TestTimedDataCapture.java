@@ -3,19 +3,14 @@ package com.od.jtimeseries.fixture;
 import org.junit.Test;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.util.JTimeSeriesTestConstants;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
-import com.od.jtimeseries.source.ValueSource;
 
 import java.util.List;
 import java.util.Iterator;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,7 +22,7 @@ import java.util.Arrays;
 public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
-        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.COUNT(capturePeriod));
+        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.DELTA(capturePeriod));
         valueRecorder = rootContext.createValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
         eventTimer = rootContext.createEventTimer("TestEventTimer", "Test Event Timer", CaptureFunctions.MAX(capturePeriod));
         queueTimer = rootContext.createQueueTimer("TestQueueTimer", "Test Queue Timer", CaptureFunctions.MIN(capturePeriod));

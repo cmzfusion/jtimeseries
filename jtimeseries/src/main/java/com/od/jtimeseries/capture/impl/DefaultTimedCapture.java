@@ -86,7 +86,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             //keep a reference to the old, which contains any values collected during the last period
             synchronized (functionLock) {
                 oldFunctionInstance = this.function;
-                function = getCaptureFunction().getFunctionInstance();
+                function = getCaptureFunction().nextFunctionInstance();
                 if ( oldFunctionInstance == DUMMY_FUNCTION) {
                     //this was the first trigger, we are now writing into a real function instance
                     //which means we can transition from STARTING to STARTED
@@ -155,7 +155,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
 
         public void clear() {}
 
-        public AggregateFunction newInstance() {
+        public AggregateFunction nextInstance() {
             return new DummyFunction();
         }
     }

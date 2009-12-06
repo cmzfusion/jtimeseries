@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.timeseries.function.aggregate;
 
+import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.numeric.LongNumeric;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -41,6 +44,23 @@ public class AggregateFunctions {
 
     public static AggregateFunction SUM() {
         return new SumFunction();
+    }
+
+    /**
+     * @return a Delta function which measures change starting from zero
+     */
+    public static AggregateFunction DELTA() {
+        return new DeltaFunction(new LongNumeric(0));
+    }
+
+    /**
+     * (initialValue may be Double.NaN if you want to take the initial value from the first recorded value.
+     * This sometimes makes sense if you will, for example, get a very large initial value, but are only interested in small
+     * changes thereafter)
+     * @return A Delta function which measures change starting from initialValue.
+     */
+    public static AggregateFunction DELTA(Numeric initialValue) {
+        return new DeltaFunction(initialValue);
     }
 
     public static AggregateFunction COUNT() {

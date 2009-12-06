@@ -2,6 +2,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -41,9 +42,10 @@ public class JmxMetric extends AbstractServerMetric {
     private Map<String, ?> connectorEnvironment;
     private JmxValueSupplier valueSupplier = new JmxValueSupplier();
     private String parentContextPath;
+    private double divisor = 1;
 
-    public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, String objectName, String attribute, String compositeDataKey ) {
-        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(new JmxValue(objectName, attribute, compositeDataKey)), AggregateFunctions.MAX()); //max of 1 value is that value
+    public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, JmxValue jmxValue ) {
+        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(jmxValue), AggregateFunctions.MAX()); //max of 1 value is that value
     }
 
     public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
@@ -62,6 +64,10 @@ public class JmxMetric extends AbstractServerMetric {
 
     public String getParentContextPath() {
         return parentContextPath;
+    }
+
+    public void setDivisor(double divisor) {
+        this.divisor = divisor;
     }
 
     public void setupSeries(TimeSeriesContext metricContext) {
@@ -88,7 +94,6 @@ public class JmxMetric extends AbstractServerMetric {
                 retreiveAndAddValues(jmxConnection);
                 result = aggregateFunction.calculateAggregateValue();
                 aggregateFunction.clear();
-                return result;
             } catch (Throwable t) {
                 logMethods.logError("Error in JMX Metric connection", t);
             } finally {
@@ -99,6 +104,9 @@ public class JmxMetric extends AbstractServerMetric {
                         logMethods.logError("Failed to close jmx connection", e);
                     }
                 }
+            }
+            if ( result != null && divisor != 1) {
+                result = new DoubleNumeric(result.doubleValue() / divisor);
             }
             return result;
         }

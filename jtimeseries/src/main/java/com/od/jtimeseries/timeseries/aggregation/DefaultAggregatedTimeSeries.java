@@ -103,10 +103,10 @@ public class DefaultAggregatedTimeSeries extends AbstractDelegatingTimeSeries im
     }
 
     private boolean addNewAggregatedTimepoint(long nextTimepoint) {
-        AggregateFunction f = aggregateFunction.newInstance();
-        boolean success = addValuesFromChildSeries(nextTimepoint, f);
+        aggregateFunction.clear();
+        boolean success = addValuesFromChildSeries(nextTimepoint, aggregateFunction);
         if (success) {
-            append(new TimeSeriesItem(nextTimepoint, f.calculateAggregateValue()));
+            append(new TimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
             lastTimepoint = nextTimepoint;
         }
         return success;

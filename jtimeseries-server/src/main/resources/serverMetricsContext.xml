@@ -20,7 +20,8 @@
                                 <constructor-arg value="${serverMetricsContextPath}"/>
                             </bean>
 
-                            <!-- this metric reads heap and non-heap memory from the server's own jmx management service, and sums them -->
+                            <!-- this jmx metric reads heap and non-heap memory from the server's own jmx management service,
+                            and sums them, then divides by 1000000 -->
                             <bean class="com.od.jtimeseries.server.servermetrics.JmxMetric">
                                 <constructor-arg>
                                     <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
@@ -48,6 +49,7 @@
                                 <constructor-arg>
                                     <bean class="com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions" factory-method="SUM"/>
                                 </constructor-arg>
+                                <property name="divisor" value="1000000"/>
                             </bean>
 
                             <!-- running count of total series in server -->

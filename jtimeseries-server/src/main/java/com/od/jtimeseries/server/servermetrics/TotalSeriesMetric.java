@@ -2,7 +2,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.ValueSupplier;
-import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 
@@ -13,25 +13,38 @@ import com.od.jtimeseries.util.numeric.LongNumeric;
  * Time: 19:53:14
  * To change this template use File | Settings | File Templates.
  */
-public class TotalSeriesCountMetric extends ServerMetric {
+public class TotalSeriesMetric extends AbstractServerMetric {
 
-    private static final String id = "TotalSeriesCount";
+    private static final String id = "TotalSeries";
+    private String parentContextPath;
     private TimeSeriesContext rootContext;
+    private TimePeriod countPeriod;
 
-    public TotalSeriesCountMetric(TimeSeriesContext rootContext) {
-        this.rootContext = rootContext;
+    public TotalSeriesMetric(String parentContextPath, TimeSeriesContext rootContext) {
+        this(parentContextPath, rootContext, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
     }
+
+    public TotalSeriesMetric(String parentContextPath, TimeSeriesContext rootContext, TimePeriod countPeriod) {
+        this.parentContextPath = parentContextPath;
+        this.rootContext = rootContext;
+        this.countPeriod = countPeriod;
+    }
+
 
     public String getSeriesId() {
         return id;
     }
 
+    public String getParentContextPath() {
+        return parentContextPath;
+    }
+
     public void setupSeries(TimeSeriesContext metricContext) {
         metricContext.createTimedValueSource(
-                id,
+            id,
             "Total number of series managed by the server",
             new TotalSeriesCountValueSupplier(),
-            Time.minutes(15)
+            countPeriod
         );
     }
 

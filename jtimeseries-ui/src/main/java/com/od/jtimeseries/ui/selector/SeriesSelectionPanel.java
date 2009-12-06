@@ -202,10 +202,10 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
 
     public static void main(String[] args) throws MalformedURLException {
         final TimeSeriesContext root = JTimeSeries.createRootContext();
-        TimeSeriesContext a = root.getOrCreateContextForPath("prod.client.test");
-        TimeSeriesContext b = root.getOrCreateContextForPath("prod.server.test");
-        TimeSeriesContext c = root.getOrCreateContextForPath("uat.server.test");
-        TimeSeriesContext d = root.getOrCreateContextForPath("uat.client.test");
+        TimeSeriesContext a = root.createContextForPath("prod.client.test");
+        TimeSeriesContext b = root.createContextForPath("prod.server.test");
+        TimeSeriesContext c = root.createContextForPath("uat.server.test");
+        TimeSeriesContext d = root.createContextForPath("uat.client.test");
         a.addChild(new RemoteChartingTimeSeries("aseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
         b.addChild(new RemoteChartingTimeSeries("bseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
         c.addChild(new RemoteChartingTimeSeries("cseries", "test", new URL("http://localhost"), Time.minutes(5), 1));

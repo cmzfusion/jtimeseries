@@ -27,7 +27,7 @@ import java.net.MalformedURLException;
  * Time: 22:14:47
  * To change this template use File | Settings | File Templates.
  */
-public class JmxMetric extends ServerMetric {
+public class JmxMetric extends AbstractServerMetric {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
 
@@ -36,26 +36,32 @@ public class JmxMetric extends ServerMetric {
     private final String description;
     private final String serviceUrl;
     private JMXServiceURL url;
-    private final List<NameAttributeAndKey> listOfNameAttributeAndKey;
+    private final List<JmxValue> listOfJmxValue;
     private final AggregateFunction aggregateFunction;
     private Map<String, ?> connectorEnvironment;
     private JmxValueSupplier valueSupplier = new JmxValueSupplier();
+    private String parentContextPath;
 
-    public JmxMetric(TimePeriod timePeriod, String id, String description, String serviceUrl, String objectName, String attribute, String compositeDataKey ) {
-        this(timePeriod, id, description, serviceUrl, Arrays.asList(new NameAttributeAndKey(objectName, attribute, compositeDataKey)), AggregateFunctions.MAX()); //max of 1 value is that value
+    public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, String objectName, String attribute, String compositeDataKey ) {
+        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(new JmxValue(objectName, attribute, compositeDataKey)), AggregateFunctions.MAX()); //max of 1 value is that value
     }
 
-    public JmxMetric(TimePeriod timePeriod, String id, String description, String serviceUrl, List<NameAttributeAndKey> listOfNameAttributeAndKey, AggregateFunction aggregateFunction) {
+    public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
         this.timePeriod = timePeriod;
+        this.parentContextPath = parentContextPath;
         this.id = id;
         this.description = description;
         this.serviceUrl = serviceUrl;
-        this.listOfNameAttributeAndKey = listOfNameAttributeAndKey;
+        this.listOfJmxValue = listOfJmxValue;
         this.aggregateFunction = aggregateFunction;
     }
 
     public String getSeriesId() {
         return id;
+    }
+
+    public String getParentContextPath() {
+        return parentContextPath;
     }
 
     public void setupSeries(TimeSeriesContext metricContext) {
@@ -98,7 +104,7 @@ public class JmxMetric extends ServerMetric {
         }
 
         private void retreiveAndAddValues(MBeanServerConnection jmxConnection) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException, MalformedObjectNameException {
-            for ( NameAttributeAndKey n : listOfNameAttributeAndKey) {
+            for ( JmxValue n : listOfJmxValue) {
                 Object value = ((CompositeDataSupport)jmxConnection.getAttribute(
                     new ObjectName(n.getObjectName()), n.getAttribute())).get(n.getCompositeDataKey()
                 );
@@ -108,28 +114,4 @@ public class JmxMetric extends ServerMetric {
         }
     }
 
-    public static class NameAttributeAndKey {
-
-        private final String objectName;
-        private final String attribute;
-        private String compositeDataKey;
-
-        public NameAttributeAndKey(String objectName, String attribute, String compositeDataKey) {
-            this.objectName = objectName;
-            this.attribute = attribute;
-            this.compositeDataKey = compositeDataKey;
-        }
-
-        public String getObjectName() {
-            return objectName;
-        }
-
-        public String getAttribute() {
-            return attribute;
-        }
-
-        public String getCompositeDataKey() {
-            return compositeDataKey;
-        }
-    }
 }

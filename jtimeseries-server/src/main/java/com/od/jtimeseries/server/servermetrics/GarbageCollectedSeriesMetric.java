@@ -14,13 +14,23 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 21:43:01
  * To change this template use File | Settings | File Templates.
  */
-public class GarbageCollectedSeriesMetric extends ServerMetric {
+public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
 
-    private static final TimePeriod countPeriod = Time.minutes(5);
+    private TimePeriod countPeriod;
     private static final String id = "SeriesGarbageCollected";
+    private String parentContextPath;
 
-    public TimePeriod getSchedulingPeriod() {
-        return null;
+    public GarbageCollectedSeriesMetric(String parentContextPath) {
+        this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    }
+
+    public GarbageCollectedSeriesMetric(String parentContextPath, TimePeriod countPeriod) {
+        this.parentContextPath = parentContextPath;
+        this.countPeriod = countPeriod;
+    }
+
+    public String getParentContextPath() {
+        return parentContextPath;
     }
 
     public String getSeriesId() {
@@ -36,4 +46,5 @@ public class GarbageCollectedSeriesMetric extends ServerMetric {
                 CaptureFunctions.COUNT(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
+
 }

@@ -93,7 +93,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
 
     private void addLocalTimeSeries(java.util.List<RemoteChartingTimeSeries> selectedTimeSeries) {
         for ( IdentifiableTimeSeries s : selectedTimeSeries) {
-            TimeSeriesContext c = contextToReceiveSeries.getOrCreateContextForPath(s.getParentPath());
+            TimeSeriesContext c = contextToReceiveSeries.createContextForPath(s.getParentPath());
 
             RemoteChartingTimeSeries remoteSeries = (RemoteChartingTimeSeries)s;
 

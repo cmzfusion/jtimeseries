@@ -11,9 +11,11 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 21:39:49
  * To change this template use File | Settings | File Templates.
  */
-public abstract class ServerMetric {
+public interface ServerMetric {
 
-    public abstract void setupSeries(TimeSeriesContext metricContext) ;
+    public void setupSeries(TimeSeriesContext metricContext) ;
 
-    public abstract String getSeriesId();
+    public String getSeriesId();
+
+    String getParentContextPath();
 }

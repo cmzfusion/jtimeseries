@@ -11,12 +11,21 @@ import com.od.jtimeseries.source.ValueRecorder;
  * Time: 19:33:20
  * To change this template use File | Settings | File Templates.
  */
-public class LiveSeriesMetric extends ServerMetric {
+public class LiveSeriesMetric extends AbstractServerMetric {
 
     private static final String id = "TotalLiveSeries";
+    private String parentContextPath;
+
+    public LiveSeriesMetric(String parentContextPath) {
+        this.parentContextPath = parentContextPath;
+    }
 
     public String getSeriesId() {
         return id;
+    }
+
+    public String getParentContextPath() {
+        return parentContextPath;
     }
 
     public void setupSeries(TimeSeriesContext metricContext) {

@@ -377,7 +377,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public IdentifiableTimeSeries getOrCreateTimeSeriesForPath(String path, String description) {
+    public IdentifiableTimeSeries createTimeSeriesForPath(String path, String description) {
         synchronized (getTreeLock()) {
             List<String> contextIds = splitPath(path);
             TimeSeriesContext parentContext = ( contextIds.size() > 1) ? createContextRecursive(this, contextIds.subList(0, contextIds.size() -1)) : this;
@@ -454,7 +454,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public TimeSeriesContext getOrCreateContextForPath(String path) {
+    public TimeSeriesContext createContextForPath(String path) {
         synchronized (getTreeLock()) {
             if ( path.equals("")) {
                 return this;

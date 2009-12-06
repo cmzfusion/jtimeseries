@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+
+    <bean id="serverMetricInitializer" class="com.od.jtimeseries.server.servermetrics.ServerMetricInitializer">
+        <constructor-arg ref="rootContext"/>
+        <constructor-arg>
+            <list>
+                <!-- A list of ServerMetricSource to supply server metric instances -->
+                <bean id="serverMetrics" class="com.od.jtimeseries.server.servermetrics.TimeSeriesServerMetricSource">
+                    <constructor-arg>
+                        <!-- list of the default timeseries-server metrics -->
+                        <list>
+
+                            <!-- count of series gc'd for performance -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.GarbageCollectedSeriesMetric">
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                            </bean>
+
+                            <!-- this metric reads heap and non-heap memory from the server's own jmx management service, and sums them -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.JmxMetric">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="5"/>
+                                    </bean>
+                                </constructor-arg>
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg value="ServerMemory"/>
+                                <constructor-arg value="Heap and NonHeap Memory usage by server in MB"/>
+                                <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>
+                                <constructor-arg>
+                                    <list>
+                                        <bean class="com.od.jtimeseries.server.servermetrics.JmxValue">
+                                            <constructor-arg value="java.lang:type=Memory"/>
+                                            <constructor-arg value="HeapMemoryUsage"/>
+                                            <constructor-arg value="used"/>
+                                        </bean>
+                                        <bean class="com.od.jtimeseries.server.servermetrics.JmxValue">
+                                            <constructor-arg value="java.lang:type=Memory"/>
+                                            <constructor-arg value="NonHeapMemoryUsage"/>
+                                            <constructor-arg value="used"/>
+                                        </bean>
+                                    </list>
+                                </constructor-arg>
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions" factory-method="SUM"/>
+                                </constructor-arg>
+                            </bean>
+
+                            <!-- running count of total series in server -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.TotalSeriesMetric">
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg ref="rootContext"/>
+                            </bean>
+
+                            <!-- running count of series for which server is currently receiving updates -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.LiveSeriesMetric">
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                            </bean>
+
+                            <!-- Count of UDP updates received -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.UpdatesReceivedMetric">
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                            </bean>
+
+                        </list>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+	
+</beans>

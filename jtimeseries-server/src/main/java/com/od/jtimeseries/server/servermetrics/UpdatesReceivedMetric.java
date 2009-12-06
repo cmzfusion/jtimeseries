@@ -14,17 +14,31 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 19:47:38
  * To change this template use File | Settings | File Templates.
  */
-public class UpdatesReceivedMetric extends ServerMetric {
+public class UpdatesReceivedMetric extends AbstractServerMetric {
 
-    private static final TimePeriod countPeriod = Time.minutes(5);
+    private TimePeriod countPeriod;
+    private String parentContextPath;
+
+    public UpdatesReceivedMetric(String parentContextPath) {
+        this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    }
+
+    public UpdatesReceivedMetric(String parentContextPath, TimePeriod countPeriod) {
+        this.parentContextPath = parentContextPath;
+        this.countPeriod = countPeriod;
+    }
 
     public String getSeriesId() {
         return "UdpSeriesUpdateCount";
     }
 
+    public String getParentContextPath() {
+        return parentContextPath;
+    }
+
     public void setupSeries(TimeSeriesContext metricContext) {
         Counter counter = metricContext.createCounter(
-            "UdpSeriesUpdateCount",
+            "UdpSeriesUpdates",
             "A count of the udp series updates received during the last " + countPeriod,
             CaptureFunctions.COUNT(countPeriod)
         );

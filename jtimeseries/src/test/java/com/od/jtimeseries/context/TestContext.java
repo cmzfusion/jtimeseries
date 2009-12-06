@@ -215,7 +215,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testCreateContextRecursive() {
-        rootContext.getOrCreateContextForPath("child2.grandchild1");
+        rootContext.createContextForPath("child2.grandchild1");
         assertNotNull(rootContext.getChildContext("child2"));
         assertNotNull(rootContext.getChildContext("child2").getChildContext("grandchild1"));
     }

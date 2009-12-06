@@ -9,6 +9,8 @@
         <property name="location" value="/serverConfigProperties.props"/>
     </bean>
 
+    <import resource="serverMetricsContext.xml"/>
+
     <bean id="seriesDirectory" class="java.io.File">
         <constructor-arg value="${seriesDirectory}"/>
     </bean>
@@ -61,13 +63,6 @@
     </bean>
 
     <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient"/>
-
-    <bean id="serverMetricInitializer" class="com.od.jtimeseries.server.servermetrics.ServerMetricInitializer">
-        <constructor-arg value="${serverMetricsContextPath}"/>
-        <constructor-arg ref="rootContext"/>
-        <constructor-arg ref="fileSerializer"/>
-        <constructor-arg value="${jmxManagementPort}"/>
-    </bean>
 
     <bean id="udpServer" class="com.od.jtimeseries.net.udp.UdpServer">
         <constructor-arg value="${udpServerPort}"/>

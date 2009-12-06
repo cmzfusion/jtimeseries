@@ -95,12 +95,12 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries, Context
     /**
      * Get or create context for the given path, creating any missing context nodes
      */
-    TimeSeriesContext getOrCreateContextForPath(String path);
+    TimeSeriesContext createContextForPath(String path);
 
     /**
      * Get or create timeseries for the given path, creating any missing context nodes
      */
-    IdentifiableTimeSeries getOrCreateTimeSeriesForPath(String path, String description);
+    IdentifiableTimeSeries createTimeSeriesForPath(String path, String description);
 
     /**
      * Create a child context with the given id, which will also be used for the description

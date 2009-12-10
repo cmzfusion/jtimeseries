@@ -19,8 +19,9 @@
 package com.od.jtimeseries.capture.function;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
-import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 public class CaptureFunctions {
 
@@ -41,24 +42,48 @@ public class CaptureFunctions {
     }
 
     /**
-     * @return a Delta function which measures change starting from zero
+     * @return a function which measures net change over a time period, from a starting value of zero
      */
-    public static CaptureFunction DELTA(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.DELTA());
+    public static CaptureFunction CHANGE(TimePeriod timePeriod) {
+        return CHANGE(timePeriod, new LongNumeric(0));
     }
 
     /**
-     * (initialValue may be Double.NaN if you want to take the initial value from the first recorded value.
-     * This sometimes makes sense if you will, for example, get a very large initial value, but are only interested in small
-     * changes thereafter)
-     * @return A Delta function which measures change starting from initialValue.
+     * @return a function which measures net change over a time period, starting from the initialValue
      */
-    public static CaptureFunction DELTA(TimePeriod timePeriod, Numeric initialValue) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.DELTA(initialValue));
+    public static CaptureFunction CHANGE(TimePeriod timePeriod, Numeric initialValue) {
+        return new DefaultCaptureFunction(timePeriod, new ChangeFunction(initialValue));
     }
 
-    public static CaptureFunction MEAN_DELTA(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
-        return new MeanDeltaCaptureFunction(timePeriod, timeIntervalToExpressCount);
+    /**
+     * @return a function which measures net change over a time period, starting from the first value captured
+     */
+    public static CaptureFunction CHANGE_FROM_FIRST(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, new ChangeFunction());
+    }
+
+    /**
+     * @return a function which measures net change over a time period, starting from zero, expressed
+     * as a mean change over timeIntervalToExpressCount
+     */
+    public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
+        return MEAN_CHANGE(timePeriod, timeIntervalToExpressCount, new LongNumeric(0));
+    }
+
+    /**
+     * @return a function which measures net change over a time period, starting from initialValue, expressed
+     * as a mean change over timeIntervalToExpressCount
+     */
+    public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount, Numeric initialValue) {
+        return new MeanChangeFunction(timePeriod, timeIntervalToExpressCount, initialValue);
+    }
+
+    /**
+     * @return a function which measures net change over a time period, starting from the first value captured, expressed
+     * as a mean change over timeIntervalToExpressCount
+     */
+    public static CaptureFunction MEAN_CHANGE_FROM_FIRST(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
+        return new MeanChangeFunction(timePeriod, timeIntervalToExpressCount);
     }
 
 

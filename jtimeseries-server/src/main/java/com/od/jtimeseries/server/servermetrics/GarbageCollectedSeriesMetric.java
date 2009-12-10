@@ -42,7 +42,7 @@ public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
                 "A count of the series deallocated for memory efficiency every " + countPeriod +
                 ", we would expect a heavily loaded server to regularly deallocate series data once it is no longer possible to " +
                 "maintain all series data in RAM",
-                CaptureFunctions.DELTA(countPeriod));
+                CaptureFunctions.CHANGE(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
 

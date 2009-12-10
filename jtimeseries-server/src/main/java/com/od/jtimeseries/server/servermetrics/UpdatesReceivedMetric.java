@@ -40,7 +40,7 @@ public class UpdatesReceivedMetric extends AbstractServerMetric {
         Counter counter = metricContext.createCounter(
             SERIES_ID,
             "A count of the udp series updates received during the last " + countPeriod,
-            CaptureFunctions.DELTA(countPeriod)
+            CaptureFunctions.CHANGE(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

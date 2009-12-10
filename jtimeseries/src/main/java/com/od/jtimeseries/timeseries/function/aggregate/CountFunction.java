@@ -9,6 +9,8 @@ import com.od.jtimeseries.util.numeric.LongNumeric;
  * Date: 06-Dec-2009
  * Time: 15:48:50
  * To change this template use File | Settings | File Templates.
+ *
+ * Count of the number of values
  */
 public class CountFunction extends AbstractDoubleBasedAggregateFunction {
 

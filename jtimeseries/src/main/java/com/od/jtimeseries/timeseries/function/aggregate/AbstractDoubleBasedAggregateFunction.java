@@ -19,6 +19,7 @@
 package com.od.jtimeseries.timeseries.function.aggregate;
 
 import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,22 +33,33 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public abstract class AbstractDoubleBasedAggregateFunction implements AggregateFunction {
 
+    private double lastValue = Double.NaN;
+
     public final void addValue(Numeric value) {
         double d = value.doubleValue();
         if ( ! Double.isNaN(d)) {
-            doAddValue(d);
+            add(d);
         }
     }
 
     public final void addValue(double d) {
-        doAddValue(d);
+        add(d);
     }
 
     public final void addValue(long l) {
-        doAddValue((double)l);
+        add((double)l);
+    }
+
+    private void add(double d) {
+        this.lastValue = d;
+        doAddValue(d);
     }
 
     protected abstract void doAddValue(double d);
+
+    public Numeric getLastAddedValue() {
+        return new DoubleNumeric(lastValue);
+    }
 
     public String toString() {
         return getDescription();

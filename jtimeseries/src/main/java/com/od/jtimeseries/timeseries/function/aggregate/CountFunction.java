@@ -12,7 +12,7 @@ import com.od.jtimeseries.util.numeric.LongNumeric;
  *
  * Count of the number of values
  */
-public class CountFunction extends AbstractDoubleBasedAggregateFunction {
+class CountFunction extends AbstractDoubleBasedAggregateFunction {
 
     private static final String NAME = "Count";
     private int count = 0;

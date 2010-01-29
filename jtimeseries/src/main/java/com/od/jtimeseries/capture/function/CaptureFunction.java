@@ -21,6 +21,10 @@ package com.od.jtimeseries.capture.function;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+/**
+ * Supplies Aggregate functions which can be used to aggregate the values recorded
+ * during a given TimePeriod
+ */
 public interface CaptureFunction {
 
     /**

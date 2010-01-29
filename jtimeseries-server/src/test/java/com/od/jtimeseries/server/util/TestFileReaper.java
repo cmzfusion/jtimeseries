@@ -73,7 +73,7 @@ public class TestFileReaper extends TestCase {
     }
 
     public void testReaperDeleteByTimestampAllFilesNew() throws IOException {
-        FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 1000);
+        FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 10000);
         r.reap();
         assertEquals(10, getFileCount());
     }

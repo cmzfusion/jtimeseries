@@ -28,6 +28,8 @@ public interface AggregateFunction {
 
     void addValue(long value);
 
+    Numeric getLastAddedValue();    
+
     Numeric calculateAggregateValue();
 
     String getDescription();

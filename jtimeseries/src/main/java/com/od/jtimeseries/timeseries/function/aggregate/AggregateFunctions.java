@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.timeseries.function.aggregate;
 
+import com.od.jtimeseries.util.numeric.Numeric;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -45,5 +47,17 @@ public class AggregateFunctions {
 
     public static AggregateFunction COUNT() {
         return new CountFunction();
+    }
+
+    public static AggregateFunction CHANGE() {
+        return new ChangeFunction();
+    }
+
+    public static AggregateFunction CHANGE(Numeric initialValue) {
+        return new ChangeFunction(initialValue);
+    }
+
+    public static AggregateFunction MEAN_CHANGE(Numeric initialValue, double divisor) {
+        return new MeanChangeAggregateFunction(divisor, initialValue);
     }
 }

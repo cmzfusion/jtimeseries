@@ -52,14 +52,7 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, starting from the initialValue
      */
     public static CaptureFunction CHANGE(TimePeriod timePeriod, Numeric initialValue) {
-        return new DefaultCaptureFunction(timePeriod, new ChangeFunction(initialValue));
-    }
-
-    /**
-     * @return a function which measures net change over a time period, starting from the first value captured
-     */
-    public static CaptureFunction CHANGE_FROM_FIRST(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, new ChangeFunction());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.CHANGE(initialValue));
     }
 
     /**
@@ -75,16 +68,12 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount, Numeric initialValue) {
-        return new MeanChangeFunction(timePeriod, timeIntervalToExpressCount, initialValue);
+        double divisor = calculateDivisorForMeanChange(timePeriod, timeIntervalToExpressCount);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN_CHANGE(initialValue, divisor));
     }
 
-    /**
-     * @return a function which measures net change over a time period, starting from the first value captured, expressed
-     * as a mean change over timeIntervalToExpressCount
-     */
-    public static CaptureFunction MEAN_CHANGE_FROM_FIRST(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
-        return new MeanChangeFunction(timePeriod, timeIntervalToExpressCount);
+    private static double calculateDivisorForMeanChange(TimePeriod t, TimePeriod v) {
+        return ((double)t.getLengthInMillis())/v.getLengthInMillis();
     }
-
 
 }

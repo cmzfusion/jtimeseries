@@ -145,6 +145,10 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
 
         public void addValue(long value) {}
 
+        public Numeric getLastAddedValue() {
+            return null;
+        }
+
         public Numeric calculateAggregateValue() {
             return null;
         }

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.capture.function;
+package com.od.jtimeseries.timeseries.function.aggregate;
 
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -82,10 +82,6 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
 
     public void setInitialValue(double initialValue) {
         this.initialValue = initialValue;
-    }
-
-    Numeric getLastValue() {
-        return new DoubleNumeric(currentValue);
     }
 
     public String getDescription() {

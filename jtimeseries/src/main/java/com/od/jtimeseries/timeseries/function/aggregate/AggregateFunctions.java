@@ -57,7 +57,7 @@ public class AggregateFunctions {
         return new ChangeFunction(initialValue);
     }
 
-    public static AggregateFunction MEAN_CHANGE(Numeric initialValue, double divisor) {
-        return new MeanChangeAggregateFunction(divisor, initialValue);
+    public static AggregateFunction CHANGE(String functionName, Numeric initialValue) {
+        return new ChangeFunction(functionName, initialValue);
     }
 }

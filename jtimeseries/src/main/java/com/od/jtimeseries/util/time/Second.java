@@ -34,6 +34,6 @@ class Second extends AbstractTimePeriod {
 
     public String toString() {
         long secs = getLengthInMillis() / millis;
-        return secs == 1 ? "second" : secs + " s";
+        return secs + "s";
     }
 }

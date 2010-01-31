@@ -29,7 +29,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 */
 class MinFunction extends AbstractDoubleBasedAggregateFunction {
 
-    private static final String NAME = "Min";
+    private static final String DESCRIPTION = "Min";
     private double min = Double.NaN;
 
     public void doAddValue(double value) {
@@ -45,7 +45,7 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public String getDescription() {
-        return NAME;
+        return DESCRIPTION;
     }
 
     public AggregateFunction nextInstance() {

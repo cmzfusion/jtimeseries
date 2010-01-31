@@ -32,6 +32,6 @@ class Millisecond extends AbstractTimePeriod {
 
     public String toString() {
         long ms = getLengthInMillis();
-        return ms == 1 ? "millisecond" : ms + " ms";
+        return  ms + "ms";
     }
 }

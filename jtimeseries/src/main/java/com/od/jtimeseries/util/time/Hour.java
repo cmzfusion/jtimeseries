@@ -34,6 +34,6 @@ class Hour extends AbstractTimePeriod {
 
     public String toString() {
         long hours = getLengthInMillis() / millis;
-        return hours == 1 ? "hour" : hours + " hours";
+        return hours + "hr";
     }
 }

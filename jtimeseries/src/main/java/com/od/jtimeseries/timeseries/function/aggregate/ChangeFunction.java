@@ -38,14 +38,20 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 */
 class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
 
-    private static final String NAME = "Change";
+    private String description = "Change";
     private double initialValue = Double.NaN;
     private double currentValue = Double.NaN;
+
+
+    ChangeFunction(Numeric initialValue) {
+        this("Change", initialValue);
+    }
 
     /**
      * Change function where initial value is specified up front
      */
-    ChangeFunction(Numeric initialValue) {
+    ChangeFunction(String description, Numeric initialValue) {
+        this.description = description;
         this.initialValue = initialValue.doubleValue();
 
         //set currentValue too, otherwise we lose the initial value on the first call to
@@ -85,7 +91,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public String getDescription() {
-        return NAME;
+        return description;
     }
 
     public AggregateFunction nextInstance() {

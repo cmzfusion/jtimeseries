@@ -29,7 +29,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 */
 class MeanFunction extends AbstractDoubleBasedAggregateFunction {
 
-    private static final String NAME = "Mean";
+    private static final String DESCRIPTION = "Mean";
     private double sum;
     private long count;
 
@@ -52,7 +52,7 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public String getDescription() {
-        return NAME;
+        return DESCRIPTION;
     }
 
     public AggregateFunction nextInstance() {

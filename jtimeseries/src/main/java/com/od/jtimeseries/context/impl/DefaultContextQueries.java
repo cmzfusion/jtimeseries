@@ -223,6 +223,7 @@ public class DefaultContextQueries implements ContextQueries {
         List<E> result = new ArrayList<E>();
         for ( E i : identifiables) {
             if ( p.matcher(((Identifiable)i).getPath()).find() ) {
+                System.out.println("Wibble");
                 result.add(i);
             }
         }

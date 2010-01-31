@@ -34,6 +34,6 @@ class Day extends AbstractTimePeriod {
 
     public String toString() {
         long days = getLengthInMillis() / millis;
-        return days == 1 ? "day" : days + " days";
+        return days + "day";
     }
 }

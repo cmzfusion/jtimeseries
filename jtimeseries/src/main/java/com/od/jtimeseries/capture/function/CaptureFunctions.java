@@ -18,7 +18,10 @@
  */
 package com.od.jtimeseries.capture.function;
 
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -68,12 +71,41 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount, Numeric initialValue) {
-        double divisor = calculateDivisorForMeanChange(timePeriod, timeIntervalToExpressCount);
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN_CHANGE(initialValue, divisor));
+        final double divisor = ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
+        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction(initialValue, divisor));
     }
 
-    private static double calculateDivisorForMeanChange(TimePeriod t, TimePeriod v) {
-        return ((double)t.getLengthInMillis())/v.getLengthInMillis();
+    /**
+     * Count Over is actually the same as the 'change' in the count during a time period, but when used with a Counter
+     * this version can result in a more intelligable description:
+     * (e.g  Login Attempts (Count Over 10ms) rather than Login Attempts (Change 10ms))
+     * @return a function which records a change in a count in a given time period.
+     */
+    public static CaptureFunction COUNT_OVER(TimePeriod timePeriod) {
+        return COUNT_OVER(timePeriod, new LongNumeric(0));
     }
+
+    public static CaptureFunction COUNT_OVER(TimePeriod timePeriod, Numeric initialValue) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.CHANGE("Count Over", initialValue));
+    }
+
+    private static class MeanChangeAggregateFunction extends AbstractDelegatingAggregateFunction {
+
+        private double divisor;
+
+        public MeanChangeAggregateFunction(Numeric initialValue, double divisor) {
+            super(AggregateFunctions.CHANGE("Mean Change", initialValue));
+            this.divisor = divisor;
+        }
+
+        public Numeric calculateAggregateValue() {
+            return new DoubleNumeric(getWrappedFunction().calculateAggregateValue().doubleValue() / divisor);
+        }
+
+        public AggregateFunction nextInstance() {
+            return new MeanChangeAggregateFunction(getLastAddedValue(), divisor);
+        }
+    }
+
 
 }

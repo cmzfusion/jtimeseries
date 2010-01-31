@@ -29,7 +29,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 */
 class SumFunction extends AbstractDoubleBasedAggregateFunction {
 
-    private static final String NAME = "Sum";
+    private static final String DESCRIPTION = "Sum";
     private double total = Double.NaN;
 
     public void doAddValue(double value) {
@@ -45,7 +45,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public String getDescription() {
-        return NAME;
+        return DESCRIPTION;
     }
 
     public AggregateFunction nextInstance() {

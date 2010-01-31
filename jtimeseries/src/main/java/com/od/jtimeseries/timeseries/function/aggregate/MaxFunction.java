@@ -29,7 +29,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 */
 class MaxFunction extends AbstractDoubleBasedAggregateFunction implements AggregateFunction {
 
-    private static final String NAME = "Max";
+    private static final String DESCRIPTION = "Max";
     private double max = Double.NaN;
 
     public void doAddValue(double value) {
@@ -45,7 +45,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
     }
 
     public String getDescription() {
-        return NAME;
+        return DESCRIPTION;
     }
 
     public AggregateFunction nextInstance() {

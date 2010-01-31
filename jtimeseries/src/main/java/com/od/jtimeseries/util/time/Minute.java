@@ -34,6 +34,6 @@ class Minute extends AbstractTimePeriod {
 
     public String toString() {
         long mins = getLengthInMillis() / millis;
-        return mins == 1 ? "minute" : mins + " mins";
+        return mins + "min";
     }
 }

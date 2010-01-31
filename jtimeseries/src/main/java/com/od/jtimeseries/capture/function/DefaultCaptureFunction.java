@@ -38,7 +38,7 @@ public class DefaultCaptureFunction extends AbstractCaptureFunction {
     }
 
     protected String doGetDescription() {
-        return prototype.getDescription();
+        return prototype.getDescription() + " " + getCapturePeriod();
     }
 
     public AggregateFunction nextFunctionInstance() {

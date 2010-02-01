@@ -71,60 +71,72 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
-        final double divisor = ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
-        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction("Mean Change Per " + timeIntervalToExpressCount + " Over", initialValue, divisor));
+        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction(initialValue, timeIntervalToExpressCount, timePeriod));
     }
 
-    /**
-     * Count Over is actually the same as the 'change' in the count during a time period, but when used with a Counter
-     * this version can result in a more intelligable description:
-     * (e.g  Login Attempts (Count Over 10ms) rather than Login Attempts (Change 10ms))
-     * @return a function which records a change in a count in a given time period.
-     */
-    public static CaptureFunction COUNT_OVER(TimePeriod timePeriod) {
-        return COUNT_OVER(timePeriod, new LongNumeric(0));
+    public static CaptureFunction COUNT(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT());
     }
 
-    public static CaptureFunction COUNT_OVER(TimePeriod timePeriod, Numeric initialValue) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.CHANGE("Count Over", initialValue));
+    public static CaptureFunction MEAN_COUNT(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, new MeanCountAggregateFunction(timeIntervalToExpressCount, timePeriod));
     }
 
-    /**
-     * Count Over is actually the same as the 'change' in the count during a time period, but when used with a Counter
-     * this version can result in a more intelligable description:
-     * (e.g  Login Attempts (Count Over 10ms) rather than Login Attempts (Change 10ms))
-     * @return a function which records a change in a count in a given time period.
-     */
-    public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-        return MEAN_COUNT_OVER(timeIntervalToExpressCount, timePeriod, new LongNumeric(0));
+    public static CaptureFunction LAST(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LAST());
     }
 
-    public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
-        final double divisor = ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
-        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction("Mean Count Per " + timeIntervalToExpressCount + " Over", initialValue, divisor));
+    private static class MeanChangeAggregateFunction extends MeanPerXTimeOverYTimeFunction {
+
+        public MeanChangeAggregateFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Mean Change Per " + timeIntervalToExpressCount + " Over");
+        }
+
+        public AggregateFunction nextInstance() {
+            return new MeanChangeAggregateFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
+        }
     }
 
+    private static class MeanCountAggregateFunction extends MeanPerXTimeOverYTimeFunction {
 
+        public MeanCountAggregateFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+            super(AggregateFunctions.COUNT(), timeIntervalToExpressCount, timePeriod, "Mean Count Per " + timeIntervalToExpressCount + " Over");
+        }
 
-    private static class MeanChangeAggregateFunction extends AbstractDelegatingAggregateFunction {
+        public AggregateFunction nextInstance() {
+            return new MeanCountAggregateFunction(getTimeIntervalToExpressCount(), getTimePeriod());
+        }
+    }
+
+    private abstract static class MeanPerXTimeOverYTimeFunction extends AbstractDelegatingAggregateFunction {
 
         private String description;
         private double divisor;
-        
-        public MeanChangeAggregateFunction(String description, Numeric initialValue, double divisor) {
-            super(AggregateFunctions.CHANGE(description, initialValue));
+        private TimePeriod timeIntervalToExpressCount;
+        private TimePeriod timePeriod;
+
+        public MeanPerXTimeOverYTimeFunction(AggregateFunction aggregateFunction, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, String description) {
+            super(aggregateFunction);
+            this.timeIntervalToExpressCount = timeIntervalToExpressCount;
+            this.timePeriod = timePeriod;
+            this.divisor =  ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
             this.description = description;
-            this.divisor = divisor;
         }
 
         public Numeric calculateAggregateValue() {
             return new DoubleNumeric(getWrappedFunction().calculateAggregateValue().doubleValue() / divisor);
         }
 
-        public AggregateFunction nextInstance() {
-            return new MeanChangeAggregateFunction(description, getLastAddedValue(), divisor);
+        public String getDescription() {
+            return description;
+        }
+
+        public TimePeriod getTimeIntervalToExpressCount() {
+            return timeIntervalToExpressCount;
+        }
+
+        public TimePeriod getTimePeriod() {
+            return timePeriod;
         }
     }
-
-
 }

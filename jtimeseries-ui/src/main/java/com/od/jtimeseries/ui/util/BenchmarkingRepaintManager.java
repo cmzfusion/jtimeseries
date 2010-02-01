@@ -57,14 +57,15 @@ public class BenchmarkingRepaintManager extends RepaintManager {
     private void createDefaultSources(TimeSeriesContext context, TimePeriod timePeriod) {
         timer = context.newEventTimer(
                 REPAINT_EVENT_DURATION_METRIC_ID,
-                "Length of time taken by each screen repainting operation in ms - lower is better. Anything more than 50ms will result in noticible sluggishness.",
+                "Length of time taken by each screen repainting operation in ms - lower is better. " +
+                        "Anything more than 50ms will result in noticible sluggishness.",
                 CaptureFunctions.MEAN(timePeriod),
                 CaptureFunctions.MAX(timePeriod)
         );
 
         count = context.newCounter(
                 NUMBER_OF_REPAINT_EVENTS_METRIC_ID,
-                "Count of the repaint events taking place in each 30s period",
+                "Number of repaint events",
                 CaptureFunctions.MEAN_CHANGE(timePeriod, Time.seconds(1))
         );
     }

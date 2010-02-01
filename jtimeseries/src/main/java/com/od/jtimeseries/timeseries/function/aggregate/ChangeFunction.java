@@ -52,11 +52,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
      */
     ChangeFunction(String description, Numeric initialValue) {
         this.description = description;
-        this.initialValue = initialValue.doubleValue();
-
-        //set currentValue too, otherwise we lose the initial value on the first call to
-        // nextInstance(), unless we received a new value in the meantime
-        this.currentValue = this.initialValue;
+        addValue(initialValue);
     }
 
     /**

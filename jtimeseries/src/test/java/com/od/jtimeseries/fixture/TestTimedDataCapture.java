@@ -7,6 +7,7 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 
 import java.util.List;
@@ -22,7 +23,13 @@ import java.util.Iterator;
 public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
-        counter = rootContext.newCounter("TestCounter", "Test Counter Description", CaptureFunctions.CHANGE(capturePeriod));
+        counter = rootContext.newCounter("TestCounter", "Test Counter Description",
+                CaptureFunctions.COUNT(capturePeriod),
+                CaptureFunctions.CHANGE(capturePeriod),
+                CaptureFunctions.MEAN_CHANGE(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
+                CaptureFunctions.MEAN_COUNT(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod)
+        );
+
         valueRecorder = rootContext.newValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
         eventTimer = rootContext.newEventTimer("TestEventTimer", "Test Event Timer", CaptureFunctions.MAX(capturePeriod));
         queueTimer = rootContext.newQueueTimer("TestQueueTimer", "Test Queue Timer", CaptureFunctions.MIN(capturePeriod));
@@ -47,18 +54,43 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         rootContext.stopDataCapture().stopScheduling();
 
         List<IdentifiableTimeSeries> allSeries = rootContext.findAllTimeSeries().getAllMatches();
-        assertEquals(4, allSeries.size());
+        assertEquals(7, allSeries.size());
 
         for (IdentifiableTimeSeries s : allSeries) {
             assertEquals(2, s.size());
         }
 
-        TimeSeries s = rootContext.findTimeSeries(counter).getFirstMatch();
+        //this series is the change in the count over the period, which is 2 because the count was decremented
+        TimeSeries s = rootContext.findTimeSeries("TestCounter \\(Change " + capturePeriod).getFirstMatch();
         Iterator<TimeSeriesItem> i = s.iterator();
         TimeSeriesItem i1 = i.next();
         TimeSeriesItem i2 = i.next();
         assertEquals(2, i1.longValue());
         assertEquals(2, i2.longValue());
+
+        //this series is the absolute count of values collected over the period, which is 4
+        s = rootContext.findTimeSeries("TestCounter \\(Count " + capturePeriod).getFirstMatch();
+        i = s.iterator();
+        i1 = i.next();
+        i2 = i.next();
+        assertEquals(4, i1.longValue());
+        assertEquals(4, i2.longValue());
+
+        //this series is the mean change over capturePeriod / 5
+        s = rootContext.findTimeSeries("TestCounter \\(Mean Change Per").getFirstMatch();
+        i = s.iterator();
+        i1 = i.next();
+        i2 = i.next();
+        assertEquals(0.4, i1.doubleValue(), 0.0001);
+        assertEquals(0.4, i2.doubleValue(), 0.0001);
+
+        //this series is the mean count over capturePeriod / 5
+        s = rootContext.findTimeSeries("TestCounter \\(Mean Count Per").getFirstMatch();
+        i = s.iterator();
+        i1 = i.next();
+        i2 = i.next();
+        assertEquals(0.8, i1.doubleValue(), 0.0001);
+        assertEquals(0.8, i2.doubleValue(), 0.0001);
 
         s = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
         i = s.iterator();

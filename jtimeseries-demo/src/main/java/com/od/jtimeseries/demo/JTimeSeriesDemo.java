@@ -59,7 +59,7 @@ public class JTimeSeriesDemo {
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
 
         //create some diagnostics time series for the Swing repainting which will appear at the top level/root context
-        RepaintManager.setCurrentManager(new BenchmarkingRepaintManager(rootContext, Time.seconds(5)));
+        RepaintManager.setCurrentManager(new BenchmarkingRepaintManager(rootContext, Time.seconds(10)));
 
         //we'll create a demo sub-context, one step down from the context tree root and add a value recorder time series
         //to show the max of some random values

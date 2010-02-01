@@ -27,6 +27,11 @@ import java.net.MalformedURLException;
  * Date: 03-Dec-2009
  * Time: 22:14:47
  * To change this template use File | Settings | File Templates.
+ *
+ * Connect to a JMX management service to capture values to a timeseries (e.g. heap memory)
+ * This is used by the server itself to capture its own memory usage.
+ * It may also be configured to capture performance stats from third party processes.
+ * See the serverMetricsContext.xml where the jmx metrics are defined.
  */
 public class JmxMetric extends AbstractServerMetric {
 

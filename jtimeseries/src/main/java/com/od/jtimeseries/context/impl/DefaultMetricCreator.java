@@ -104,7 +104,6 @@ class DefaultMetricCreator implements ContextMetricCreator {
         //if there is a function we use this to create the id and description for the timeseries
         if ( captureFunction != null) {
             id = id + " " + captureFunction.getDescription();
-            description = description + " " + captureFunction.getDescription() + " every " + captureFunction.getCapturePeriod();
         }
 
         IdentifiableTimeSeries series = timeSeriesContext.getTimeSeries(id);

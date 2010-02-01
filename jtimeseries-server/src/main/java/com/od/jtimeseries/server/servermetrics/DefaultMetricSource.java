@@ -7,13 +7,16 @@ import java.util.List;
  * User: nick
  * Date: 06-Dec-2009
  * Time: 11:57:12
- * To change this template use File | Settings | File Templates.
+ *
+ * Simply stores a list of metrics, usually created and populated from xml via spring context.
+ * Other implementations might connect to a database to read in the details of metrics to be
+ * created, for example
  */
-public class TimeSeriesServerMetricSource implements ServerMetricSource {
+public class DefaultMetricSource implements ServerMetricSource {
 
     private List<ServerMetric> metrics;
 
-    public TimeSeriesServerMetricSource(List<ServerMetric> metrics) {
+    public DefaultMetricSource(List<ServerMetric> metrics) {
         this.metrics = metrics;
     }
 

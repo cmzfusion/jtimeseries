@@ -15,7 +15,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public class UpdatesReceivedMetric extends AbstractServerMetric {
 
-    private static final String SERIES_ID = "UdpSeriesUpdateCount";
+    private static final String SERIES_ID = "UdpSeriesUpdates";
     private TimePeriod countPeriod;
     private String parentContextPath;
 
@@ -39,8 +39,8 @@ public class UpdatesReceivedMetric extends AbstractServerMetric {
     public void setupSeries(TimeSeriesContext metricContext) {
         Counter counter = metricContext.createCounter(
             SERIES_ID,
-            "A count of the udp series updates received during the last " + countPeriod,
-            CaptureFunctions.CHANGE(countPeriod)
+            "A count of series data update UDP datagram messages received",
+            CaptureFunctions.COUNT_OVER(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

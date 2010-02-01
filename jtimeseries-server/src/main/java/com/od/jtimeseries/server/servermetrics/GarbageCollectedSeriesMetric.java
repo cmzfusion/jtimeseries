@@ -39,10 +39,9 @@ public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
     public void setupSeries(TimeSeriesContext metricContext) {
         Counter counter = metricContext.createCounter(
                 id,
-                "A count of the series deallocated for memory efficiency every " + countPeriod +
-                ", we would expect a heavily loaded server to regularly deallocate series data once it is no longer possible to " +
-                "maintain all series data in RAM",
-                CaptureFunctions.CHANGE(countPeriod));
+                "A count of the series deallocated for memory efficiency, we would expect a heavily loaded server to " +
+                "regularly deallocate series data once it is no longer possible to maintain all series data in RAM",
+                CaptureFunctions.COUNT_OVER(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
 

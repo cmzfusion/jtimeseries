@@ -1,4 +1,4 @@
-package com.od.jtimeseries.capture.function;
+package com.od.jtimeseries.context;
 
 import junit.framework.TestCase;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -6,6 +6,7 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.source.*;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import org.junit.Before;
 
 /**
@@ -15,7 +16,7 @@ import org.junit.Before;
  * Time: 11:56:19
  * To change this template use File | Settings | File Templates.
  */
-public class TestCaptureFunctions extends TestCase {
+public class TestTimeSeriesNaming extends TestCase {
 
     protected TimeSeriesContext rootContext;
 
@@ -58,19 +59,5 @@ public class TestCaptureFunctions extends TestCase {
         assertNotNull(rootContext.get("Login Attempts (Count Over 3day)"));
         assertNotNull(rootContext.get("Login Attempts (Max 50ms)"));
     }
-
-
-
-
-
-
-
-//    protected void doExtraSetUp() {
-//        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.CHANGE(capturePeriod));
-//        valueRecorder = rootContext.createValueRecorder("TestValueRecorder", "Test Value Recorder Description", CaptureFunctions.MEAN(capturePeriod));
-//        eventTimer = rootContext.createEventTimer("TestEventTimer", "Test Event Timer Description", CaptureFunctions.MAX(capturePeriod));
-//        queueTimer = rootContext.createQueueTimer("TestQueueTimer", "Test Queue Timer Description", CaptureFunctions.MIN(capturePeriod));
-//    }
-
 
 }

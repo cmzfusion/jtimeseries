@@ -62,17 +62,17 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, starting from zero, expressed
      * as a mean change over timeIntervalToExpressCount
      */
-    public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount) {
-        return MEAN_CHANGE(timePeriod, timeIntervalToExpressCount, new LongNumeric(0));
+    public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+        return MEAN_CHANGE(timeIntervalToExpressCount, timePeriod, new LongNumeric(0));
     }
 
     /**
      * @return a function which measures net change over a time period, starting from initialValue, expressed
      * as a mean change over timeIntervalToExpressCount
      */
-    public static CaptureFunction MEAN_CHANGE(TimePeriod timePeriod, TimePeriod timeIntervalToExpressCount, Numeric initialValue) {
+    public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
         final double divisor = ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
-        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction(initialValue, divisor));
+        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction("Mean Change Per " + timeIntervalToExpressCount + " Over", initialValue, divisor));
     }
 
     /**
@@ -89,12 +89,31 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.CHANGE("Count Over", initialValue));
     }
 
+    /**
+     * Count Over is actually the same as the 'change' in the count during a time period, but when used with a Counter
+     * this version can result in a more intelligable description:
+     * (e.g  Login Attempts (Count Over 10ms) rather than Login Attempts (Change 10ms))
+     * @return a function which records a change in a count in a given time period.
+     */
+    public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+        return MEAN_COUNT_OVER(timeIntervalToExpressCount, timePeriod, new LongNumeric(0));
+    }
+
+    public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
+        final double divisor = ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
+        return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction("Mean Count Per " + timeIntervalToExpressCount + " Over", initialValue, divisor));
+    }
+
+
+
     private static class MeanChangeAggregateFunction extends AbstractDelegatingAggregateFunction {
 
+        private String description;
         private double divisor;
-
-        public MeanChangeAggregateFunction(Numeric initialValue, double divisor) {
-            super(AggregateFunctions.CHANGE("Mean Change", initialValue));
+        
+        public MeanChangeAggregateFunction(String description, Numeric initialValue, double divisor) {
+            super(AggregateFunctions.CHANGE(description, initialValue));
+            this.description = description;
             this.divisor = divisor;
         }
 
@@ -103,7 +122,7 @@ public class CaptureFunctions {
         }
 
         public AggregateFunction nextInstance() {
-            return new MeanChangeAggregateFunction(getLastAddedValue(), divisor);
+            return new MeanChangeAggregateFunction(description, getLastAddedValue(), divisor);
         }
     }
 

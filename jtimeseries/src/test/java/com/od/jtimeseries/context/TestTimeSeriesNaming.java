@@ -51,12 +51,17 @@ public class TestTimeSeriesNaming extends TestCase {
 
     public void testNaming() {
         rootContext.newCounter("Login Attempts", "Count of Login Attempts",
+                CaptureFunctions.CHANGE(Time.days(3)),
                 CaptureFunctions.COUNT_OVER(Time.days(3)),
-                CaptureFunctions.MAX(Time.milliseconds(50))
+                CaptureFunctions.MAX(Time.milliseconds(50)),
+                CaptureFunctions.MEAN_CHANGE(Time.minutes(1), Time.minutes(30)),
+                CaptureFunctions.MEAN_COUNT_OVER(Time.seconds(30), Time.hours(1))
         );
 
         assertNotNull(rootContext.get("Login Attempts (Count Over 3day)"));
         assertNotNull(rootContext.get("Login Attempts (Max 50ms)"));
+        assertNotNull(rootContext.get("Login Attempts (Mean Change Per 1min Over 30min)"));
+        assertNotNull(rootContext.get("Login Attempts (Mean Count Per 30s Over 1hr)"));
     }
 
 }

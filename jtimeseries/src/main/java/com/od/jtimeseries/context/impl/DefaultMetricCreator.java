@@ -56,32 +56,32 @@ class DefaultMetricCreator implements ContextMetricCreator {
         this.timeSeriesContext = timeSeriesContext;
     }
 
-    public ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
-        ValueRecorder v = timeSeriesContext.createValueRecorderOnly(SOURCE_PREFIX + id, description);
+    public ValueRecorder newValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
+        ValueRecorder v = timeSeriesContext.createValueRecorder(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, v, captureFunctions);
         return v;
     }
 
-    public QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
-        QueueTimer q = timeSeriesContext.createQueueTimerOnly(SOURCE_PREFIX + id, description);
+    public QueueTimer newQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
+        QueueTimer q = timeSeriesContext.createQueueTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, q, captureFunctions);
         return q;
     }
 
-    public Counter createCounter(String id, String description, CaptureFunction... captureFunctions) {
-        Counter c = timeSeriesContext.createCounterOnly(SOURCE_PREFIX + id, description);
+    public Counter newCounter(String id, String description, CaptureFunction... captureFunctions) {
+        Counter c = timeSeriesContext.createCounter(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, c, captureFunctions);
         return c;
     }
 
-    public EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunctions) {
-        EventTimer m = timeSeriesContext.createEventTimerOnly(SOURCE_PREFIX + id, description);
+    public EventTimer newEventTimer(String id, String description, CaptureFunction... captureFunctions) {
+        EventTimer m = timeSeriesContext.createEventTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, m, captureFunctions);
         return m;
     }
 
-    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSource s = timeSeriesContext.createTimedValueSourceOnly(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
+    public TimedValueSource newTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSource s = timeSeriesContext.createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
         createSeriesAndCapturesForSource(id, description, s);
         return s;
     }

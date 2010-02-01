@@ -130,25 +130,25 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries, Context
     /**
      * Create a ValueRecorder and add it to this context, without creating an associated Capture and TimeSeries
      */
-    ValueRecorder createValueRecorderOnly(String id, String description);
+    ValueRecorder createValueRecorder(String id, String description);
 
     /**
      * Create a QueueTimer and add it to this context, without creating an associated Capture and TimeSeries
      */
-    QueueTimer createQueueTimerOnly(String id, String description);
+    QueueTimer createQueueTimer(String id, String description);
 
     /**
      * Create a Counter and add it to this context, without creating an associated Capture and TimeSeries
      */
-    Counter createCounterOnly(String id, String description);
+    Counter createCounter(String id, String description);
 
     /**
      * Create a EventTimer and add it to this context, without creating an associated Capture and TimeSeries
      */
-    EventTimer createEventTimerOnly(String id, String description);
+    EventTimer createEventTimer(String id, String description);
 
     /**
      * Create a TimedValueSource and add it to this context, without creating an associated Capture and TimeSeries
      */
-    TimedValueSource createTimedValueSourceOnly(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

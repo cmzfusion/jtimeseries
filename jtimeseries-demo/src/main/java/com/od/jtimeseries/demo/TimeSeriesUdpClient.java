@@ -51,8 +51,8 @@ public class TimeSeriesUdpClient {
         TimeSeriesContext fooContext = rootContext.createChildContext("Udp Context", "A context for foo");
         TimeSeriesContext testContext = rootContext.createContextForPath("Udp Context.test");
 
-        ValueRecorder v = fooContext.createValueRecorder("Foo Benchmark", "Foo Benchmark Description", CaptureFunctions.MAX(Time.seconds(1)));
-        ValueRecorder f = testContext.createValueRecorder("Wibble Benchmark", "Wibble Benchmark Description", CaptureFunctions.MEAN(Time.seconds(2)));
+        ValueRecorder v = fooContext.newValueRecorder("Foo Benchmark", "Foo Benchmark Description", CaptureFunctions.MAX(Time.seconds(1)));
+        ValueRecorder f = testContext.newValueRecorder("Wibble Benchmark", "Wibble Benchmark Description", CaptureFunctions.MEAN(Time.seconds(2)));
         rootContext.startScheduling().startDataCapture();
 
         while(true) {

@@ -3,7 +3,6 @@ package com.od.jtimeseries.context;
 import junit.framework.TestCase;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
@@ -26,32 +25,32 @@ public class TestTimeSeriesNaming extends TestCase {
     }
 
     public void testMilliseconds() {
-        ValueRecorder v = rootContext.createValueRecorder("Value", "Value Description", CaptureFunctions.CHANGE(Time.milliseconds(10)));
+        ValueRecorder v = rootContext.newValueRecorder("Value", "Value Description", CaptureFunctions.CHANGE(Time.milliseconds(10)));
         assertEquals("Value (Change 10ms)", rootContext.findTimeSeries(v).getFirstMatch().getId());
     }
 
     public void testSeconds() {
-        ValueRecorder v = rootContext.createValueRecorder("Value", "Value Description", CaptureFunctions.MAX(Time.seconds(30)));
+        ValueRecorder v = rootContext.newValueRecorder("Value", "Value Description", CaptureFunctions.MAX(Time.seconds(30)));
         assertEquals("Value (Max 30s)", rootContext.findTimeSeries(v).getFirstMatch().getId());
     }
 
     public void testMinutes() {
-        ValueRecorder v = rootContext.createValueRecorder("Value", "Value Description", CaptureFunctions.MIN(Time.minutes(20)));
+        ValueRecorder v = rootContext.newValueRecorder("Value", "Value Description", CaptureFunctions.MIN(Time.minutes(20)));
         assertEquals("Value (Min 20min)", rootContext.findTimeSeries(v).getFirstMatch().getId());
     }
 
     public void testHours() {
-        ValueRecorder v = rootContext.createValueRecorder("Value", "Value Description", CaptureFunctions.MEAN(Time.hours(2)));
+        ValueRecorder v = rootContext.newValueRecorder("Value", "Value Description", CaptureFunctions.MEAN(Time.hours(2)));
         assertEquals("Value (Mean 2hr)", rootContext.findTimeSeries(v).getFirstMatch().getId());
     }
 
     public void testDays() {
-        ValueRecorder v = rootContext.createValueRecorder("Value", "Value Description", CaptureFunctions.SUM(Time.days(3)));
+        ValueRecorder v = rootContext.newValueRecorder("Value", "Value Description", CaptureFunctions.SUM(Time.days(3)));
         assertEquals("Value (Sum 3day)", rootContext.findTimeSeries(v).getFirstMatch().getId());
     }
 
     public void testNaming() {
-        rootContext.createCounter("Login Attempts", "Count of Login Attempts",
+        rootContext.newCounter("Login Attempts", "Count of Login Attempts",
                 CaptureFunctions.COUNT_OVER(Time.days(3)),
                 CaptureFunctions.MAX(Time.milliseconds(50))
         );

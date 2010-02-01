@@ -14,8 +14,5 @@ public interface Triggerable extends Identifiable {
 
     TimePeriod getTimePeriod();
 
-    /**
-     * Called by the scheduler when the Capture is in STARTING or STARTED state
-     */
     void trigger(long timestamp);
 }

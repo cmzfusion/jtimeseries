@@ -36,8 +36,8 @@ public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
         return id;
     }
 
-    public void setupSeries(TimeSeriesContext metricContext) {
-        Counter counter = metricContext.createCounter(
+    public void initializeMetric(TimeSeriesContext metricContext) {
+        Counter counter = metricContext.newCounter(
                 id,
                 "A count of the series deallocated for memory efficiency, we would expect a heavily loaded server to " +
                 "regularly deallocate series data once it is no longer possible to maintain all series data in RAM",

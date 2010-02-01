@@ -22,10 +22,10 @@ import java.util.Iterator;
 public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
-        counter = rootContext.createCounter("TestCounter", "Test Counter Description", CaptureFunctions.CHANGE(capturePeriod));
-        valueRecorder = rootContext.createValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
-        eventTimer = rootContext.createEventTimer("TestEventTimer", "Test Event Timer", CaptureFunctions.MAX(capturePeriod));
-        queueTimer = rootContext.createQueueTimer("TestQueueTimer", "Test Queue Timer", CaptureFunctions.MIN(capturePeriod));
+        counter = rootContext.newCounter("TestCounter", "Test Counter Description", CaptureFunctions.CHANGE(capturePeriod));
+        valueRecorder = rootContext.newValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
+        eventTimer = rootContext.newEventTimer("TestEventTimer", "Test Event Timer", CaptureFunctions.MAX(capturePeriod));
+        queueTimer = rootContext.newQueueTimer("TestQueueTimer", "Test Queue Timer", CaptureFunctions.MIN(capturePeriod));
     }
 
     @Test

@@ -75,13 +75,13 @@ public class JmxMetric extends AbstractServerMetric {
         this.divisor = divisor;
     }
 
-    public void setupSeries(TimeSeriesContext metricContext) {
+    public void initializeMetric(TimeSeriesContext metricContext) {
         try {
             url = new JMXServiceURL(serviceUrl);
         } catch (MalformedURLException e) {
             logMethods.logError("Failed to set up JMX Metric " + id + " - bad URL " + serviceUrl, e);
         }
-        metricContext.createTimedValueSource(id, description, valueSupplier, timePeriod);
+        metricContext.newTimedValueSource(id, description, valueSupplier, timePeriod);
     }
 
     public void setConnectorEnvironment(Map<String, ?> connectorEnvironment) {

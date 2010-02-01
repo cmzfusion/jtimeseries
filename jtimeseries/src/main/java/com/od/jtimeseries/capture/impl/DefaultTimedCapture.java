@@ -36,8 +36,10 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Date: 04-Feb-2009
  * Time: 22:37:28
  *
- * A Capture which subscribes to values from a ValueSource, collects the values over a given period and then captures
- * a value to a timerseries based on the result of applying an aggregate function
+ * A Capture which subscribes to values from a ValueSource, collects values over a given time period and aggregates them
+ * using an aggregation function, before adding the aggregated value to a time series.
+ *
+ * e.g. We may set up a timed capture to record the mean of the values from a value source every five minutes.
  *
  * Some implementation notes:
  *

@@ -11,19 +11,23 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 21:06:54
  *
  * TimeSeriesContext has several convenience methods such as createValueRecorder() which allow the user to create
- * a value source, a capture (timed or otherwise) and a time series within the context in one method call. A ContextMetricCreator
- * handles the creation and wiring together of all of those items.
+ * a value source, a capture (timed or otherwise) and a time series within the context in one method call.
+ *
+ * e.g. context.newValueRecorder("Memory", "Memory Usage", CaptureFunction.MEAN(Time.mins(5));
+ *
+ * This would create in the context a ValueRecorder instance, a TimedCapture to aggregate the values across a five minute period,
+ * and TimeSeries to store the mean value every five minutes.
  */
 public interface ContextMetricCreator {
 
-    ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunctions);
+    ValueRecorder newValueRecorder(String id, String description, CaptureFunction... captureFunctions);
 
-    QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunctions);
+    QueueTimer newQueueTimer(String id, String description, CaptureFunction... captureFunctions);
 
-    Counter createCounter(String id, String description, CaptureFunction... captureFunctions);
+    Counter newCounter(String id, String description, CaptureFunction... captureFunctions);
 
-    EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunctions);
+    EventTimer newEventTimer(String id, String description, CaptureFunction... captureFunctions);
 
-    TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSource newTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
 }

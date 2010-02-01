@@ -34,6 +34,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * User: Nick Ebbutt
  * Date: 18-Dec-2008
  * Time: 11:53:28
+ *
+ * Capture values from a source to a timeseries, without aggregation
  */
 public class DefaultCapture extends AbstractCapture implements ValueSourceCapture {
 

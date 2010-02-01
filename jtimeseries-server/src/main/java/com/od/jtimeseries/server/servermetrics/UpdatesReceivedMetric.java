@@ -36,8 +36,8 @@ public class UpdatesReceivedMetric extends AbstractServerMetric {
         return parentContextPath;
     }
 
-    public void setupSeries(TimeSeriesContext metricContext) {
-        Counter counter = metricContext.createCounter(
+    public void initializeMetric(TimeSeriesContext metricContext) {
+        Counter counter = metricContext.newCounter(
             SERIES_ID,
             "A count of series data update UDP datagram messages received",
             CaptureFunctions.COUNT_OVER(countPeriod)

@@ -13,8 +13,17 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public interface ServerMetric {
 
-    public void setupSeries(TimeSeriesContext metricContext) ;
+    /**
+     * Called by the server to ask the metric to initialize itself
+     * Typically this will involve creating a new timeseries within the metricContext
+     *
+     * @param metricContext, the parent context mapping, determined by getParentContextPath()
+     */
+    public void initializeMetric(TimeSeriesContext metricContext) ;
 
+    /**
+     * @return the id of the TimeSeries created, to be used when the server logs the setup of the metric
+     */
     public String getSeriesId();
 
     String getParentContextPath();

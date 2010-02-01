@@ -39,8 +39,8 @@ public class TotalSeriesMetric extends AbstractServerMetric {
         return parentContextPath;
     }
 
-    public void setupSeries(TimeSeriesContext metricContext) {
-        metricContext.createTimedValueSource(
+    public void initializeMetric(TimeSeriesContext metricContext) {
+        metricContext.newTimedValueSource(
             id,
             "Total number of series managed by the server",
             new TotalSeriesCountValueSupplier(),

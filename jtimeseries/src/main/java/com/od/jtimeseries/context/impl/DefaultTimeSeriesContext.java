@@ -414,7 +414,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public ValueRecorder createValueRecorderOnly(String id, String description) {
+    public ValueRecorder createValueRecorder(String id, String description) {
         synchronized (getTreeLock()) {
             ValueRecorder v = getValueSourceFactory().createValueRecorder(getPath() + NAMESPACE_SEPARATOR + id, id, description);
             addChild(v);
@@ -422,7 +422,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public QueueTimer createQueueTimerOnly(String id, String description) {
+    public QueueTimer createQueueTimer(String id, String description) {
         synchronized (getTreeLock()) {
             QueueTimer q = getValueSourceFactory().createQueueTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
             addChild(q);
@@ -430,7 +430,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public Counter createCounterOnly(String id, String description) {
+    public Counter createCounter(String id, String description) {
         synchronized (getTreeLock()) {
             Counter c = getValueSourceFactory().createCounter(getPath() + NAMESPACE_SEPARATOR + id, id, description);
             addChild(c);
@@ -438,7 +438,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public EventTimer createEventTimerOnly(String id, String description) {
+    public EventTimer createEventTimer(String id, String description) {
         synchronized (getTreeLock()) {
             EventTimer e = getValueSourceFactory().createEventTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
             addChild(e);
@@ -446,7 +446,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public TimedValueSource createTimedValueSourceOnly(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         synchronized (getTreeLock()) {
             TimedValueSource t = getValueSourceFactory().createTimedValueSource(getPath() + NAMESPACE_SEPARATOR + id, id, description, valueSupplier, timePeriod);
             addChild(t);
@@ -496,32 +496,32 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public ValueRecorder createValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
+    public ValueRecorder newValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createValueRecorder(id, description, captureFunctions);
+            return defaultMetricCreator.newValueRecorder(id, description, captureFunctions);
         }
     }
 
-    public QueueTimer createQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
+    public QueueTimer newQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createQueueTimer(id, description, captureFunctions);
+            return defaultMetricCreator.newQueueTimer(id, description, captureFunctions);
         }
     }
 
-    public Counter createCounter(String id, String description, CaptureFunction... captureFunctions) {
+    public Counter newCounter(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createCounter(id, description, captureFunctions);
+            return defaultMetricCreator.newCounter(id, description, captureFunctions);
         }
     }
 
-    public EventTimer createEventTimer(String id, String description, CaptureFunction... captureFunctions) {
+    public EventTimer newEventTimer(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createEventTimer(id, description, captureFunctions);
+            return defaultMetricCreator.newEventTimer(id, description, captureFunctions);
         }
     }
 
-    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return defaultMetricCreator.createTimedValueSource(id, description, valueSupplier, timePeriod);
+    public TimedValueSource newTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        return defaultMetricCreator.newTimedValueSource(id, description, valueSupplier, timePeriod);
     }
 
     public QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {

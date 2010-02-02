@@ -28,6 +28,21 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 public class CaptureFunctions {
 
+    /**
+     * The RAW_VALUES function can be used to signify that in addition to a specified list of
+     * time period functions, we also want to capture raw values from a source into a timeseries
+     * e.g. the below would capture the MAX every 15 mins, the MEAN every 15 mins, and separately
+     * a series with all the individual (raw) values recorded
+     * context.newValueRecorder(
+     *  "Memory Usage",
+     *  "Heap Memory Usage",
+     *  CaptureFunctions.MAX(Time.minutes(15)),
+     *  CaptureFunctions.MEAN(Time.minutes(15)),
+     *  CaptureFunctions.RAW_VALUES
+     * )
+     */
+    public static final CaptureFunction RAW_VALUES = new DefaultCaptureFunction(null, null);
+
     public static CaptureFunction MAX(TimePeriod timePeriod) {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MAX());
     }
@@ -86,10 +101,17 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LAST());
     }
 
+    /**
+     * Can be used to indicate we should capture Raw Values from a source, in addition to any time based functions specified
+     */
+    public static CaptureFunction RAW_VALUES() {
+        return RAW_VALUES;
+    }
+
     private static class MeanChangeAggregateFunction extends MeanPerXTimeOverYTimeFunction {
 
         public MeanChangeAggregateFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Mean Change Per " + timeIntervalToExpressCount + " Over");
+            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
         }
 
         public AggregateFunction nextInstance() {
@@ -100,7 +122,7 @@ public class CaptureFunctions {
     private static class MeanCountAggregateFunction extends MeanPerXTimeOverYTimeFunction {
 
         public MeanCountAggregateFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-            super(AggregateFunctions.COUNT(), timeIntervalToExpressCount, timePeriod, "Mean Count Per " + timeIntervalToExpressCount + " Over");
+            super(AggregateFunctions.COUNT(), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
         }
 
         public AggregateFunction nextInstance() {

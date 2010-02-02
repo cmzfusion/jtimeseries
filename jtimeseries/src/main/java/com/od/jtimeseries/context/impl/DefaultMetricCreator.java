@@ -19,6 +19,7 @@
 package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
@@ -87,21 +88,37 @@ class DefaultMetricCreator implements ContextMetricCreator {
     }
 
     private void createSeriesAndCapturesForSource(String id, String description, ValueSource source, CaptureFunction... captureFunctions) {
+        //if no functions are specified, assume that means we want to capture the raw values to a time series
         if (captureFunctions.length == 0) {
-            IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, null);
-            String captureId = getNextCaptureId(id);
-            timeSeriesContext.createCapture(captureId, source, series);
+            createRawValueSeriesAndCapture(id, description, source);
         } else {
             for (CaptureFunction captureFunction : captureFunctions) {
-                IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, captureFunction);
-                String captureId = getNextCaptureId(id);
-                timeSeriesContext.createTimedCapture(captureId, source, series, captureFunction);
+                //handle the special 'RAW Values' functon which can be added to the list to mean
+                //'in addition to these time based function, we also want to capture the raw values'
+                if ( captureFunction == CaptureFunctions.RAW_VALUES) {
+                    createRawValueSeriesAndCapture(id, description, source);
+                } else {
+                    createCaptureFunctionSeriesAndCapture(id, description, source, captureFunction);
+                }
             }
         }
     }
 
+    private void createCaptureFunctionSeriesAndCapture(String id, String description, ValueSource source, CaptureFunction captureFunction) {
+        IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, captureFunction);
+        String captureId = getNextCaptureId(id);
+        timeSeriesContext.createTimedCapture(captureId, source, series, captureFunction);
+    }
+
+    private void createRawValueSeriesAndCapture(String id, String description, ValueSource source) {
+        IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, null);
+        String captureId = getNextCaptureId(id);
+        timeSeriesContext.createCapture(captureId, source, series);
+    }
+
     private IdentifiableTimeSeries createTimeSeriesIfNotPresent(String id, String description, CaptureFunction captureFunction) {
         //if there is a function we use this to create the id and description for the timeseries
+        //otherwise for 'raw' values series, the id becomes the id of the timeseries literally
         if ( captureFunction != null) {
             id = id + " " + captureFunction.getDescription();
         }

@@ -14,6 +14,15 @@ import org.junit.Before;
  * Date: 31-Jan-2010
  * Time: 11:56:19
  * To change this template use File | Settings | File Templates.
+ *
+ * When we create value source (e.g. Counter, ValueRecorder) via the context.new methods,
+ * in addition to the value source itself we end up creating one or more timeseries
+ * in the context (one per function specified) to hold the values, each of which which derive their id
+ * from the id of the value sounds
+ *
+ * We need to check that these ids don't get changed accidentally, since the id of a series identifies
+ * it when stored in a time series server, and also users may have preferences to reload series
+ * by id in a client application - changing the series ID will break this link.
  */
 public class TestTimeSeriesNaming extends TestCase {
 
@@ -58,17 +67,19 @@ public class TestTimeSeriesNaming extends TestCase {
                 CaptureFunctions.MEAN_COUNT(Time.seconds(30), Time.hours(1)),
                 CaptureFunctions.SUM(Time.hours(3)),
                 CaptureFunctions.MIN(Time.minutes(120)),
-                CaptureFunctions.LAST(Time.seconds(10))
+                CaptureFunctions.LAST(Time.seconds(10)),
+                CaptureFunctions.RAW_VALUES()
         );
 
         assertNotNull(rootContext.get("Login Attempts (Change 3day)"));
         assertNotNull(rootContext.get("Login Attempts (Count 3day)"));
         assertNotNull(rootContext.get("Login Attempts (Max 50ms)"));
-        assertNotNull(rootContext.get("Login Attempts (Mean Change Per 1min Over 30min)"));
-        assertNotNull(rootContext.get("Login Attempts (Mean Count Per 30s Over 1hr)"));
+        assertNotNull(rootContext.get("Login Attempts (Change Per 1min Over 30min)"));
+        assertNotNull(rootContext.get("Login Attempts (Count Per 30s Over 1hr)"));
         assertNotNull(rootContext.get("Login Attempts (Sum 3hr)"));
         assertNotNull(rootContext.get("Login Attempts (Min 120min)"));
         assertNotNull(rootContext.get("Login Attempts (Last 10s)"));
+        assertNotNull(rootContext.get("Login Attempts")); //the raw values
     }
 
 }

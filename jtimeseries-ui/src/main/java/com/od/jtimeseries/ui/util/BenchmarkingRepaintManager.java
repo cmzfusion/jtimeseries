@@ -66,7 +66,7 @@ public class BenchmarkingRepaintManager extends RepaintManager {
         count = context.newCounter(
                 NUMBER_OF_REPAINT_EVENTS_METRIC_ID,
                 "Number of repaint events",
-                CaptureFunctions.MEAN_CHANGE(timePeriod, Time.seconds(1))
+                CaptureFunctions.MEAN_COUNT(Time.seconds(1), timePeriod)
         );
     }
 

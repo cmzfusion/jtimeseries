@@ -27,7 +27,8 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
                 CaptureFunctions.COUNT(capturePeriod),
                 CaptureFunctions.CHANGE(capturePeriod),
                 CaptureFunctions.MEAN_CHANGE(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
-                CaptureFunctions.MEAN_COUNT(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod)
+                CaptureFunctions.MEAN_COUNT(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
+                CaptureFunctions.RAW_VALUES()
         );
 
         valueRecorder = rootContext.newValueRecorder("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
@@ -53,11 +54,18 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         countDownListener.waitForAll();
         rootContext.stopDataCapture().stopScheduling();
 
-        List<IdentifiableTimeSeries> allSeries = rootContext.findAllTimeSeries().getAllMatches();
-        assertEquals(7, allSeries.size());
+        //the 'raw' count values - these are not 'timed capture' but worth testing them here
+        TimeSeries rawValueSeries = rootContext.getTimeSeries("TestCounter");
+        assertEquals(8, rawValueSeries.size());
+        assertEquals(1, rawValueSeries.getEarliestItem().longValue());
+        assertEquals(4, rawValueSeries.getLatestItem().longValue());
 
+        List<IdentifiableTimeSeries> allSeries = rootContext.findAllTimeSeries().getAllMatches();
+        assertEquals(8, allSeries.size());
         for (IdentifiableTimeSeries s : allSeries) {
-            assertEquals(2, s.size());
+            if ( s != rawValueSeries) {
+                assertEquals(2, s.size());
+            }
         }
 
         //this series is the change in the count over the period, which is 2 because the count was decremented
@@ -77,7 +85,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(4, i2.longValue());
 
         //this series is the mean change over capturePeriod / 5
-        s = rootContext.findTimeSeries("TestCounter \\(Mean Change Per").getFirstMatch();
+        s = rootContext.findTimeSeries("TestCounter \\(Change Per").getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
@@ -85,7 +93,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(0.4, i2.doubleValue(), 0.0001);
 
         //this series is the mean count over capturePeriod / 5
-        s = rootContext.findTimeSeries("TestCounter \\(Mean Count Per").getFirstMatch();
+        s = rootContext.findTimeSeries("TestCounter \\(Count Per").getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();

@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.servermetrics;
+package com.od.jtimeseries.server.servermetrics.jmx;
 
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
@@ -9,6 +9,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.source.ValueSupplier;
+import com.od.jtimeseries.server.servermetrics.AbstractServerMetric;
 
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.JMXConnectorFactory;
@@ -50,7 +51,7 @@ public class JmxMetric extends AbstractServerMetric {
     private double divisor = 1;
 
     public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, JmxValue jmxValue ) {
-        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(jmxValue), AggregateFunctions.MAX()); //max of 1 value is that value
+        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(jmxValue), AggregateFunctions.LAST()); //last of 1 value is that value
     }
 
     public JmxMetric(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {

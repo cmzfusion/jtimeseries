@@ -23,36 +23,14 @@
                                 <constructor-arg value="${serverMetricsContextPath}"/>
                             </bean>
 
-                            <!-- this jmx metric reads heap and non-heap memory from the server's own jmx management service,
-                            and sums them, then divides by 1000000 -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.JmxMetric">
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="5"/>
-                                    </bean>
-                                </constructor-arg>
+                            <!-- this jmx metric sums heap and non-heap memory from the timeseries server's own jmx management service -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetrics" factory-method="memoryUsage">
+                                <!-- connect to jmx service to read memory every 5 mins -->
+                                <constructor-arg><bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes"><constructor-arg value="5"/></bean></constructor-arg>
                                 <constructor-arg value="${serverMetricsContextPath}"/>
                                 <constructor-arg value="ServerMemory"/>
                                 <constructor-arg value="Heap and NonHeap Memory usage by server in MB"/>
                                 <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>
-                                <constructor-arg>
-                                    <list>
-                                        <bean class="com.od.jtimeseries.server.servermetrics.JmxValue">
-                                            <constructor-arg value="java.lang:type=Memory"/>
-                                            <constructor-arg value="HeapMemoryUsage"/>
-                                            <constructor-arg value="used"/>
-                                        </bean>
-                                        <bean class="com.od.jtimeseries.server.servermetrics.JmxValue">
-                                            <constructor-arg value="java.lang:type=Memory"/>
-                                            <constructor-arg value="NonHeapMemoryUsage"/>
-                                            <constructor-arg value="used"/>
-                                        </bean>
-                                    </list>
-                                </constructor-arg>
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions" factory-method="SUM"/>
-                                </constructor-arg>
-                                <property name="divisor" value="1000000"/>
                             </bean>
 
                             <!-- running count of total series in server -->

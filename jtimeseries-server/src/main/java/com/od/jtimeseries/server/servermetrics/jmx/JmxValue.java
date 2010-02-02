@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.servermetrics;
+package com.od.jtimeseries.server.servermetrics.jmx;
 
 /**
  * Created by IntelliJ IDEA.

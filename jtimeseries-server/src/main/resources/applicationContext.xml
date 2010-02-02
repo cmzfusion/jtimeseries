@@ -6,7 +6,7 @@
 
 	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
 	<bean id="propertyConfigurer" class="com.od.jtimeseries.server.util.LoggingPropertyPlaceholderConfigurer">
-        <property name="location" value="/serverConfigProperties.props"/>
+        <property name="location" value="/jtimeseries-server.properties"/>
     </bean>
 
     <import resource="serverMetricsContext.xml"/>

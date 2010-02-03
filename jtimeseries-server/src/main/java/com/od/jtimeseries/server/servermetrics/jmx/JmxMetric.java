@@ -15,7 +15,6 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXConnector;
 import javax.management.*;
-import javax.management.openmbean.CompositeDataSupport;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
@@ -97,7 +96,7 @@ public class JmxMetric extends AbstractServerMetric {
             try {
                 jmxc = JMXConnectorFactory.connect(url, connectorEnvironment);
                 MBeanServerConnection jmxConnection = jmxc.getMBeanServerConnection();
-                retreiveAndAddValues(jmxConnection);
+                retreiveAndAddValues(jmxConnection, aggregateFunction);
                 result = aggregateFunction.calculateAggregateValue();
                 aggregateFunction.clear();
             } catch (Throwable t) {
@@ -111,19 +110,20 @@ public class JmxMetric extends AbstractServerMetric {
                     }
                 }
             }
-            if ( result != null && divisor != 1) {
-                result = new DoubleNumeric(result.doubleValue() / divisor);
+
+            if ( result != null ) {
+                if ( Double.isNaN(result.doubleValue())) {
+                    result = null;
+                } else if ( divisor != 1) {
+                    result = new DoubleNumeric(result.doubleValue() / divisor);
+                }    
             }
             return result;
         }
 
-        private void retreiveAndAddValues(MBeanServerConnection jmxConnection) throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException, MalformedObjectNameException {
+        private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
             for ( JmxValue n : listOfJmxValue) {
-                Object value = ((CompositeDataSupport)jmxConnection.getAttribute(
-                    new ObjectName(n.getObjectName()), n.getAttribute())).get(n.getCompositeDataKey()
-                );
-                Double d = Double.valueOf(value.toString());
-                aggregateFunction.addValue(d);
+                n.readValues(jmxConnection, aggregateFunction);
             }
         }
     }

@@ -24,8 +24,8 @@ class JmxMemoryUsage extends JmxMetric {
     public static JmxMemoryUsage createJmxMemoryUsage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
         //memory usage is the sum of the heap and non-heap memory
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
-        jmxValue.add(new JmxValue("java.lang:type=Memory", "HeapMemoryUsage", "used"));
-        jmxValue.add(new JmxValue("java.lang:type=Memory", "NonHeapMemoryUsage", "used"));
+        jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "used"));
+        jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "NonHeapMemoryUsage", "used"));
 
         JmxMemoryUsage m = new JmxMemoryUsage(timePeriod, parentContextPath, id, description, serviceUrl, jmxValue, AggregateFunctions.SUM());
         m.setDivisor(1000000);

@@ -14,4 +14,8 @@ public class JmxMetrics {
     public static JmxMetric memoryUsage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
         return JmxMemoryUsage.createJmxMemoryUsage(timePeriod, parentContextPath, id, description, serviceUrl);
     }
+
+    public static JmxMetric garbageCollectionPercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
+        return JmxGarbageCollectionPercentage.createJmxGarbageCollectionPercentage(timePeriod, parentContextPath, id, description, serviceUrl);
+    }
 }

@@ -1,22 +1,27 @@
 package com.od.jtimeseries.server.servermetrics.jmx;
 
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
+
+import javax.management.MBeanServerConnection;
+import javax.management.ObjectName;
+import java.util.Set;
+
 /**
  * Created by IntelliJ IDEA.
 * User: nick
 * Date: 06-Dec-2009
 * Time: 12:30:35
-* To change this template use File | Settings | File Templates.
+*
+* A simple data type attribute on a named JMX bean
 */
 public class JmxValue {
 
     private final String objectName;
     private final String attribute;
-    private String compositeDataKey;
 
-    public JmxValue(String objectName, String attribute, String compositeDataKey) {
+    public JmxValue(String objectName, String attribute) {
         this.objectName = objectName;
         this.attribute = attribute;
-        this.compositeDataKey = compositeDataKey;
     }
 
     public String getObjectName() {
@@ -27,7 +32,18 @@ public class JmxValue {
         return attribute;
     }
 
-    public String getCompositeDataKey() {
-        return compositeDataKey;
+    /**
+     * Read value(s) from the mbeans via the jmx connection into the aggregate function supplied
+     */
+    public void readValues(MBeanServerConnection jmxConnection, AggregateFunction f) throws Exception {
+
+        //one or more MBeans may match the object name specified, we add the values from each matching bean
+        Set<ObjectName> matchingBeans = jmxConnection.queryNames(new ObjectName(objectName), null);
+
+        for ( ObjectName beanName : matchingBeans ) {
+            Object value = jmxConnection.getAttribute(beanName, attribute);
+            System.out.println("Reading value " + value);
+            f.addValue(Double.valueOf(value.toString()));
+        }
     }
 }

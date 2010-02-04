@@ -1,11 +1,11 @@
 package com.od.jtimeseries.server.servermetrics.jmx;
 
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import com.od.jtimeseries.util.time.TimePeriod;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +21,7 @@ class JmxMemoryUsage extends JmxMetric {
         super(timePeriod, parentContextPath, id, description, serviceUrl, listOfJmxValue, aggregateFunction);
     }
 
-    public static JmxMemoryUsage createJmxMemoryUsage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
+    static JmxMemoryUsage createJmxMemoryUsage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
         //memory usage is the sum of the heap and non-heap memory
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "used"));

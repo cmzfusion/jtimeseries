@@ -18,4 +18,14 @@ public class JmxMetrics {
     public static JmxMetric garbageCollectionPercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
         return JmxGarbageCollectionPercentage.createJmxGarbageCollectionPercentage(timePeriod, parentContextPath, id, description, serviceUrl);
     }
+
+    public static JmxMetric cpuTimePercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
+        return JmxCpuTimePercentage.createJmxCpuTimePercentage(timePeriod, parentContextPath, id, description, serviceUrl);
+    }
+
+    public static JmxMetric memoryUsagePercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
+        return JmxMemoryUsagePercentage.createMemoryUsagePercentage(timePeriod, parentContextPath, id, description, serviceUrl);
+    }
+
+
 }

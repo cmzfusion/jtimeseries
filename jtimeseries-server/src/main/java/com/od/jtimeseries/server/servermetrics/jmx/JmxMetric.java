@@ -1,25 +1,25 @@
 package com.od.jtimeseries.server.servermetrics.jmx;
 
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
-import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.server.servermetrics.AbstractServerMetric;
+import com.od.jtimeseries.source.ValueSupplier;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
-import com.od.jtimeseries.source.ValueSupplier;
-import com.od.jtimeseries.server.servermetrics.AbstractServerMetric;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.time.TimePeriod;
 
-import javax.management.remote.JMXServiceURL;
-import javax.management.remote.JMXConnectorFactory;
+import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXConnector;
-import javax.management.*;
-import java.util.List;
-import java.util.Arrays;
-import java.util.Map;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -96,9 +96,11 @@ public class JmxMetric extends AbstractServerMetric {
             try {
                 jmxc = JMXConnectorFactory.connect(url, connectorEnvironment);
                 MBeanServerConnection jmxConnection = jmxc.getMBeanServerConnection();
-                retreiveAndAddValues(jmxConnection, aggregateFunction);
-                result = aggregateFunction.calculateAggregateValue();
-                aggregateFunction.clear();
+                synchronized(aggregateFunction) {
+                    retreiveAndAddValues(jmxConnection, aggregateFunction);
+                    result = aggregateFunction.calculateAggregateValue();
+                    aggregateFunction.clear();
+                }
             } catch (Throwable t) {
                 logMethods.logError("Error in JMX Metric connection", t);
             } finally {

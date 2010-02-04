@@ -41,9 +41,12 @@ public class JmxValue {
         Set<ObjectName> matchingBeans = jmxConnection.queryNames(new ObjectName(objectName), null);
 
         for ( ObjectName beanName : matchingBeans ) {
-            Object value = jmxConnection.getAttribute(beanName, attribute);
-            System.out.println("Reading value " + value);
-            f.addValue(Double.valueOf(value.toString()));
+            readValueFromBean(jmxConnection, f, beanName);
         }
+    }
+
+    protected void readValueFromBean(MBeanServerConnection jmxConnection, AggregateFunction f, ObjectName beanName) throws Exception {
+        Object value = jmxConnection.getAttribute(beanName, attribute);
+        f.addValue(Double.valueOf(value.toString()));
     }
 }

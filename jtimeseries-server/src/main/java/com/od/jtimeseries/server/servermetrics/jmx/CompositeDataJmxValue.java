@@ -5,7 +5,6 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.openmbean.CompositeDataSupport;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +24,7 @@ public class CompositeDataJmxValue extends JmxValue {
         this.compositeDataKey = compositeDataKey;
     }
 
-    public void readValues(MBeanServerConnection jmxConnection, AggregateFunction f) throws Exception {
+    public void readValueFromBean(MBeanServerConnection jmxConnection, AggregateFunction f, ObjectName beanName) throws Exception {
         Object value = ((CompositeDataSupport)jmxConnection.getAttribute(
                 new ObjectName(getObjectName()), getAttribute())).get(compositeDataKey);
         f.addValue(Double.valueOf(value.toString()));

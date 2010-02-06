@@ -22,10 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
-import com.jidesoft.grid.BeanTableModel;
-import com.jidesoft.grid.SortableTable;
-import com.jidesoft.grid.AutoFilterTableHeader;
-import com.jidesoft.grid.BooleanCheckBoxCellEditor;
+import com.jidesoft.grid.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -145,7 +142,9 @@ public class TableSelector extends SelectorPanel {
 
             public void tableChanged(TableModelEvent e) {
                 super.tableChanged(e);
-                sizeColumns();
+                if ( e.getFirstRow() == TableModelEvent.HEADER_ROW ) {
+                    sizeColumns();
+                }
             }
         };
 
@@ -153,7 +152,6 @@ public class TableSelector extends SelectorPanel {
         sortableTable.setRowResizable(true);
         sortableTable.setVariousRowHeights(true);
         sortableTable.setSelectInsertedRows(false);
-        sortableTable.setClickCountToStart(2);
         sortableTable.setAutoSelectTextWhenStartsEditing(true);
         sortableTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 

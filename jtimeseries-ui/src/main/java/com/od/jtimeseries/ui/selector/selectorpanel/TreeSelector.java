@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
@@ -31,10 +32,8 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -152,11 +151,14 @@ public class TreeSelector extends SelectorPanel {
 
     private DefaultMutableTreeNode buildTreeNode(TimeSeriesContext context) {
         DefaultMutableTreeNode n = new ContextTreeNode(context);
-        for ( TimeSeriesContext c : context.getChildContexts()) {
+
+        List<TimeSeriesContext> childContexts = sort(context.getChildContexts());
+        for ( TimeSeriesContext c : childContexts) {
             n.add(buildTreeNode(c));
         }
 
-        for ( IdentifiableTimeSeries s : context.getTimeSeries()) {
+        List<IdentifiableTimeSeries> timeSeries = sort(context.getTimeSeries());
+        for ( IdentifiableTimeSeries s : timeSeries) {
             SeriesTreeNode node = new SeriesTreeNode((RemoteChartingTimeSeries)s);
             seriesToNodeMap.put(s, node);
             n.add(node);
@@ -164,6 +166,15 @@ public class TreeSelector extends SelectorPanel {
         return n;
     }
 
+    //sort child series by display name
+    private <E extends Identifiable> List<E> sort(List<E> identifiables) {
+        Collections.sort(identifiables, new Comparator<Identifiable>() {
+            public int compare(Identifiable o1, Identifiable o2) {
+                return getDisplayName(o1).compareTo(getDisplayName(o2));
+            }
+        });
+        return identifiables;
+    }
 
     /**
      * @return ContextTimeSeries selected in the tree, or null if no time series is selected
@@ -200,17 +211,26 @@ public class TreeSelector extends SelectorPanel {
                 if ( value instanceof SeriesTreeNode ) {
                     SeriesTreeNode seriesNode = (SeriesTreeNode)value;
                     seriesSelectionCheckbox.setSelected(seriesNode.getTimeSeries().isSelected());
-                    delegateRenderer.setText(((SeriesTreeNode)value).getTimeSeries().getDisplayName());
+                    delegateRenderer.setText(getDisplayName(((SeriesTreeNode)value).getTimeSeries()));
                     add(seriesSelectionCheckbox, BorderLayout.WEST);
                     add(delegateRenderer, BorderLayout.CENTER);
                 } else {
-                    delegateRenderer.setText(((ContextTreeNode)value).getContext().getId());
+                    delegateRenderer.setText(getDisplayName(((ContextTreeNode)value).getContext()));
                     add(delegateRenderer, BorderLayout.CENTER);
                 }
                 return this;
             } else {
                 return delegateRenderer;
             }
+        }
+    }
+
+    //get the display name for an identifiable in the context tree
+    private String getDisplayName(Identifiable i) {
+        if ( i instanceof RemoteChartingTimeSeries ) {
+            return ((RemoteChartingTimeSeries)i).getDisplayName();
+        } else {
+            return i.getId();
         }
     }
 

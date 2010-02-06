@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  *
  * A time series used by the ui, which loads its data from a remote server
  *
- * It ias assumed that the extra methods this class provides over and above the standard TimeSeries methods are
+ * It is assumed that the extra methods this class provides over and above the standard TimeSeries methods are
  * to be called on the AWT only, and so there is no need for extra synchronization here. Furthermore property change
  * events should only be fired on the AWT
  */

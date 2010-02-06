@@ -12,13 +12,17 @@ import java.util.Set;
 * Date: 06-Dec-2009
 * Time: 12:30:35
 *
-* A simple data type attribute on a named JMX bean
+* Read simple data type attribute on JMX bean(s)
 */
 public class JmxValue {
 
     private final String objectName;
     private final String attribute;
 
+    /**
+     * @param objectName, String representation of a JMX ObjectName, identifying one or more mbeans from which we want to read an attribute value
+     * @param attribute, of mbeans to read
+     */
     public JmxValue(String objectName, String attribute) {
         this.objectName = objectName;
         this.attribute = attribute;

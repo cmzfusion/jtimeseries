@@ -27,5 +27,4 @@ public class JmxMetrics {
         return JmxMemoryUsagePercentage.createMemoryUsagePercentage(timePeriod, parentContextPath, id, description, serviceUrl);
     }
 
-
 }

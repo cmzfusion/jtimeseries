@@ -14,10 +14,10 @@ import com.od.jtimeseries.util.numeric.Numeric;
 *
 *  Several jmx attributes represent total time (e.g. total process CPU time)
  *
-*  For each time period, we want to measure the increase in time value recorded as a
- * percentage of the total time in the period we are monitoring.
+*  For each time period, we want to measure the increase in total time as a
+ * percentage of time elapsed over the period we are monitoring.
 *
-*  e.g. If the process has 500ms added to processor time in a 1000ms period, then it has used 50% of a processor
+*  e.g. If the process has 500ms added to total process CPU time in a 1000ms period, then it has used 50% of a processor
 *       (if there are more than one processors, this value may exceed 100%, which is expected)
 */
 class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {

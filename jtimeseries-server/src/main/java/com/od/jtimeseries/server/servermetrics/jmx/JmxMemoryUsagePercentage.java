@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Date: 04-Feb-2010
  * Time: 10:45:21
  */
-public class JmxMemoryUsagePercentage extends JmxMetric {
+class JmxMemoryUsagePercentage extends JmxMetric {
 
     private JmxMemoryUsagePercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
         super(timePeriod, parentContextPath, id, description, serviceUrl, listOfJmxValue, aggregateFunction);

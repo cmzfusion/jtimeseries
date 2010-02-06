@@ -12,14 +12,10 @@ import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import javax.management.MBeanServerConnection;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,6 +32,7 @@ import java.util.Map;
 public class JmxMetric extends AbstractServerMetric {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
+    private static JmxExecutorService jmxExecutorService = new DefaultJmxExecutorService();
 
     private final TimePeriod timePeriod;
     private final String id;
@@ -44,7 +41,6 @@ public class JmxMetric extends AbstractServerMetric {
     private JMXServiceURL url;
     private final List<JmxValue> listOfJmxValue;
     private final AggregateFunction aggregateFunction;
-    private Map<String, ?> connectorEnvironment;
     private JmxValueSupplier valueSupplier = new JmxValueSupplier();
     private String parentContextPath;
     private double divisor = 1;
@@ -75,6 +71,10 @@ public class JmxMetric extends AbstractServerMetric {
         this.divisor = divisor;
     }
 
+    protected static JmxExecutorService getJmxExecutorService() {
+        return jmxExecutorService;
+    }
+
     public void initializeMetric(TimeSeriesContext metricContext) {
         try {
             url = new JMXServiceURL(serviceUrl);
@@ -84,33 +84,17 @@ public class JmxMetric extends AbstractServerMetric {
         metricContext.newTimedValueSource(id, description, valueSupplier, timePeriod);
     }
 
-    public void setConnectorEnvironment(Map<String, ?> connectorEnvironment) {
-        this.connectorEnvironment = connectorEnvironment;
-    }
-
     private class JmxValueSupplier implements ValueSupplier {
 
+        //Use the jmx executor service to execute a jmx task to calculate the new value for the jmx metric
         public Numeric getValue() {
-            JMXConnector jmxc = null;
             Numeric result = null;
             try {
-                jmxc = JMXConnectorFactory.connect(url, connectorEnvironment);
-                MBeanServerConnection jmxConnection = jmxc.getMBeanServerConnection();
-                synchronized(aggregateFunction) {
-                    retreiveAndAddValues(jmxConnection, aggregateFunction);
-                    result = aggregateFunction.calculateAggregateValue();
-                    aggregateFunction.clear();
-                }
-            } catch (Throwable t) {
-                logMethods.logError("Error in JMX Metric connection", t);
-            } finally {
-                if ( jmxc != null) {
-                    try {
-                        jmxc.close();
-                    } catch (IOException e) {
-                        logMethods.logError("Failed to close jmx connection", e);
-                    }
-                }
+                CalculateJmxMetricTask task = new CalculateJmxMetricTask();
+                getJmxExecutorService().executeTask(task);
+                result = task.getResult();
+            } catch (JmxExecutionException e) {
+                logMethods.logError("Error performing CalculateJmxMetricTask", e);
             }
 
             if ( result != null ) {
@@ -123,10 +107,35 @@ public class JmxMetric extends AbstractServerMetric {
             return result;
         }
 
+    }
+
+    /**
+     * Calculate the value for the JMX metric
+     */
+    private class CalculateJmxMetricTask implements JmxExecutorTask {
+
+        private Numeric result;
+
+        public void executeTask(MBeanServerConnection jmxConnection) throws Exception {
+            synchronized(aggregateFunction) {
+                retreiveAndAddValues(jmxConnection, aggregateFunction);
+                result = aggregateFunction.calculateAggregateValue();
+                aggregateFunction.clear();
+            }
+        }
+
+        public JMXServiceURL getServiceURL() {
+            return url;
+        }
+
         private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
             for ( JmxValue n : listOfJmxValue) {
                 n.readValues(jmxConnection, aggregateFunction);
             }
+        }
+
+        public Numeric getResult() {
+            return result;
         }
     }
 

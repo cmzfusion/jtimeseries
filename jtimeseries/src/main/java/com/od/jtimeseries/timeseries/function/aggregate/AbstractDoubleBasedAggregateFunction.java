@@ -27,8 +27,8 @@ import com.od.jtimeseries.util.numeric.DoubleNumeric;
  * Date: 18-Dec-2008
  * Time: 13:06:31
  *
- * Superclass for default aggregate function implementations which use doubles internally
- * (There may be some loss of accuracy due to the conversion to double if the source values are int/long)
+ * Superclass for default aggregate function implementations which return a DoubleNumeric as the result,
+ * and generally use a double as the internal representation.
  *
  * Functions derived from AbstractDoubleBasedAggregateFunction ignore any NaN values which are added
  */

@@ -15,7 +15,7 @@ import com.od.jtimeseries.util.numeric.DoubleNumeric;
 class CountFunction extends AbstractDoubleBasedAggregateFunction {
 
     private static final String DESCRIPTION = "Count";
-    private int count = 0;
+    private long count = 0;
 
     protected void doAddValue(double d) {
         count++;

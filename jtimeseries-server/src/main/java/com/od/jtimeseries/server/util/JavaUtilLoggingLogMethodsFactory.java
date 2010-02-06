@@ -49,6 +49,7 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
     private int logFileCount;
     private FileHandler fileHandler;
     private Level logLevel;
+    private StandardOutputLogMethods.LogLevel timeseriesLibraryLogLevel;
 
     public JavaUtilLoggingLogMethodsFactory(File logFile, String logLevel, int logFileSizeBytes, int logFileCount) {
         this.logFile = logFile;
@@ -67,6 +68,20 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
     }
 
     private void setLevel(String logLevel) {
+        setJavaUtilLoggingLogLevel(logLevel);
+        setTimeseriesLibraryLogLevel(logLevel);
+    }
+
+    private void setTimeseriesLibraryLogLevel(String logLevel) {
+        timeseriesLibraryLogLevel = LogMethods.LogLevel.getLogLevel(logLevel);
+    }
+
+    private void setJavaUtilLoggingLogLevel(String logLevel) {
+        //support 'debug' as a log level - translate to the silly FINEST level
+        if ( "DEBUG".equalsIgnoreCase(logLevel)) {
+            logLevel = "FINEST";
+        }
+
         try {
             this.logLevel = Level.parse(logLevel);
         } catch ( IllegalArgumentException iae) {
@@ -118,6 +133,7 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
                 logger.addHandler(fileHandler);
                 logger.setUseParentHandlers(false);
             }
+            setLogLevel(timeseriesLibraryLogLevel);
         }
 
         public void logInfo(String s) {
@@ -153,6 +169,10 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         public void logError(String s, Throwable t) {
             standardOutMethods.logError(s, t);
             logger.log(Level.SEVERE, s, t);
+        }
+
+        public void setLogLevel(LogLevel l) {
+            standardOutMethods.setLogLevel(l);
         }
     }
 

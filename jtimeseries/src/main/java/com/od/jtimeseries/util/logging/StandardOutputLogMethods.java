@@ -28,44 +28,55 @@ import java.util.Date;
  */
 public class StandardOutputLogMethods implements LogMethods {
 
-    private static volatile boolean isDebugLoggingOn = false;
+    private LogLevel currentLogLevel = LogLevel.INFO;
 
     public void logInfo(String s) {
         System.out.println("JTIMESERIES INFO--> " + new Date() + " " + s);
     }
 
     public void logDebug(String s) {
-        if ( isDebugLoggingOn) {
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.DEBUG)) {
             System.out.println("JTIMESERIES DEBUG--> " + new Date() + " " + s);
         }
     }
 
     public void logDebug(String s, Throwable t) {
-        System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
-        t.printStackTrace();
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.DEBUG)) {
+            System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+            t.printStackTrace();
+        }
     }
 
     public void logWarning(String s) {
-        System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.WARNING)) {
+            System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
+        }
     }
 
     public void logWarning(String s, Throwable t) {
-        System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
-        t.printStackTrace();
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.WARNING)) {
+            System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
+            t.printStackTrace();
+        }
     }
 
     public void logError(String s) {
-        System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);        
-        System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.ERROR)) {
+            System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+            System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+        }
     }
 
     public void logError(String s, Throwable t) {
-        System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
-        System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
-        t.printStackTrace();
+        if ( currentLogLevel.equalsOrExceeds(LogLevel.ERROR)) {
+            System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+            System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
+            t.printStackTrace();
+        }
     }
 
-    public static void setDebugLoggingOn(boolean debugLoggingOn) {
-        isDebugLoggingOn = debugLoggingOn;
+    public void setLogLevel(LogLevel l) {
+        this.currentLogLevel = l;
     }
+
 }

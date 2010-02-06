@@ -39,4 +39,39 @@ public interface LogMethods {
     void logError(String s);
 
     void logError(String s, Throwable t);
+
+    void setLogLevel(LogLevel l);
+
+    static enum LogLevel {
+        ERROR(1),
+        WARNING(2),
+        INFO(3),
+        DEBUG(4);
+
+        int logLevel;
+
+        LogLevel(int level) {
+            this.logLevel = level;
+        }
+
+        public boolean equalsOrExceeds(LogLevel l) {
+            return this.logLevel >= l.logLevel;
+        }
+
+        public static LogLevel getLogLevel(String logLevel) {
+            logLevel = logLevel.trim();
+            if ( logLevel.equalsIgnoreCase("error") ) {
+                return ERROR;
+            } else if ( logLevel.equalsIgnoreCase("warning") ) {
+                return WARNING;
+            } else if ( logLevel.equalsIgnoreCase("info") ) {
+                return INFO;
+            } else if ( logLevel.equalsIgnoreCase("debug") ) {
+                return DEBUG;
+            } else {
+                System.err.println("Unknown Log Level " + logLevel + ". Will use INFO");
+                return INFO;
+            }
+        }
+    }
 }

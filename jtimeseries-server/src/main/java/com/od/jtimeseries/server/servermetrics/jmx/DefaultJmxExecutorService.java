@@ -40,7 +40,9 @@ public class DefaultJmxExecutorService implements JmxExecutorService {
     private int connectionLimit = 10;
     private int maxConnectionAgeMillis = 60000;
 
-    public DefaultJmxExecutorService() {
+    public DefaultJmxExecutorService(int connectionLimit, int maxConnectionAgeMillis) {
+        this.connectionLimit = connectionLimit;
+        this.maxConnectionAgeMillis = maxConnectionAgeMillis;
         startConnectionPruningThread();
     }
 
@@ -189,6 +191,10 @@ public class DefaultJmxExecutorService implements JmxExecutorService {
         public String toString() {
             return "JmxConnectionWrapper { " + serviceURL + " }";
         }
+    }
+
+    public String toString() {
+        return "DefaultJmxExecutorService, max connections: " + connectionLimit + " max age ms:" + maxConnectionAgeMillis;
     }
 
 }

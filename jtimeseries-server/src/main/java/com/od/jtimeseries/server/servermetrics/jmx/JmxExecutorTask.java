@@ -12,6 +12,9 @@ import javax.management.remote.JMXServiceURL;
  */
 public interface JmxExecutorTask {
 
+    /**
+     * @return the JMXServiceURL used to create the connection required by this task
+     */
     JMXServiceURL getServiceURL();
 
     /**

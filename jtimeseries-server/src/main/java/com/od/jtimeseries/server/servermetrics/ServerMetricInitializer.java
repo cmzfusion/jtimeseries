@@ -3,6 +3,8 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.jtimeseries.server.servermetrics.jmx.JmxExecutorService;
+import com.od.jtimeseries.server.servermetrics.jmx.JmxMetric;
 
 import java.util.List;
 
@@ -19,14 +21,19 @@ public class ServerMetricInitializer {
 
     private TimeSeriesContext rootContext;
     private List<ServerMetricSource> serverMetricSourceList;
+    private JmxExecutorService jmxExecutorService;
 
-    public ServerMetricInitializer(TimeSeriesContext rootContext, List<ServerMetricSource> serverMetricSourceList) {
+    public ServerMetricInitializer(TimeSeriesContext rootContext, List<ServerMetricSource> serverMetricSourceList, JmxExecutorService jmxExecutorService) {
         this.rootContext = rootContext;
         this.serverMetricSourceList = serverMetricSourceList;
+        this.jmxExecutorService = jmxExecutorService;
     }
 
     public void initializeServerMetrics() {
         logMethods.logInfo("Initializing Server Metrics");
+
+        logMethods.logInfo("Creating JMX Executor Service " + jmxExecutorService);
+        JmxMetric.setJmxExecutorService(jmxExecutorService);
 
         for ( ServerMetricSource s : serverMetricSourceList ) {
             for ( ServerMetric m : s.getServerMetrics()) {

@@ -54,6 +54,12 @@
                 </bean>
             </list>
         </constructor-arg>
+        <constructor-arg>
+            <bean class="com.od.jtimeseries.server.servermetrics.jmx.DefaultJmxExecutorService">
+                <constructor-arg value="${jmxConnectionCountLimit}"/>
+                <constructor-arg value="${jmxConnectionMaxAgeMillis}"/>
+            </bean>
+        </constructor-arg>
     </bean>
 	
 </beans>

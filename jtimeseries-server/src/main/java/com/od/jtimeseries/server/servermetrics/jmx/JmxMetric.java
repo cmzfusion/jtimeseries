@@ -32,7 +32,7 @@ import java.util.List;
 public class JmxMetric extends AbstractServerMetric {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
-    private static JmxExecutorService jmxExecutorService = new DefaultJmxExecutorService();
+    private static JmxExecutorService jmxExecutorService = new DefaultJmxExecutorService(10, 60000);
 
     private final TimePeriod timePeriod;
     private final String id;
@@ -73,6 +73,10 @@ public class JmxMetric extends AbstractServerMetric {
 
     protected static JmxExecutorService getJmxExecutorService() {
         return jmxExecutorService;
+    }
+
+    public static void setJmxExecutorService(JmxExecutorService jmxExecutorService) {
+        JmxMetric.jmxExecutorService = jmxExecutorService;
     }
 
     public void initializeMetric(TimeSeriesContext metricContext) {

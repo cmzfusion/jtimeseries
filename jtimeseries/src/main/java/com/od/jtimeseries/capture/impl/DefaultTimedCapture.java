@@ -104,8 +104,9 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             //this would be very bad, since that thread may be very performance sensitive
             //this way the source is free to update the new function instance while the calculation takes place on the timer thread
             if ( oldFunctionInstance != DUMMY_FUNCTION ) {
+                Numeric value = oldFunctionInstance.calculateAggregateValue();
                 getTimeSeries().append(
-                   new TimeSeriesItem(timestamp, oldFunctionInstance.calculateAggregateValue())
+                   new TimeSeriesItem(timestamp, value)
                 );
             }
         }

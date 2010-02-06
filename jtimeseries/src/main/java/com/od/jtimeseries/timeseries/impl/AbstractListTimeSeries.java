@@ -20,9 +20,9 @@ package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.numeric.LongNumeric;
 
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -272,7 +272,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     int binarySearchForItemWithTimestamp(long timestamp) {
         return Collections.binarySearch(
             this,
-            new TimeSeriesItem(timestamp, new LongNumeric(0)),
+            new TimeSeriesItem(timestamp, DoubleNumeric.valueOf(0)),
             new Comparator<TimeSeriesItem>() {
                 public int compare(TimeSeriesItem o1, TimeSeriesItem o2) {
                     return o1.getTimestamp() == o2.getTimestamp() ? 0 :

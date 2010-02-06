@@ -43,7 +43,7 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
         if ( count > 0 ) {
             result = sum / count;
         }
-        return new DoubleNumeric(result);
+        return DoubleNumeric.valueOf(result);
     }
 
     public void clear() {

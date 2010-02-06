@@ -37,7 +37,7 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        return new DoubleNumeric(min);
+        return DoubleNumeric.valueOf(min);
     }
 
     public void clear() {

@@ -51,11 +51,11 @@ public class DefaultCapture extends AbstractCapture implements ValueSourceCaptur
             if ( getState() == CaptureState.STOPPED) {
                 valueSourceListener = new ValueSourceListener() {
                     public void newValue(long value) {
-                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), new LongNumeric(value)));
+                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), LongNumeric.valueOf(value)));
                     }
 
                     public void newValue(double value) {
-                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), new DoubleNumeric(value)));
+                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(value)));
                     }
 
                     public void newValue(Numeric sourceValue) {

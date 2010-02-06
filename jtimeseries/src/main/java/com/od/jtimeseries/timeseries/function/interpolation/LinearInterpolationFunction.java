@@ -40,6 +40,6 @@ public class LinearInterpolationFunction implements InterpolationFunction {
         double y0 = beforeItem.getValue().doubleValue();
         double y1 = afterItem.getValue().doubleValue();
         double y = y0 + (x - x0) * (y1 - y0 ) / (x1 - x0);
-        return y0 == y1 ? new TimeSeriesItem(x, new DoubleNumeric(y0)) : new TimeSeriesItem(x, new DoubleNumeric(y));
+        return y0 == y1 ? new TimeSeriesItem(x, DoubleNumeric.valueOf(y0)) : new TimeSeriesItem(x, DoubleNumeric.valueOf(y));
     }
 }

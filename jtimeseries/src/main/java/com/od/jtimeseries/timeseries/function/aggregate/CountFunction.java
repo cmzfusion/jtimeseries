@@ -1,7 +1,7 @@
 package com.od.jtimeseries.timeseries.function.aggregate;
 
 import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.numeric.LongNumeric;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +22,7 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        return new LongNumeric(count);
+        return DoubleNumeric.valueOf(count);
     }
 
     public String getDescription() {

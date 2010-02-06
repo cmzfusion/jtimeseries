@@ -122,8 +122,8 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
         valueRecorder.newValue(1.5d);
         valueRecorder.newValue(100l);
-        valueRecorder.newValue(new DoubleNumeric(1.5d));
-        valueRecorder.newValue(new LongNumeric(100l));
+        valueRecorder.newValue(DoubleNumeric.valueOf(1.5d));
+        valueRecorder.newValue(LongNumeric.valueOf(100l));
 
         eventTimer.startEventTimer();
         sleep(sleepPeriod);

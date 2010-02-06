@@ -23,17 +23,25 @@ package com.od.jtimeseries.util.numeric;
  * User: Nick Ebbutt
  * Date: 18-Dec-2008
  * Time: 12:38:21
+ *
+ * An immutable Numeric, which uses a double internally
  */
 public class DoubleNumeric implements Numeric {
 
-    private double d;
+    private static final DoubleNumeric ZERO = new DoubleNumeric(0);
 
-    public DoubleNumeric(double d) {
+    private final double d;
+
+    private DoubleNumeric(double d) {
         this.d = d;
     }
 
     public double doubleValue() {
         return d;
+    }
+
+    public boolean isNaN() {
+        return Double.isNaN(d);
     }
 
     public long longValue() {
@@ -55,6 +63,16 @@ public class DoubleNumeric implements Numeric {
     public int hashCode() {
         long bits = Double.doubleToLongBits(d);
         return (int)(bits ^ (bits >>> 32));
+    }
+
+    public static DoubleNumeric valueOf(double d) {
+        DoubleNumeric result;
+        if ( d == 0) {
+            result = ZERO;
+        } else {
+            result = new DoubleNumeric(d);
+        }
+        return result;
     }
 
 }

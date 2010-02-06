@@ -20,7 +20,7 @@ public class LastFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        return new DoubleNumeric(last);
+        return DoubleNumeric.valueOf(last);
     }
 
     public String getDescription() {

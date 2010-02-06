@@ -63,7 +63,7 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, from a starting value of zero
      */
     public static CaptureFunction CHANGE(TimePeriod timePeriod) {
-        return CHANGE(timePeriod, new LongNumeric(0));
+        return CHANGE(timePeriod, LongNumeric.valueOf(0));
     }
 
     /**
@@ -78,7 +78,7 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-        return MEAN_CHANGE(timeIntervalToExpressCount, timePeriod, new LongNumeric(0));
+        return MEAN_CHANGE(timeIntervalToExpressCount, timePeriod, LongNumeric.valueOf(0));
     }
 
     /**
@@ -146,7 +146,7 @@ public class CaptureFunctions {
         }
 
         public Numeric calculateAggregateValue() {
-            return new DoubleNumeric(getWrappedFunction().calculateAggregateValue().doubleValue() / divisor);
+            return DoubleNumeric.valueOf(getWrappedFunction().calculateAggregateValue().doubleValue() / divisor);
         }
 
         public String getDescription() {

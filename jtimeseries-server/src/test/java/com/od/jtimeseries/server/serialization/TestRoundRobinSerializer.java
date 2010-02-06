@@ -156,7 +156,7 @@ public class TestRoundRobinSerializer extends TestCase {
     public void testAppendSpeed() throws SerializationException {
         long startTime = System.currentTimeMillis();
         for ( int loop=0; loop < 1000; loop++) {
-            serializer.append(f, Collections.singletonList(new TimeSeriesItem(loop, new DoubleNumeric(loop))));
+            serializer.append(f, Collections.singletonList(new TimeSeriesItem(loop, DoubleNumeric.valueOf(loop))));
         }
         long endTime = System.currentTimeMillis();
         assertEquals(7, f.getCurrentSize());
@@ -190,7 +190,7 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public static TimeSeriesItem createItemForTimestamp(long timestampsForItem) {
-        return new TimeSeriesItem(timestampsForItem,  new DoubleNumeric(timestampsForItem));
+        return new TimeSeriesItem(timestampsForItem,  DoubleNumeric.valueOf(timestampsForItem));
     }
 
 

@@ -37,7 +37,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        return new DoubleNumeric(total);
+        return DoubleNumeric.valueOf(total);
     }
 
     public void clear() {

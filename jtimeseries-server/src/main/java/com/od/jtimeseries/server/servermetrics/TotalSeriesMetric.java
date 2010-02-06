@@ -51,7 +51,7 @@ public class TotalSeriesMetric extends AbstractServerMetric {
     private class TotalSeriesCountValueSupplier implements ValueSupplier {
 
         public Numeric getValue() {
-            return new LongNumeric(rootContext.findAllTimeSeries().getNumberOfMatches());
+            return LongNumeric.valueOf(rootContext.findAllTimeSeries().getNumberOfMatches());
         }
     }
 }

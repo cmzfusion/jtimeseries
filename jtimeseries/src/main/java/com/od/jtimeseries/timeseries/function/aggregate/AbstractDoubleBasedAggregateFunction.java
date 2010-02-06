@@ -27,19 +27,17 @@ import com.od.jtimeseries.util.numeric.DoubleNumeric;
  * Date: 18-Dec-2008
  * Time: 13:06:31
  *
- * Superclass for default aggregate function implementations which are based on double values
- * There may be some loss of accuracy due to the conversion to double if the source values are int/long
- * (If this is a problem a custom AggregateFunction should be implemented)
+ * Superclass for default aggregate function implementations which use doubles internally
+ * (There may be some loss of accuracy due to the conversion to double if the source values are int/long)
+ *
+ * Functions derived from AbstractDoubleBasedAggregateFunction ignore any NaN values which are added
  */
 public abstract class AbstractDoubleBasedAggregateFunction implements AggregateFunction {
 
     private double lastValue = Double.NaN;
 
     public final void addValue(Numeric value) {
-        double d = value.doubleValue();
-        if ( ! Double.isNaN(d)) {
-            add(d);
-        }
+        add(value.doubleValue());
     }
 
     public final void addValue(double d) {
@@ -51,14 +49,16 @@ public abstract class AbstractDoubleBasedAggregateFunction implements AggregateF
     }
 
     private void add(double d) {
-        this.lastValue = d;
-        doAddValue(d);
+        if ( ! Double.isNaN(d)) {
+            this.lastValue = d;
+            doAddValue(d);
+        }
     }
 
     protected abstract void doAddValue(double d);
 
     public Numeric getLastAddedValue() {
-        return new DoubleNumeric(lastValue);
+        return DoubleNumeric.valueOf(lastValue);
     }
 
     public String toString() {

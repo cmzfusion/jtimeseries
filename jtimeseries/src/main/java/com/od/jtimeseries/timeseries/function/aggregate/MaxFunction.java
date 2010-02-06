@@ -37,7 +37,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
     }
 
     public Numeric calculateAggregateValue() {
-        return new DoubleNumeric(max);
+        return DoubleNumeric.valueOf(max);
     }
 
     public void clear() {

@@ -62,15 +62,18 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public void doAddValue(double value) {
-        if ( Double.isNaN(initialValue)) {
+        if ( Double.isNaN(initialValue)) { //an initial value is not yet set
             initialValue = value;
         }
         currentValue = value;
     }
 
     public Numeric calculateAggregateValue() {
-        double result = currentValue - initialValue;
-        return new DoubleNumeric(result);
+        Numeric result = Numeric.NaN;
+        if (! Double.isNaN(currentValue) && ! Double.isNaN(initialValue)) {
+            result = DoubleNumeric.valueOf(currentValue - initialValue);
+        }
+        return result;
     }
 
     public void clear() {
@@ -91,6 +94,6 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public AggregateFunction nextInstance() {
-        return new ChangeFunction(new DoubleNumeric(currentValue));
+        return new ChangeFunction(DoubleNumeric.valueOf(currentValue));
     }
 }

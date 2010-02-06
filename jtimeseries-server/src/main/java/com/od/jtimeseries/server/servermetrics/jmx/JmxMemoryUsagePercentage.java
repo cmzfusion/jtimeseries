@@ -47,7 +47,7 @@ class JmxMemoryUsagePercentage extends JmxMetric {
                 double sumOfUsed = values.get(0) + values.get(1);
                 double sumOfMax = values.get(2) + values.get(3);
                 double percentage = sumOfUsed * 100 / sumOfMax;
-                result = new DoubleNumeric(percentage);
+                result = DoubleNumeric.valueOf(percentage);
             }
             return result;
         }

@@ -12,7 +12,7 @@ import org.junit.Test;
 public class TestDoubleNumeric extends AbstractNumericTest{
 
     Numeric createNumeric(long value) {
-        return new DoubleNumeric((double)value);
+        return DoubleNumeric.valueOf((double)value);
     }
 
 }

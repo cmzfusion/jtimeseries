@@ -292,7 +292,7 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
             List<TimeSeriesItem> tailItems = new ArrayList<TimeSeriesItem>();
             if ( fileHeader.getCurrentTail() <= fileHeader.getCurrentHead()) {
                 for ( int loop=0; loop < fileHeader.getCurrentTail(); loop++) {
-                    tailItems.add(new TimeSeriesItem(d.readLong(), new DoubleNumeric(d.readDouble())));
+                    tailItems.add(new TimeSeriesItem(d.readLong(), DoubleNumeric.valueOf(d.readDouble())));
                 }
                 itemsRead = fileHeader.getCurrentTail();
             }
@@ -308,7 +308,7 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
             //this is to avoid triggering an insert event for each time series item when we add them to the series
             List<TimeSeriesItem> itemsToAdd = new ArrayList<TimeSeriesItem>();
             for ( int loop=0; loop < itemsToRead; loop++) {
-                itemsToAdd.add(new TimeSeriesItem(d.readLong(), new DoubleNumeric(d.readDouble())));
+                itemsToAdd.add(new TimeSeriesItem(d.readLong(), DoubleNumeric.valueOf(d.readDouble())));
             }
 
             for ( TimeSeriesItem i : tailItems) {

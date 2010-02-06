@@ -71,7 +71,7 @@ public class TimeSeriesValueMessage extends UdpMessage {
     public TimeSeriesItem getTimeSeriesItem() {
         return new TimeSeriesItem(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),
-            new DoubleNumeric(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
+            DoubleNumeric.valueOf(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
         );
     }
 

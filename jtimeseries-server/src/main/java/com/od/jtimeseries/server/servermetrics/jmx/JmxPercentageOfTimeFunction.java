@@ -46,7 +46,7 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
             }
             this.lastRecordedTimeValue = newCollectionTime.longValue();
         }
-        return new DoubleNumeric(result);
+        return DoubleNumeric.valueOf(result);
     }
 
     public AggregateFunction nextInstance() {

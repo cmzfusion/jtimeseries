@@ -28,8 +28,12 @@ public interface AggregateFunction {
 
     void addValue(long value);
 
-    Numeric getLastAddedValue();    
+    Numeric getLastAddedValue();
 
+    /**
+     * @return a Numeric value which is the result of the aggregation.
+     * If it is not possible to calculate a value, the Numeric returned should have numeric.isNaN() == true, or use Numeric.NaN
+     */
     Numeric calculateAggregateValue();
 
     String getDescription();

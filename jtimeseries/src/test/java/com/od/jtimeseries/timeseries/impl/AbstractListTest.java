@@ -325,11 +325,11 @@ public abstract class AbstractListTest extends Assert {
     }
 
     protected TimeSeriesItem createItemWithTimestamp(long timestamp) {
-        return new TimeSeriesItem(timestamp, new LongNumeric(0));
+        return new TimeSeriesItem(timestamp, LongNumeric.valueOf(0));
     }
 
     protected TimeSeriesItem createItemWithTimestamp(long timestamp, long value) {
-        return new TimeSeriesItem(timestamp, new LongNumeric(value));
+        return new TimeSeriesItem(timestamp, LongNumeric.valueOf(value));
     }
 
 }

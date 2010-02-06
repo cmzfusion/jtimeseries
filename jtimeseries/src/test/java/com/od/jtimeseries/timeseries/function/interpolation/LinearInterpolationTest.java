@@ -19,8 +19,8 @@ public class LinearInterpolationTest extends Assert {
     @Test
     public void testLinearInterpolation() {
         ListTimeSeries t = new DefaultTimeSeries();
-        t.add(new TimeSeriesItem(1000, new LongNumeric(1000)));
-        t.add(new TimeSeriesItem(2000, new LongNumeric(2000)));
+        t.add(new TimeSeriesItem(1000, LongNumeric.valueOf(1000)));
+        t.add(new TimeSeriesItem(2000, LongNumeric.valueOf(2000)));
 
         LinearInterpolationFunction l = new LinearInterpolationFunction();
 
@@ -33,8 +33,8 @@ public class LinearInterpolationTest extends Assert {
         i = l.calculateInterpolatedValue(t, 1750, t.get(0), t.get(1));
         assertEquals(1750, i.getValue().longValue());
 
-        t.add(new TimeSeriesItem(3000, new LongNumeric(3)));
-        t.add(new TimeSeriesItem(4000, new LongNumeric(4)));
+        t.add(new TimeSeriesItem(3000, LongNumeric.valueOf(3)));
+        t.add(new TimeSeriesItem(4000, LongNumeric.valueOf(4)));
         i = l.calculateInterpolatedValue(t, 3500, t.get(2), t.get(3));
         assertEquals(3.5, i.getValue().doubleValue());
     }

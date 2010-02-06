@@ -92,7 +92,7 @@ public class JmxMetric extends AbstractServerMetric {
 
         //Use the jmx executor service to execute a jmx task to calculate the new value for the jmx metric
         public Numeric getValue() {
-            Numeric result = null;
+            Numeric result = Numeric.NaN;
             try {
                 CalculateJmxMetricTask task = new CalculateJmxMetricTask();
                 getJmxExecutorService().executeTask(task);
@@ -101,11 +101,9 @@ public class JmxMetric extends AbstractServerMetric {
                 logMethods.logError("Error performing CalculateJmxMetricTask", e);
             }
 
-            if ( result != null ) {
-                if ( Double.isNaN(result.doubleValue())) {
-                    result = null;
-                } else if ( divisor != 1) {
-                    result = new DoubleNumeric(result.doubleValue() / divisor);
+            if ( ! result.isNaN() ) {
+                if ( divisor != 1) {
+                    result = DoubleNumeric.valueOf(result.doubleValue() / divisor);
                 }    
             }
             return result;
@@ -118,7 +116,7 @@ public class JmxMetric extends AbstractServerMetric {
      */
     private class CalculateJmxMetricTask implements JmxExecutorTask {
 
-        private Numeric result;
+        private Numeric result = Numeric.NaN;
 
         public void executeTask(MBeanServerConnection jmxConnection) throws Exception {
             synchronized(aggregateFunction) {

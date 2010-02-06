@@ -17,13 +17,13 @@ public class NumericTests extends Assert {
     public void testNumericsOfDifferentTypeCannotBeEqual() {
         //In this case, Double.MAX_VALUE cannot be represented as a Long
         //clearly, here the two are not equal
-        DoubleNumeric d = new DoubleNumeric(Double.MAX_VALUE);
-        LongNumeric l = new LongNumeric(new Double(Double.MAX_VALUE).longValue());
+        DoubleNumeric d = DoubleNumeric.valueOf(Double.MAX_VALUE);
+        LongNumeric l = LongNumeric.valueOf(new Double(Double.MAX_VALUE).longValue());
         assertFalse(d.equals(l));
 
         //two Numerics with different class are not equal - even if they both represent the same exact value
-        d = new DoubleNumeric(10d);
-        l = new LongNumeric(10);
+        d = DoubleNumeric.valueOf(10d);
+        l = LongNumeric.valueOf(10);
         assertFalse(d.equals(l));
 
         Long longVal = new Long(10);

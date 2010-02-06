@@ -23,21 +23,29 @@ package com.od.jtimeseries.util.numeric;
  * User: Nick Ebbutt
  * Date: 18-Dec-2008
  * Time: 12:37:08
+ *
+ *  An immutable Numeric, which uses a long internally
  */
 public class LongNumeric implements Numeric {
 
+    private static final LongNumeric ZERO = new LongNumeric(0);
+
     private long l;
 
-    public LongNumeric(long l) {
+    private LongNumeric(long l) {
         this.l = l;
     }
 
-    public LongNumeric(int l) {
+    private LongNumeric(int l) {
         this.l = l;
     }
 
     public double doubleValue() {
         return l;
+    }
+
+    public boolean isNaN() {
+        return false;
     }
 
     public long longValue() {
@@ -50,6 +58,14 @@ public class LongNumeric implements Numeric {
 
     public int hashCode() {
 	    return (int)(l ^ (l >>> 32));
+    }
+
+    public static LongNumeric valueOf(long i) {
+        if ( i == 0) {
+            return ZERO;
+        } else {
+            return new LongNumeric(i);
+        }
     }
 
     public boolean equals(Object obj) {

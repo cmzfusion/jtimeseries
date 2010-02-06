@@ -79,7 +79,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
         //only add latest items
         if ( destinationSeries.size() == 0 || longTimestamp > destinationSeries.getLatestTimestamp()) {
-            TimeSeriesItem newItem = new TimeSeriesItem(longTimestamp, new DoubleNumeric(doubleValue));
+            TimeSeriesItem newItem = new TimeSeriesItem(longTimestamp, DoubleNumeric.valueOf(doubleValue));
             itemsToAdd.add(newItem);
         }
     }

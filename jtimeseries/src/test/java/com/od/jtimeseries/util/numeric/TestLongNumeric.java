@@ -10,6 +10,6 @@ package com.od.jtimeseries.util.numeric;
 public class TestLongNumeric extends AbstractNumericTest {
 
     Numeric createNumeric(long value) {
-        return new LongNumeric(value);
+        return LongNumeric.valueOf(value);
     }
 }

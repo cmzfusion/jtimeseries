@@ -18,16 +18,16 @@ public class TestTimeSeriesItem extends Assert {
     public void testEqualityAndHashcode() {
         long time = System.currentTimeMillis();
         long value = (long)(Math.random() * Long.MAX_VALUE);
-        TimeSeriesItem item1 = new TimeSeriesItem(time, new LongNumeric(value));
-        TimeSeriesItem item2 = new TimeSeriesItem(time, new LongNumeric(value));
+        TimeSeriesItem item1 = new TimeSeriesItem(time, LongNumeric.valueOf(value));
+        TimeSeriesItem item2 = new TimeSeriesItem(time, LongNumeric.valueOf(value));
         assertEquals(item1, item2);
         assertEquals(item1.hashCode(), item2.hashCode());
 
-        item1 = new TimeSeriesItem(time, new LongNumeric(value-1));
+        item1 = new TimeSeriesItem(time, LongNumeric.valueOf(value-1));
         assertFalse(item1.equals(item2));
         assertFalse(item1.hashCode() == item2.hashCode());
 
-        item1 = new TimeSeriesItem(time -1, new LongNumeric(value));
+        item1 = new TimeSeriesItem(time -1, LongNumeric.valueOf(value));
         assertFalse(item1.equals(item2));
     }
 }

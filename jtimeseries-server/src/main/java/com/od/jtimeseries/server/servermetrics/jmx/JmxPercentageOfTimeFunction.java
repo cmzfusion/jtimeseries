@@ -22,16 +22,16 @@ import com.od.jtimeseries.util.numeric.Numeric;
 */
 class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
 
-    private long lastRecordedTimeValue;
+    private long oldTotalTime;
     private long millisInPeriod;
 
     public JmxPercentageOfTimeFunction(long millisInPeriod) {
         this(0, millisInPeriod);
     }
 
-    JmxPercentageOfTimeFunction(long lastRecordedTimeValue, long millisInPeriod) {
+    JmxPercentageOfTimeFunction(long oldTotalTime, long millisInPeriod) {
         super(AggregateFunctions.SUM());
-        this.lastRecordedTimeValue = lastRecordedTimeValue;
+        this.oldTotalTime = oldTotalTime;
         this.millisInPeriod = millisInPeriod;
     }
 
@@ -39,17 +39,24 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
         double result = Double.NaN;
         Numeric newCollectionTime = super.calculateAggregateValue();
         if ( ! Double.isNaN(newCollectionTime.doubleValue())) {
-            if ( lastRecordedTimeValue != 0) {
-                long difference = newCollectionTime.longValue() - lastRecordedTimeValue;
+            long newTotalTime = newCollectionTime.longValue();
+            if ( oldTotalTime > 0 && componentNotRestarted(newTotalTime)) {
+                long difference = newTotalTime - oldTotalTime;
                 result = (100 * difference) / (double)millisInPeriod;
                 //System.out.println("Calculated percentage " + result);
             }
-            this.lastRecordedTimeValue = newCollectionTime.longValue();
+            this.oldTotalTime = newCollectionTime.longValue();
         }
         return DoubleNumeric.valueOf(result);
     }
 
+    //if the total accumulated time has decreased we can assume the component we are monitoring
+    //has been restarted
+    private boolean componentNotRestarted(long newTotalTime) {
+        return oldTotalTime < newTotalTime;
+    }
+
     public AggregateFunction nextInstance() {
-        return new JmxPercentageOfTimeFunction(lastRecordedTimeValue, millisInPeriod);
+        return new JmxPercentageOfTimeFunction(oldTotalTime, millisInPeriod);
     }
 }

@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.servermetrics.jmx;
+package com.od.jtimeseries.server.servermetrics.jmx.measurement;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
@@ -23,29 +23,30 @@ import com.od.jtimeseries.util.numeric.Numeric;
 class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
 
     private long oldTotalTime;
-    private long millisInPeriod;
+    private long lastTriggerTime;
 
-    public JmxPercentageOfTimeFunction(long millisInPeriod) {
-        this(0, millisInPeriod);
+    public JmxPercentageOfTimeFunction() {
+        this(0);
     }
 
-    JmxPercentageOfTimeFunction(long oldTotalTime, long millisInPeriod) {
+    private JmxPercentageOfTimeFunction(long oldTotalTime) {
         super(AggregateFunctions.SUM());
         this.oldTotalTime = oldTotalTime;
-        this.millisInPeriod = millisInPeriod;
     }
 
     public Numeric calculateAggregateValue() {
         double result = Double.NaN;
-        Numeric newCollectionTime = super.calculateAggregateValue();
-        if ( ! Double.isNaN(newCollectionTime.doubleValue())) {
-            long newTotalTime = newCollectionTime.longValue();
+        Numeric totalTime = super.calculateAggregateValue();
+        if ( ! totalTime.isNaN() ) {
+            long newTotalTime = totalTime.longValue();
             if ( oldTotalTime > 0 && componentNotRestarted(newTotalTime)) {
                 long difference = newTotalTime - oldTotalTime;
-                result = (100 * difference) / (double)millisInPeriod;
+                long timeInPeriod = System.currentTimeMillis() - lastTriggerTime;
+                result = (100 * difference) / (double)timeInPeriod;
                 //System.out.println("Calculated percentage " + result);
             }
-            this.oldTotalTime = newCollectionTime.longValue();
+            this.oldTotalTime = totalTime.longValue();
+            lastTriggerTime = System.currentTimeMillis();
         }
         return DoubleNumeric.valueOf(result);
     }
@@ -57,6 +58,6 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
     }
 
     public AggregateFunction nextInstance() {
-        return new JmxPercentageOfTimeFunction(oldTotalTime, millisInPeriod);
+        return new JmxPercentageOfTimeFunction(oldTotalTime);
     }
 }

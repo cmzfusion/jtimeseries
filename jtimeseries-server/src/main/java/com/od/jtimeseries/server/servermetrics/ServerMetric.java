@@ -15,16 +15,8 @@ public interface ServerMetric {
 
     /**
      * Called by the server to ask the metric to initialize itself
-     * Typically this will involve creating a new timeseries within the metricContext
-     *
-     * @param metricContext, the parent context mapping, determined by getParentContextPath()
+     * Typically this will involve creating a new timeseries
      */
-    public void initializeMetric(TimeSeriesContext metricContext) ;
+    public void initializeMetrics(TimeSeriesContext rootContext) ;
 
-    /**
-     * @return the id of the TimeSeries created, to be used when the server logs the setup of the metric
-     */
-    public String getSeriesId();
-
-    String getParentContextPath();
 }

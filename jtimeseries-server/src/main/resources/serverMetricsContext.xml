@@ -11,7 +11,7 @@
             <list>
                 <!-- A list of ServerMetricSource to supply server metric instances -->
                 <!-- The following DefaultMetricSource defines some useful server monitoring metrics, but you could add other sources
-                or define extra JmxMetrics within this source to capture stats from third party processes which support jmx management service,
+                or define extra JmxMetric within this source to capture stats from third party processes which support jmx management service,
                 for example -->
                 <bean id="serverMetrics" class="com.od.jtimeseries.server.servermetrics.DefaultMetricSource">
                     <constructor-arg>
@@ -24,13 +24,17 @@
                             </bean>
 
                             <!-- this jmx metric sums heap and non-heap memory from the timeseries server's own jmx management service -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetrics" factory-method="memoryUsage">
+                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetric">
                                 <!-- connect to jmx service to read memory every 5 mins -->
                                 <constructor-arg><bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes"><constructor-arg value="5"/></bean></constructor-arg>
-                                <constructor-arg value="${serverMetricsContextPath}"/>
-                                <constructor-arg value="ServerMemory"/>
-                                <constructor-arg value="Heap and NonHeap Memory usage by server in MB"/>
                                 <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="memoryUsage">
+                                        <constructor-arg value="${serverMetricsContextPath}"/>
+                                        <constructor-arg value="ServerMemory"/>
+                                        <constructor-arg value="Heap and NonHeap Memory usage by server in MB"/>
+                                    </bean>
+                                </constructor-arg>
                             </bean>
 
                             <!-- running count of total series in server -->

@@ -46,8 +46,7 @@ public class ServerMetricInitializer {
 
     private void setupMetric(ServerMetric m) {
         try {
-            TimeSeriesContext c = rootContext.createContextForPath(m.getParentContextPath());
-            m.initializeMetric(c);
+            m.initializeMetrics(rootContext);
         } catch (Throwable t) {
             logMethods.logError("Failed to set up server metric " + m.getClass() + " " + m, t);
         }

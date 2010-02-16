@@ -1,14 +1,15 @@
-package com.od.jtimeseries.server.servermetrics.jmx;
+package com.od.jtimeseries.server.servermetrics.jmx.measurement;
 
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
-import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AbstractDoubleBasedAggregateFunction;
+import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.server.servermetrics.jmx.JmxValue;
+import com.od.jtimeseries.server.servermetrics.jmx.CompositeDataJmxValue;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,13 +17,13 @@ import java.util.ArrayList;
  * Date: 04-Feb-2010
  * Time: 10:45:21
  */
-class JmxMemoryUsagePercentage extends JmxMetric {
+class JmxMemoryUsagePercentage extends JmxMeasurement {
 
-    private JmxMemoryUsagePercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
-        super(timePeriod, parentContextPath, id, description, serviceUrl, listOfJmxValue, aggregateFunction);
+    private JmxMemoryUsagePercentage(String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
+        super(parentContextPath, id, description, listOfJmxValue, aggregateFunction);
     }
 
-    static JmxMemoryUsagePercentage createMemoryUsagePercentage(TimePeriod timePeriod, String parentContextPath, String id, String description, String serviceUrl) {
+    static JmxMemoryUsagePercentage createMemoryUsagePercentage(String parentContextPath, String id, String description) {
         //memory usage is the sum of the heap and non-heap memory
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "used"));
@@ -30,7 +31,7 @@ class JmxMemoryUsagePercentage extends JmxMetric {
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "max"));
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "NonHeapMemoryUsage", "max"));
 
-        return new JmxMemoryUsagePercentage(timePeriod, parentContextPath, id, description, serviceUrl, jmxValue, new PercentageOfMaxMemoryFunction());
+        return new JmxMemoryUsagePercentage(parentContextPath, id, description, jmxValue, new PercentageOfMaxMemoryFunction());
     }
 
     private static class PercentageOfMaxMemoryFunction extends AbstractDoubleBasedAggregateFunction {

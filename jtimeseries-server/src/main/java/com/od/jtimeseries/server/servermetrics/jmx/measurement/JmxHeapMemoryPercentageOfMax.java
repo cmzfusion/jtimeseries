@@ -17,21 +17,18 @@ import java.util.List;
  * Date: 04-Feb-2010
  * Time: 10:45:21
  */
-class JmxMemoryUsagePercentage extends JmxMeasurement {
+class JmxHeapMemoryPercentageOfMax extends JmxMeasurement {
 
-    private JmxMemoryUsagePercentage(String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
+    private JmxHeapMemoryPercentageOfMax(String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
         super(parentContextPath, id, description, listOfJmxValue, aggregateFunction);
     }
 
-    static JmxMemoryUsagePercentage createMemoryUsagePercentage(String parentContextPath, String id, String description) {
-        //memory usage is the sum of the heap and non-heap memory
+    static JmxHeapMemoryPercentageOfMax createMemoryUsagePercentage(String parentContextPath, String id, String description) {
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "used"));
-        jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "NonHeapMemoryUsage", "used"));
         jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "HeapMemoryUsage", "max"));
-        jmxValue.add(new CompositeDataJmxValue("java.lang:type=Memory", "NonHeapMemoryUsage", "max"));
 
-        return new JmxMemoryUsagePercentage(parentContextPath, id, description, jmxValue, new PercentageOfMaxMemoryFunction());
+        return new JmxHeapMemoryPercentageOfMax(parentContextPath, id, description, jmxValue, new PercentageOfMaxMemoryFunction());
     }
 
     private static class PercentageOfMaxMemoryFunction extends AbstractDoubleBasedAggregateFunction {
@@ -43,10 +40,10 @@ class JmxMemoryUsagePercentage extends JmxMeasurement {
         }
 
         public Numeric calculateAggregateValue() {
-            Numeric result = null;
-            if ( values.size() == 4) {
-                double sumOfUsed = values.get(0) + values.get(1);
-                double sumOfMax = values.get(2) + values.get(3);
+            Numeric result = DoubleNumeric.NaN;
+            if ( values.size() == 2) {
+                double sumOfUsed = values.get(0);
+                double sumOfMax = values.get(1);
                 double percentage = sumOfUsed * 100 / sumOfMax;
                 result = DoubleNumeric.valueOf(percentage);
             }
@@ -54,7 +51,7 @@ class JmxMemoryUsagePercentage extends JmxMeasurement {
         }
 
         public String getDescription() {
-            return "JmxPercentageOfMaxMemory";
+            return "JmxPercentageOfMaxHeapMemory";
         }
 
         public void clear() {

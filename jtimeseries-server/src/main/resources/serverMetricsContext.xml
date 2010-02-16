@@ -18,23 +18,9 @@
                         <!-- list of the default timeseries-server metrics -->
                         <list>
 
-                            <!-- count of series gc'd for performance -->
+                            <!-- count of series gc'd, this should happen especially when the server is short of memory -->
                             <bean class="com.od.jtimeseries.server.servermetrics.GarbageCollectedSeriesMetric">
                                 <constructor-arg value="${serverMetricsContextPath}"/>
-                            </bean>
-
-                            <!-- this jmx metric sums heap and non-heap memory from the timeseries server's own jmx management service -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetric">
-                                <!-- connect to jmx service to read memory every 5 mins -->
-                                <constructor-arg><bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes"><constructor-arg value="5"/></bean></constructor-arg>
-                                <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="memoryUsage">
-                                        <constructor-arg value="${serverMetricsContextPath}"/>
-                                        <constructor-arg value="ServerMemory"/>
-                                        <constructor-arg value="Heap and NonHeap Memory usage by server in MB"/>
-                                    </bean>
-                                </constructor-arg>
                             </bean>
 
                             <!-- running count of total series in server -->
@@ -51,6 +37,36 @@
                             <!-- Count of UDP updates received -->
                             <bean class="com.od.jtimeseries.server.servermetrics.UpdatesReceivedMetric">
                                 <constructor-arg value="${serverMetricsContextPath}"/>
+                            </bean>
+
+                             <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetric">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="seconds">
+                                        <constructor-arg value="5"/>  <!-- connect to jmx service to take measurements every 5 mins -->
+                                    </bean>
+                                </constructor-arg>
+                                <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>
+                                <constructor-arg>
+                                    <list>
+                                        <!-- Read memory Usage -->
+                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="heapMemoryUsage">
+                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                        </bean>
+                                        <!-- Read CPU percentage -->
+                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="cpuTimePercentage">
+                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                        </bean>
+                                        <!-- Read Percentage time in GC -->
+                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="gcTimePercentage">
+                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                        </bean>
+                                        <!-- Read Percentage of Max Memory -->
+                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
+                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                        </bean>
+                                    </list>
+                                </constructor-arg>
                             </bean>
 
                         </list>

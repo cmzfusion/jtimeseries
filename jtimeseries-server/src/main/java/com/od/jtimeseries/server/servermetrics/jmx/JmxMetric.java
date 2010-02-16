@@ -38,11 +38,9 @@ public class JmxMetric implements ServerMetric {
     private static JmxExecutorService jmxExecutorService = new DefaultJmxExecutorService(10, 60000);
     private static final AtomicInteger triggerableId = new AtomicInteger();
 
-
     private final TimePeriod timePeriod;
     private final String serviceUrl;
     private JMXServiceURL url;
-    private double divisor = 1;
     private List<JmxMeasurement> jmxMeasurements;
     private Map<JmxMeasurement, ValueRecorder> measurementsToValueRecorder = Collections.synchronizedMap(new HashMap<JmxMeasurement, ValueRecorder>());
 
@@ -70,10 +68,6 @@ public class JmxMetric implements ServerMetric {
         this.jmxMeasurements = jmxMeasurements;
     }
 
-    public void setDivisor(double divisor) {
-        this.divisor = divisor;
-    }
-
     protected static JmxExecutorService getJmxExecutorService() {
         return jmxExecutorService;
     }
@@ -98,7 +92,7 @@ public class JmxMetric implements ServerMetric {
     private void createValueRecorders(TimeSeriesContext rootContext) {
         for (JmxMeasurement m : jmxMeasurements) {
             TimeSeriesContext c = rootContext.createContextForPath(m.getParentContextPath());
-            ValueRecorder r = c.newValueRecorder(m.getId() + " Value Recorder", m.getDescription());
+            ValueRecorder r = c.newValueRecorder(m.getId(), m.getDescription());
             measurementsToValueRecorder.put(m, r);
         }
     }
@@ -126,8 +120,8 @@ public class JmxMetric implements ServerMetric {
                 Numeric result = task.getResult();
 
                 if ( ! result.isNaN() ) {
-                    if ( divisor != 1) {
-                        result = DoubleNumeric.valueOf(result.doubleValue() / divisor);
+                    if ( m.getDivisor() != 1) {
+                        result = DoubleNumeric.valueOf(result.doubleValue() / m.getDivisor());
                     }
 
                     ValueRecorder v = measurementsToValueRecorder.get(m);

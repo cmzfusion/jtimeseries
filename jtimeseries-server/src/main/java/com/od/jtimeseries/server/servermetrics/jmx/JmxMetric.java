@@ -68,6 +68,10 @@ public class JmxMetric implements ServerMetric {
         this.jmxMeasurements = jmxMeasurements;
     }
 
+    public String toString() {
+        return "JmxMetric " + serviceUrl + " timeperiod: " + timePeriod + " measurements: " + jmxMeasurements.size();
+    }
+
     protected static JmxExecutorService getJmxExecutorService() {
         return jmxExecutorService;
     }

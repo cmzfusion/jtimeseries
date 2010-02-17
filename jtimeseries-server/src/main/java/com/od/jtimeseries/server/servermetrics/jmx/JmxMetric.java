@@ -46,19 +46,20 @@ public class JmxMetric implements ServerMetric {
     private JMXServiceURL url;
     private List<JmxMeasurement> jmxMeasurements;
     private Map<JmxMeasurement, ValueRecorder> measurementsToValueRecorder = Collections.synchronizedMap(new HashMap<JmxMeasurement, ValueRecorder>());
+    private String description = "";
 
     /**
      * A JmxMetric with a single series / measurement
      */
-    public JmxMetric(TimePeriod timePeriod, String serviceUrl, String parentContextPath, String id, String description, JmxValue jmxValue ) {
-        this(timePeriod, parentContextPath, id, description, serviceUrl, Arrays.asList(jmxValue), AggregateFunctions.LAST()); //last of 1 value is that value
+    public JmxMetric(TimePeriod timePeriod, String serviceUrl, String metricParentContextPath, String metricId, String metricDescription, JmxValue metricJmxValue ) {
+        this(timePeriod, metricParentContextPath, metricId, metricDescription, serviceUrl, Arrays.asList(metricJmxValue), AggregateFunctions.LAST()); //last of 1 value is that value
     }
 
     /**
      * A JmxMetric with a single series, which reads several jmx values and aggregates them using a defined function (e.g. Sum)
      */
-    public JmxMetric(TimePeriod timePeriod, String serviceUrl, String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
-        this(timePeriod, serviceUrl, Arrays.asList(new JmxMeasurement(parentContextPath, id, description, listOfJmxValue, aggregateFunction)));
+    public JmxMetric(TimePeriod timePeriod, String serviceUrl, String metricParentContextPath, String metricId, String metricDescription, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
+        this(timePeriod, serviceUrl, Arrays.asList(new JmxMeasurement(metricParentContextPath, metricId, metricDescription, listOfJmxValue, aggregateFunction)));
     }
 
     public JmxMetric(TimePeriod timePeriod, String serviceUrl, JmxMeasurement jmxMeasurement) {
@@ -71,8 +72,15 @@ public class JmxMetric implements ServerMetric {
         this.jmxMeasurements = jmxMeasurements;
     }
 
+    /**
+     * Set a description for this JMX Metric
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String toString() {
-        return "JmxMetric " + serviceUrl + " timeperiod: " + timePeriod + " measurements: " + jmxMeasurements.size();
+        return "JmxMetric " + description + " " + serviceUrl + " timeperiod: " + timePeriod + " measurements: " + jmxMeasurements.size();
     }
 
     protected static JmxExecutorService getJmxExecutorService() {
@@ -122,9 +130,9 @@ public class JmxMetric implements ServerMetric {
             } catch (Throwable t) {
                 if ( t.getCause() instanceof IOException || t.getCause() instanceof ServiceUnavailableException) {
                     //stop stack traces for connect exceptions filling the logs
-                    logMethods.logWarning("Error processing JmxMetric for service " + serviceUrl + ". Could not connect to service.");
+                    logMethods.logWarning("Could not connect to JMX management service for " + JmxMetric.this);
                 } else {
-                    logMethods.logError("Error processing JmxMetric for service " + serviceUrl, t);
+                    logMethods.logError("Error processing " + JmxMetric.this, t);
                 }
             }
         }

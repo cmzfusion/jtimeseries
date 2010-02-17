@@ -16,9 +16,12 @@ import com.od.jtimeseries.scheduling.Triggerable;
 
 import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
+import javax.naming.ServiceUnavailableException;
 import java.net.MalformedURLException;
+import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -117,7 +120,12 @@ public class JmxMetric implements ServerMetric {
                     processMeasurement(m);
                 }
             } catch (Throwable t) {
-                logMethods.logError("Error processing JmxMetric", t);
+                if ( t.getCause() instanceof IOException || t.getCause() instanceof ServiceUnavailableException) {
+                    //stop stack traces for connect exceptions filling the logs
+                    logMethods.logWarning("Error processing JmxMetric for service " + serviceUrl + ". Could not connect to service.");
+                } else {
+                    logMethods.logError("Error processing JmxMetric for service " + serviceUrl, t);
+                }
             }
         }
 

@@ -83,7 +83,6 @@ public class DefaultJmxExecutorService implements JmxExecutorService {
             connection = getConnection(serviceUrl, connection);
             task.executeTask(connection.getConnection());
         } catch (Throwable t) {
-            logMethods.logError("Failed to execute task for JMX service at " + serviceUrl, t);
             throw new JmxExecutionException(serviceUrl, t);
         } finally {
             returnConnection(connection);

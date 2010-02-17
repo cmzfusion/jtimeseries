@@ -91,7 +91,7 @@ public class TableSelector extends SelectorPanel {
         columns.add(new ColumnInfo("id", "Id", 75));
         columns.add(new ColumnInfo("maxDaysHistory", "Max Days", 100));
         columns.add(new ColumnInfo("refreshTimeSeconds", "Refresh(s)", 100));
-        columns.add(new ColumnInfo("contextPath", "Path", 100));
+        columns.add(new ColumnInfo("path", "Path", 100));
         columns.add(new ColumnInfo("URL", "URL", 100));
         populateColumnWidthsMap();
     }

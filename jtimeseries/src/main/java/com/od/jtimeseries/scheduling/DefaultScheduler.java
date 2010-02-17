@@ -39,7 +39,7 @@ public class DefaultScheduler extends AbstractScheduler {
     private Map<Triggerable, TriggerableTimerTask> tasks = Collections.synchronizedMap(new HashMap<Triggerable, TriggerableTimerTask>());
 
     public DefaultScheduler(String id, String description) {
-        this(id, description, 1);
+        this(id, description, 3);
     }
 
     public DefaultScheduler(String id, String description, int threadCount) {

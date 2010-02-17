@@ -137,42 +137,46 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         }
 
         public void logInfo(String s) {
-            standardOutMethods.logInfo(s);
-            logger.log(Level.INFO, s);
+            standardOutMethods.logInfo(addThreadDetails(s));
+            logger.log(Level.INFO, addThreadDetails(s));
         }
 
         public void logDebug(String s) {
-            standardOutMethods.logDebug(s);
-            logger.log(Level.FINEST, s);
+            standardOutMethods.logDebug(addThreadDetails(s));
+            logger.log(Level.FINEST, addThreadDetails(s));
         }
 
         public void logDebug(String s, Throwable t) {
-            standardOutMethods.logDebug(s, t);
-            logger.log(Level.FINEST, s, t);
+            standardOutMethods.logDebug(addThreadDetails(s), t);
+            logger.log(Level.FINEST, addThreadDetails(s), t);
         }
 
         public void logWarning(String s) {
-            standardOutMethods.logWarning(s);
+            standardOutMethods.logWarning(addThreadDetails(s));
             logger.log(Level.WARNING, s);
         }
 
         public void logWarning(String s, Throwable t) {
-            standardOutMethods.logWarning(s, t);
-            logger.log(Level.WARNING, s, t);
+            standardOutMethods.logWarning(addThreadDetails(s), t);
+            logger.log(Level.WARNING, addThreadDetails(s), t);
         }
 
         public void logError(String s) {
-            standardOutMethods.logError(s);
-            logger.log(Level.SEVERE, s);
+            standardOutMethods.logError(addThreadDetails(s));
+            logger.log(Level.SEVERE, addThreadDetails(s));
         }
 
         public void logError(String s, Throwable t) {
-            standardOutMethods.logError(s, t);
-            logger.log(Level.SEVERE, s, t);
+            standardOutMethods.logError(addThreadDetails(s), t);
+            logger.log(Level.SEVERE, addThreadDetails(s), t);
         }
 
         public void setLogLevel(LogLevel l) {
             standardOutMethods.setLogLevel(l);
+        }
+        
+        private String addThreadDetails(String s) {
+            return "{" + Thread.currentThread().getName() + "} " + " " + s;
         }
     }
 

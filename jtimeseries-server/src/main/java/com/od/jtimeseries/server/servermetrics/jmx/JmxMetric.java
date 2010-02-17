@@ -112,27 +112,27 @@ public class JmxMetric implements ServerMetric {
         }
 
         public void trigger(long timestamp) {
-            for (JmxMeasurement m : jmxMeasurements) {
-                processMeasurement(m);
+            try {
+                for (JmxMeasurement m : jmxMeasurements) {
+                    processMeasurement(m);
+                }
+            } catch (Throwable t) {
+                logMethods.logError("Error processing JmxMetric", t);
             }
         }
 
-        private void processMeasurement(JmxMeasurement m) {
-            try {
-                CalculateJmxMeasurementTask task = new CalculateJmxMeasurementTask(m);
-                getJmxExecutorService().executeTask(task);
-                Numeric result = task.getResult();
+        private void processMeasurement(JmxMeasurement m) throws JmxExecutionException {
+            CalculateJmxMeasurementTask task = new CalculateJmxMeasurementTask(m);
+            getJmxExecutorService().executeTask(task);
+            Numeric result = task.getResult();
 
-                if ( ! result.isNaN() ) {
-                    if ( m.getDivisor() != 1) {
-                        result = DoubleNumeric.valueOf(result.doubleValue() / m.getDivisor());
-                    }
-
-                    ValueRecorder v = measurementsToValueRecorder.get(m);
-                    v.newValue(result);
+            if ( ! result.isNaN() ) {
+                if ( m.getDivisor() != 1) {
+                    result = DoubleNumeric.valueOf(result.doubleValue() / m.getDivisor());
                 }
-            } catch (Throwable t) {
-                logMethods.logError("Error processing JmxMeasurement " + m, t);
+
+                ValueRecorder v = measurementsToValueRecorder.get(m);
+                v.newValue(result);
             }
         }
     }

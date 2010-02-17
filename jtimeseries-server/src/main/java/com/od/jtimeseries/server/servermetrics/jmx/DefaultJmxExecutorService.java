@@ -24,11 +24,16 @@ import java.util.concurrent.TimeUnit;
  *
  * A default service to execute JMX connection based tasks
  *
- * This service maintains a list of open connections to jmx services
- * There is an upper limit on the number of open connections, and a maximum connection age
+ * This service maintains a list of open connections to jmx services, so that connections are not always closed after use
+ * There is an upper limit on the number of connections which will be kept open for possible reuse, and a maximum connection age
  *
  * The intention is to prevent closing and reopening connections if there are several metrics defined which 
  * make use of the same service URL - if there is already a connection in the active list, it may be reused
+ *
+ * n.b. The current implementation does not actually block the calling thread creating a new connection if the limit for reuse is reached,
+ * and could temporarily create more connections than the limit - in practise this is bounded by the number of calling threads, which is
+ * the number of threads in the scheduler service in the case of Jmx Metrics (default == 3). Ideally this class should be enhanced so that the
+ * calling thread blocks when the limit is reached.
  */
 public class DefaultJmxExecutorService implements JmxExecutorService {
 
@@ -71,39 +76,46 @@ public class DefaultJmxExecutorService implements JmxExecutorService {
         );
     }
 
-    public synchronized void executeTask(JmxExecutorTask task) throws JmxExecutionException {
-        JMXServiceURL serviceUrl = null;
+    public void executeTask(JmxExecutorTask task) throws JmxExecutionException {
+        JMXServiceURL serviceUrl = task.getServiceURL();
+        JmxConnectionWrapper connection = null;
         try {
-            serviceUrl = task.getServiceURL();
-            MBeanServerConnection connection = getConnection(serviceUrl);
-            task.executeTask(connection);
-
-            //prune any excess connections
-            pruneByConnectionCount();
+            connection = getConnection(serviceUrl, connection);
+            task.executeTask(connection.getConnection());
         } catch (Throwable t) {
-            logMethods.logError("Failed to get connection to JMX service at " + serviceUrl, t);
+            logMethods.logError("Failed to execute task for JMX service at " + serviceUrl, t);
             throw new JmxExecutionException(serviceUrl, t);
+        } finally {
+            returnConnection(connection);
         }
     }
 
-    private MBeanServerConnection getConnection(JMXServiceURL serviceUrl) throws IOException {
+    private void returnConnection(JmxConnectionWrapper connection) {
+        //take back the lock when returning connection to connection cache
+        synchronized (this) {
+            if ( connection != null) {
+                //add to the start of the list of active connections (the most recently used)
+                activeConnections.add(0, connection);
+                //prune any excess connections
+                pruneByConnectionCount();
+            }
+        }
+    }
+
+    private JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl, JmxConnectionWrapper connection) throws IOException {
         logMethods.logDebug("Getting JMX connection to service " + serviceUrl);
+        synchronized(this) {
+            connection = removeFromActiveConnections(serviceUrl);
+        }
 
-        //remove it if it exists, we will add it back to the front of the list later
-        JmxConnectionWrapper connectionWrapper = removeFromActiveConnections(serviceUrl);
-
-        //create it if it doesn't already exist
-        if ( connectionWrapper == null) {
+        //surrender the lock to allow other threads to process tasks
+        if ( connection == null) {
             logMethods.logDebug("Creating JMX connection to service " + serviceUrl);
-            connectionWrapper = new JmxConnectionWrapper(serviceUrl);
+            connection = new JmxConnectionWrapper(serviceUrl);
         } else {
             logMethods.logDebug("Reusing JMX connection to service " + serviceUrl + " from active connections list");
         }
-
-        //add to the start of the list of active connections (the most recently used)
-        activeConnections.add(0, connectionWrapper);
-
-        return connectionWrapper.getConnection();
+        return connection;
     }
 
     private JmxConnectionWrapper removeFromActiveConnections(JMXServiceURL serviceUrl) {

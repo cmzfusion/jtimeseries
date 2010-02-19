@@ -45,7 +45,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
         //the new scheduler should now own the eventTimer capture
         assertTrue(childContext2.getScheduler().containsTriggerable(
-            (Triggerable)childContext2.findCaptures(eventTimer).getFirstMatch())
+            childContext2.findCaptures(eventTimer).getFirstMatch())
         );
 
         testCapture();

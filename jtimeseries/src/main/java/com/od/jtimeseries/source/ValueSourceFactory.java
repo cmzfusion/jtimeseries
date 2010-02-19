@@ -46,5 +46,5 @@ public interface ValueSourceFactory extends Identifiable {
     /**
      * @param path, full context path including id
      */
-    TimedValueSupplier createTimedValueSource(String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSource createTimedValueSource(String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

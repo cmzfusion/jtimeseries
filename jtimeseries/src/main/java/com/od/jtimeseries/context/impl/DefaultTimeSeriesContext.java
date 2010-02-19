@@ -446,9 +446,9 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public TimedValueSupplier createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         synchronized (getTreeLock()) {
-            TimedValueSupplier t = getValueSourceFactory().createTimedValueSource(getPath() + NAMESPACE_SEPARATOR + id, id, description, valueSupplier, timePeriod);
+            TimedValueSource t = getValueSourceFactory().createTimedValueSource(getPath() + NAMESPACE_SEPARATOR + id, id, description, valueSupplier, timePeriod);
             addChild(t);
             return t;
         }
@@ -520,7 +520,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         }
     }
 
-    public TimedValueSupplier createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         return defaultMetricCreator.createValueSupplierSeries(id, description, valueSupplier, timePeriod);
     }
 

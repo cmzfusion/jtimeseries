@@ -48,7 +48,7 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
         return new DefaultEventTimer(id, description);
     }
 
-    public TimedValueSupplier createTimedValueSource(String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createTimedValueSource(String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         return new DefaultTimedValueSupplier(id, description, valueSupplier, timePeriod);
     }
 

@@ -1,6 +1,6 @@
 package com.od.jtimeseries.source.impl;
 
-import com.od.jtimeseries.source.TimedValueSupplier;
+import com.od.jtimeseries.source.TimedValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.source.ValueSupplier;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -13,7 +13,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Time: 19:08:41
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultTimedValueSupplier extends AbstractValueSource implements TimedValueSupplier {
+public class DefaultTimedValueSupplier extends AbstractValueSource implements TimedValueSource {
 
     private TimePeriod timePeriod;
     private ValueSupplier valueSupplier;

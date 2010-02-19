@@ -95,11 +95,11 @@ public class SeriesDirectoryManager {
     private void loadTimeSeries(File f) {
         try {
             FileHeader h = roundRobinSerializer.readHeader(f);
-            logMethods.logInfo("Setting up series " + h.getContextPath() + " with current size " + h.getCurrentSize());
+            logMethods.logInfo("Setting up series " + h.getPath() + " with current size " + h.getCurrentSize());
 
             //the type of time series which will be created depends on the TimeSeriesFactory set on the context
             //we are expecting FilesystemTimeSeries, but it may be something else
-            rootContext.createTimeSeriesForPath(h.getContextPath(), h.getDescription());
+            rootContext.createTimeSeriesForPath(h.getPath(), h.getDescription());
             loadCount++;
         } catch (SerializationException e) {
             logMethods.logError("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);

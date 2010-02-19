@@ -25,6 +25,7 @@ import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,11 +44,11 @@ public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFa
         super(id, description);
     }
 
-    public Capture createCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
+    public Capture createCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
         return new DefaultCapture(id, source, timeSeries);
     }
 
-    public TimedCapture createTimedCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
+    public TimedCapture createTimedCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         return new DefaultTimedCapture(id, source, timeSeries, captureFunction);
     }
 }

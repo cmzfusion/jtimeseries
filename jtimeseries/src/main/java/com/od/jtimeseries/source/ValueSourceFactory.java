@@ -26,25 +26,25 @@ public interface ValueSourceFactory extends Identifiable {
     /**
      * @param path, full context path including id
      */
-    ValueRecorder createValueRecorder(String path, String id, String description);
+    ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description);
 
     /**
      * @param path, full context path including id
      */
-    QueueTimer createQueueTimer(String path, String id, String description);
+    QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description);
 
     /**
      * @param path, full context path including id
      */
-    Counter createCounter(String path, String id, String description);
+    Counter createCounter(Identifiable parent, String path, String id, String description);
 
     /**
      * @param path, full context path including id
      */
-    EventTimer createEventTimer(String path, String id, String description);
+    EventTimer createEventTimer(Identifiable parent, String path, String id, String description);
 
     /**
      * @param path, full context path including id
      */
-    TimedValueSource createTimedValueSource(String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSource createTimedValueSource(Identifiable parent, String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

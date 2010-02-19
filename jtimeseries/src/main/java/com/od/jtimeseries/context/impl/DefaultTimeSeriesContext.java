@@ -392,7 +392,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public IdentifiableTimeSeries createTimeSeries(String id, String description) {
         synchronized (getTreeLock()) {
-            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description);
             addChild(i);
             return i;
         }
@@ -400,7 +400,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
         synchronized (getTreeLock()) {
-            Capture c = getCaptureFactory().createCapture(getPath() + NAMESPACE_SEPARATOR + id, id, source, series);
+            Capture c = getCaptureFactory().createCapture(this, getPathForChild(id), id, source, series);
             addChild(c);
             return c;
         }
@@ -408,7 +408,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
         synchronized (getTreeLock()) {
-            TimedCapture c = getCaptureFactory().createTimedCapture(getPath() + NAMESPACE_SEPARATOR + id, id, source, series, captureFunction);
+            TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
             addChild(c);
             return c;
         }
@@ -416,7 +416,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public ValueRecorder createValueRecorder(String id, String description) {
         synchronized (getTreeLock()) {
-            ValueRecorder v = getValueSourceFactory().createValueRecorder(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            ValueRecorder v = getValueSourceFactory().createValueRecorder(this, getPathForChild(id), id, description);
             addChild(v);
             return v;
         }
@@ -424,7 +424,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public QueueTimer createQueueTimer(String id, String description) {
         synchronized (getTreeLock()) {
-            QueueTimer q = getValueSourceFactory().createQueueTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            QueueTimer q = getValueSourceFactory().createQueueTimer(this, getPathForChild(id), id, description);
             addChild(q);
             return q;
         }
@@ -432,7 +432,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public Counter createCounter(String id, String description) {
         synchronized (getTreeLock()) {
-            Counter c = getValueSourceFactory().createCounter(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            Counter c = getValueSourceFactory().createCounter(this, getPathForChild(id), id, description);
             addChild(c);
             return c;
         }
@@ -440,7 +440,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public EventTimer createEventTimer(String id, String description) {
         synchronized (getTreeLock()) {
-            EventTimer e = getValueSourceFactory().createEventTimer(getPath() + NAMESPACE_SEPARATOR + id, id, description);
+            EventTimer e = getValueSourceFactory().createEventTimer(this, getPathForChild(id), id, description);
             addChild(e);
             return e;
         }
@@ -448,7 +448,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         synchronized (getTreeLock()) {
-            TimedValueSource t = getValueSourceFactory().createTimedValueSource(getPath() + NAMESPACE_SEPARATOR + id, id, description, valueSupplier, timePeriod);
+            TimedValueSource t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
             addChild(t);
             return t;
         }
@@ -498,30 +498,30 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     public ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createValueRecorderSeries(id, description, captureFunctions);
+            return defaultMetricCreator.createValueRecorderSeries(this, getPathForChild(id), id, description, captureFunctions);
         }
     }
 
     public QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createQueueTimerSeries(id, description, captureFunctions);
+            return defaultMetricCreator.createQueueTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
         }
     }
 
     public Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createCounterSeries(id, description, captureFunctions);
+            return defaultMetricCreator.createCounterSeries(this, getPathForChild(id), id, description, captureFunctions);
         }
     }
 
     public EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
         synchronized (getTreeLock()) {
-            return defaultMetricCreator.createEventTimerSeries(id, description, captureFunctions);
+            return defaultMetricCreator.createEventTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
         }
     }
 
     public TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return defaultMetricCreator.createValueSupplierSeries(id, description, valueSupplier, timePeriod);
+        return defaultMetricCreator.createValueSupplierSeries(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
     }
 
     public QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {

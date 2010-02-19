@@ -24,6 +24,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -57,31 +58,31 @@ class DefaultMetricCreator implements ContextMetricCreator {
         this.timeSeriesContext = timeSeriesContext;
     }
 
-    public ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
+    public ValueRecorder createValueRecorderSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
         ValueRecorder v = timeSeriesContext.createValueRecorder(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, v, captureFunctions);
         return v;
     }
 
-    public QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
+    public QueueTimer createQueueTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
         QueueTimer q = timeSeriesContext.createQueueTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, q, captureFunctions);
         return q;
     }
 
-    public Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
+    public Counter createCounterSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
         Counter c = timeSeriesContext.createCounter(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, c, captureFunctions);
         return c;
     }
 
-    public EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
+    public EventTimer createEventTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
         EventTimer m = timeSeriesContext.createEventTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, m, captureFunctions);
         return m;
     }
 
-    public TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createValueSupplierSeries(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         TimedValueSource s = timeSeriesContext.createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
         createSeriesAndCapturesForSource(id, description, s);
         return s;

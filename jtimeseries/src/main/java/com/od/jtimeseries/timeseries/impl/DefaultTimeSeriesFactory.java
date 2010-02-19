@@ -21,6 +21,7 @@ package com.od.jtimeseries.timeseries.impl;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +40,7 @@ public class DefaultTimeSeriesFactory extends IdentifiableBase implements TimeSe
     }
     
 
-    public IdentifiableTimeSeries createTimeSeries(String path, String id, String description) {
+    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description) {
         return new DefaultIdentifiableTimeSeries(id, description);
     }
 }

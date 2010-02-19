@@ -28,5 +28,5 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface TimeSeriesFactory extends Identifiable {
 
-    IdentifiableTimeSeries createTimeSeries(String path, String id, String description);
+    IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description);
 }

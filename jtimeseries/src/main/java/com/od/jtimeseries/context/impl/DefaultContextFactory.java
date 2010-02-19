@@ -35,15 +35,6 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
  * Time: 14:03:35
  *
  * A factory for contexts, which can be added to a context to handle the creation of child contexts
- *
- * A ContextFactory can also be used to create a root context, in which case it should usually register itself
- * as the context factory for the root. This may be desirable to ensure the root context is of the same class
- * type as all its child contexts, in cases were a custom context type is required.
- *
- * The default implementation creates contexts of class DefaultTimeSeriesContext
- * Subclasses may override this to create contexts of a custom class, and optionally override the methods
- * which create the various resources to register with the root context (e.g. schedulers, factories for
- * timeseries etc).
  */
 public class DefaultContextFactory extends IdentifiableBase implements ContextFactory{
 
@@ -58,45 +49,4 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
     public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description) {
         return new DefaultTimeSeriesContext(parent, id, description);
     }
-
-    /**
-     *  The root context creation differs because we need to set up factories and properties which
-     *  child contexts will inherit
-     */
-    public TimeSeriesContext createRootContext(String id, String description) {
-        TimeSeriesContext c = createContext(null, id, description);
-        c.setContextFactory(createRootContextFactory());
-        c.setScheduler(createRootScheduler());
-        c.setTimeSeriesFactory(createRootTimeSeriesFactory());
-        c.setValueSourceFactory(createRootValueSourceFactory());
-        c.setCaptureFactory(createRootCaptureFactory());
-        setRootContextProperties(c);
-        return c;
-    }
-
-    protected void setRootContextProperties(TimeSeriesContext c) {
-        c.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
-    }
-
-    protected DefaultCaptureFactory createRootCaptureFactory() {
-        return new DefaultCaptureFactory();
-    }
-
-    protected DefaultValueSourceFactory createRootValueSourceFactory() {
-        return new DefaultValueSourceFactory();
-    }
-
-    protected DefaultTimeSeriesFactory createRootTimeSeriesFactory() {
-        return new DefaultTimeSeriesFactory();
-    }
-
-    protected DefaultScheduler createRootScheduler() {
-        return new DefaultScheduler(JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID + " Scheduler", "Root Context Scheduler");
-    }
-
-    protected DefaultContextFactory createRootContextFactory() {
-        //usually this factory will be used for the root and all the child contexts created.
-        return this;
-    }
-
 }

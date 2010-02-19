@@ -33,5 +33,4 @@ public interface ContextFactory extends Identifiable {
      */
     TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description);
 
-    TimeSeriesContext createRootContext(String id, String description);
 }

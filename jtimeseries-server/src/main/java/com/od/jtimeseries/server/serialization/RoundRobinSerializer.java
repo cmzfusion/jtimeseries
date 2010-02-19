@@ -226,12 +226,12 @@ public class RoundRobinSerializer {
 
     public File getFile(FileHeader f) throws SerializationException {
         synchronized (writeLock) {
-            if ( f.getContextPath() == null) {
+            if ( f.getPath() == null) {
                 throw new SerializationException("Cannot get File for FileHeader with null context path");
             }
 
             try {
-                String fileName = URLEncoder.encode(f.getContextPath(), "UTF-8") + timeSeriesFileSuffix;
+                String fileName = URLEncoder.encode(f.getPath(), "UTF-8") + timeSeriesFileSuffix;
                 return new File(rootDirectory, fileName);
             } catch (UnsupportedEncodingException e) {
                 throw new SerializationException("Failed to encode file name", e);

@@ -184,4 +184,8 @@ public class IdentifiableBase implements Identifiable {
     public <E extends Identifiable> E get(String id, Class<E> classType) {
         return null;
     }
+
+    protected String getPathForChild(String id) {
+        return getPath() + NAMESPACE_SEPARATOR + id;
+    }
 }

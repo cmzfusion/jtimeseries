@@ -24,6 +24,8 @@ import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,9 +48,10 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
         this.seriesLength = seriesLength;
     }
 
-    public IdentifiableTimeSeries createTimeSeries(String path, String id, String description) {
+    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description) {
         try {
-            return new FilesystemTimeSeries(id, description, roundRobinSerializer, new FileHeader(path, description, seriesLength), fileAppendDelay, fileRewriteDelay);
+            FileHeader fileHeader = new FileHeader(path, description, seriesLength);
+            return new FilesystemTimeSeries(id, description, roundRobinSerializer, fileHeader, fileAppendDelay, fileRewriteDelay);
         } catch (SerializationException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to create timeseries", e);

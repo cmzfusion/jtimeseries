@@ -20,6 +20,7 @@ package com.od.jtimeseries.source.impl;
 
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 public class DefaultValueSourceFactory extends IdentifiableBase implements ValueSourceFactory {
@@ -32,23 +33,23 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
         super(id, description);
     }
 
-    public ValueRecorder createValueRecorder(String path, String id, String description) {
+    public ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description) {
         return new DefaultValueRecorder(id, description);
     }
 
-    public QueueTimer createQueueTimer(String path, String id, String description) {
+    public QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description) {
         return new DefaultQueueTimer(id, description);
     }
 
-    public Counter createCounter(String path, String id, String description) {
+    public Counter createCounter(Identifiable parent, String path, String id, String description) {
         return new DefaultCounter(id, description);
     }
 
-    public EventTimer createEventTimer(String path, String id, String description) {
+    public EventTimer createEventTimer(Identifiable parent, String path, String id, String description) {
         return new DefaultEventTimer(id, description);
     }
 
-    public TimedValueSource createTimedValueSource(String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createTimedValueSource(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         return new DefaultTimedValueSupplier(id, description, valueSupplier, timePeriod);
     }
 

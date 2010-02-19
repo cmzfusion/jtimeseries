@@ -39,7 +39,7 @@ public interface CaptureFactory extends Identifiable {
      * @param timeSeries, series to capture values
      * @return new Capture
      */
-    Capture createCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries);
+    Capture createCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries);
 
      /**
      * @param path, full context path including the id
@@ -49,6 +49,6 @@ public interface CaptureFactory extends Identifiable {
      * @param captureFunction, function and time period to process source values
      * @return new TimedCapture
      */
-    TimedCapture createTimedCapture(String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction);
+    TimedCapture createTimedCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction);
 
 }

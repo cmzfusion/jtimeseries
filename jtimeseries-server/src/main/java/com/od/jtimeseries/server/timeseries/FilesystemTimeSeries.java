@@ -71,14 +71,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
     private volatile boolean persistenceStopped = false;
 
-    public FilesystemTimeSeries(Identifiable parent, String id, String description, RoundRobinSerializer roundRobinSerializer, FileHeader fileHeader, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
-        super(parent, id, description);
-        this.roundRobinSerializer = roundRobinSerializer;
-        this.appendPeriod = appendPeriod;
-        this.rewritePeriod = rewritePeriod;
-        checkHeader(fileHeader);
-    }
-
     public FilesystemTimeSeries(String id, String description, RoundRobinSerializer roundRobinSerializer, FileHeader fileHeader, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(id, description);
         this.roundRobinSerializer = roundRobinSerializer;

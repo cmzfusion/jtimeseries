@@ -21,6 +21,7 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,7 +47,7 @@ public class UdpRemoteTimeSeriesFactory extends IdentifiableBase implements Time
         this.udpClient = udpClient;
     }
 
-    public IdentifiableTimeSeries createTimeSeries(String path, String id, String description) {
+    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description) {
         return new UdpRemoteTimeSeries(id, description, udpClient);
     }
 }

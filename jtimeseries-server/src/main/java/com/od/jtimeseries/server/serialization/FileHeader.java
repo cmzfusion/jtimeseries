@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 public class FileHeader {
 
-    private static final String CONTEXT_PATH_KEY = "CONTEXT_PATH";
+    private static final String PATH_KEY = "CONTEXT_PATH";
     private static final String DESCRIPTION_KEY = "DESCRIPTION";
 
     private int headerLength = 512;  //default start length for header
@@ -53,17 +53,17 @@ public class FileHeader {
     }
 
     public FileHeader(String contextPath, String description, int seriesLength) {
-        fileProperties.put(CONTEXT_PATH_KEY, contextPath);
+        fileProperties.put(PATH_KEY, contextPath);
         fileProperties.put(DESCRIPTION_KEY, description);
         this.seriesLength = seriesLength;
     }
 
-    public String getContextPath() {
-        return fileProperties.getProperty(CONTEXT_PATH_KEY);
+    public String getPath() {
+        return fileProperties.getProperty(PATH_KEY);
     }
 
     public void setContextPath(String contextPath) {
-        fileProperties.setProperty(CONTEXT_PATH_KEY, contextPath);
+        fileProperties.setProperty(PATH_KEY, contextPath);
     }
 
     public Properties getFileProperties() {
@@ -127,7 +127,7 @@ public class FileHeader {
     @Override
     public String toString() {
         return "FileHeader{" +
-                "contextPath =" + getContextPath() +
+                "path =" + getPath() +
                 '}';
     }
 }

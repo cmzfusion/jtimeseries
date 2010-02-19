@@ -28,7 +28,6 @@ import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
-import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogMethodsFactory;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -94,20 +93,27 @@ public class JTimeSeriesServer {
 
     private void startup() {
         logMethods.logInfo("Starting JTimeSeriesServer");
+        try {
+            doStartup();
+            logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
+        } catch ( Throwable t) {
+            logMethods.logError("Error starting JTimeseriesServer", t);
+        }
+    }
 
+    private void doStartup() throws IOException {
         startSeriesDirectoryManager();
         startJmxManagementServer();
         setupServerMetrics();
         addUdpMessageListeners();
-        addHttpdShutdownHook();
         startServerAnnouncementPings();
         startJmx();
+        startTimeSeriesHttpServer();
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
 
         serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
-        logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
     }
 
     private void startJmxManagementServer() {
@@ -126,14 +132,6 @@ public class JTimeSeriesServer {
     private void startServerAnnouncementPings() {
         logMethods.logInfo("Starting Server Announcement Pings");
         udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
-    }
-
-    private void addHttpdShutdownHook() {
-        //this handler enables the TimeSeriesServer to be shutdown from an http call
-        //the plan is to add extra shutdown listeners to cleanly shut the server down (e.g. stop file writing and services first)
-        ShutdownHandlerFactory shutdownFactory = new ShutdownHandlerFactory(rootContext, new ShutdownHandlerFactory.SystemExitShutdownListener());
-        shutdownFactory.addShutdownListener(fileSerializer);
-        httpdServer.setHandlerFactory(shutdownFactory);
     }
 
     private void addUdpMessageListeners() {
@@ -167,6 +165,10 @@ public class JTimeSeriesServer {
         } catch (Exception e) {
             logMethods.logError("Failed to start JMX interface", e);
         }
+    }
+
+    private void startTimeSeriesHttpServer() throws IOException {
+        httpdServer.start();
     }
 
     public void setServerAnnouncementPingPeriodSeconds(int serverAnnouncementPingPeriodSeconds) {

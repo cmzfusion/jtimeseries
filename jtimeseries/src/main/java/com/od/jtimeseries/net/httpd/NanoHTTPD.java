@@ -221,27 +221,29 @@ public class NanoHTTPD
 	 */
 	public NanoHTTPD( int port ) throws IOException
 	{
-		myTcpPort = port;
-
-		final ServerSocket ss = new ServerSocket( myTcpPort );
-		Thread t = new Thread( new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						while( true )
-							new HTTPSession( ss.accept());
-					}
-					catch ( IOException ioe )
-					{}
-				}
-			});
-		t.setDaemon( true );
-		t.start();
+        myTcpPort = port;
 	}
 
-	/**
+    public void start() throws IOException {
+        final ServerSocket ss = new ServerSocket( myTcpPort );
+        Thread t = new Thread( new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        while( true )
+                            new HTTPSession( ss.accept());
+                    }
+                    catch ( IOException ioe )
+                    {}
+                }
+            });
+        t.setDaemon( true );
+        t.start();
+    }
+
+    /**
 	 * Starts as a standalone file server and waits for Enter.
 	 */
 	public static void main( String[] args )

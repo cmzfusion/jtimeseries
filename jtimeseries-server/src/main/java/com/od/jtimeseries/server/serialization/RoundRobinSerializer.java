@@ -18,8 +18,6 @@
  */
 package com.od.jtimeseries.server.serialization;
 
-import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
-import com.od.jtimeseries.server.util.ShutdownHandlerFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -46,7 +44,7 @@ import java.util.Properties;
  * Development time allowing it would be better to allow concurrent reads and concurrent writes on different files,
  * or perhaps make use of ReentrantReadWriteLock
  */
-public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownListener {
+public class RoundRobinSerializer {
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
@@ -59,6 +57,7 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
         this.rootDirectory = rootDirectory;
         this.timeSeriesFileSuffix = timeSeriesFileSuffix;
         checkRootDirectory(rootDirectory);
+        addShutdownHook();
     }
 
     private void checkRootDirectory(File rootDirectory) {
@@ -248,12 +247,6 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
         }
     }
 
-    public void shutdownNow() {
-        synchronized (writeLock) {
-            shutdown = true;
-        }
-    }
-
     public File getRootDirectory() {
         return rootDirectory;
     }
@@ -388,5 +381,30 @@ public class RoundRobinSerializer implements ShutdownHandlerFactory.ShutdownList
                 currentTail > currentHead ?
                     currentTail - currentHead :
                     currentTail + (seriesLength - currentHead);
+    }
+
+
+    //this should ensure no files are corrupted on linux shutdown - although it most likely won't work on Windows, becuase of lack
+    //of support for SIGTERM etc. Still, I have yet to see a corrupted file on either!
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook( new Thread() {
+            public void run() {
+                logMethods.logInfo("Shutdown Starting");
+                shutdownNow();
+                try {
+                    Thread.sleep(250); //just in the hope that 250ms is enough for that log statement to make it into the logs
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                logMethods.logInfo("Shutdown complete");
+
+            }
+        });
+    }
+
+    private void shutdownNow() {
+        synchronized (writeLock) {
+            shutdown = true;
+        }
     }
 }

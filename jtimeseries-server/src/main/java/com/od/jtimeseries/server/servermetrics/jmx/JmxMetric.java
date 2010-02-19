@@ -18,7 +18,6 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.naming.ServiceUnavailableException;
 import java.net.MalformedURLException;
-import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.io.IOException;
@@ -107,7 +106,7 @@ public class JmxMetric implements ServerMetric {
     private void createValueRecorders(TimeSeriesContext rootContext) {
         for (JmxMeasurement m : jmxMeasurements) {
             TimeSeriesContext c = rootContext.createContextForPath(m.getParentContextPath());
-            ValueRecorder r = c.newValueRecorder(m.getId(), m.getDescription());
+            ValueRecorder r = c.createValueRecorderSeries(m.getId(), m.getDescription());
             measurementsToValueRecorder.put(m, r);
         }
     }

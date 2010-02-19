@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.jidesoft.grid.*;
 
 import javax.swing.*;
@@ -34,6 +35,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.beans.IntrospectionException;
 
 /**
@@ -208,7 +210,14 @@ public class TableSelector extends SelectorPanel {
 
     public void refreshSeries() {
         tableModel.clearTable();
-        tableModel.addRowData(rootContext.findAllTimeSeries().getAllMatches().toArray());
+        List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
+        List<RemoteChartingTimeSeries> timeSeries = new ArrayList<RemoteChartingTimeSeries>();
+        for ( IdentifiableTimeSeries i : l) {
+            if ( i instanceof RemoteChartingTimeSeries ) {
+                timeSeries.add((RemoteChartingTimeSeries)i);
+            }
+        }
+        tableModel.addRowData(timeSeries.toArray(new RemoteChartingTimeSeries[timeSeries.size()]));
     }
 
     public void removeSeries(java.util.List<RemoteChartingTimeSeries> series) {

@@ -150,5 +150,5 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries, Context
     /**
      * Create a TimedValueSource and add it to this context, without creating an associated Capture and TimeSeries
      */
-    TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSupplier createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

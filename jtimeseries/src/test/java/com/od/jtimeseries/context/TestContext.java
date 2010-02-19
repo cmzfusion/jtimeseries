@@ -29,10 +29,10 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
         rootContext.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "false");
-        counter = rootContext.newCounter("TestCounter", "Test Counter Description");
-        valueRecorder = rootContext.newValueRecorder("TestValueRecorder", "Test Value Recorder");
-        eventTimer = rootContext.newEventTimer("TestEventTimer", "Test Event Timer");
-        queueTimer = rootContext.newQueueTimer("TestQueueTimer", "Test Queue Timer");
+        counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description");
+        valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder");
+        eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer");
+        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer");
 
         childContext = rootContext.createChildContext("Child");
     }
@@ -222,10 +222,10 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testStartCaptureStartsAllCapturesRecursivelyFromLocalContextDown() {
-        childContext.newCounter("counter", "counter");
+        childContext.createCounterSeries("counter", "counter");
 
         TimeSeriesContext grandchildcontext = childContext.createChildContext("grandchild");
-        grandchildcontext.newCounter("counter", "counter");
+        grandchildcontext.createCounterSeries("counter", "counter");
 
         childContext.startDataCapture();
         assertEquals(2, childContext.findAllCaptures().getNumberOfMatches());
@@ -243,11 +243,11 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     @Test
     public void testStartCaptureImmediatelyProperty() {
         rootContext.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "false");
-        Counter c = childContext.newCounter("counter", "counter");
+        Counter c = childContext.createCounterSeries("counter", "counter");
         assertTrue(childContext.findCaptures(c).getFirstMatch().getState() == CaptureState.STOPPED);
 
         rootContext.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
-        c = childContext.newCounter("counter2", "counter2");
+        c = childContext.createCounterSeries("counter2", "counter2");
         assertTrue(childContext.findCaptures(c).getFirstMatch().getState() == CaptureState.STARTED);
     }
 

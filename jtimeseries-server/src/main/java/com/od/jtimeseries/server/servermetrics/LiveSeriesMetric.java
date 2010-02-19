@@ -29,7 +29,7 @@ public class LiveSeriesMetric extends AbstractServerMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.newValueRecorder(id, "A count of the series which have recevied updates during the last " + AppendToSeriesMessageListener.STALE_SERIES_DELAY);
+        ValueRecorder v = metricContext.createValueRecorderSeries(id, "A count of the series which have recevied updates during the last " + AppendToSeriesMessageListener.STALE_SERIES_DELAY);
         AppendToSeriesMessageListener.setLiveSeriesTotalValueRecorder(v);
     }
 }

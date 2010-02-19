@@ -20,14 +20,14 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public interface ContextMetricCreator {
 
-    ValueRecorder newValueRecorder(String id, String description, CaptureFunction... captureFunctions);
+    ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions);
 
-    QueueTimer newQueueTimer(String id, String description, CaptureFunction... captureFunctions);
+    QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions);
 
-    Counter newCounter(String id, String description, CaptureFunction... captureFunctions);
+    Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions);
 
-    EventTimer newEventTimer(String id, String description, CaptureFunction... captureFunctions);
+    EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions);
 
-    TimedValueSource newTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSupplier createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
 }

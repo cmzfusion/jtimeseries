@@ -57,32 +57,32 @@ class DefaultMetricCreator implements ContextMetricCreator {
         this.timeSeriesContext = timeSeriesContext;
     }
 
-    public ValueRecorder newValueRecorder(String id, String description, CaptureFunction... captureFunctions) {
+    public ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
         ValueRecorder v = timeSeriesContext.createValueRecorder(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, v, captureFunctions);
         return v;
     }
 
-    public QueueTimer newQueueTimer(String id, String description, CaptureFunction... captureFunctions) {
+    public QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
         QueueTimer q = timeSeriesContext.createQueueTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, q, captureFunctions);
         return q;
     }
 
-    public Counter newCounter(String id, String description, CaptureFunction... captureFunctions) {
+    public Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
         Counter c = timeSeriesContext.createCounter(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, c, captureFunctions);
         return c;
     }
 
-    public EventTimer newEventTimer(String id, String description, CaptureFunction... captureFunctions) {
+    public EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
         EventTimer m = timeSeriesContext.createEventTimer(SOURCE_PREFIX + id, description);
         createSeriesAndCapturesForSource(id, description, m, captureFunctions);
         return m;
     }
 
-    public TimedValueSource newTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSource s = timeSeriesContext.createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
+    public TimedValueSupplier createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSupplier s = timeSeriesContext.createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
         createSeriesAndCapturesForSource(id, description, s);
         return s;
     }

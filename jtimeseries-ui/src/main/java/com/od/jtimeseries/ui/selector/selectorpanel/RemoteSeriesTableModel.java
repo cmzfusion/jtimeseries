@@ -28,6 +28,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.
@@ -148,10 +149,8 @@ public class RemoteSeriesTableModel extends AbstractTableModel implements Contex
         wrappedModel.clear();
     }
 
-    public void addRowData(Object[] objects) {
-        for (Object o : objects) {
-            wrappedModel.addObject((RemoteChartingTimeSeries)o);
-        }
+    public void addRowData(RemoteChartingTimeSeries[] objects) {
+        wrappedModel.addObjects(Arrays.asList(objects));
     }
 
     public void removeRowData(RemoteChartingTimeSeries[] remoteChartingTimeSerieses) {

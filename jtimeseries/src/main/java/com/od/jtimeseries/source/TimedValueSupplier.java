@@ -9,6 +9,6 @@ import com.od.jtimeseries.scheduling.Triggerable;
  * Time: 19:08:04
  * To change this template use File | Settings | File Templates.
  */
-public interface TimedValueSource extends ValueSource, Triggerable {
+public interface TimedValueSupplier extends ValueSource, Triggerable {
 
 }

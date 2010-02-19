@@ -64,7 +64,7 @@ public class JTimeSeriesDemo {
         //we'll create a demo sub-context, one step down from the context tree root and add a value recorder time series
         //to show the max of some random values
         TimeSeriesContext demoContext = rootContext.createChildContext("demo", "A context node to contain demo values");
-        final ValueRecorder maxOfRandomLongValueRecorder = demoContext.newValueRecorder(
+        final ValueRecorder maxOfRandomLongValueRecorder = demoContext.createValueRecorderSeries(
                 "ValueRecorder",
                 "Max of the values recorded every second",
                 CaptureFunctions.MAX(Time.seconds(1))

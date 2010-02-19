@@ -20,10 +20,10 @@ import org.junit.Test;
 public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
-        counter = rootContext.newCounter("TestCounter", "Test Counter Description");
-        valueRecorder = rootContext.newValueRecorder("TestValueRecorder", "Test Value Recorder");
-        eventTimer = rootContext.newEventTimer("TestEventTimer", "Test Event Timer");
-        queueTimer = rootContext.newQueueTimer("TestQueueTimer", "Test Queue Timer");
+        counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description");
+        valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder");
+        eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer");
+        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer");
     }
 
     @Test

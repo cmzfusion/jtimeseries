@@ -30,6 +30,7 @@ public class TestRoundRobinSerializer extends TestCase {
     private FileHeader fileHeader = new FileHeader("test.id", "test series", SERIES_LENGTH);
 
     public void setUp() throws SerializationException {
+        RoundRobinSerializer.setShutdownHandlingDisabled(true);        
         serializer = createTestSerializer();
         RoundRobinTimeSeries r = createTestSeries();
         serializer.serialize(fileHeader, r);

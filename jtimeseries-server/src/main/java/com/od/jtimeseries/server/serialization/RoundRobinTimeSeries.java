@@ -61,6 +61,7 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
 
     public synchronized void addWithoutFiringEvent(Collection<TimeSeriesItem> i) {
         addAllWithoutFiringEvents(i);
+        checkSize(true);
     }
 
     public synchronized boolean add(TimeSeriesItem i) {

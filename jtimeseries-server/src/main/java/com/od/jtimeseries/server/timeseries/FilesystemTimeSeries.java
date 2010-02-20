@@ -34,10 +34,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.lang.ref.SoftReference;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,9 +62,9 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private TimePeriod rewritePeriod;
     private FileHeader fileHeader;
     private WrappedTimeSeriesEventHandler timeSeriesEventHandler = new WrappedTimeSeriesEventHandler(this);
-    private WriteBehindCache writeBehindCache = new WriteBehindCache();
+    private WriteBehindCache writeBehindCache;
     private long lastTimestamp = -1;
-    private long flushScheduled = Long.MAX_VALUE;
+    private ScheduledFuture nextFlushTask;
     private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
     private volatile boolean persistenceStopped = false;
 
@@ -78,6 +75,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         this.rewritePeriod = rewritePeriod;
         this.fileHeader = new FileHeader(getPath(), description, seriesLength);
         checkHeader(fileHeader);
+        this.writeBehindCache = new WriteBehindCache();
     }
 
     private void checkHeader(FileHeader fileHeader) throws SerializationException {
@@ -245,7 +243,9 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         if ( r != null ) {
             return r.size();
         } else {
-            return fileHeader.getCurrentSize() + writeBehindCache.getAppendItems().size();
+            //when the cache is flushed, if the cache contains more items than can fit in the series, we will lose the earlist due to round robin
+            //so we will end up with maxSize items in the series
+            return Math.min(getMaxSize(), fileHeader.getCurrentSize() + writeBehindCache.getAppendItems().size());
         }
     }
 
@@ -452,24 +452,27 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      */
     private class WriteBehindCache {
 
+        //when changes to series are not just appends, keep the whole series in memory until flush by holding this reference
         private RoundRobinTimeSeries roundRobinSeries;
-        private List<TimeSeriesItem> items = new ArrayList<TimeSeriesItem>();
+
+        //there is never any point in appending more items than the max series size, so use a round robin series to store until flush
+        private RoundRobinTimeSeries itemsToAppend = new RoundRobinTimeSeries(getMaxSize());
 
         public void cacheSeriesForRewrite(RoundRobinTimeSeries roundRobinSeries) {
             this.roundRobinSeries = roundRobinSeries;
-            items.clear(); //clear the append items list, we don't need it, we will now rewrite the whole series instead
+            itemsToAppend.clear(); //clear the append items list, we don't need it, we will now rewrite the whole series instead
             scheduleFlushCacheTask(rewritePeriod.getLengthInMillis());
         }
 
         public void addItemForAppend(TimeSeriesItem timeSeriesItem) {
             if ( roundRobinSeries == null) { //only if we are not already going to rewrite the whole series
-                items.add(timeSeriesItem);
+                itemsToAppend.add(timeSeriesItem);
                 scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
             }
         }
 
         public List<TimeSeriesItem> getAppendItems() {
-            return items;
+            return itemsToAppend;
         }
 
         public void flush() {
@@ -480,7 +483,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                         roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
                     } else {
                         //only changes are appends
-                        roundRobinSerializer.append(fileHeader, items);
+                        roundRobinSerializer.append(fileHeader, itemsToAppend);
                     }
 
                     //clear cache if no exception / write succeeded
@@ -497,11 +500,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         private void clearCache() {
             roundRobinSeries = null;
-            items.clear();
+            itemsToAppend.clear();
         }
 
         private boolean isFlushed() {
-            return roundRobinSeries == null && items.size() == 0;
+            return roundRobinSeries == null && itemsToAppend.size() == 0;
         }
 
         private boolean isSeriesInCache() {
@@ -509,7 +512,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
 
         private int getAppendListSize() {
-            return items.size();
+            return itemsToAppend.size();
         }
 
         public RoundRobinTimeSeries getSeries() {
@@ -518,26 +521,29 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private void scheduleFlushCacheTask(long delayMillis) {
-        long newFlushTime = System.currentTimeMillis() + delayMillis;
-
-        //flush scheduled should not be less than current time but lets be safe
-        if ( newFlushTime < flushScheduled || flushScheduled < System.currentTimeMillis()) {
-            flushScheduled = newFlushTime;
-            clearCacheExecutor.schedule(
-                    new Runnable() {
-                        public void run() {
-                            synchronized( FilesystemTimeSeries.this) {
-                                writeBehindCache.flush();
-                                flushScheduled = Long.MAX_VALUE;
-                            }
-                        }
-                    },
-                    delayMillis,
-                    TimeUnit.MILLISECONDS
-            );
+        //cancel the next flush, and schedule a new one sooner
+        if ( nextFlushTask == null || nextFlushTask.isDone())  {
+            scheduleNewTask(delayMillis);
+        } else if ( nextFlushTask.getDelay(TimeUnit.MILLISECONDS) > delayMillis ) {
+            //bring forward by cancelling and scheduling a new task
+            nextFlushTask.cancel(false);
+            scheduleNewTask(delayMillis);
         }
     }
 
+    private void scheduleNewTask(long delayMillis) {
+        nextFlushTask = clearCacheExecutor.schedule(
+            new Runnable() {
+                public void run() {
+                    synchronized( FilesystemTimeSeries.this) {
+                        writeBehindCache.flush();
+                    }
+                }
+            },
+            delayMillis,
+            TimeUnit.MILLISECONDS
+        );
+    }
 
 
     //testing hook

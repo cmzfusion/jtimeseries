@@ -46,6 +46,9 @@ import java.util.Properties;
  */
 public class RoundRobinSerializer {
 
+    //for testing, where we create dozens of serializers
+    private static boolean shutdownHandlingDisabled;
+
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
     private final int BYTES_IN_HEADER_START = 20;
@@ -391,24 +394,30 @@ public class RoundRobinSerializer {
     //this should ensure no files are corrupted on linux shutdown - although it most likely won't work on Windows, becuase of lack
     //of support for SIGTERM etc. Still, I have yet to see a corrupted file on either!
     private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook( new Thread() {
-            public void run() {
-                logMethods.logInfo("Shutdown Starting");
-                shutdownNow();
-                try {
-                    Thread.sleep(250); //just in the hope that 250ms is enough for that log statement to make it into the logs
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                logMethods.logInfo("Shutdown complete");
+        if ( ! shutdownHandlingDisabled) {
+            Runtime.getRuntime().addShutdownHook( new Thread() {
+                public void run() {
+                    logMethods.logInfo("Shutdown Starting");
+                    shutdownNow();
+                    try {
+                        Thread.sleep(250); //just in the hope that 250ms is enough for that log statement to make it into the logs
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    logMethods.logInfo("Shutdown complete");
 
-            }
-        });
+                }
+            });
+        }
     }
 
     private void shutdownNow() {
         synchronized (writeLock) {
             shutdown = true;
         }
+    }
+
+    public static void setShutdownHandlingDisabled(boolean shutdownHandlingDisabled) {
+        RoundRobinSerializer.shutdownHandlingDisabled = shutdownHandlingDisabled;
     }
 }

@@ -3,6 +3,7 @@ package com.od.jtimeseries.server.timeseries;
 import com.od.jtimeseries.timeseries.impl.AbstractListTimeSeriesTest;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
+import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -24,6 +25,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
     private RoundRobinSerializer roundRobinSerializer;
 
     public void setUp() throws Exception {
+        RoundRobinSerializer.setShutdownHandlingDisabled(true);
         roundRobinSerializer = TestRoundRobinSerializer.createTestSerializer();
         super.setUp();
     }
@@ -113,5 +115,50 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
 
     }
 
+    @Test
+    public void testMaximumSize() throws SerializationException {
+        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
+        int maxSize = 3;
+        FilesystemTimeSeries series = new FilesystemTimeSeries(c, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, maxSize, Time.seconds(10), Time.seconds(10));
+
+        //after creation, we have just read the header, not deserialized the series yet
+        assertTrue(series.isSeriesCollected());
+
+        series.append(createItemWithTimestamp(1));
+        series.append(createItemWithTimestamp(2));
+        series.append(createItemWithTimestamp(3));
+        series.append(createItemWithTimestamp(4));
+
+        assertEquals(3, series.size());
+        assertEquals(2, series.get(0).getTimestamp());
+
+        series.triggerGarbageCollection();
+        series.flush();
+
+        series.append(createItemWithTimestamp(5));
+        assertEquals(3, series.size());
+        assertEquals(1, series.getCacheAppendListSize());
+        assertTrue(series.isSeriesCollected());
+
+        assertEquals(3, series.get(0).getTimestamp());
+        assertFalse(series.isSeriesCollected());
+
+        series.append(createItemWithTimestamp(6));
+        series.append(createItemWithTimestamp(7));
+        series.append(createItemWithTimestamp(8));
+        series.append(createItemWithTimestamp(9));
+
+        series.triggerGarbageCollection();
+        assertEquals(3, series.size());
+        //cached append items cannot grow above 3 since that is the max series size, should contain 3 most recent items
+        assertEquals(3, series.getCacheAppendListSize());
+
+        series.flush();
+        assertTrue(series.isSeriesCollected());
+        assertEquals(7, series.get(0).getTimestamp());
+        assertEquals(8, series.get(1).getTimestamp());
+        assertEquals(9, series.get(2).getTimestamp());
+        assertFalse(series.isSeriesCollected());
+    }
 
 }

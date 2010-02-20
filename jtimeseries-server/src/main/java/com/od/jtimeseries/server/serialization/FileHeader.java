@@ -40,20 +40,9 @@ public class FileHeader {
     private int seriesLength;
     private int currentHead;
     private int currentTail;
+    private long mostRecentItemTimestamp = -1;
 
     public FileHeader() {
-    }
-
-    /**
-     * Create a FileHeader which is a copy of the supplied header,
-     * performing a clone of the header information
-     */
-    public FileHeader(FileHeader f) {
-        this.headerLength = f.getHeaderLength();
-        this.seriesLength = f.getSeriesLength();
-        this.currentHead = f.getCurrentHead();
-        this.currentTail = f.getCurrentSize();
-        this.fileProperties.putAll(f.getFileProperties());
     }
 
     /**
@@ -116,6 +105,14 @@ public class FileHeader {
 
     public void setCurrentHead(int currentHead) {
         this.currentHead = currentHead;
+    }
+
+    public long getMostRecentItemTimestamp() {
+        return mostRecentItemTimestamp;
+    }
+
+    public void setMostRecentItemTimestamp(long mostRecentItemTimestamp) {
+        this.mostRecentItemTimestamp = mostRecentItemTimestamp;
     }
 
     public int getCurrentTail() {

@@ -74,17 +74,17 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
         this.fileHeader = new FileHeader(getPath(), description, seriesLength);
-        checkHeader(fileHeader);
+        checkOrCreateFileAndUpdateHeader(fileHeader);
         this.writeBehindCache = new WriteBehindCache();
     }
 
-    private void checkHeader(FileHeader fileHeader) throws SerializationException {
-        //protective copy for our private access
+    private void checkOrCreateFileAndUpdateHeader(FileHeader fileHeader) throws SerializationException {
         if ( roundRobinSerializer.fileExists(fileHeader) ) {
             roundRobinSerializer.updateHeader(fileHeader);
         } else {
             roundRobinSerializer.createFile(fileHeader);
         }
+        lastTimestamp = fileHeader.getMostRecentItemTimestamp();
     }
 
     public synchronized boolean add(TimeSeriesItem i) {
@@ -158,7 +158,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         RoundRobinTimeSeries r = getRoundRobinSeries();
         r.add(index, i);
         writeBehindCache.cacheSeriesForRewrite(r);
-        lastTimestamp = getLatestTimestamp();
+        lastTimestamp = r.getLatestTimestamp();
     }
 
     public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> i) {
@@ -167,7 +167,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         if ( change ) {
             writeBehindCache.cacheSeriesForRewrite(r);
         }
-        lastTimestamp = getLatestTimestamp();
+        lastTimestamp = r.getLatestTimestamp();
         return change;
     }
 
@@ -177,7 +177,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         if ( change ) {
             writeBehindCache.cacheSeriesForRewrite(r);
         }
-        lastTimestamp = getLatestTimestamp();
+        lastTimestamp = r.getLatestTimestamp();
         return change;
     }
 

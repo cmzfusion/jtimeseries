@@ -42,7 +42,7 @@
                              <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
                             <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetric">
                                 <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="seconds">
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
                                         <constructor-arg value="5"/>  <!-- connect to jmx service to take measurements every 5 mins -->
                                     </bean>
                                 </constructor-arg>

@@ -46,12 +46,16 @@ import java.util.Properties;
  */
 public class RoundRobinSerializer {
 
+    private static final String VERSION_STRING = "TSVERSION001";
+    private static final int VERSION_STRING_LENGTH = 12;
+    private static final int CURRENT_HEAD_OFFSET = 20;
+    private static final int BYTES_IN_HEADER_START = 72;
+
     //for testing, where we create dozens of serializers
     private static boolean shutdownHandlingDisabled;
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
-    private final int BYTES_IN_HEADER_START = 20;
     private final LogMethods logMethods = LogUtils.getLogMethods(RoundRobinSerializer.class);
     private final Object writeLock = new Object();
     private volatile boolean shutdown;
@@ -85,17 +89,25 @@ public class RoundRobinSerializer {
                 fileHeader.setCurrentHead(head);
                 fileHeader.setCurrentTail(t.size());
                 fileHeader.setSeriesLength(t.getMaxSize());
+                fileHeader.setMostRecentItemTimestamp(t.getLatestTimestamp());
 
                 File f = getFile(fileHeader);
                 DataOutputStream b = null;
                 try {
                     b = new DataOutputStream(new FileOutputStream(f));
-                    //BYTES_IN_HEADER_START  (20 bytes)
+                    //BYTES_IN_HEADER_START  (70 bytes)
+                    b.writeBytes(VERSION_STRING); //add a version description, to support future versioning
                     b.writeInt(fileHeader.getHeaderLength());  //offset where data will start
                     b.writeInt(fileHeader.getSeriesLength());
                     b.writeInt(fileHeader.getCurrentHead());  //start index in rr structure
                     b.writeInt(fileHeader.getCurrentTail());
+                    b.writeLong(fileHeader.getMostRecentItemTimestamp());
                     b.writeInt(properties.length);
+                    //the next 32 bytes are currently undefined, left open for future use
+                    for ( int loop=0; loop<8; loop++) {
+                        b.writeInt(-1);
+                    }
+
                     //Header Properties
                     b.write(properties);
                     byte[] padding = new byte[fileHeader.getHeaderLength() - requiredHeaderLength];
@@ -184,12 +196,13 @@ public class RoundRobinSerializer {
      */
     public void append(FileHeader header, List<TimeSeriesItem> l) throws SerializationException {
         synchronized (writeLock) {
-            if ( ! shutdown ) {
+            if ( ! shutdown && l.size() > 0) {
                 File file = getFile(header);
                 checkFileWriteable(file);
                 RandomAccessFile r = null;
                 try {
                     r = new RandomAccessFile(file, "rw");
+                    r.seek(VERSION_STRING_LENGTH);
                     int headerLength = r.readInt();
                     int seriesLength = r.readInt();
                     int currentHead = r.readInt();
@@ -204,13 +217,16 @@ public class RoundRobinSerializer {
                     int newHead = (currentHead + headAdjust) % seriesLength;
                     int newTail = (currentTail + l.size()) % seriesLength;
 
-                    r.seek(8);
+                    r.seek(CURRENT_HEAD_OFFSET);
                     r.writeInt(newHead);
                     r.writeInt(newTail);
+                    long newLastTimestamp = l.get(l.size() - 1).getTimestamp();
+                    r.writeLong(newLastTimestamp);
 
                     //now update the header with the new values
                     header.setCurrentHead(newHead);
                     header.setCurrentTail(newTail);
+                    header.setMostRecentItemTimestamp(newLastTimestamp);
 
                     r.seek(headerLength + (currentTail * 16));
                     int currentIndex = currentTail;
@@ -329,11 +345,14 @@ public class RoundRobinSerializer {
 
 
     private void readHeader(FileHeader fileHeader, DataInputStream d) throws IOException {
+        skipBytes(d, fileHeader, VERSION_STRING_LENGTH);
         fileHeader.setHeaderLength(d.readInt());
         fileHeader.setSeriesLength(d.readInt());
         fileHeader.setCurrentHead(d.readInt());
         fileHeader.setCurrentTail(d.readInt());
+        fileHeader.setMostRecentItemTimestamp(d.readLong());
         int propertiesLength = d.readInt();
+        skipBytes(d, fileHeader, 32); //skip the currently undefined bytes
         fileHeader.setFileProperties(readProperties(fileHeader, d, propertiesLength));
 
         //skip to end of header section

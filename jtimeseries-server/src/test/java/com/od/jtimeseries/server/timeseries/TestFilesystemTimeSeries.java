@@ -23,6 +23,7 @@ import org.junit.Test;
 public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<FilesystemTimeSeries> {
 
     private RoundRobinSerializer roundRobinSerializer;
+    private final String TEST_CONTEXT = "test";
 
     public void setUp() throws Exception {
         RoundRobinSerializer.setShutdownHandlingDisabled(true);
@@ -30,9 +31,14 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         super.setUp();
     }
 
+    public void tearDown() {
+        super.tearDown();
+        roundRobinSerializer = null;
+    }
+
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
-        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
-        FilesystemTimeSeries s = new FilesystemTimeSeries(c, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        TimeSeriesContext context = new DefaultTimeSeriesContext().createContextForPath(TEST_CONTEXT);
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
         File file = roundRobinSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();
         return s;
@@ -159,6 +165,34 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         assertEquals(8, series.get(1).getTimestamp());
         assertEquals(9, series.get(2).getTimestamp());
         assertFalse(series.isSeriesCollected());
+    }
+
+    @Test
+    public void testLastModifiedTimestamp() throws SerializationException {
+        FilesystemTimeSeries series = getTimeSeries();
+        assertEquals(-1, series.getLatestTimestamp());
+
+        series.append(createItemWithTimestamp(1));
+        assertEquals(1, series.getLatestTimestamp());
+
+        series.triggerGarbageCollection();
+        series.flush();
+
+        assertEquals(1, series.getLatestTimestamp());
+        series.add(createItemWithTimestamp(3));
+        assertEquals(3, series.getLatestTimestamp());
+
+        series.add(1, createItemWithTimestamp(2));
+        assertEquals(3, series.getLatestTimestamp());
+
+        //the file header is out of date because we have local changes, until we flush
+        assertEquals(1, series.getFileHeader().getMostRecentItemTimestamp());
+        series.flush();
+        assertEquals(3, series.getFileHeader().getMostRecentItemTimestamp());
+
+        TimeSeriesContext context = new DefaultTimeSeriesContext().createContextForPath(TEST_CONTEXT);
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context, series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        assertEquals(3, s.getLatestTimestamp());
     }
 
 }

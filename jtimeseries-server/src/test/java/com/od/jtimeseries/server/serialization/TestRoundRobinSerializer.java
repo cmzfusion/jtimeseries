@@ -6,6 +6,8 @@ import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.TimeSeriesContext;
 import junit.framework.TestCase;
 
 import java.io.File;
@@ -24,8 +26,8 @@ import java.util.List;
 public class TestRoundRobinSerializer extends TestCase {
 
     private RoundRobinSerializer serializer;
-    private FileHeader fileHeader = new FileHeader("test.path", "test series", 10000);
-    private boolean deleteScheduled;
+    private int SERIES_LENGTH = 10000;
+    private FileHeader fileHeader = new FileHeader("test.id", "test series", SERIES_LENGTH);
 
     public void setUp() throws SerializationException {
         serializer = createTestSerializer();
@@ -129,7 +131,9 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public void testFilesystemTimeSeries() throws SerializationException {
-        FilesystemTimeSeries series = new FilesystemTimeSeries("id", "description", serializer, fileHeader, Time.seconds(10), Time.seconds(10));
+        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
+        FilesystemTimeSeries series = new FilesystemTimeSeries(c, "id", "description", serializer, SERIES_LENGTH, Time.seconds(10), Time.seconds(10));
+        FileHeader fileHeader = series.getFileHeader();
         assertEquals(4, series.size());
         assertEquals(4, series.get(3).longValue());
 

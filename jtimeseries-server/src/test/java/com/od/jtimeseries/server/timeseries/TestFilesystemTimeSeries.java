@@ -7,6 +7,8 @@ import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 import java.io.File;
 
@@ -27,9 +29,9 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest {
     }
 
     public ListTimeSeries getTimeSeriesInstance() throws Exception {
-        FileHeader f = new FileHeader("test.series." + (int)(Math.random() * 100000000), "test series", 10000);
-        FilesystemTimeSeries s = new FilesystemTimeSeries("id", "description", roundRobinSerializer, f, Time.seconds(10), Time.seconds(10));
-        File file = roundRobinSerializer.getFile(f);
+        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
+        FilesystemTimeSeries s = new FilesystemTimeSeries(c, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        File file = roundRobinSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();
         return s;
     }

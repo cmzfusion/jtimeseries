@@ -71,11 +71,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
     private volatile boolean persistenceStopped = false;
 
-    public FilesystemTimeSeries(String id, String description, RoundRobinSerializer roundRobinSerializer, FileHeader fileHeader, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
-        super(id, description);
+    public FilesystemTimeSeries(Identifiable parentContext, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+        super(parentContext, id, description);
         this.roundRobinSerializer = roundRobinSerializer;
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
+        this.fileHeader = new FileHeader(getPath(), description, seriesLength);
         checkHeader(fileHeader);
     }
 
@@ -86,7 +87,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         } else {
             roundRobinSerializer.createFile(fileHeader);
         }
-        this.fileHeader = new FileHeader(fileHeader);
     }
 
     public synchronized boolean add(TimeSeriesItem i) {

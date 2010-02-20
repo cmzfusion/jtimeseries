@@ -96,9 +96,6 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                 }
             }
 
-            //fire an event to tell observers this timed capture has been triggered by the scheduler
-            fireTriggerEvent();
-
             //do the aggregate calculation on the old function instance, while we are not holding the functionlock
             //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
             //this would be very bad, since that thread may be very performance sensitive
@@ -109,6 +106,9 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                    new TimeSeriesItem(timestamp, value)
                 );
             }
+
+            //fire an event to tell observers this timed capture has been triggered by the scheduler
+            fireTriggerEvent();
         }
     }
 

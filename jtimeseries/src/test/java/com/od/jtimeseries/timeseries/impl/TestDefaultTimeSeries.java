@@ -11,28 +11,25 @@ import org.junit.After;
  * Time: 21:12:41
  * To change this template use File | Settings | File Templates.
  */
-public class TestDefaultTimeSeries extends AbstractListTimeSeriesTest {
+public class TestDefaultTimeSeries extends AbstractListTimeSeriesTest<DefaultTimeSeries> {
 
-    private DefaultTimeSeries s;
 
-    public ListTimeSeries getTimeSeriesInstance() {
-        s = new DefaultTimeSeries();
-        return s;
+    public DefaultTimeSeries getTimeSeriesInstance() {
+        return new DefaultTimeSeries();
     }
 
     @After
     public void tearDown() {
         super.tearDown();
-        s = null;
     }
 
     @Test
     public void testBinarySearchForTimestamp() {
         addNewItemsForTimestamps(10,20,30,40,50);
-        assertEquals(1, s.binarySearchForItemWithTimestamp(20));
-        assertEquals(4, s.binarySearchForItemWithTimestamp(50));
-        assertEquals(-2, s.binarySearchForItemWithTimestamp(15));
-        assertEquals(-6, s.binarySearchForItemWithTimestamp(60));
+        assertEquals(1, getTimeSeries().binarySearchForItemWithTimestamp(20));
+        assertEquals(4, getTimeSeries().binarySearchForItemWithTimestamp(50));
+        assertEquals(-2, getTimeSeries().binarySearchForItemWithTimestamp(15));
+        assertEquals(-6, getTimeSeries().binarySearchForItemWithTimestamp(60));
     }
 
 

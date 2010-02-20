@@ -15,9 +15,9 @@ import java.util.Arrays;
  * Time: 22:49:02
  * To change this template use File | Settings | File Templates.
  */
-public class TestRoundRobinTimeSeries extends AbstractListTimeSeriesTest {
+public class TestRoundRobinTimeSeries extends AbstractListTimeSeriesTest<RoundRobinTimeSeries> {
 
-    public ListTimeSeries getTimeSeriesInstance() throws Exception {
+    public RoundRobinTimeSeries getTimeSeriesInstance() throws Exception {
         return new RoundRobinTimeSeries(10000);
     }
 

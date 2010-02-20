@@ -67,6 +67,9 @@ public class RoundRobinSerializer {
         }
     }
 
+    /**
+     * Serialize the series to the file, and update the fileHeader
+     */
     public void serialize(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {
         synchronized (writeLock) {
             if ( ! shutdown ) {
@@ -158,6 +161,9 @@ public class RoundRobinSerializer {
         }
     }
 
+    /**
+     * Update the fileHeader by reading the file header information from disk
+     */
     public void updateHeader(FileHeader fileHeader) throws SerializationException {
         synchronized (writeLock) {
             File f = getFile(fileHeader);
@@ -170,10 +176,13 @@ public class RoundRobinSerializer {
         }
     }
 
-    public void append(FileHeader f, List<TimeSeriesItem> l) throws SerializationException {
+    /**
+     * Append items to the timeseries file and update the header
+     */
+    public void append(FileHeader header, List<TimeSeriesItem> l) throws SerializationException {
         synchronized (writeLock) {
             if ( ! shutdown ) {
-                File file = getFile(f);
+                File file = getFile(header);
                 checkFileWriteable(file);
                 RandomAccessFile r = null;
                 try {
@@ -183,7 +192,7 @@ public class RoundRobinSerializer {
                     int currentHead = r.readInt();
                     int currentTail = r.readInt();
 
-                    int currentSize = getCurrentSize(seriesLength, currentHead, currentTail);
+                    int currentSize = FileHeader.calculateCurrentSize(seriesLength, currentHead, currentTail);
 
                     currentHead = Math.max(currentHead, 0); //manage empty file (head==-1)
 
@@ -195,8 +204,10 @@ public class RoundRobinSerializer {
                     r.seek(8);
                     r.writeInt(newHead);
                     r.writeInt(newTail);
-                    f.setCurrentHead(newHead);
-                    f.setCurrentTail(newTail);
+
+                    //now update the header with the new values
+                    header.setCurrentHead(newHead);
+                    header.setCurrentTail(newTail);
 
                     r.seek(headerLength + (currentTail * 16));
                     int currentIndex = currentTail;
@@ -210,7 +221,7 @@ public class RoundRobinSerializer {
                         currentIndex ++;
                     }
                 } catch ( Exception e) {
-                    throw new SerializationException("Failed to append items to file " + f, e);
+                    throw new SerializationException("Failed to append items to file " + header, e);
                 } finally {
                     try {
                         if ( r != null) {
@@ -374,13 +385,6 @@ public class RoundRobinSerializer {
             throw new SerializationException("Failed to serialize properties", ioe);
         }
         return bos.toByteArray();
-    }
-
-    public static int getCurrentSize(int seriesLength, int currentHead, int currentTail) {
-        return currentHead == -1 ? 0 :
-                currentTail > currentHead ?
-                    currentTail - currentHead :
-                    currentTail + (seriesLength - currentHead);
     }
 
 

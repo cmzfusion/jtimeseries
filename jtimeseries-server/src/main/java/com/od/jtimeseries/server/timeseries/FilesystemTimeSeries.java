@@ -131,7 +131,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         if ( i.getTimestamp() >= lastTimestamp) {
             writeBehindCache.addItemForAppend(i);
             result = true;
-            RoundRobinTimeSeries s = softSeriesReference.get();
+            RoundRobinTimeSeries s = getRoundRobinSeries(false);
             if ( s != null) {
                 s.append(i);
             } else {
@@ -241,11 +241,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public synchronized int size() {
-        RoundRobinTimeSeries r = softSeriesReference.get();
+        RoundRobinTimeSeries r = getRoundRobinSeries(false);
         if ( r != null ) {
             return r.size();
         } else {
-            return fileHeader.getCurrentSize() + writeBehindCache.getItems().size();
+            return fileHeader.getCurrentSize() + writeBehindCache.getAppendItems().size();
         }
     }
 
@@ -406,8 +406,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private RoundRobinTimeSeries getRoundRobinSeries() {
-        RoundRobinTimeSeries s = softSeriesReference.get();
-        if ( s == null) {
+        return getRoundRobinSeries(true);
+    }
+
+    private RoundRobinTimeSeries getRoundRobinSeries(boolean deserializeIfRequired) {
+        RoundRobinTimeSeries s = isSeriesInWriteCache() ? writeBehindCache.getSeries() : softSeriesReference.get();
+        if ( s == null && deserializeIfRequired ) {
             try {
                 s = roundRobinSerializer.deserialize(fileHeader);
 
@@ -420,7 +424,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 //Due to the asynchronous event firing, when we call s.add() we could end
                 //up firing duplicate events when we add these items, even though our propagating listener has not yet
                 //been added - we will probably not receive the events back until the listener has been added.
-                s.addWithoutFiringEvent(writeBehindCache.getItems());
+                s.addWithoutFiringEvent(writeBehindCache.getAppendItems());
+                //nb. the items stay in the cache append list, so we keep track that we still haven't written them to disk
 
                 s.addTimeSeriesListener(timeSeriesEventHandler);
                 softSeriesReference = new SoftReference<RoundRobinTimeSeries>(s);
@@ -452,19 +457,22 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         public void cacheSeriesForRewrite(RoundRobinTimeSeries roundRobinSeries) {
             this.roundRobinSeries = roundRobinSeries;
+            items.clear(); //clear the append items list, we don't need it, we will now rewrite the whole series instead
             scheduleFlushCacheTask(rewritePeriod.getLengthInMillis());
         }
 
-        public synchronized void addItemForAppend(TimeSeriesItem timeSeriesItem) {
-            items.add(timeSeriesItem);
-            scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
+        public void addItemForAppend(TimeSeriesItem timeSeriesItem) {
+            if ( roundRobinSeries == null) { //only if we are not already going to rewrite the whole series
+                items.add(timeSeriesItem);
+                scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
+            }
         }
 
-        public List<TimeSeriesItem> getItems() {
+        public List<TimeSeriesItem> getAppendItems() {
             return items;
         }
 
-        public synchronized void flush() {
+        public void flush() {
             if ( ! persistenceStopped) {
                 try {
                     if ( roundRobinSeries != null) {
@@ -491,10 +499,22 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             roundRobinSeries = null;
             items.clear();
         }
-    }
 
-    public synchronized void flush() {
-        writeBehindCache.flush();
+        private boolean isFlushed() {
+            return roundRobinSeries == null && items.size() == 0;
+        }
+
+        private boolean isSeriesInCache() {
+            return roundRobinSeries != null;
+        }
+
+        private int getAppendListSize() {
+            return items.size();
+        }
+
+        public RoundRobinTimeSeries getSeries() {
+            return roundRobinSeries;
+        }
     }
 
     private void scheduleFlushCacheTask(long delayMillis) {
@@ -516,6 +536,36 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                     TimeUnit.MILLISECONDS
             );
         }
+    }
+
+
+
+    //testing hook
+    public synchronized void flush() {
+        writeBehindCache.flush();
+    }
+
+    //testing hook
+    synchronized boolean isCacheFlushed() {
+        return writeBehindCache.isFlushed();
+    }
+
+    synchronized boolean isSeriesInWriteCache() {
+        return writeBehindCache.isSeriesInCache();
+    }
+
+    synchronized int getCacheAppendListSize() {
+        return writeBehindCache.getAppendListSize();
+    }
+
+    //testing hook, trigger the garbage collection of the soft referenced series
+    synchronized void triggerGarbageCollection() {
+        softSeriesReference.clear();
+    }
+
+    //testing hook
+    synchronized boolean isSeriesCollected() {
+        return softSeriesReference.get() == null;
     }
 
 }

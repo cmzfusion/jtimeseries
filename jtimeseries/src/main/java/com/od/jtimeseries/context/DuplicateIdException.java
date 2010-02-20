@@ -8,9 +8,9 @@ package com.od.jtimeseries.context;
 *
 * Thrown when you try to add an item to a context which has the same id as another item already present.
 */
-public class AlreadyExistsException extends RuntimeException {
+public class DuplicateIdException extends RuntimeException {
 
-    public AlreadyExistsException(String message) {
+    public DuplicateIdException(String message) {
         super(message);
     }
 }

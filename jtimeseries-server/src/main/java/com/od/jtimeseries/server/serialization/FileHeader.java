@@ -25,9 +25,13 @@ import java.util.Properties;
  * User: Nick Ebbutt
  * Date: 18-May-2009
  * Time: 07:30:42
+ *
+ * Represents header information stored in a timeseries file
+ * Updated when a series is saved, or loaded
  */
 public class FileHeader {
 
+    //these properties will be stored in the serialized series files, careful if you change them!
     private static final String PATH_KEY = "CONTEXT_PATH";
     private static final String DESCRIPTION_KEY = "DESCRIPTION";
 
@@ -52,8 +56,11 @@ public class FileHeader {
         this.fileProperties.putAll(f.getFileProperties());
     }
 
-    public FileHeader(String contextPath, String description, int seriesLength) {
-        fileProperties.put(PATH_KEY, contextPath);
+    /**
+     * @param seriesLength, maximum size for this series
+     */
+    public FileHeader(String path, String description, int seriesLength) {
+        fileProperties.put(PATH_KEY, path);
         fileProperties.put(DESCRIPTION_KEY, description);
         this.seriesLength = seriesLength;
     }
@@ -88,6 +95,9 @@ public class FileHeader {
         }
     }
 
+    /**
+     * @return length of round robin series, which is the maximum size this series can obtain
+     */
     public int getSeriesLength() {
         return seriesLength;
     }
@@ -97,7 +107,7 @@ public class FileHeader {
     }
 
     public int getCurrentSize() {
-        return RoundRobinSerializer.getCurrentSize(seriesLength, currentHead, currentTail);
+        return calculateCurrentSize(seriesLength, currentHead, currentTail);
     }
 
     public int getCurrentHead() {
@@ -129,5 +139,15 @@ public class FileHeader {
         return "FileHeader{" +
                 "path =" + getPath() +
                 '}';
+    }
+
+    /**
+     * @return current series size, based on current head, tail and length
+     */
+    public static int calculateCurrentSize(int seriesLength, int currentHead, int currentTail) {
+        return currentHead == -1 ? 0 :
+                currentTail > currentHead ?
+                    currentTail - currentHead :
+                    currentTail + (seriesLength - currentHead);
     }
 }

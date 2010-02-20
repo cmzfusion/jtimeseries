@@ -652,7 +652,7 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         synchronized (getTreeLock()) {
             synchronized (children) {
                 if ( childrenById.containsKey(identifiable.getId())) {
-                    throw new AlreadyExistsException("id " + identifiable.getId() + " already exists in this context");
+                    throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
                 } else {
                     children.add(identifiable);
                     childrenById.put(identifiable.getId(), identifiable);

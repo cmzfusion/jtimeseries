@@ -36,6 +36,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -72,6 +73,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
     private boolean neverRefresh;
+    private Date lastRefreshTime;
 
     //a series starts 'connected' and remains connected until a set number of consecutive download failures have occurred
     private volatile int errorCount;
@@ -175,6 +177,16 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         propertyChangeSupport.firePropertyChange("refreshTimeSeconds", oldValue, this.refreshTimeSeconds);
     }
 
+    public Date getLastRefreshTime() {
+        return lastRefreshTime;
+    }
+
+    public void setLastRefreshTime(Date time) {
+        Date oldValue = lastRefreshTime;
+        this.lastRefreshTime = time;
+        propertyChangeSupport.firePropertyChange("lastRefreshTime", oldValue, time);
+    }
+
     /**
      * Set this timeseries so that the load data task will never run
      * this is somtimes useful when using the series as a placeholder to represent a timeseries on a remote server only
@@ -200,18 +212,6 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
                     runCommandTask, 0, (long) this.refreshTimeSeconds, TimeUnit.SECONDS
             );
         }
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     public RemoteChartingTimeSeriesConfig getConfig() {
@@ -271,5 +271,29 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
                 setConnected(false);
             }
         }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners(String propertyName) {
+        return propertyChangeSupport.getPropertyChangeListeners(propertyName);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListeners() {
+        return propertyChangeSupport.getPropertyChangeListeners();
     }
 }

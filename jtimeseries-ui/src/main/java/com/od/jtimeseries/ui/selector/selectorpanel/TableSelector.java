@@ -29,10 +29,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -96,6 +93,7 @@ public class TableSelector extends SelectorPanel {
         columns.add(new ColumnInfo("refreshTimeSeconds", "Refresh(s)", 100));
         columns.add(new ColumnInfo("path", "Path", 100));
         columns.add(new ColumnInfo("URL", "URL", 100));
+        columns.add(new ColumnInfo("lastRefreshTime", "Last Refresh", 50));
         populateColumnWidthsMap();
     }
 
@@ -147,7 +145,12 @@ public class TableSelector extends SelectorPanel {
                 super.tableChanged(e);
                 if ( e.getFirstRow() == TableModelEvent.HEADER_ROW ) {
                     sizeColumns();
+                    setColumnRenderers();
                 }
+            }
+
+            private void setColumnRenderers() {
+                getColumnModel().getColumn(7).setCellRenderer(new TimeRenderer());
             }
         };
 
@@ -157,7 +160,6 @@ public class TableSelector extends SelectorPanel {
         sortableTable.setSelectInsertedRows(false);
         sortableTable.setAutoSelectTextWhenStartsEditing(true);
         sortableTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
         AutoFilterTableHeader header = new AutoFilterTableHeader(sortableTable);
         header.setAutoFilterEnabled(true);
         header.setShowFilterName(true);
@@ -250,4 +252,5 @@ public class TableSelector extends SelectorPanel {
             return preferredWidth;
         }
     }
+
 }

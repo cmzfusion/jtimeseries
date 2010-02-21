@@ -21,9 +21,9 @@ package com.od.jtimeseries.ui.query;
 import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,9 +44,9 @@ import java.util.Properties;
 public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
     private List<TimeSeriesItem> itemsToAdd = new ArrayList<TimeSeriesItem>();
-    private IdentifiableTimeSeries destinationSeries;
+    private RemoteChartingTimeSeries destinationSeries;
 
-    public DownloadRemoteTimeSeriesDataQuery(IdentifiableTimeSeries destinationSeries, URL url) {
+    public DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries destinationSeries, URL url) {
         super(url);
         this.destinationSeries = destinationSeries;
     }
@@ -65,6 +66,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
             public void endDocument() {
                 destinationSeries.addAll(itemsToAdd);
                 itemsToAdd.clear();
+                destinationSeries.setLastRefreshTime(new Date());
             }
         };
     }

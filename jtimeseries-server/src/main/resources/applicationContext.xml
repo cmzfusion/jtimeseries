@@ -10,6 +10,7 @@
     </bean>
 
     <import resource="serverMetrics.xml"/>
+    <import resource="summaryStats.xml"/>    
 
     <bean id="seriesDirectory" class="java.io.File">
         <constructor-arg value="${seriesDirectory}"/>
@@ -100,6 +101,7 @@
         <property name="serverAnnouncementMessage" ref="serverAnnouncementMessage"/>
         <property name="serverConfigJmx" ref="serverConfigJmx"/>
         <property name="serverMetricInitializer" ref="serverMetricInitializer"/>
+        <property name="summaryStatisticsCalculator" ref="summaryStatsCalculator"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>
     </bean>

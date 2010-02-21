@@ -28,6 +28,7 @@ import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
+import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogMethodsFactory;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -71,6 +72,7 @@ public class JTimeSeriesServer {
     private ServerConfigJmx serverConfigJmx;
     private UdpServer udpServer;
     private ServerMetricInitializer serverMetricInitializer;
+    private SummaryStatisticsCalculator summaryStatisticsCalculator;
     private HtmlAdaptorServer htmlAdaptorServer;
     private JTimeSeriesHttpd httpdServer;
 
@@ -105,6 +107,7 @@ public class JTimeSeriesServer {
         startSeriesDirectoryManager();
         startJmxManagementServer();
         setupServerMetrics();
+        startSummaryStats();
         addUdpMessageListeners();
         startServerAnnouncementPings();
         startJmx();
@@ -143,6 +146,11 @@ public class JTimeSeriesServer {
     private void setupServerMetrics() {
         logMethods.logInfo("Setting up server metrics series");
         serverMetricInitializer.initializeServerMetrics();
+    }
+
+    private void startSummaryStats() {
+        logMethods.logInfo("Starting summary stats");
+        summaryStatisticsCalculator.start();
     }
 
     private void startSeriesDirectoryManager() {
@@ -201,6 +209,10 @@ public class JTimeSeriesServer {
 
     public void setServerMetricInitializer(ServerMetricInitializer metricInitializer) {
         this.serverMetricInitializer = metricInitializer;
+    }
+
+    public void setSummaryStatisticsCalculator(SummaryStatisticsCalculator summaryStatisticsCalculator) {
+        this.summaryStatisticsCalculator = summaryStatisticsCalculator;
     }
 
     public void setHtmlAdaptorServer(HtmlAdaptorServer htmlAdaptorServer) {

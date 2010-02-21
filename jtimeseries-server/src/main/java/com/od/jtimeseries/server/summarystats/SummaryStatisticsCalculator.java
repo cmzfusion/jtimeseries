@@ -25,18 +25,16 @@ public class SummaryStatisticsCalculator {
 
     private TimeSeriesContext rootContext;
     private List<SummaryStatistic> statistics;
-    private int summaryStatsUpdateFrequencyMins;
     private TimePeriod refreshPeriod;
 
-    public SummaryStatisticsCalculator(TimeSeriesContext rootContext, List<SummaryStatistic> statistics, int summaryStatsUpdateFrequencyMins) {
+    public SummaryStatisticsCalculator(TimeSeriesContext rootContext, TimePeriod refreshPeriod, List<SummaryStatistic> statistics) {
         this.rootContext = rootContext;
+        this.refreshPeriod = refreshPeriod;
         this.statistics = statistics;
-        this.summaryStatsUpdateFrequencyMins = summaryStatsUpdateFrequencyMins;
-        refreshPeriod = Time.minutes(summaryStatsUpdateFrequencyMins);
     }
 
     public void start() {
-        if ( summaryStatsUpdateFrequencyMins > -1 ) {
+        if ( statistics.size() > 0) {
             logMethods.logInfo("Starting summary statistics calculation every " + refreshPeriod);
             Thread t = new Thread(new SummaryStatisticsRecalculator());
             t.setDaemon(true);
@@ -65,21 +63,33 @@ public class SummaryStatisticsCalculator {
                 ContextQueries.QueryResult<IdentifiableTimeSeries> r = rootContext.findAllTimeSeries();
                 int numberOfSeries = r.getNumberOfMatches();
 
-                long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
-                logMethods.logInfo("Summary statistics sleep time to caculate " + numberOfSeries + " for this run will be " + requiredSleepTime);
-
-                for (IdentifiableTimeSeries s : r.getAllMatches()) {
-                    if ( requiresRecalculation(s)) {
-                        recalculateStats(s);
-                    }
-                    s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
-
-                    try {
-                        Thread.sleep(requiredSleepTime);
-                    } catch (InterruptedException e) {
-                        logMethods.logError("Interrupted when sleeping for summary stats", e);
-                    }
+                if ( numberOfSeries == 0) {
+                    sleepRecalcThread(refreshPeriod.getLengthInMillis());
+                } else {
+                    doRecalculations(r, numberOfSeries);
                 }
+            }
+        }
+
+        private void doRecalculations(ContextQueries.QueryResult<IdentifiableTimeSeries> r, int numberOfSeries) {
+            long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
+            logMethods.logDebug("Summary statistics sleep time to caculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
+
+            for (IdentifiableTimeSeries s : r.getAllMatches()) {
+                if ( requiresRecalculation(s)) {
+                    recalculateStats(s);
+                }
+                s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
+
+                sleepRecalcThread(requiredSleepTime);
+            }
+        }
+
+        private void sleepRecalcThread(long requiredSleepTime) {
+            try {
+                Thread.sleep(requiredSleepTime);
+            } catch (InterruptedException e) {
+                logMethods.logError("Interrupted when sleeping for summary stats", e);
             }
         }
 

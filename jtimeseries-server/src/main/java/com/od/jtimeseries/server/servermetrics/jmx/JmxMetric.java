@@ -44,7 +44,7 @@ public class JmxMetric implements ServerMetric {
     private final String serviceUrl;
     private JMXServiceURL url;
     private List<JmxMeasurement> jmxMeasurements;
-    private Map<JmxMeasurement, ValueRecorder> measurementsToValueRecorder = Collections.synchronizedMap(new HashMap<JmxMeasurement, ValueRecorder>());
+    private List<JmxMeasurementTask> measuerementTasks = new ArrayList<JmxMeasurementTask>();
     private String description = "";
 
     /**
@@ -97,17 +97,17 @@ public class JmxMetric implements ServerMetric {
             logMethods.logError("Failed to set up JMX Metric - bad URL " + serviceUrl, e);
         }
 
-        createValueRecorders(rootContext);
+        createJmxTasks(rootContext);
 
         //adding the triggerable to root context should cause it to start getting triggered
         rootContext.addChild(new TriggerableJmxConnectTask());
     }
 
-    private void createValueRecorders(TimeSeriesContext rootContext) {
+    private void createJmxTasks(TimeSeriesContext rootContext) {
         for (JmxMeasurement m : jmxMeasurements) {
             TimeSeriesContext c = rootContext.createContextForPath(m.getParentContextPath());
             ValueRecorder r = c.createValueRecorderSeries(m.getId(), m.getDescription());
-            measurementsToValueRecorder.put(m, r);
+            measuerementTasks.add(new JmxMeasurementTask(r, m));
         }
     }
 
@@ -123,8 +123,8 @@ public class JmxMetric implements ServerMetric {
 
         public void trigger(long timestamp) {
             try {
-                for (JmxMeasurement m : jmxMeasurements) {
-                    processMeasurement(m);
+                for (JmxMeasurementTask m : measuerementTasks) {
+                    m.processMeasurement();
                 }
             } catch (Throwable t) {
                 if ( t.getCause() instanceof IOException || t.getCause() instanceof ServiceUnavailableException) {
@@ -135,38 +135,31 @@ public class JmxMetric implements ServerMetric {
                 }
             }
         }
-
-        private void processMeasurement(JmxMeasurement m) throws JmxExecutionException {
-            CalculateJmxMeasurementTask task = new CalculateJmxMeasurementTask(m);
-            getJmxExecutorService().executeTask(task);
-            Numeric result = task.getResult();
-
-            if ( ! result.isNaN() ) {
-                if ( m.getDivisor() != 1) {
-                    result = DoubleNumeric.valueOf(result.doubleValue() / m.getDivisor());
-                }
-
-                ValueRecorder v = measurementsToValueRecorder.get(m);
-                v.newValue(result);
-            }
-        }
     }
 
-    private class CalculateJmxMeasurementTask implements JmxExecutorTask {
+    private class JmxMeasurementTask implements JmxExecutorTask {
 
         private Numeric result = Numeric.NaN;
-        private JmxMeasurement m;
+        private ValueRecorder valueRecorder;
+        private AggregateFunction aggregateFunction;
+        private JmxMeasurement measurement;
 
-        public CalculateJmxMeasurementTask(JmxMeasurement m) {
-            this.m = m;
+        private JmxMeasurementTask(ValueRecorder valueRecorder, JmxMeasurement measurement) {
+            this.valueRecorder = valueRecorder;
+            this.aggregateFunction = measurement.getAggregateFunction();
+            this.measurement = measurement;
         }
 
-        public void executeTask(MBeanServerConnection jmxConnection) throws Exception {
-            AggregateFunction aggregateFunction = m.getAggregateFunction();
-            synchronized(aggregateFunction) {
-                retreiveAndAddValues(jmxConnection, aggregateFunction);
-                result = aggregateFunction.calculateAggregateValue();
-                aggregateFunction.clear();
+        private void processMeasurement() throws JmxExecutionException {
+            result = Numeric.NaN;
+            getJmxExecutorService().executeTask(this);
+
+            if ( ! result.isNaN() ) {
+                if ( measurement.getDivisor() != 1) {
+                    result = DoubleNumeric.valueOf(result.doubleValue() / measurement.getDivisor());
+                }
+
+                valueRecorder.newValue(result);
             }
         }
 
@@ -174,15 +167,16 @@ public class JmxMetric implements ServerMetric {
             return url;
         }
 
-        private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
-            for ( JmxValue n : m.getListOfJmxValue()) {
+        public void executeTask(MBeanServerConnection jmxConnection) throws Exception {
+            retreiveAndAddValues(jmxConnection, aggregateFunction);
+            result = aggregateFunction.calculateAggregateValue();
+            aggregateFunction = aggregateFunction.next(); //allow chaining
+        }
+
+         private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
+            for ( JmxValue n : measurement.getListOfJmxValue()) {
                 n.readValues(jmxConnection, aggregateFunction);
             }
         }
-
-        public Numeric getResult() {
-            return result;
-        }
     }
-
 }

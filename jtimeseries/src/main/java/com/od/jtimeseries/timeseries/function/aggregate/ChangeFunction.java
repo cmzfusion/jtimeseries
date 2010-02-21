@@ -93,7 +93,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
         return description;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new ChangeFunction(DoubleNumeric.valueOf(currentValue));
     }
 }

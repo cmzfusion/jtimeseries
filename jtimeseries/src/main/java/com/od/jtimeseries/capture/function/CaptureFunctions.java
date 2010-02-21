@@ -114,7 +114,7 @@ public class CaptureFunctions {
             super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
         }
 
-        public AggregateFunction nextInstance() {
+        public AggregateFunction next() {
             return new MeanChangeAggregateFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
         }
     }
@@ -125,7 +125,7 @@ public class CaptureFunctions {
             super(AggregateFunctions.COUNT(), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
         }
 
-        public AggregateFunction nextInstance() {
+        public AggregateFunction next() {
             return new MeanCountAggregateFunction(getTimeIntervalToExpressCount(), getTimePeriod());
         }
     }

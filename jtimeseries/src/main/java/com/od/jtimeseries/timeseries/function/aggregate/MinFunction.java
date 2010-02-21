@@ -48,7 +48,7 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new MinFunction();
     }
 }

@@ -48,7 +48,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
         return DESCRIPTION;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new MaxFunction();
     }
 }

@@ -9,7 +9,7 @@
         <property name="location" value="/jtimeseries-server.properties"/>
     </bean>
 
-    <import resource="serverMetricsContext.xml"/>
+    <import resource="serverMetrics.xml"/>
 
     <bean id="seriesDirectory" class="java.io.File">
         <constructor-arg value="${seriesDirectory}"/>

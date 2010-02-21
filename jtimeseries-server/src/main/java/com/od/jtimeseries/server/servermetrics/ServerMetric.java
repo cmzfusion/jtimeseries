@@ -15,7 +15,7 @@ public interface ServerMetric {
 
     /**
      * Called by the server to ask the metric to initialize itself
-     * Typically this will involve creating a new timeseries
+     * Typically this will involve creating one or more new timeseries
      */
     public void initializeMetrics(TimeSeriesContext rootContext) ;
 

@@ -57,7 +57,7 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
         return oldTotalTime < newTotalTime;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new JmxPercentageOfTimeFunction(oldTotalTime);
     }
 }

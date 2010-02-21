@@ -52,5 +52,11 @@ public abstract class AbstractDelegatingAggregateFunction implements AggregateFu
         return wrappedFunction;
     }
 
-    public abstract AggregateFunction nextInstance();
+    public AggregateFunction newInstance() {
+        AggregateFunction a = next();
+        a.clear();
+        return a;
+    }
+
+    public abstract AggregateFunction next();
 }

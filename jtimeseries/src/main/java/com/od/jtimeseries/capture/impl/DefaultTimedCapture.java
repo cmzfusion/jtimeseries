@@ -162,7 +162,11 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
 
         public void clear() {}
 
-        public AggregateFunction nextInstance() {
+        public AggregateFunction newInstance() {
+            return new DummyFunction();
+        }
+
+        public AggregateFunction next() {
             return new DummyFunction();
         }
     }

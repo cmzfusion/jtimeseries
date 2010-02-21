@@ -42,7 +42,7 @@ public class DefaultCaptureFunction extends AbstractCaptureFunction {
     }
 
     public AggregateFunction nextFunctionInstance() {
-        prototype = prototype.nextInstance();
+        prototype = prototype.next();
         return prototype;
     }
 }

@@ -48,7 +48,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new SumFunction();
     }
 }

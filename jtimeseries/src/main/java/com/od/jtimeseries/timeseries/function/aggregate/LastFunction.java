@@ -31,7 +31,7 @@ public class LastFunction extends AbstractDoubleBasedAggregateFunction {
         last = Double.NaN;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new LastFunction();
     }
 }

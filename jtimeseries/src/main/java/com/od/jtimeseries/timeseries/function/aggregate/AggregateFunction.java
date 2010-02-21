@@ -42,11 +42,17 @@ public interface AggregateFunction {
 
     /**
      * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance can be used
-     * as a prototype. Functions are sometimes used in sequence with the previous function providing an initial
-     * value to the next (in the case of Delta function, for example)
+     * as a prototype. The function returned should be in its default initial state (equivalent to calling clear())
+     */
+    AggregateFunction newInstance();
+
+    /**
+     * This is similar to newInstance() in that a new function is created, but in this case the new instance may be initialized
+     * with values from the current function. Functions are sometimes used in sequence with the previous function providing an initial
+     * value to the next (in the case of Delta function, for example, where we need to keep track of the current value).
      *
      * @return a new instance of the AggregateFunction
      */
-    AggregateFunction nextInstance();
+    AggregateFunction next();
 
 }

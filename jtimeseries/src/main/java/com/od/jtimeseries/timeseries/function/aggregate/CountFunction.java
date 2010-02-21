@@ -33,7 +33,7 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
         count = 0;
     }
 
-    public AggregateFunction nextInstance() {
+    public AggregateFunction next() {
         return new CountFunction();
     }
 }

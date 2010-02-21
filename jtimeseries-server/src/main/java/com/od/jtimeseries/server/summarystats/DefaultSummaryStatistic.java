@@ -24,22 +24,25 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
 
     public Numeric calculateSummaryStatistic(TimeSeries timeSeries) {
         AggregateFunction f = function.newInstance();  //not supporting chaining functions
+        long startTime = getStartTime();
+        long endTime = getEndTime();
         synchronized (timeSeries) {
             for (TimeSeriesItem i : timeSeries) {
                 long timestamp = i.getTimestamp();
-                if ( timestamp >= getStartTime() && timestamp <= getEndTime())
-                f.addValue(i.getValue());
+                if ( timestamp >= startTime && timestamp <= endTime) {
+                    f.addValue(i.getValue());
+                }
             }
         }
         return f.calculateAggregateValue();
     }
 
-    protected long getEndTime() {
-        return Long.MAX_VALUE;
-    }
-
     protected long getStartTime() {
         return Long.MIN_VALUE;
+    }
+
+    protected long getEndTime() {
+        return Long.MAX_VALUE;
     }
 
     public String getStatisticName() {

@@ -18,6 +18,10 @@
  */
 package com.od.jtimeseries.context;
 
+import sun.net.ftp.FtpClient;
+
+import java.util.Properties;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -27,6 +31,8 @@ package com.od.jtimeseries.context;
  * Standard proprties which can be set on a TimeSeriesContext
  */
 public class ContextProperties {
+
+    private static final String SUMMARY_STATS_PREFIX = "ss";
 
     /**
      * This property determines whether captures added to a context are started immediately.
@@ -41,7 +47,21 @@ public class ContextProperties {
 
 
     public static String getSummaryStatsPropertyName(String statisticName, SummaryStatsDataType d) {
-        return "ss" + ":" + statisticName + ":" + d;
+        return SUMMARY_STATS_PREFIX + ":" + statisticName + ":" + d;
+    }
+
+    public static String getSummaryStatsAsString(Properties properties) {
+        StringBuilder sb = new StringBuilder();
+        for ( String property : properties.stringPropertyNames()) {
+            if ( isSummaryStatsProperty(property) ){
+                sb.append(property).append("=").append(properties.get(property)).append(";");
+            }
+        }
+        return sb.toString();
+    }
+
+    private static boolean isSummaryStatsProperty(String property) {
+        return property.startsWith(SUMMARY_STATS_PREFIX);
     }
 
     public static enum SummaryStatsDataType {

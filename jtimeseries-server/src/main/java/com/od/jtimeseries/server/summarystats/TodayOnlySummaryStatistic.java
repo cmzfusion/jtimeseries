@@ -19,15 +19,14 @@ public class TodayOnlySummaryStatistic extends DefaultSummaryStatistic {
         super(name, function);
     }
 
-    protected long getEndTime() {
-        Calendar c = getStartOfToday();
-        return c.getTimeInMillis() + MILLIS_IN_DAY;
-    }
-
-
     protected long getStartTime() {
         Calendar c = getStartOfToday();
-        return c.getTimeInMillis();
+        return c.getTime().getTime();
+    }
+    
+    protected long getEndTime() {
+        Calendar c = getStartOfToday();
+        return c.getTime().getTime() + MILLIS_IN_DAY;
     }
 
     private Calendar getStartOfToday() {

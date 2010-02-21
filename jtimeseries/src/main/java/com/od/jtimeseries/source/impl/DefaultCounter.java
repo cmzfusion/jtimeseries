@@ -23,6 +23,7 @@ import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -138,6 +139,10 @@ public class DefaultCounter implements Counter {
 
     public String getProperty(String propertyName) {
         return simpleSource.getProperty(propertyName);
+    }
+
+    public Properties getProperties() {
+        return simpleSource.getProperties();
     }
 
     public String toString() {

@@ -35,7 +35,7 @@ public class IdentifiableBase implements Identifiable {
     /**
      * A lock for the context tree structure which should be held while changing or traversing the tree structure, to ensure integrity
      */
-    private static final Object TREE_LOCK = new Object();
+    private final Object TREE_LOCK = new Object();
 
     protected static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
     protected static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
@@ -112,19 +112,33 @@ public class IdentifiableBase implements Identifiable {
     }
 
     public String getProperty(String propertyName) {
-        return properties.getProperty(propertyName);
+        synchronized (getTreeLock()) {
+            return properties.getProperty(propertyName);
+        }
+    }
+
+    public Properties getProperties() {
+        synchronized (getTreeLock()) {
+            Properties p = new Properties();
+            p.putAll(properties);
+            return p;
+        }
     }
 
     public String findProperty(String propertyName) {
-        String property = getProperty(propertyName);
-        if ( property == null && ! isRoot() ) {
-            property = getParent().findProperty(propertyName);
+        synchronized (getTreeLock()) {
+            String property = getProperty(propertyName);
+            if ( property == null && ! isRoot() ) {
+                property = getParent().findProperty(propertyName);
+            }
+            return property;
         }
-        return property;
     }
 
     public String setProperty(String propertyName, String value) {
-        return (String)properties.setProperty(propertyName,  value);
+        synchronized (getTreeLock()) {
+            return (String)properties.setProperty(propertyName,  value);
+        }
     }
 
     public List<Identifiable> getChildren() {

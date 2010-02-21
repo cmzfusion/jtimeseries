@@ -24,6 +24,7 @@ import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  *
@@ -142,5 +143,9 @@ public class DefaultQueueTimer implements QueueTimer {
 
     public String setProperty(String propertyName, String value) {
         return timingSource.setProperty(propertyName, value);
+    }
+
+    public Properties getProperties() {
+        return timingSource.getProperties();
     }
 }

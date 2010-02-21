@@ -11,6 +11,8 @@ import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 import java.util.List;
+import java.text.NumberFormat;
+import java.text.DecimalFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +40,7 @@ public class SummaryStatisticsCalculator {
             logMethods.logInfo("Starting summary statistics calculation every " + refreshPeriod);
             Thread t = new Thread(new SummaryStatisticsRecalculator());
             t.setDaemon(true);
+            t.setName("SummaryStats");
             t.start();
         }
     }
@@ -49,6 +52,8 @@ public class SummaryStatisticsCalculator {
      * the stats for all the series over the period specified
      */
     private class SummaryStatisticsRecalculator implements Runnable {
+
+        private final DecimalFormat doubleFormat = new DecimalFormat("#.####");
 
         public void run() {
             try {
@@ -100,7 +105,7 @@ public class SummaryStatisticsCalculator {
 
                     //all stats will be doubles currently
                     String propertyName = ContextProperties.getSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
-                    s.setProperty(propertyName, String.valueOf(n.doubleValue()));
+                    s.setProperty(propertyName, doubleFormat.format(n.doubleValue()));
                 } catch (Throwable t) {
                     logMethods.logError("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);
                 }

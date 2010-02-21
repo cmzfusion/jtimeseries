@@ -19,6 +19,7 @@
 package com.od.jtimeseries.util.identifiable;
 
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,6 +78,11 @@ public interface Identifiable {
      * @return value associated with propertyName for this identifiable, or null if property not set
      */
     String getProperty(String propertyName);
+
+    /**
+     * @return a copy of the properties associated with this identifiable
+     */
+    Properties getProperties();
     
      /**
      * This mechanism allows an Identifiable to 'inherit' a property from a parent

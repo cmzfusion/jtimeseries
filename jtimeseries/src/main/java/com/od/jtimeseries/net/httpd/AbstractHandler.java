@@ -19,6 +19,7 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
@@ -119,6 +120,7 @@ public abstract class AbstractHandler implements HttpHandler {
         builder.append(" ").append(AttributeName.description).append("=\"").append(encodeXml(s.getDescription())).append("\"");
         builder.append(" ").append(AttributeName.seriesUrl).append("=\"").append(parentContextUrl).append(encodeUrl(s.getId())).append(SeriesHandler.SERIES_POSTFIX).append("\"");
         builder.append(" ").append(AttributeName.chartImage).append("=\"").append(encodeUrl(s.getId())).append(ChartPngHandler.CHART_PNG_POSTFIX).append("\"");
+        builder.append(" ").append(AttributeName.summaryStats).append("=\"").append(encodeXml(ContextProperties.getSummaryStatsAsString(s.getProperties()))).append("\"");
         builder.append("/>");
     }
 }

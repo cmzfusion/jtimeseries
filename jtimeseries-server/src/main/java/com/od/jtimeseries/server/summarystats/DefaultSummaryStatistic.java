@@ -12,16 +12,14 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
  * Time: 10:37:18
  * To change this template use File | Settings | File Templates.
  */
-public class AggregateFunctionSummaryStatistic implements SummaryStatistic {
+public class DefaultSummaryStatistic implements SummaryStatistic {
 
+    private String name;
     private final AggregateFunction function;
-    private long startTime;
-    private long endTime;
 
-    public AggregateFunctionSummaryStatistic(AggregateFunction function, long startTime, long endTime) {
+    public DefaultSummaryStatistic(String name, AggregateFunction function) {
+        this.name = name;
         this.function = function;
-        this.startTime = startTime;
-        this.endTime = endTime;
     }
 
     public Numeric calculateSummaryStatistic(TimeSeries timeSeries) {
@@ -29,10 +27,22 @@ public class AggregateFunctionSummaryStatistic implements SummaryStatistic {
         synchronized (timeSeries) {
             for (TimeSeriesItem i : timeSeries) {
                 long timestamp = i.getTimestamp();
-                if ( timestamp >= startTime && timestamp <= endTime)
+                if ( timestamp >= getStartTime() && timestamp <= getEndTime())
                 f.addValue(i.getValue());
             }
         }
         return f.calculateAggregateValue();
+    }
+
+    protected long getEndTime() {
+        return Long.MAX_VALUE;
+    }
+
+    protected long getStartTime() {
+        return Long.MIN_VALUE;
+    }
+
+    public String getStatisticName() {
+        return name;
     }
 }

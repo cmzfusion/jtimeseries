@@ -14,4 +14,6 @@ public interface SummaryStatistic {
 
     public Numeric calculateSummaryStatistic(TimeSeries timeSeries);
 
+    public String getStatisticName();
+
 }

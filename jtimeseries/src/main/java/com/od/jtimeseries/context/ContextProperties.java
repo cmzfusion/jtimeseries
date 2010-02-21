@@ -33,4 +33,35 @@ public class ContextProperties {
      * If not set locally, a context will inherit this property from it's ancestors in the context tree
      */
     public static final String START_CAPTURES_IMMEDIATELY_PROPERTY = "START_CAPTURES_IMMEDIATELY";
+
+    /**
+     * Time summary stats were last updated
+     */
+    public static final String SUMMARY_STATS_LAST_UPDATE_PROPERTY = getSummaryStatsPropertyName("lastSummaryStatsUpdate", SummaryStatsDataType.TIMESTAMP);
+
+
+    public static String getSummaryStatsPropertyName(String statisticName, SummaryStatsDataType d) {
+        return "ss" + ":" + statisticName + ":" + d;
+    }
+
+    public static enum SummaryStatsDataType {
+
+        TIMESTAMP("ts"),
+        LONG("l"),
+        DOUBLE("d");
+
+        String propertySuffix;
+
+        private SummaryStatsDataType(String propertySuffix) {
+            this.propertySuffix = propertySuffix;
+        }
+
+        public String getPropertySuffix() {
+            return propertySuffix;
+        }
+
+        public String toString() {
+            return propertySuffix;
+        }
+    }
 }

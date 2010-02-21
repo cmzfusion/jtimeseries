@@ -62,6 +62,11 @@ public class TableEventDispatcher {
         fireTableModelListeners(new TableModelEvent(owner, firstRow, lastRow, TableModelEvent.ALL_COLUMNS, TableModelEvent.DELETE));
     }
 
+    public void fireTableCellsUpdated(int firstRow, int lastRow, int column) {
+        fireTableModelListeners(new TableModelEvent(owner, firstRow, lastRow, column, TableModelEvent.UPDATE));
+    }
+
+
     public void fireTableDataChanged() {
         fireTableModelListeners(new TableModelEvent(owner));
     }
@@ -78,4 +83,5 @@ public class TableEventDispatcher {
             }
         }
     }
+
 }

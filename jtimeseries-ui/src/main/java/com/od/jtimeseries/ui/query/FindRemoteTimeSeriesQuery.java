@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.query;
 
 import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.context.ContextProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
@@ -28,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,7 +65,9 @@ public class FindRemoteTimeSeriesQuery extends AbstractRemoteQuery {
                 String id = attributes.getValue(AttributeName.id.name());
                 String description = attributes.getValue(AttributeName.description.name());
                 String parentPath = attributes.getValue(AttributeName.parentPath.name());
-                result.add(new RemoteTimeSeries(parentPath, id, description, seriesUrl));
+                String summaryStats = attributes.getValue(AttributeName.summaryStats.name());
+                RemoteTimeSeries series = new RemoteTimeSeries(parentPath, id, description, seriesUrl, summaryStats);
+                result.add(series);
             }
         };
     }
@@ -87,12 +91,14 @@ public class FindRemoteTimeSeriesQuery extends AbstractRemoteQuery {
         private String id;
         private String description;
         private URL seriesURL;
+        private Properties summaryStats;
 
-        public RemoteTimeSeries(String parentPath, String id, String description, URL seriesURL) {
+        public RemoteTimeSeries(String parentPath, String id, String description, URL seriesURL, String summaryStats) {
             this.parentPath = parentPath;
             this.id = id;
             this.description = description;
             this.seriesURL = seriesURL;
+            this.summaryStats = ContextProperties.getSummaryStatsProperties(summaryStats);
         }
 
         public String getId() {
@@ -109,6 +115,10 @@ public class FindRemoteTimeSeriesQuery extends AbstractRemoteQuery {
 
         public String getParentPath() {
             return parentPath;
+        }
+
+        public Properties getSummaryStatsProperties() {
+            return summaryStats;
         }
     }
 }

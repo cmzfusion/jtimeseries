@@ -106,9 +106,9 @@ public class DownloadRemoteSeriesDialog extends JFrame {
                         Time.seconds(remoteSeries.getRefreshTimeSeconds()),
                         remoteSeries.getMaxDaysHistory()
                 );
+                newLocalSeries.putAllProperties(remoteSeries.getProperties());
                 newLocalSeries.setDisplayName(remoteSeries.getDisplayName());
                 c.addChild(newLocalSeries);
-
             }
         }
     }

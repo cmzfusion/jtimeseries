@@ -32,7 +32,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -51,7 +51,8 @@ public class TableSelector extends SelectorPanel {
     private TimeSeriesContext rootContext;
     private java.util.List<Action> seriesActions;
     private String selectionText;
-    private RemoteSeriesTableModel tableModel;
+    private BeanTableModel<RemoteChartingTimeSeries> beanTableModel;
+    private TableModel tableModel;
     private SortableTable sortableTable;
     private JPopupMenu tablePopupMenu;
 
@@ -130,7 +131,7 @@ public class TableSelector extends SelectorPanel {
         sortableTable = new SortableTable(tableModel) {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                if (! ((RemoteChartingTimeSeries) tableModel.getObject(row)).isConnected()) {
+                if (! ((RemoteChartingTimeSeries) beanTableModel.getObject(row)).isConnected()) {
                     c.setBackground(STALE_SERIES_COLOR);
                 } else {
                     if (isCellSelected(row, column)) {
@@ -166,10 +167,9 @@ public class TableSelector extends SelectorPanel {
     }
 
     private void createTableModels() {
-        BeanTableModel<RemoteChartingTimeSeries> model = null;
         String[] colConfigString = generateColumnConfigStringForBeanTableModel();
         try {
-            model = new BeanTableModel<RemoteChartingTimeSeries>(
+            beanTableModel = new BeanTableModel<RemoteChartingTimeSeries>(
                 new ArrayList(),
                 RemoteChartingTimeSeries.class,
                 colConfigString
@@ -178,7 +178,8 @@ public class TableSelector extends SelectorPanel {
             e.printStackTrace();
         }
         int[] editableCols = new int[] {0, 1, 3, 4};
-        tableModel = new RemoteSeriesTableModel(model, editableCols);
+        PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(beanTableModel);
+        tableModel = new EditableColumnsTableModel(pathTokenizingTableModel, editableCols);
     }
 
     //jide BeanTableModel requires the propertyNames and column display names as a String[]
@@ -199,7 +200,7 @@ public class TableSelector extends SelectorPanel {
             new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     if ( sortableTable.getSelectedRow() > -1 ) {
-                        RemoteChartingTimeSeries series = (RemoteChartingTimeSeries)tableModel.getObject(sortableTable.getSelectedRow());
+                        RemoteChartingTimeSeries series = beanTableModel.getObject(sortableTable.getSelectedRow());
                         getSeriesActionModel().setSelected(series);
                         fireSelectedForDescription(series);
                     }
@@ -209,7 +210,7 @@ public class TableSelector extends SelectorPanel {
     }
 
     public void refreshSeries() {
-        tableModel.clearTable();
+        beanTableModel.clear();
         List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
         List<RemoteChartingTimeSeries> timeSeries = new ArrayList<RemoteChartingTimeSeries>();
         for ( IdentifiableTimeSeries i : l) {
@@ -217,11 +218,13 @@ public class TableSelector extends SelectorPanel {
                 timeSeries.add((RemoteChartingTimeSeries)i);
             }
         }
-        tableModel.addRowData(timeSeries.toArray(new RemoteChartingTimeSeries[timeSeries.size()]));
+        beanTableModel.addObjects(timeSeries);
     }
 
     public void removeSeries(java.util.List<RemoteChartingTimeSeries> series) {
-        tableModel.removeRowData(series.toArray(new RemoteChartingTimeSeries[series.size()]));
+        for (RemoteChartingTimeSeries s : series ) {
+            beanTableModel.removeObject(s);
+        }
     }
 
     private static class ColumnInfo {

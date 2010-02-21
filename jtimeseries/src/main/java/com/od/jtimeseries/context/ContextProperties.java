@@ -21,6 +21,7 @@ package com.od.jtimeseries.context;
 import sun.net.ftp.FtpClient;
 
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +34,7 @@ import java.util.Properties;
 public class ContextProperties {
 
     private static final String SUMMARY_STATS_PREFIX = "ss";
+    private static final String SUMMARY_STATS_SEPARATOR_TOKEN = ";";
 
     /**
      * This property determines whether captures added to a context are started immediately.
@@ -50,14 +52,27 @@ public class ContextProperties {
         return SUMMARY_STATS_PREFIX + ":" + statisticName + ":" + d;
     }
 
-    public static String getSummaryStatsAsString(Properties properties) {
+    public static String getSummaryStatsPropertyString(Properties properties) {
         StringBuilder sb = new StringBuilder();
         for ( String property : properties.stringPropertyNames()) {
             if ( isSummaryStatsProperty(property) ){
-                sb.append(property).append("=").append(properties.get(property)).append(";");
+                sb.append(property).append("=").append(properties.get(property)).append(SUMMARY_STATS_SEPARATOR_TOKEN);
             }
         }
         return sb.toString();
+    }
+
+    public static Properties getSummaryStatsProperties(String summaryStatsPropertyString) {
+        Properties p = new Properties();
+        StringTokenizer st = new StringTokenizer(summaryStatsPropertyString, SUMMARY_STATS_SEPARATOR_TOKEN);
+        String property;
+        String[] nameAndValue;
+        while(st.hasMoreTokens()) {
+            property = st.nextToken();
+            nameAndValue = property.split("=");
+            p.setProperty(nameAndValue[0], nameAndValue[1]);
+        }
+        return p;
     }
 
     private static boolean isSummaryStatsProperty(String property) {

@@ -20,9 +20,10 @@ package com.od.jtimeseries.ui.query;
 
 import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.net.httpd.ElementName;
-import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.context.ContextProperties;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
@@ -30,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,9 +43,9 @@ import java.util.List;
 public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
     private List<TimeSeriesItem> itemsToAdd = new ArrayList<TimeSeriesItem>();
-    private TimeSeries destinationSeries;
+    private IdentifiableTimeSeries destinationSeries;
 
-    public DownloadRemoteTimeSeriesDataQuery(TimeSeries destinationSeries, URL url) {
+    public DownloadRemoteTimeSeriesDataQuery(IdentifiableTimeSeries destinationSeries, URL url) {
         super(url);
         this.destinationSeries = destinationSeries;
     }
@@ -51,6 +53,10 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
     public ContentHandler getContentHandler() {
         return new DefaultHandler(){
             public void startElement (String uri, String localName, String qName, Attributes attributes) {
+                if ( localName.equals(ElementName.series.name())) {
+                    refreshSummaryStatsProperties(attributes);
+                }
+
                 if ( localName.equals(ElementName.seriesItem.name())) {
                     parseTimeSeriesItem(attributes);
                 }
@@ -61,6 +67,13 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
                 itemsToAdd.clear();
             }
         };
+    }
+
+
+    private void refreshSummaryStatsProperties(Attributes attributes) {
+        String stats = attributes.getValue(AttributeName.summaryStats.name());
+        Properties p = ContextProperties.getSummaryStatsProperties(stats);
+        destinationSeries.putAllProperties(p);
     }
 
 

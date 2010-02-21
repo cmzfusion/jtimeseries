@@ -125,6 +125,12 @@ public class IdentifiableBase implements Identifiable {
         }
     }
 
+    public void putAllProperties(Properties p) {
+        synchronized (getTreeLock()) {
+            properties.putAll(p);
+        }
+    }
+
     public String findProperty(String propertyName) {
         synchronized (getTreeLock()) {
             String property = getProperty(propertyName);

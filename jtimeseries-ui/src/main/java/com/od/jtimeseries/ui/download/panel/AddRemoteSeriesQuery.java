@@ -61,6 +61,7 @@ public class AddRemoteSeriesQuery {
                 Time.minutes(5),
                 1
         );
+        series.putAllProperties(timeSeriesResult.getSummaryStatsProperties());
         series.setNeverLoadRemoteSeriesData(true);
         c.addChild(series);
 

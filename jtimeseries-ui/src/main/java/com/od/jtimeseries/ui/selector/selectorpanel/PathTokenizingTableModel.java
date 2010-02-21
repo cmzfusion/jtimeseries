@@ -40,16 +40,14 @@ import java.util.Arrays;
  * A simple model to show the elements of the context path as additional columns
  * More work will be needed to handle events optimally
  */
-public class RemoteSeriesTableModel extends AbstractTableModel implements ContextSensitiveTableModel {
+public class PathTokenizingTableModel extends AbstractTableModel {
 
     private TableEventDispatcher eventDispatcher = new TableEventDispatcher(this);
     private BeanTableModel<RemoteChartingTimeSeries> wrappedModel;
-    private int[] editableColumnIndexes;
     private int maxPathElements;
 
-    public RemoteSeriesTableModel(BeanTableModel<RemoteChartingTimeSeries> wrappedModel, int[] editableColumnIndexes) {
+    public PathTokenizingTableModel(BeanTableModel<RemoteChartingTimeSeries> wrappedModel) {
         this.wrappedModel = wrappedModel;
-        this.editableColumnIndexes = editableColumnIndexes;
         SeriesModelEventParserListener eventListener = new SeriesModelEventParserListener();
         TableModelEventParser eventParser = new TableModelEventParser(eventListener);
         wrappedModel.addTableModelListener(eventParser);
@@ -57,8 +55,12 @@ public class RemoteSeriesTableModel extends AbstractTableModel implements Contex
     }
 
     private void recalculate(boolean fireUpdate) {
+        recalculate(fireUpdate, 0, wrappedModel.getRowCount() - 1);
+    }
+
+    private void recalculate(boolean fireUpdate, int firstRow, int lastRow) {
         int oldMax = maxPathElements;
-        for ( int row = 0; row < wrappedModel.getRowCount(); row++) {
+        for ( int row = firstRow; row <= lastRow; row++) {
             RemoteChartingTimeSeries s = wrappedModel.getObject(row);
             maxPathElements = Math.max(maxPathElements, s.getPathElements().size());
         }
@@ -103,14 +105,7 @@ public class RemoteSeriesTableModel extends AbstractTableModel implements Contex
     }
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        boolean result = false;
-        for (int col : editableColumnIndexes) {
-            if ( col == columnIndex) {
-                result = true;
-                break;
-            }
-        }
-        return result;
+        return wrappedModel.isCellEditable(rowIndex, columnIndex);
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
@@ -145,32 +140,6 @@ public class RemoteSeriesTableModel extends AbstractTableModel implements Contex
         return columnIndex < wrappedModel.getColumnCount();
     }
 
-    public void clearTable() {
-        wrappedModel.clear();
-    }
-
-    public void addRowData(RemoteChartingTimeSeries[] objects) {
-        wrappedModel.addObjects(Arrays.asList(objects));
-    }
-
-    public void removeRowData(RemoteChartingTimeSeries[] remoteChartingTimeSerieses) {
-        for (RemoteChartingTimeSeries s : remoteChartingTimeSerieses) {
-            wrappedModel.removeObject(s);    
-        }
-    }
-
-    public ConverterContext getConverterContextAt(int i, int i1) {
-        return null;
-    }
-
-    public EditorContext getEditorContextAt(int rowIndex, int columnIndex) {
-        return getColumnClass(columnIndex) == Boolean.class ? BooleanCheckBoxCellEditor.CONTEXT : null;
-    }
-
-    public Class<?> getCellClassAt(int rowIndex, int columnIndex) {
-        return getColumnClass(columnIndex);
-    }
-
     private class SeriesModelEventParserListener implements TableModelEventParser.TableModelEventParserListener {
 
         public void tableStructureChanged(TableModelEvent e) {
@@ -182,19 +151,19 @@ public class RemoteSeriesTableModel extends AbstractTableModel implements Contex
         }
 
         public void tableRowsUpdated(int firstRow, int lastRow, TableModelEvent e) {
-            recalculate(true);
-        }
-
-        public void tableCellsUpdated(int firstRow, int lastRow, int column, TableModelEvent e) {
             eventDispatcher.fireTableRowsUpdated(firstRow, lastRow);
         }
 
+        public void tableCellsUpdated(int firstRow, int lastRow, int column, TableModelEvent e) {
+            eventDispatcher.fireTableCellsUpdated(firstRow, lastRow, column);
+        }
+
         public void tableRowsDeleted(int firstRow, int lastRow, TableModelEvent e) {
-            recalculate(true);
+            eventDispatcher.fireTableRowsDeleted(firstRow, lastRow);
         }
 
         public void tableRowsInserted(int firstRow, int lastRow, TableModelEvent e) {
-            recalculate(true);
+            recalculate(true, firstRow, lastRow);
         }
     }
 }

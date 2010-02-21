@@ -148,4 +148,8 @@ public class DefaultQueueTimer implements QueueTimer {
     public Properties getProperties() {
         return timingSource.getProperties();
     }
+
+    public void putAllProperties(Properties p) {
+        timingSource.putAllProperties(p);
+    }
 }

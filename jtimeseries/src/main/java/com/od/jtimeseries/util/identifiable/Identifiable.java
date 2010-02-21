@@ -83,6 +83,12 @@ public interface Identifiable {
      * @return a copy of the properties associated with this identifiable
      */
     Properties getProperties();
+
+
+    /**
+     * Add all the properties into the identifiables properties map, replacing any with matching keys
+     */
+    void putAllProperties(Properties p);
     
      /**
      * This mechanism allows an Identifiable to 'inherit' a property from a parent

@@ -145,6 +145,10 @@ public class DefaultCounter implements Counter {
         return simpleSource.getProperties();
     }
 
+    public void putAllProperties(Properties p) {
+        simpleSource.putAllProperties(p);
+    }
+
     public String toString() {
         return simpleSource.toString();
     }

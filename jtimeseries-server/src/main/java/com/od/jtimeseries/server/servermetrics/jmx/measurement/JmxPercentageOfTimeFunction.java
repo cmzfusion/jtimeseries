@@ -26,12 +26,13 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
     private long lastTriggerTime;
 
     public JmxPercentageOfTimeFunction() {
-        this(0);
+        this(0, 0);
     }
 
-    private JmxPercentageOfTimeFunction(long oldTotalTime) {
+    private JmxPercentageOfTimeFunction(long oldTotalTime, long lastTriggerTime) {
         super(AggregateFunctions.SUM());
         this.oldTotalTime = oldTotalTime;
+        this.lastTriggerTime = lastTriggerTime;
     }
 
     public Numeric calculateAggregateValue() {
@@ -58,6 +59,6 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
     }
 
     public AggregateFunction next() {
-        return new JmxPercentageOfTimeFunction(oldTotalTime);
+        return new JmxPercentageOfTimeFunction(oldTotalTime, lastTriggerTime);
     }
 }

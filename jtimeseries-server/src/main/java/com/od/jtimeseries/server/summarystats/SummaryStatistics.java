@@ -26,4 +26,20 @@ public class SummaryStatistics {
     public static SummaryStatistic MAX_TODAY() {
         return new TodayOnlySummaryStatistic("Max Today", AggregateFunctions.MAX());
     }
+
+    public static SummaryStatistic MEDIAN() {
+        return new DefaultSummaryStatistic("Median", AggregateFunctions.MEDIAN());
+    }
+
+    public static SummaryStatistic MEDIAN_TODAY() {
+        return new TodayOnlySummaryStatistic("Median Today", AggregateFunctions.MEDIAN());            
+    }
+
+    public static SummaryStatistic PERCENTILE(int percentile) {
+        return new DefaultSummaryStatistic("Percentile " + percentile, AggregateFunctions.PERCENTILE(percentile));
+    }
+
+    public static SummaryStatistic PERCENTILE_TODAY(int percentile) {
+        return new TodayOnlySummaryStatistic("Percentile " + percentile + " Today", AggregateFunctions.PERCENTILE(percentile));
+    }
 }

@@ -15,11 +15,16 @@
         </constructor-arg>
         <constructor-arg>
             <!-- list of SummaryStatistics to calculate for each series -->
+            <!-- by default, the median, median today, 90th percentile, 90th percentile today -->
             <list>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEAN"/>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MAX"/>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEAN_TODAY"/>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MAX_TODAY"/>
+                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEDIAN"/>
+                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="PERCENTILE">
+                    <constructor-arg value="90"/>
+                </bean>
+                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEDIAN_TODAY"/>
+                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="PERCENTILE_TODAY">
+                    <constructor-arg value="90"/>
+                </bean>
             </list>
         </constructor-arg>
     </bean>

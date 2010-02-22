@@ -33,12 +33,20 @@ public class AggregateFunctions {
         return new MaxFunction();
     }
 
+    public static AggregateFunction MIN() {
+        return new MinFunction();
+    }
+
     public static AggregateFunction MEAN() {
         return new MeanFunction();
     }
 
-    public static AggregateFunction MIN() {
-        return new MinFunction();
+    public static AggregateFunction MEDIAN() {
+        return new PercentileFunction("Median", 50);
+    }
+
+    public static AggregateFunction PERCENTILE(int percentile) {
+        return new PercentileFunction(percentile);
     }
 
     public static AggregateFunction SUM() {

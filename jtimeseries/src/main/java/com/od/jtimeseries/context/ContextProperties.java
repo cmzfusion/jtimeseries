@@ -54,9 +54,9 @@ public class ContextProperties {
 
     public static String getSummaryStatsPropertyString(Properties properties) {
         StringBuilder sb = new StringBuilder();
-        for ( String property : properties.stringPropertyNames()) {
-            if ( isSummaryStatsProperty(property) ){
-                sb.append(property).append("=").append(properties.get(property)).append(SUMMARY_STATS_SEPARATOR_TOKEN);
+        for ( Object property : properties.keySet()) {
+            if ( property instanceof String && isSummaryStatsProperty((String)property) ){
+                sb.append(property).append("=").append(properties.getProperty((String)property)).append(SUMMARY_STATS_SEPARATOR_TOKEN);
             }
         }
         return sb.toString();

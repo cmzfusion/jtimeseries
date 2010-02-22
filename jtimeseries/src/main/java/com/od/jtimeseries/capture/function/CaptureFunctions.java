@@ -55,6 +55,14 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN());
     }
 
+    public static CaptureFunction MEDIAN(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEDIAN());
+    }
+
+    public static CaptureFunction PERCENTILE(TimePeriod timePeriod, int percentile) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.PERCENTILE(percentile));
+    }
+
     public static CaptureFunction SUM(TimePeriod timePeriod) {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM());
     }

@@ -3,6 +3,7 @@ package com.od.jtimeseries.server.servermetrics.jmx;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.servermetrics.ServerMetric;
 import com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurement;
+import com.od.jtimeseries.server.servermetrics.jmx.value.JmxValue;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;

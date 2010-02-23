@@ -345,7 +345,7 @@ public class RoundRobinSerializer {
 
 
     private void readHeader(FileHeader fileHeader, DataInputStream d) throws IOException {
-        skipBytes(d, fileHeader, VERSION_STRING_LENGTH);
+        readAndCheckVersion(fileHeader, d);
         fileHeader.setHeaderLength(d.readInt());
         fileHeader.setSeriesLength(d.readInt());
         fileHeader.setCurrentHead(d.readInt());
@@ -357,6 +357,14 @@ public class RoundRobinSerializer {
 
         //skip to end of header section
         skipBytes(d, fileHeader, fileHeader.getHeaderLength() - (propertiesLength + BYTES_IN_HEADER_START));
+    }
+
+    private void readAndCheckVersion(FileHeader fileHeader, DataInputStream d) throws IOException {
+        byte[] bytes = readBytes(fileHeader, d, VERSION_STRING_LENGTH);
+        String versionString = new String(bytes, "UTF-8");  //one byte per character, ASCII only
+        if ( ! versionString.equals(VERSION_STRING)) {
+            throw new IOException("Wrong timeseries file version, expecting version " + VERSION_STRING + " but was " + versionString);
+        }
     }
 
     private void skipItems(DataInputStream d, int itemsToSkip, FileHeader fileHeader) throws IOException {
@@ -379,7 +387,15 @@ public class RoundRobinSerializer {
     }
 
     private Properties readProperties(FileHeader fileHeader, DataInputStream d, int propertiesLength) throws IOException {
-        byte[] bytes = new byte[propertiesLength];
+        byte[] bytes = readBytes(fileHeader, d, propertiesLength);
+        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        Properties p = new Properties();
+        p.load(bis);
+        return p;
+    }
+
+    private byte[] readBytes(FileHeader fileHeader, DataInputStream d, int numberOfBytesToRead) throws IOException {
+        byte[] bytes = new byte[numberOfBytesToRead];
         // Read in the bytes
         int offset = 0;
         int numRead = 0;
@@ -392,11 +408,7 @@ public class RoundRobinSerializer {
         if (offset < bytes.length) {
             throw new IOException("Could not completely read file " + fileHeader);
         }
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        Properties p = new Properties();
-        p.load(bis);
-        return p;
+        return bytes;
     }
 
     private byte[] getBytesForProperties(FileHeader f) throws SerializationException {

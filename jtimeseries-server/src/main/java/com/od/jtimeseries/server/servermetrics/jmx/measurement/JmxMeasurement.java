@@ -2,7 +2,7 @@ package com.od.jtimeseries.server.servermetrics.jmx.measurement;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
-import com.od.jtimeseries.server.servermetrics.jmx.JmxValue;
+import com.od.jtimeseries.server.servermetrics.jmx.value.JmxValue;
 
 import java.util.List;
 import java.util.Arrays;

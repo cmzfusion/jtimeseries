@@ -1,10 +1,12 @@
-package com.od.jtimeseries.server.servermetrics;
+package com.od.jtimeseries.server;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.server.servermetrics.jmx.JmxExecutorService;
 import com.od.jtimeseries.server.servermetrics.jmx.JmxMetric;
+import com.od.jtimeseries.server.servermetrics.ServerMetricSource;
+import com.od.jtimeseries.server.servermetrics.ServerMetric;
 
 import java.util.List;
 

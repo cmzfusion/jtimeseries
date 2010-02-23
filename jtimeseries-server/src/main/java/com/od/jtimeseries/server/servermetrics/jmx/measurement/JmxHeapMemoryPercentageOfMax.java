@@ -4,8 +4,8 @@ import com.od.jtimeseries.timeseries.function.aggregate.AbstractDoubleBasedAggre
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.server.servermetrics.jmx.JmxValue;
-import com.od.jtimeseries.server.servermetrics.jmx.CompositeDataJmxValue;
+import com.od.jtimeseries.server.servermetrics.jmx.value.JmxValue;
+import com.od.jtimeseries.server.servermetrics.jmx.value.CompositeDataJmxValue;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

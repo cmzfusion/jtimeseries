@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.servermetrics.jmx;
+package com.od.jtimeseries.server.servermetrics.jmx.value;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 

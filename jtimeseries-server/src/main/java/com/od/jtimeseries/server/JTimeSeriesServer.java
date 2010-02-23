@@ -27,7 +27,7 @@ import com.od.jtimeseries.server.jmx.ServerConfigJmx;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.servermetrics.ServerMetricInitializer;
+import com.od.jtimeseries.server.ServerMetricInitializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogMethodsFactory;

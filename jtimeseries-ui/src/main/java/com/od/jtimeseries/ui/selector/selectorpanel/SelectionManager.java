@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.selector.selectorpanel;
 
-import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
+import com.od.jtimeseries.ui.selector.selectorpanel.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 
 import java.util.List;

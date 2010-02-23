@@ -29,25 +29,25 @@ public class TestAggregateFunctions extends TestCase {
         //the calculation logic / interpretation of percentile
 
         AggregateFunction f = AggregateFunctions.PERCENTILE(90);
-        assertEquals("Percentile 90", f.getDescription());
+        assertEquals("90 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
         assertEquals(47d, f.calculateAggregateValue().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(95);
-        assertEquals("Percentile 95", f.getDescription());
+        assertEquals("95 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
         assertEquals(48d, f.calculateAggregateValue().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(75);
-        assertEquals("Percentile 75", f.getDescription());
+        assertEquals("75 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
         assertEquals(42.5d, f.calculateAggregateValue().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(15);
-        assertEquals("Percentile 15", f.getDescription());
+        assertEquals("15 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
         assertEquals(11d, f.calculateAggregateValue().doubleValue());

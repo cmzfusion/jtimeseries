@@ -21,7 +21,7 @@ public class PercentileFunction extends AbstractDoubleBasedAggregateFunction {
     private String description;
 
     public PercentileFunction(int percentile) {
-        this("Percentile " + percentile, percentile);
+        this(percentile + " Percentile", percentile);
     }
 
     public PercentileFunction(String description, int percentile) {

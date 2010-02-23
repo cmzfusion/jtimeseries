@@ -36,10 +36,10 @@ public class SummaryStatistics {
     }
 
     public static SummaryStatistic PERCENTILE(int percentile) {
-        return new DefaultSummaryStatistic("Percentile " + percentile, AggregateFunctions.PERCENTILE(percentile));
+        return new DefaultSummaryStatistic(percentile + " Percentile", AggregateFunctions.PERCENTILE(percentile));
     }
 
     public static SummaryStatistic PERCENTILE_TODAY(int percentile) {
-        return new TodayOnlySummaryStatistic("Percentile " + percentile + " Today", AggregateFunctions.PERCENTILE(percentile));
+        return new TodayOnlySummaryStatistic(percentile + " Percentile Today", AggregateFunctions.PERCENTILE(percentile));
     }
 }

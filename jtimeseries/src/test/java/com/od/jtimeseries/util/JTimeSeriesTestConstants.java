@@ -12,5 +12,5 @@ import com.od.jtimeseries.util.time.Time;
  */
 public class JTimeSeriesTestConstants {
 
-    public static final int TIMER_INACCURACY_MS = 50;
+    public static final int TIMER_INACCURACY_MS = 100;
 }

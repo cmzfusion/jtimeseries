@@ -19,14 +19,13 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,12 +75,22 @@ public class SeriesHandler extends AbstractHandler {
         builder.append("\n<timeSeries>");
         String contextUrl = createUrlForIdentifiable(context);
         appendSeries(contextUrl, builder, timeSeries);
-
+        builder.append("\n<summaryStats>");
+        appendSummaryStats(contextUrl, builder, timeSeries);
+        builder.append("\n</summaryStats>");
         builder.append("\n<seriesItems>");
         appendTimeSeriesItems(timeSeries, builder, lastTimestamp);
         builder.append("\n</seriesItems>");
         builder.append("\n</timeSeries>");
         return builder.toString();
+    }
+
+    private void appendSummaryStats(String contextUrl, StringBuilder builder, IdentifiableTimeSeries timeSeries) {
+        Properties properties = timeSeries.getProperties();
+        List<String> propertyNames = ContextProperties.getSummaryStatsPropertyNames(properties);
+        for (String p : propertyNames) {
+            builder.append("\n  <summaryStat name=\"").append(ContextProperties.parseStatisticName(p)).append("\" value=\"").append(properties.getProperty(p)).append("\"/>");
+        }
     }
 
     private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, StringBuilder builder, long lastTimestamp) {

@@ -37,6 +37,8 @@
 			<body>
 				<xsl:apply-templates select="series"/>
 				<p/>
+                <xsl:apply-templates select="summaryStats"/>
+                <p/>
 				<xsl:apply-templates select="seriesItems"/>
 			</body>
 		</html>
@@ -46,6 +48,20 @@
 		<p/>
 		<h3><xsl:value-of select="@id"/></h3>
 		<h4><xsl:value-of select="@description"/></h4>
+	</xsl:template>
+
+    <xsl:template match="summaryStats">
+		<table class='seriesTable'>
+		<tr><th>Summary Stat</th><th>Value</th></tr>
+		<xsl:apply-templates select="summaryStat"/>
+		</table>
+	</xsl:template>
+
+    <xsl:template match="summaryStat">
+		<tr>
+		<td><xsl:value-of select="@name"/></td>
+		<td><xsl:value-of select="@value"/></td>
+		</tr>
 	</xsl:template>
 
 	<xsl:template match="seriesItems">

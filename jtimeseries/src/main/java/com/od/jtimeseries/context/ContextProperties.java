@@ -18,10 +18,7 @@
  */
 package com.od.jtimeseries.context;
 
-import sun.net.ftp.FtpClient;
-
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,14 +42,20 @@ public class ContextProperties {
     /**
      * Time summary stats were last updated
      */
-    public static final String SUMMARY_STATS_LAST_UPDATE_PROPERTY = getSummaryStatsPropertyName("lastSummaryStatsUpdate", SummaryStatsDataType.TIMESTAMP);
+    public static final String SUMMARY_STATS_LAST_UPDATE_PROPERTY = createSummaryStatsPropertyName("lastSummaryStatsUpdate", SummaryStatsDataType.TIMESTAMP);
 
 
-    public static String getSummaryStatsPropertyName(String statisticName, SummaryStatsDataType d) {
+    public static String createSummaryStatsPropertyName(String statisticName, SummaryStatsDataType d) {
         return SUMMARY_STATS_PREFIX + ":" + statisticName + ":" + d;
     }
 
-    public static String getSummaryStatsPropertyString(Properties properties) {
+    public static String parseStatisticName(String summaryStatsProperty) {
+        StringTokenizer st = new StringTokenizer(summaryStatsProperty, ":");
+        st.nextToken();
+        return st.nextToken();
+    }
+
+    public static String getSummaryStatsStringRepresentation(Properties properties) {
         StringBuilder sb = new StringBuilder();
         for ( Object property : properties.keySet()) {
             if ( property instanceof String && isSummaryStatsProperty((String)property) ){
@@ -62,9 +65,9 @@ public class ContextProperties {
         return sb.toString();
     }
 
-    public static Properties getSummaryStatsProperties(String summaryStatsPropertyString) {
+    public static Properties getSummaryStatsProperties(String summaryStatsStringRepresentation) {
         Properties p = new Properties();
-        StringTokenizer st = new StringTokenizer(summaryStatsPropertyString, SUMMARY_STATS_SEPARATOR_TOKEN);
+        StringTokenizer st = new StringTokenizer(summaryStatsStringRepresentation, SUMMARY_STATS_SEPARATOR_TOKEN);
         String property;
         String[] nameAndValue;
         while(st.hasMoreTokens()) {
@@ -72,6 +75,20 @@ public class ContextProperties {
             nameAndValue = property.split("=");
             p.setProperty(nameAndValue[0], nameAndValue[1]);
         }
+        return p;
+    }
+
+    /**
+     * @return a sorted list of summary stats properties from the Properties map
+     */
+    public static List<String> getSummaryStatsPropertyNames(Properties properties) {
+        List<String> p = new ArrayList<String>();
+        for ( Map.Entry e : properties.entrySet()) {
+            if ( isSummaryStatsProperty((String)e.getKey())) {
+                p.add((String)e.getKey());
+            }
+        }
+        Collections.sort(p);
         return p;
     }
 

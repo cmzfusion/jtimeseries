@@ -1,7 +1,6 @@
 package com.od.jtimeseries.server.summarystats;
 
 import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
@@ -11,7 +10,6 @@ import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 import java.util.List;
-import java.text.NumberFormat;
 import java.text.DecimalFormat;
 
 /**
@@ -104,7 +102,7 @@ public class SummaryStatisticsCalculator {
                     Numeric n = stat.calculateSummaryStatistic(s);
 
                     //all stats will be doubles currently
-                    String propertyName = ContextProperties.getSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
+                    String propertyName = ContextProperties.createSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
                     s.setProperty(propertyName, doubleFormat.format(n.doubleValue()));
                 } catch (Throwable t) {
                     logMethods.logError("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);

@@ -27,7 +27,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.selector.selectorpanel.TimeSeriesSelectorListener;
+import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;

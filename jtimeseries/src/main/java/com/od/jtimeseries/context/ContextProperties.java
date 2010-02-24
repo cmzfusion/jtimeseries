@@ -92,7 +92,7 @@ public class ContextProperties {
         return p;
     }
 
-    private static boolean isSummaryStatsProperty(String property) {
+    public static boolean isSummaryStatsProperty(String property) {
         return property.startsWith(SUMMARY_STATS_PREFIX);
     }
 

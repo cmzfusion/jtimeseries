@@ -16,24 +16,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector.table;
 
+import com.jidesoft.grid.AutoFilterTableHeader;
+import com.jidesoft.grid.BeanTableModel;
+import com.jidesoft.grid.SortableTable;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
-import com.od.swing.action.ListSelectionActionModel;
-import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.jidesoft.grid.*;
+import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
+import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
+import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
-import javax.swing.table.*;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
+import java.beans.IntrospectionException;
 import java.util.*;
 import java.util.List;
-import java.beans.IntrospectionException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -180,8 +186,10 @@ public class TableSelector extends SelectorPanel {
             e.printStackTrace();
         }
         int[] editableCols = new int[] {0, 1, 3, 4};
-        PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(beanTableModel);
-        tableModel = new EditableColumnsTableModel(pathTokenizingTableModel, editableCols);
+        BeanPerRowModel<RemoteChartingTimeSeries> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper<RemoteChartingTimeSeries>(beanTableModel);
+        PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(modelWrapper);
+        SummaryStatsTableModel summaryStatsTableModel = new SummaryStatsTableModel(pathTokenizingTableModel);
+        tableModel = new EditableColumnsTableModel<RemoteChartingTimeSeries>(summaryStatsTableModel, editableCols);
     }
 
     //jide BeanTableModel requires the propertyNames and column display names as a String[]

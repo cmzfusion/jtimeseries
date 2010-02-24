@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.ui.selector.selectorpanel.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 
 import java.util.List;
@@ -26,20 +25,11 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 06-Jan-2009
- * Time: 17:49:42
+ * Date: 07-Jan-2009
+ * Time: 12:47:57
  */
-public interface SelectionManager {
-    
-    List<RemoteChartingTimeSeries> getSelectedTimeSeries();
+public interface TimeSeriesSelectorListener {
 
-    void addSelectionListener(TimeSeriesSelectorListener l);
+    void selectionChanged(List<RemoteChartingTimeSeries> newSelection);
 
-    void removeSelectionListener(TimeSeriesSelectorListener l);
-
-    void addSelection(RemoteChartingTimeSeries s);
-
-    void removeSelection(RemoteChartingTimeSeries s);
-
-    void setSelectedTimeSeries(List<RemoteChartingTimeSeries> selections);
 }

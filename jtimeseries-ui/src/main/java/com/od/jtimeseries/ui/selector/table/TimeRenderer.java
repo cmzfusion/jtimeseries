@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector.table;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.*;

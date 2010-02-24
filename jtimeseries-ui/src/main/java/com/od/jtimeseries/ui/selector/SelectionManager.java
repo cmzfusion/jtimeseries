@@ -16,24 +16,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
+import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
+import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 07-Jan-2009
- * Time: 11:03:45
+ * Date: 06-Jan-2009
+ * Time: 17:49:42
  */
-public class TitleLabelPanel extends JPanel {
+public interface SelectionManager {
+    
+    List<RemoteChartingTimeSeries> getSelectedTimeSeries();
 
-    public JLabel createTitleLabel(String text) {
-        JLabel l = new JLabel(text);
-        l.setBorder(new EmptyBorder(3,3,3,3));
-        l.setForeground(Color.BLUE.darker());
-        return l;
-    }
+    void addSelectionListener(TimeSeriesSelectorListener l);
+
+    void removeSelectionListener(TimeSeriesSelectorListener l);
+
+    void addSelection(RemoteChartingTimeSeries s);
+
+    void removeSelection(RemoteChartingTimeSeries s);
+
+    void setSelectedTimeSeries(List<RemoteChartingTimeSeries> selections);
 }

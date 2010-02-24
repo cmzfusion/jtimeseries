@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.ContextSensitiveTableModel;
 import com.jidesoft.grid.EditorContext;
@@ -19,12 +19,12 @@ import javax.swing.event.TableModelEvent;
  *
  * Just manage which columns are editable, and also support the jide ContextSensitiveTableModel
  */
-public class EditableColumnsTableModel extends AbstractTableModel implements TableModel, ContextSensitiveTableModel {
+public class EditableColumnsTableModel<E> extends AbstractTableModel implements BeanPerRowModel<E>, ContextSensitiveTableModel {
 
-    private TableModel wrappedModel;
+    private BeanPerRowModel<E> wrappedModel;
     private int[] editableColumnIndexes;
 
-    public EditableColumnsTableModel(TableModel wrappedModel, int[] editableColumnIndexes) {
+    public EditableColumnsTableModel(BeanPerRowModel<E> wrappedModel, int[] editableColumnIndexes) {
         this.wrappedModel = wrappedModel;
         this.editableColumnIndexes = editableColumnIndexes;
         wrappedModel.addTableModelListener(new TableModelListener() {
@@ -35,6 +35,8 @@ public class EditableColumnsTableModel extends AbstractTableModel implements Tab
             }
         });
     }
+
+
 
     public int getRowCount() {
         return wrappedModel.getRowCount();
@@ -83,4 +85,7 @@ public class EditableColumnsTableModel extends AbstractTableModel implements Tab
         return getColumnClass(columnIndex);
     }
 
+    public E getObject(int row) {
+        return wrappedModel.getObject(row);
+    }
 }

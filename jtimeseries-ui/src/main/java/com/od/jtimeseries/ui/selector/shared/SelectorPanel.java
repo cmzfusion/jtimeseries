@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.selector.selectorpanel;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.selector.shared.TitleLabelPanel;
 import com.od.swing.action.ListSelectionActionModel;
 
 import java.util.ArrayList;

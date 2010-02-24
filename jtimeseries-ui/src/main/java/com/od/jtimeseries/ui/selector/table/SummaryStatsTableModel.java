@@ -13,8 +13,10 @@ import java.util.*;
  */
 public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChartingTimeSeries> {
 
+    private TreeMap<String,String> statsProperties = new TreeMap<String,String>();
+    private List<String> statNamesList = new ArrayList<String>();
     private List<String> propertyNamesList = new ArrayList<String>();
-    private Map<String,String> propertyNameToStatName = new HashMap<String,String>();
+
 
     public SummaryStatsTableModel(BeanPerRowModel<RemoteChartingTimeSeries> wrappedModel) {
         super(wrappedModel);
@@ -23,51 +25,60 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
 
     protected boolean requiresStructureChange(int firstRow, int lastRow) {
         boolean result = false;
-        int oldSize = propertyNamesList.size();
+        int oldSize = statsProperties.size();
 
-        Set<String> summaryProperties = getRequiredSummaryProps(firstRow, lastRow);
-        if (summaryProperties.size() != oldSize) {
-            propertyNamesList.clear();
-            propertyNamesList.addAll(summaryProperties);
+        addSummaryColumns(firstRow, lastRow);
+        if (statsProperties.size() != oldSize) {
+            recreateColumnLists();
             result = true;
         }
         return result;
     }
 
-    private Set<String> getRequiredSummaryProps(int firstRow, int lastRow) {
-        Set<String> summaryProperties = new TreeSet<String>(propertyNamesList);
+    private void recreateColumnLists() {
+        statNamesList.clear();
+        propertyNamesList.clear();
+        for ( Map.Entry<String,String> e : statsProperties.entrySet()) {
+            statNamesList.add(e.getValue());
+            propertyNamesList.add(e.getKey());
+        }
+    }
+
+    private void addSummaryColumns(int firstRow, int lastRow) {
         for ( int row = firstRow; row <= lastRow; row++) {
             RemoteChartingTimeSeries s = getObject(row);
             for ( Object prop : s.getProperties().keySet()) {
                 String propertyName = (String) prop;
-                if (! propertyNameToStatName.containsKey(propertyName) && ContextProperties.isSummaryStatsProperty(propertyName)) {
-                    addSummaryProperty(summaryProperties, propertyName);
+                if (! statsProperties.containsKey(propertyName)) {
+                    if ( ContextProperties.isSummaryStatsProperty(propertyName) &&
+                        ContextProperties.getSummaryStatsDataType(propertyName) == ContextProperties.SummaryStatsDataType.DOUBLE) {
+                        addSummaryProperty(propertyName);
+                    }
                 }
             }
         }
-        return summaryProperties;
     }
 
-    private void addSummaryProperty(Set<String> summaryProperties, String propertyName) {
+    private void addSummaryProperty(String propertyName) {
         String statisticName = ContextProperties.parseStatisticName(propertyName);
-        propertyNameToStatName.put(propertyName, statisticName);
-        summaryProperties.add(propertyName);
+        statsProperties.put(propertyName, statisticName);
+        Collections.sort(propertyNamesList);
     }
 
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
         String propertyName = propertyNamesList.get(extraColsIndex);
-        return getObject(rowIndex).getProperty(propertyName);
+        return Double.valueOf(getObject(rowIndex).getProperty(propertyName));
     }
 
     public int getDynamicColumnCount() {
-        return propertyNamesList.size();
+        return statsProperties.size();
     }
 
     protected String getDynamicColumnName(int extraColsIndex) {
-        return propertyNamesList.get(extraColsIndex);
+        return statNamesList.get(extraColsIndex);
     }
 
     protected Class<?> getDynamicColumnClass(int extraColsIndex) {
-        return String.class;
+        return Double.class;
     }
 }

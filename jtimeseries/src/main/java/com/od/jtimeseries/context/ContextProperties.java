@@ -96,8 +96,20 @@ public class ContextProperties {
         return property.startsWith(SUMMARY_STATS_PREFIX);
     }
 
+    public static SummaryStatsDataType getSummaryStatsDataType(String statsProperty) {
+        SummaryStatsDataType result = SummaryStatsDataType.UNKNOWN;
+        for ( SummaryStatsDataType s : SummaryStatsDataType.values())  {
+            if ( statsProperty.endsWith(s.getPropertySuffix())) {
+                result = s;
+                break;
+            }
+        }
+        return result;
+    }
+
     public static enum SummaryStatsDataType {
 
+        UNKNOWN("unknown"),
         TIMESTAMP("ts"),
         LONG("l"),
         DOUBLE("d");

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
-import com.od.jtimeseries.net.httpd.AttributeName;
+import com.od.jtimeseries.net.httpd.HttpParameterName;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.ui.query.DownloadRemoteTimeSeriesDataQuery;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -240,7 +240,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
                 private URL getUrlWithTimestamp() throws MalformedURLException {
                     return new URL(
-                        timeSeriesUrl + "?" + AttributeName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch()
+                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch()
                     );
                 }
 

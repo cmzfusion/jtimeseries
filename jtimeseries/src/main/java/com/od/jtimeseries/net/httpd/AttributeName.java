@@ -35,6 +35,5 @@ public enum AttributeName {
     description,
     chartImage,
     selected,
-    moreRecentThanTimestamp,
     summaryStats,
 }

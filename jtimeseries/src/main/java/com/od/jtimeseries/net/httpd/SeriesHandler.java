@@ -53,23 +53,28 @@ public class SeriesHandler extends AbstractHandler {
         String seriesId = lastToken.substring(0, lastToken.length() - SERIES_POSTFIX.length() );
         IdentifiableTimeSeries timeSeries = context.getTimeSeries(seriesId);
 
-        Object showAfter = parms.get(AttributeName.moreRecentThanTimestamp.name());
+        Object showAfter = parms.get(HttpParameterName.moreRecentThanTimestamp.name());
         long lastTimestamp = -1;
         if ( showAfter != null ) {
             lastTimestamp = Long.valueOf(showAfter.toString());
+        }
+
+        boolean statsOnly = false;
+        if ( parms.containsKey(HttpParameterName.statsOnly.name())) {
+            statsOnly = Boolean.valueOf(parms.getProperty(HttpParameterName.statsOnly.name()));
         }
 
         NanoHTTPD.Response response;
         if ( timeSeries == null) {
             response = createNotFoundResponse(uri);
         } else {
-            String xmlResponse = createTimeSeriesResponse(context, timeSeries, lastTimestamp);
+            String xmlResponse = createTimeSeriesResponse(context, timeSeries, lastTimestamp, statsOnly);
             response = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
         }
         return response;
     }
 
-    private String createTimeSeriesResponse(TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp) {
+    private String createTimeSeriesResponse(TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp, boolean statsOnly) {
         StringBuilder builder = new StringBuilder("<?xml version=\"1.0\"?>");
         builder.append("\n<?xml-stylesheet type=\"text/xsl\" href=\"/").append(SERIES_XSL_RESOURCE).append("\"?>");
         builder.append("\n<timeSeries>");
@@ -78,9 +83,13 @@ public class SeriesHandler extends AbstractHandler {
         builder.append("\n<summaryStats>");
         appendSummaryStats(contextUrl, builder, timeSeries);
         builder.append("\n</summaryStats>");
-        builder.append("\n<seriesItems>");
-        appendTimeSeriesItems(timeSeries, builder, lastTimestamp);
-        builder.append("\n</seriesItems>");
+        //statsOnly feature is actually quite important for performance, since showing summary stats only
+        //does not require a timeseries to be deserialized, which would be required for seriesItems
+        if ( ! statsOnly ) {
+            builder.append("\n<seriesItems>");
+            appendTimeSeriesItems(timeSeries, builder, lastTimestamp);
+            builder.append("\n</seriesItems>");
+        }
         builder.append("\n</timeSeries>");
         return builder.toString();
     }

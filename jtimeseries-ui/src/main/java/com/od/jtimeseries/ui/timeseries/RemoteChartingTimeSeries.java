@@ -232,15 +232,13 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         protected Task createTask() {
             return new BackgroundTask() {
                 protected void doInBackground() throws Exception {
-                    if ( isConnected()) {
-                        URL urlForQuery = getUrlWithTimestamp();
-                        new DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries.this, urlForQuery).runQuery();
-                    }
+                    URL urlForQuery = getUrlWithTimestamp();
+                    new DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries.this, urlForQuery).runQuery();
                 }
 
                 private URL getUrlWithTimestamp() throws MalformedURLException {
                     return new URL(
-                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch()
+                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch() + "&" + HttpParameterName.statsOnly + "=" + isConnected()
                     );
                 }
 

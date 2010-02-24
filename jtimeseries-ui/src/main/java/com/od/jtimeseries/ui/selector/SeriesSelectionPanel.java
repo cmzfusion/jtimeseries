@@ -189,7 +189,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
             );
 
             r.addPropertyChangeListener(
-                    RemoteChartingTimeSeries.CONNECTED_PROPERTY,
+                    RemoteChartingTimeSeries.SERIES_STALE_PROPERTY,
                     seriesConnectionPropertyListener
             );
         }
@@ -310,8 +310,8 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         public void actionPerformed(ActionEvent e) {
             List<RemoteChartingTimeSeries> series = getActionModel().getSelected();
             for ( RemoteChartingTimeSeries s : series) {
-                if ( ! s.isConnected()) {
-                    s.setConnected(true);
+                if ( s.isSeriesStale()) {
+                    s.setSeriesStale(false);
                 }
             }
             repaint();
@@ -319,7 +319,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
 
         protected boolean isModelStateActionable() {
             for ( RemoteChartingTimeSeries s : getActionModel().getSelected()) {
-                if (! s.isConnected() ) {
+                if (s.isSeriesStale() ) {
                     return true;
                 }
             }

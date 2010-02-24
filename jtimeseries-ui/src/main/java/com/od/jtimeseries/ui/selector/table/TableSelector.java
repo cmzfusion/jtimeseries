@@ -135,7 +135,7 @@ public class TableSelector extends SelectorPanel {
         sortableTable = new SortableTable(tableModel) {
             public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
-                if (! ((RemoteChartingTimeSeries) beanTableModel.getObject(row)).isConnected()) {
+                if (beanTableModel.getObject(row).isSeriesStale()) {
                     c.setBackground(STALE_SERIES_COLOR);
                 } else {
                     if (isCellSelected(row, column)) {

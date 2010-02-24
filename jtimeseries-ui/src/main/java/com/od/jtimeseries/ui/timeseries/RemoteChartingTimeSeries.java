@@ -75,10 +75,10 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private boolean neverRefresh;
     private Date lastRefreshTime;
 
-    //a series starts 'connected' and remains connected until a set number of consecutive download failures have occurred
+    //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private volatile int errorCount;
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
-    private volatile boolean connected = true;
+    private volatile boolean seriesStale = false;
 
     public RemoteChartingTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()), config.getMaxDaysHistory());
@@ -124,21 +124,21 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     public void setDisplayName(String displayName) {
         String oldValue = this.displayName;
         this.displayName = displayName;
-        propertyChangeSupport.firePropertyChange("displayName", oldValue, this.displayName);
+        propertyChangeSupport.firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
     }
 
-    public static final String CONNECTED_PROPERTY = "connected";
-    public boolean isConnected() {
-        return connected;
+    public static final String SERIES_STALE_PROPERTY = "seriesStale";
+    public boolean isSeriesStale() {
+        return seriesStale;
     }
 
-    public void setConnected(boolean connected) {
-        boolean oldValue = this.connected;
-        this.connected = connected;
-        if (connected) {
+    public void setSeriesStale(boolean seriesStale) {
+        boolean oldValue = this.seriesStale;
+        this.seriesStale = seriesStale;
+        if (! seriesStale) {
             errorCount = 0;
         }
-        propertyChangeSupport.firePropertyChange("connected", oldValue, this.connected);
+        propertyChangeSupport.firePropertyChange(SERIES_STALE_PROPERTY, oldValue, this.seriesStale);
     }
 
     public static final String SELECTED_PROPERTY = "selected";
@@ -150,7 +150,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         boolean oldValue = this.selected;
         this.selected = selected;
         scheduleRefreshTask();
-        propertyChangeSupport.firePropertyChange("selected", oldValue, this.selected);
+        propertyChangeSupport.firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
     }
 
     public int getMaxDaysHistory() {
@@ -207,9 +207,9 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
             }
         };
 
-        if ( isSelected() && ! neverRefresh) {
+        if ( ! neverRefresh) {
             refreshTask = refreshExecutor.scheduleAtFixedRate(
-                    runCommandTask, 0, (long) this.refreshTimeSeconds, TimeUnit.SECONDS
+                runCommandTask, 0, (long) this.refreshTimeSeconds, TimeUnit.SECONDS
             );
         }
     }
@@ -226,19 +226,21 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
             //if we exceed the error count when running the load, set the series to stale
             //the user will need to re-enable it to start the load off again
-            addTaskListener(new DisconnectingTaskListener());
+            addTaskListener(new SetStaleOnErrorListener());
         }
 
         protected Task createTask() {
             return new BackgroundTask() {
                 protected void doInBackground() throws Exception {
-                    URL urlForQuery = getUrlWithTimestamp();
-                    new DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries.this, urlForQuery).runQuery();
+                    if ( ! isSeriesStale() ) {
+                        URL urlForQuery = getUrlWithTimestamp();
+                        new DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries.this, urlForQuery).runQuery();
+                    }
                 }
 
                 private URL getUrlWithTimestamp() throws MalformedURLException {
                     return new URL(
-                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch() + "&" + HttpParameterName.statsOnly + "=" + isConnected()
+                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch() + "&" + HttpParameterName.statsOnly + "=" + ! isSelected()
                     );
                 }
 
@@ -261,12 +263,12 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     }
 
     //perform disconnection if task failed too many times
-    private class DisconnectingTaskListener extends TaskListenerAdapter {
+    private class SetStaleOnErrorListener extends TaskListenerAdapter {
 
         public void error(Task task, Throwable error) {
             errorCount++;
             if ( errorCount >= MAX_ERRORS_BEFORE_DISCONNECT) {
-                setConnected(false);
+                setSeriesStale(true);
             }
         }
     }

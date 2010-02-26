@@ -41,6 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,6 +60,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private static ScheduledExecutorService refreshExecutor = Executors.newSingleThreadScheduledExecutor();
     private static int startOfDayOffsetMinutes = 0;
     private static final int ONE_DAY_MILLIS = 24*60*60*1000;
+    private static ColorRotator colorRotator = new ColorRotator();
 
     private int MIN_REFRESH_TIME_SECONDS = 10;
     private URL timeSeriesUrl;
@@ -74,6 +76,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
     private boolean neverRefresh;
     private Date lastRefreshTime;
+    private Color color = colorRotator.getNextColor();
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private volatile int errorCount;
@@ -84,6 +87,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()), config.getMaxDaysHistory());
         setSelected(config.isSelected());
         this.displayName = config.getDisplayName();
+        this.color = config.getColor();
     }
 
     public RemoteChartingTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime, int maxDaysHistory) {
@@ -187,6 +191,17 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         propertyChangeSupport.firePropertyChange("lastRefreshTime", oldValue, time);
     }
 
+    public static final String COLOUR_PROPERTY = "color";
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        Color oldValue = this.color;
+        this.color = color;
+        propertyChangeSupport.firePropertyChange(COLOUR_PROPERTY, oldValue, color);
+    }
+
     /**
      * Set this timeseries so that the load data task will never run
      * this is somtimes useful when using the series as a placeholder to represent a timeseries on a remote server only
@@ -216,7 +231,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
     public RemoteChartingTimeSeriesConfig getConfig() {
         return new RemoteChartingTimeSeriesConfig(
-            getParentPath(), getId(), getDescription(), timeSeriesUrl.toExternalForm(), refreshTimeSeconds, maxDaysHistory, selected, displayName
+            getParentPath(), getId(), getDescription(), timeSeriesUrl.toExternalForm(), refreshTimeSeconds, maxDaysHistory, selected, displayName, color
         );
     }
 

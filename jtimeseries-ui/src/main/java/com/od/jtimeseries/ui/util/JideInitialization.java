@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.util;
 import com.jidesoft.grid.CellEditorManager;
 import com.jidesoft.grid.BooleanCheckBoxCellEditor;
 import com.jidesoft.grid.AbstractJideCellEditor;
+import com.jidesoft.grid.ColorCellEditor;
 
 import javax.swing.*;
 

@@ -28,12 +28,17 @@ import com.od.jtimeseries.timeseries.aggregation.AggregatedIdentifiableTimeSerie
 import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.ui.TimeSeriesVisualizer;
+import com.od.jtimeseries.ui.VisualizerConfiguration;
 import com.od.jtimeseries.ui.util.BenchmarkingRepaintManager;
 import com.od.jtimeseries.util.time.Time;
 
 import javax.swing.*;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
+import java.beans.XMLEncoder;
+import java.beans.XMLDecoder;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,15 +49,20 @@ import java.net.InetAddress;
 public class JTimeSeriesDemo {
     private static final int UDP_SERVER_PORT = 1045;
     private static final int HTTPD_PORT = 1026;
+    public static TimeSeriesVisualizer visualizer;
 
     public static void main(String[] args) throws IOException {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {}
-        demo1();
+        new JTimeSeriesDemo();
     }
 
-    private static void demo1() throws IOException {
+    public JTimeSeriesDemo() throws IOException {
+        start();
+    }
+
+    private void start() throws IOException {
         
         DemoMainFrame frame = new DemoMainFrame();
 
@@ -90,6 +100,7 @@ public class JTimeSeriesDemo {
 
         //create an http server to make our time series data available over http/in a browser
         JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(HTTPD_PORT, rootContext);
+        httpd.start();
 
         //A server dictionary which stores the list of known http servers from which we can download data in the ui
         UdpPingHttpServerDictionary serverDictionary = new UdpPingHttpServerDictionary();
@@ -114,9 +125,9 @@ public class JTimeSeriesDemo {
         //        AnnouncementMessage m = new ClientAnnouncementMessage(UDP_SERVER_PORT, "JTimeseriesDemoClient");
         //        serverPing.sendRepeatedMessage(m, Time.seconds(5));
 
-        TimeSeriesVisualizer visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
-        frame.getContentPane().add(visualizer);
+        createVisualizer(serverDictionary);
 
+        frame.getContentPane().add(visualizer);
         frame.setSize(1200,900);
         frame.setVisible(true);
 
@@ -136,11 +147,54 @@ public class JTimeSeriesDemo {
         }).start();
     }
 
-    public static class DemoMainFrame extends JFrame {
+    private void createVisualizer(UdpPingHttpServerDictionary serverDictionary) throws FileNotFoundException {
+        visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
+        loadVisualizerConfig();
+    }
+
+    private void loadVisualizerConfig() throws FileNotFoundException {
+        VisualizerConfiguration v = null;
+        File configFile = getTimeSeriesDemoConfigFile();
+        if ( configFile.exists() ) {
+            XMLDecoder d = new XMLDecoder(new FileInputStream(configFile));
+            v = (VisualizerConfiguration)d.readObject();
+        }
+        if ( v != null ) {
+            visualizer.setConfiguration(v);
+        }
+    }
+
+
+    private void saveVisualizerConfig() {
+        VisualizerConfiguration v = visualizer.getConfiguration();
+        File f = getTimeSeriesDemoConfigFile();
+        XMLEncoder encoder = null;
+        try {
+            encoder = new XMLEncoder(new FileOutputStream(f));
+            encoder.writeObject(v);
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        } finally {
+            if ( encoder != null ) {
+                encoder.close();
+            }
+        }
+    }
+
+    private File getTimeSeriesDemoConfigFile() {
+        return new File(System.getProperty("user.home"), "timeSeriesDemoConfig.xml");
+    }
+
+    public class DemoMainFrame extends JFrame {
 
         public DemoMainFrame() {
             super("JTimeseries Demo");
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    saveVisualizerConfig();
+                }
+            });
         }
 
     }

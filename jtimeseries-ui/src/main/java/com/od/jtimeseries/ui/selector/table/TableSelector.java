@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.AutoFilterTableHeader;
 import com.jidesoft.grid.BeanTableModel;
 import com.jidesoft.grid.SortableTable;
+import com.jidesoft.grid.ColorCellRenderer;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
@@ -100,6 +101,7 @@ public class TableSelector extends SelectorPanel {
         columns.add(new ColumnInfo("path", "Path", 100));
         columns.add(new ColumnInfo("URL", "URL", 100));
         columns.add(new ColumnInfo("lastRefreshTime", "Last Refresh", 50));
+        columns.add(new ColumnInfo("color", "Colour", 50));
         populateColumnWidthsMap();
     }
 
@@ -157,6 +159,7 @@ public class TableSelector extends SelectorPanel {
 
             private void setColumnRenderers() {
                 getColumnModel().getColumn(7).setCellRenderer(new TimeRenderer());
+                getColumnModel().getColumn(8).setCellRenderer(new ColorCellRenderer() {{setColorValueVisible(false);}});
             }
         };
 
@@ -166,6 +169,7 @@ public class TableSelector extends SelectorPanel {
         sortableTable.setSelectInsertedRows(false);
         sortableTable.setAutoSelectTextWhenStartsEditing(true);
         sortableTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        sortableTable.setRowResizable(false);
         AutoFilterTableHeader header = new AutoFilterTableHeader(sortableTable);
         header.setAutoFilterEnabled(true);
         header.setShowFilterName(true);
@@ -185,7 +189,7 @@ public class TableSelector extends SelectorPanel {
         } catch (IntrospectionException e) {
             e.printStackTrace();
         }
-        int[] editableCols = new int[] {0, 1, 3, 4};
+        int[] editableCols = new int[] {0, 1, 3, 4, 8};
         BeanPerRowModel<RemoteChartingTimeSeries> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper<RemoteChartingTimeSeries>(beanTableModel);
         PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(modelWrapper);
         SummaryStatsTableModel summaryStatsTableModel = new SummaryStatsTableModel(pathTokenizingTableModel);

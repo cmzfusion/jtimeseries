@@ -44,6 +44,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -53,21 +54,13 @@ import java.util.List;
  */
 public class TimeSeriesChart extends JPanel {
 
+    private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
+            RemoteChartingTimeSeries.DISPLAY_NAME_PROPERTY,
+            RemoteChartingTimeSeries.COLOUR_PROPERTY
+    };
+
     private String title;
     private List<RemoteChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
-    private Color[] seriesColors = new Color[] {
-            Color.BLUE.darker(),
-            Color.GREEN.darker(),
-            Color.RED.darker(),
-            Color.BLACK,
-            Color.GRAY,
-            Color.CYAN.darker(),
-            Color.DARK_GRAY,
-            Color.MAGENTA,
-            Color.ORANGE,
-            Color.YELLOW.darker(),
-            Color.PINK
-    };
     private ChartPanel chartPanel;
     private JPanel noChartsPanel = new JPanel();
     private boolean multipleRange = true;
@@ -97,6 +90,9 @@ public class TimeSeriesChart extends JPanel {
 
     public void setSeries(List<RemoteChartingTimeSeries> newSelection) {
         removePropertyListener(this.timeSeriesList);
+
+        //our own copy guaranteed to be RandomAccess list
+        newSelection = new ArrayList<RemoteChartingTimeSeries>(newSelection);
         addPropertyListener(newSelection);
         this.timeSeriesList = newSelection;
         if ( timeSeriesList.size() == 0) {
@@ -116,16 +112,17 @@ public class TimeSeriesChart extends JPanel {
 
     private void addPropertyListener(List<RemoteChartingTimeSeries> newSelection) {
         for ( RemoteChartingTimeSeries s : newSelection) {
-            s.addPropertyChangeListener(
-                    RemoteChartingTimeSeries.DISPLAY_NAME_PROPERTY,
-                    refreshChartPropertyListener
-            );
+            for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
+                s.addPropertyChangeListener(property, refreshChartPropertyListener);
+            }
         }
     }
 
     private void removePropertyListener(List<RemoteChartingTimeSeries> timeSeriesList) {
         for ( RemoteChartingTimeSeries s : timeSeriesList) {
-            s.removePropertyChangeListener(refreshChartPropertyListener);
+            for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
+                s.removePropertyChangeListener(property, refreshChartPropertyListener);
+            }
         }
     }
 
@@ -160,7 +157,7 @@ public class TimeSeriesChart extends JPanel {
 
     private void setColors(XYPlot plot) {
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
-            setSeriesColor(plot, loop);
+            setSeriesColor(plot, loop, timeSeriesList.get(loop));
         }
     }
 
@@ -184,21 +181,17 @@ public class TimeSeriesChart extends JPanel {
         } else {
             plot.setRangeAxis(0, new NumberAxis("values"));
         }
-        setSeriesColor(plot, seriesId);
+        setSeriesColor(plot, seriesId, contextTimeSeries);
     }
 
-    private void setSeriesColor(XYPlot plot, int series) {
-        Color seriesColor = getColor(series);
+    private void setSeriesColor(XYPlot plot, int series, RemoteChartingTimeSeries remoteChartingTimeSeries) {
+        Color seriesColor = remoteChartingTimeSeries.getColor();
         XYItemRenderer renderer = plot.getRenderer(series);
         renderer.setSeriesPaint(0, seriesColor);
         if ( multipleRange) {
             plot.getRangeAxis(series).setLabelPaint(seriesColor);
             plot.getRangeAxis(series).setTickLabelPaint(seriesColor);
         }
-    }
-
-    private Color getColor(int seriesId) {
-        return seriesColors[seriesId % seriesColors.length];
     }
 
     private JFreeChart createChart() {

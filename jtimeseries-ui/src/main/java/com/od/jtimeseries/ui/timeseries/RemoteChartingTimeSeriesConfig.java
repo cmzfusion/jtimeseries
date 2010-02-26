@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
+import java.awt.*;
+
 /**
  * Created by IntelliJ IDEA.
 * User: Nick Ebbutt
@@ -33,11 +35,12 @@ public class RemoteChartingTimeSeriesConfig {
     private int maxDaysHistory;
     private boolean selected;
     private String displayName;
+    private Color color;
 
     public RemoteChartingTimeSeriesConfig() {
     }
 
-    public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, int maxDaysHistory, boolean selected, String displayName) {
+    public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, int maxDaysHistory, boolean selected, String displayName, Color color) {
         this.parentPath = parentPath;
         this.id = id;
         this.description = description;
@@ -46,6 +49,7 @@ public class RemoteChartingTimeSeriesConfig {
         this.maxDaysHistory = maxDaysHistory;
         this.selected = selected;
         this.displayName = displayName;
+        this.color = color;
     }
 
     public void setId(String id) {
@@ -112,4 +116,11 @@ public class RemoteChartingTimeSeriesConfig {
         this.parentPath = parentPath;
     }
 
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
 }

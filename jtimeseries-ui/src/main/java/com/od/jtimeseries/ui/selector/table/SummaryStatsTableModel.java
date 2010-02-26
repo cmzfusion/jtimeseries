@@ -68,7 +68,7 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
         String propertyName = propertyNamesList.get(extraColsIndex);
         String propertyValue = getObject(rowIndex).getProperty(propertyName);
-        return "?".equals(propertyValue) ? null : Double.valueOf(propertyValue);
+        return propertyValue == null || "?".equals(propertyValue) ? null : Double.valueOf(propertyValue);
     }
 
     public int getDynamicColumnCount() {

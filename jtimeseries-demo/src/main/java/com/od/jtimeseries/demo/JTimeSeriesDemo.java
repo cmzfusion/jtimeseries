@@ -148,9 +148,9 @@ public class JTimeSeriesDemo {
     }
 
     private void createVisualizer(UdpPingHttpServerDictionary serverDictionary) throws FileNotFoundException {
-        VisualizerConfiguration v = loadVisualizerConfig();
-        visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary, v);
-        loadVisualizerConfig();
+        visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
+        VisualizerConfiguration config = loadVisualizerConfig();
+        configureVisualizer(config);
     }
 
     private VisualizerConfiguration loadVisualizerConfig() throws FileNotFoundException {
@@ -165,7 +165,7 @@ public class JTimeSeriesDemo {
 
 
     private void saveVisualizerConfig() {
-        VisualizerConfiguration v = visualizer.getConfiguration();
+        VisualizerConfiguration v = getVisualizerConfiguration();
         File f = getTimeSeriesDemoConfigFile();
         XMLEncoder encoder = null;
         try {
@@ -182,6 +182,30 @@ public class JTimeSeriesDemo {
 
     private File getTimeSeriesDemoConfigFile() {
         return new File(System.getProperty("user.home"), "timeSeriesDemoConfig.xml");
+    }
+
+    public VisualizerConfiguration getVisualizerConfiguration() {
+        return new VisualizerConfiguration(
+                visualizer.getChartsTitle(),
+                visualizer.getDisplayNamePatterns(),
+                visualizer.isTableSelectorVisible(),
+                visualizer.getChartConfigs(),
+                visualizer.getChartRangeMode(),
+                visualizer.getDividerLocation(),
+                visualizer.isShowLegendOnChart(),
+                visualizer.getChartBackgroundColor()
+        );
+    }
+
+    private void configureVisualizer(VisualizerConfiguration config) {
+        visualizer.setDisplayNamePatterns(config.getDisplayNamePatterns());
+        visualizer.setTableSelectorVisible(config.isTableSelectorVisible());
+        visualizer.setDividerLocation(config.getDividorLocation());
+        visualizer.setChartRangeMode(config.getChartRangeMode());
+        visualizer.setChartsTitle(config.getChartsTitle());
+        visualizer.setShowLegendOnChart(config.isShowLegendOnChart());
+        visualizer.setChartBackgroundColor(config.getChartBackgroundColor());
+        visualizer.addChartConfigs(config.getChartConfigs());
     }
 
     public class DemoMainFrame extends JFrame {

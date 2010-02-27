@@ -40,7 +40,7 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
         initialize();
     }
 
-    protected boolean requiresStructureChange(int firstRow, int lastRow) {
+    protected boolean updateRequiresStructureChange(int firstRow, int lastRow) {
         int oldMax = maxPathElements;
         for ( int row = firstRow; row <= lastRow; row++) {
             RemoteChartingTimeSeries s = getObject(row);
@@ -52,6 +52,18 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
         List<String> pathElements = (getObject(rowIndex)).getPathElements();
         return pathElements.size() > extraColsIndex ?  pathElements.get(extraColsIndex) : null;
+    }
+
+    protected void doAddDynamicColumn(String columnName) {
+        int elementNumber = Integer.parseInt(columnName.substring(4));
+        if ( maxPathElements < elementNumber ) {
+            maxPathElements = elementNumber;
+            fireTableStructureChanged();
+        }
+    }
+
+    protected boolean isDynamicColumnInThisModel(String columnName) {
+        return columnName.matches("path\\d+");
     }
 
     public int getDynamicColumnCount() {

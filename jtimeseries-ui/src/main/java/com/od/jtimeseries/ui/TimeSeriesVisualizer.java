@@ -62,46 +62,32 @@ public class TimeSeriesVisualizer extends JPanel {
     private final ChartControlPanel chartControlPanel;
 
     public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary) {
-        this(title, remoteServerDictionary, new VisualizerConfiguration());
-    }
-
-    public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary, VisualizerConfiguration config) {
         JideInitialization.applyLicense();
-        if ( config == null) {
-            config = new VisualizerConfiguration();
-        }
 
         this.remoteServerDictionary = remoteServerDictionary;
-        createAndConfigureChart(title, config);
+        chart = new TimeSeriesChart(title);
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
-        createToolbar();
         JPanel chartPanel = createChartPanel();
         seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart");
+        createToolbar();
+        createSplitPane(chartPanel);
+        layoutVisualizer();
+        addSeriesSelectionListener();
+    }
 
+    private void layoutVisualizer() {
+        setLayout(new BorderLayout());
+        add(toolbar, BorderLayout.NORTH);
+        add(splitPane, BorderLayout.CENTER);
+    }
+
+    private void createSplitPane(JPanel chartPanel) {
         splitPane.setLeftComponent(seriesSelectionPanel);
         splitPane.setRightComponent(chartPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.5d);
         splitPane.setDividerSize(splitPane.getDividerSize() + 2);
-
-        setLayout(new BorderLayout());
-        add(toolbar, BorderLayout.NORTH);
-        add(splitPane, BorderLayout.CENTER);
-        addSeriesSelectionListener();
-
-        setDisplayNamePatterns(config.getDisplayNamePatterns());
-        setTableSelectorVisible(config.isTableSelectorVisible());
-        addChartConfigs(config.getChartConfigs());
-        setDividerLocation(config.getDividorLocation());
-    }
-
-    private void createAndConfigureChart(String title, VisualizerConfiguration config) {
-        chart = new TimeSeriesChart(title);
-        chart.setChartRangeMode(config.getChartRangeMode());
-        chart.setShowLegend(config.isShowLegendOnChart());
-        chart.setTitle(config.getChartsTitle());
-        chart.setChartBackgroundColor(config.getChartBackgroundColor());
     }
 
     private void createDisplayNameAction() {
@@ -165,17 +151,13 @@ public class TimeSeriesVisualizer extends JPanel {
         return chart.isShowLegend();
     }
 
-    public VisualizerConfiguration getConfiguration() {
-        return new VisualizerConfiguration(
-                getChartsTitle(),
-                getDisplayNamePatterns(),
-                isTableSelectorVisible(),
-                getChartConfigs(),
-                getChartRangeMode(),
-                getDividerLocation(),
-                isShowLegendOnChart(),
-                chart.getChartBackgroundColor()
-        );
+    public void setChartBackgroundColor(Color c) {
+        chart.setChartBackgroundColor(c);
+        chartControlPanel.refreshStateFromChart();
+    }
+
+    public Color getChartBackgroundColor() {
+        return chart.getChartBackgroundColor();
     }
 
     public static void setStartOfDayOffsetMinutes(int mins) {

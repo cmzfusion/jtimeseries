@@ -1,11 +1,13 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.BeanTableModel;
+import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,6 +19,13 @@ public interface BeanPerRowModel<E> extends TableModel {
 
     E getObject(int row);
 
+    void clear();
+
+    void addObjects(List<E> timeSeries);
+
+    void removeObject(E s);
+
+    void addDynamicColumn(String columnName);
 
     /**
      * Wrap the jide model as a BeanPerRowModel
@@ -67,5 +76,24 @@ public interface BeanPerRowModel<E> extends TableModel {
         public E getObject(int row) {
             return wrappedModel.getObject(row);
         }
+
+        public void clear() {
+            wrappedModel.clear();
+        }
+
+        public void addObjects(List<E> timeSeries) {
+            wrappedModel.addObjects(timeSeries);
+        }
+
+        public void removeObject(E s) {
+            wrappedModel.removeObject(s);
+        }
+
+        public void addDynamicColumn(String columnName) {
+            //this is the bottom level model
+            //no decorator models managed to handle this - so we failed to add this dynamic column
+            throw new UnsupportedOperationException();
+        }
+
     }
 }

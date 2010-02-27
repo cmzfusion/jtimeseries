@@ -174,7 +174,6 @@ public class TimeSeriesChart extends JPanel {
         ChartSeriesPopulator c = new ChartSeriesPopulator(chart, chartRangeMode);
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
             RemoteChartingTimeSeries series = timeSeriesList.get(loop);
-            System.out.println("Adding series " + series.getId());
             c.addSeriesToChart(series, loop);
         }
     }

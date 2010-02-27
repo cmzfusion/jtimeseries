@@ -13,35 +13,22 @@ import java.util.*;
  */
 public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChartingTimeSeries> {
 
-    private TreeMap<String,String> statsProperties = new TreeMap<String,String>();
-    private List<String> statNamesList = new ArrayList<String>();
     private List<String> propertyNamesList = new ArrayList<String>();
-
 
     public SummaryStatsTableModel(BeanPerRowModel<RemoteChartingTimeSeries> wrappedModel) {
         super(wrappedModel);
         initialize();
     }
 
-    protected boolean requiresStructureChange(int firstRow, int lastRow) {
+    protected boolean updateRequiresStructureChange(int firstRow, int lastRow) {
         boolean result = false;
-        int oldSize = statsProperties.size();
+        int oldSize = propertyNamesList.size();
 
         addSummaryColumns(firstRow, lastRow);
-        if (statsProperties.size() != oldSize) {
-            recreateColumnLists();
+        if (propertyNamesList.size() != oldSize) {
             result = true;
         }
         return result;
-    }
-
-    private void recreateColumnLists() {
-        statNamesList.clear();
-        propertyNamesList.clear();
-        for ( Map.Entry<String,String> e : statsProperties.entrySet()) {
-            statNamesList.add(e.getValue());
-            propertyNamesList.add(e.getKey());
-        }
     }
 
     private void addSummaryColumns(int firstRow, int lastRow) {
@@ -49,7 +36,7 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
             RemoteChartingTimeSeries s = getObject(row);
             for ( Object prop : s.getProperties().keySet()) {
                 String propertyName = (String) prop;
-                if (! statsProperties.containsKey(propertyName)) {
+                if (! propertyNamesList.contains(propertyName)) {
                     if ( ContextProperties.isSummaryStatsProperty(propertyName) &&
                         ContextProperties.getSummaryStatsDataType(propertyName) == ContextProperties.SummaryStatsDataType.DOUBLE) {
                         addSummaryProperty(propertyName);
@@ -60,8 +47,7 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
     }
 
     private void addSummaryProperty(String propertyName) {
-        String statisticName = ContextProperties.parseStatisticName(propertyName);
-        statsProperties.put(propertyName, statisticName);
+        propertyNamesList.add(propertyName);
         Collections.sort(propertyNamesList);
     }
 
@@ -71,12 +57,23 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
         return propertyValue == null || "?".equals(propertyValue) ? null : Double.valueOf(propertyValue);
     }
 
+    protected void doAddDynamicColumn(String columnName) {
+        if ( ! propertyNamesList.contains(columnName)) {
+            addSummaryProperty(columnName);
+            fireTableStructureChanged();
+        }
+    }
+
+    protected boolean isDynamicColumnInThisModel(String columnName) {
+        return ContextProperties.isSummaryStatsProperty(columnName);
+    }
+
     public int getDynamicColumnCount() {
-        return statsProperties.size();
+        return propertyNamesList.size();
     }
 
     protected String getDynamicColumnName(int extraColsIndex) {
-        return statNamesList.get(extraColsIndex);
+        return propertyNamesList.get(extraColsIndex);
     }
 
     protected Class<?> getDynamicColumnClass(int extraColsIndex) {

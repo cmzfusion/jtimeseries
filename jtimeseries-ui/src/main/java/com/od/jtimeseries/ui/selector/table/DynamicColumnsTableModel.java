@@ -2,13 +2,11 @@ package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.ui.util.TableModelEventParser;
 import com.od.jtimeseries.ui.util.TableEventDispatcher;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
-import com.jidesoft.grid.BeanTableModel;
 
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,10 +32,10 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
     }
 
     private boolean requiresStructureChange() {
-        return requiresStructureChange(0, wrappedModel.getRowCount() - 1);
+        return updateRequiresStructureChange(0, wrappedModel.getRowCount() - 1);
     }
 
-    protected abstract boolean requiresStructureChange(int firstRow, int lastRow);
+    protected abstract boolean updateRequiresStructureChange(int firstRow, int lastRow);
 
     public E getObject(int row) {
         return wrappedModel.getObject(row);
@@ -88,6 +86,20 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
 
     protected abstract Object getValueForDynamicColumn(int rowIndex, int extraColsIndex);
 
+
+    public void addDynamicColumn(String columnName) {
+        //handle this dynamic column if it should belong to this model, or delegate
+        if ( isDynamicColumnInThisModel(columnName)) {
+            doAddDynamicColumn(columnName);
+        } else {
+            wrappedModel.addDynamicColumn(columnName);
+        }
+    }
+
+    protected abstract void doAddDynamicColumn(String columnName);
+
+    protected abstract boolean isDynamicColumnInThisModel(String columnName);
+    
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if ( isColumnInWrappedModel(columnIndex)) {
             wrappedModel.setValueAt(aValue, rowIndex, columnIndex);
@@ -108,6 +120,18 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
 
     private boolean isColumnInWrappedModel(int columnIndex) {
         return columnIndex < wrappedModel.getColumnCount();
+    }
+
+    public void clear() {
+        wrappedModel.clear();
+    }
+
+    public void addObjects(List<E> timeSeries) {
+        wrappedModel.addObjects(timeSeries);
+    }
+
+    public void removeObject(E s) {
+        wrappedModel.removeObject(s);
     }
 
     public abstract int getDynamicColumnCount();
@@ -132,7 +156,7 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         }
 
         public void tableRowsUpdated(int firstRow, int lastRow, TableModelEvent e) {
-            boolean requiresStructureChange = requiresStructureChange(firstRow, lastRow);
+            boolean requiresStructureChange = updateRequiresStructureChange(firstRow, lastRow);
             if ( requiresStructureChange ) {
                 eventDispatcher.fireTableStructureChanged();
             } else {
@@ -141,7 +165,7 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         }
 
         public void tableCellsUpdated(int firstRow, int lastRow, int column, TableModelEvent e) {
-            boolean requiresStructureChange = requiresStructureChange(firstRow, lastRow);
+            boolean requiresStructureChange = updateRequiresStructureChange(firstRow, lastRow);
             if ( requiresStructureChange ) {
                 eventDispatcher.fireTableStructureChanged();
             } else {
@@ -154,7 +178,7 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         }
 
         public void tableRowsInserted(int firstRow, int lastRow, TableModelEvent e) {
-            boolean requiresStructureChange = requiresStructureChange(firstRow, lastRow);
+            boolean requiresStructureChange = updateRequiresStructureChange(firstRow, lastRow);
             if ( requiresStructureChange ) {
                 eventDispatcher.fireTableStructureChanged();
             } else {

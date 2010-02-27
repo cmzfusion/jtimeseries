@@ -9,6 +9,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,8 +36,6 @@ public class EditableColumnsTableModel<E> extends AbstractTableModel implements 
             }
         });
     }
-
-
 
     public int getRowCount() {
         return wrappedModel.getRowCount();
@@ -88,4 +87,21 @@ public class EditableColumnsTableModel<E> extends AbstractTableModel implements 
     public E getObject(int row) {
         return wrappedModel.getObject(row);
     }
+
+    public void clear() {
+        wrappedModel.clear();
+    }
+
+    public void addObjects(List<E> timeSeries) {
+        wrappedModel.addObjects(timeSeries);
+    }
+
+    public void removeObject(E s) {
+        wrappedModel.removeObject(s);
+    }
+
+    public void addDynamicColumn(String columnName) {
+        wrappedModel.addDynamicColumn(columnName);
+    }
+
 }

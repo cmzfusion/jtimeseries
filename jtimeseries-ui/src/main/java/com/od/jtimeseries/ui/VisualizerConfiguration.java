@@ -20,8 +20,10 @@ package com.od.jtimeseries.ui;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
+import com.od.jtimeseries.ui.chart.ChartRangeMode;
 
 import java.util.List;
+import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,19 +39,24 @@ public class VisualizerConfiguration {
     private List<DisplayNamePattern> displayNamePatterns;
     private boolean tableSelectorVisible;
     private List<RemoteChartingTimeSeriesConfig> chartConfigs;
-    private boolean multipleRangeChart;
     private int dividorLocation;
+    private boolean showLegendOnChart = true;
+    private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
+    private Color chartBackgroundColor = Color.WHITE;
 
     public VisualizerConfiguration() {
     }
 
-    public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<RemoteChartingTimeSeriesConfig> chartConfigs, boolean isMultipleRangeChart, int dividorLocation ) {
+    public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<RemoteChartingTimeSeriesConfig> chartConfigs,
+                                   ChartRangeMode chartRangeMode, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor ) {
         this.chartsTitle = chartsTitle;
         this.displayNamePatterns = displayNamePatterns;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
-        this.multipleRangeChart = isMultipleRangeChart;
+        this.chartRangeMode = chartRangeMode;
         this.dividorLocation = dividorLocation;
+        this.showLegendOnChart = showLegendOnChart;
+        this.chartBackgroundColor = chartBackgroundColor;
     }
 
     public String getChartsTitle() {
@@ -84,12 +91,17 @@ public class VisualizerConfiguration {
         this.chartConfigs = chartConfigs;
     }
 
-    public boolean isMultipleRangeChart() {
-        return multipleRangeChart;
+    public ChartRangeMode getChartRangeMode() {
+        return chartRangeMode;
     }
 
-    public void setMultipleRangeChart(boolean multipleRangeChart) {
-        this.multipleRangeChart = multipleRangeChart;
+    public void setChartRangeMode(ChartRangeMode chartRangeMode) {
+        this.chartRangeMode = chartRangeMode;
+    }
+
+    //for backwards compatibility
+    public void setMultipleRangeChart(boolean isMultipleRange) {
+        setChartRangeMode(isMultipleRange ? ChartRangeMode.RangePerSeries : ChartRangeMode.SingleRange);
     }
 
     public int getDividorLocation() {
@@ -98,5 +110,21 @@ public class VisualizerConfiguration {
 
     public void setDividorLocation(int dividorLocation) {
         this.dividorLocation = dividorLocation;
+    }
+
+    public boolean isShowLegendOnChart() {
+        return showLegendOnChart;
+    }
+
+    public void setShowLegendOnChart(boolean showLegendOnChart) {
+        this.showLegendOnChart = showLegendOnChart;
+    }
+
+    public Color getChartBackgroundColor() {
+        return chartBackgroundColor;
+    }
+
+    public void setChartBackgroundColor(Color chartBackgroundColor) {
+        this.chartBackgroundColor = chartBackgroundColor;
     }
 }

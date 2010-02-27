@@ -31,13 +31,14 @@ import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
+import com.od.jtimeseries.ui.chart.ChartControlPanel;
+import com.od.jtimeseries.ui.chart.TimeSeriesChart;
+import com.od.jtimeseries.ui.chart.ChartRangeMode;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,24 +52,32 @@ import java.util.List;
 public class TimeSeriesVisualizer extends JPanel {
 
     private JToolBar toolbar;
-    private TimeSeriesChart contextTimeSeriesChart;
+    private TimeSeriesChart chart;
     private SeriesSelectionPanel seriesSelectionPanel;
     private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
     private RemoteServerDictionary remoteServerDictionary;
     private LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesVisualizer.class);
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    private final ChartControlPanel chartControlPanel = new ChartControlPanel();
+    private final ChartControlPanel chartControlPanel;
 
     public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary) {
-        JideInitialization.applyLicense();
-        this.remoteServerDictionary = remoteServerDictionary;
-        contextTimeSeriesChart = new TimeSeriesChart(title);
-        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart");
+        this(title, remoteServerDictionary, new VisualizerConfiguration());
+    }
 
+    public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary, VisualizerConfiguration config) {
+        JideInitialization.applyLicense();
+        if ( config == null) {
+            config = new VisualizerConfiguration();
+        }
+
+        this.remoteServerDictionary = remoteServerDictionary;
+        createAndConfigureChart(title, config);
+        chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
         createToolbar();
         JPanel chartPanel = createChartPanel();
+        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart");
 
         splitPane.setLeftComponent(seriesSelectionPanel);
         splitPane.setRightComponent(chartPanel);
@@ -80,6 +89,19 @@ public class TimeSeriesVisualizer extends JPanel {
         add(toolbar, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
         addSeriesSelectionListener();
+
+        setDisplayNamePatterns(config.getDisplayNamePatterns());
+        setTableSelectorVisible(config.isTableSelectorVisible());
+        addChartConfigs(config.getChartConfigs());
+        setDividerLocation(config.getDividorLocation());
+    }
+
+    private void createAndConfigureChart(String title, VisualizerConfiguration config) {
+        chart = new TimeSeriesChart(title);
+        chart.setChartRangeMode(config.getChartRangeMode());
+        chart.setShowLegend(config.isShowLegendOnChart());
+        chart.setTitle(config.getChartsTitle());
+        chart.setChartBackgroundColor(config.getChartBackgroundColor());
     }
 
     private void createDisplayNameAction() {
@@ -94,11 +116,11 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void setChartsTitle(String title) {
-        contextTimeSeriesChart.setTitle(title);
+        chart.setTitle(title);
     }
 
     public String getChartsTitle() {
-        return contextTimeSeriesChart.getTitle();
+        return chart.getTitle();
     }
 
     public List<DisplayNamePattern> getDisplayNamePatterns() {
@@ -117,13 +139,13 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.setTableSelectorVisible(isVisible);
     }
 
-    public boolean isMultipleRangeChart() {
-        return contextTimeSeriesChart.isMultipleRange();
+    public ChartRangeMode getChartRangeMode() {
+        return chart.getChartRangeMode();
     }
 
-    public void setMultipleRangeChart(boolean multipleRange) {
-        contextTimeSeriesChart.setMultipleRange(multipleRange);
-        chartControlPanel.setMultipleRange(multipleRange);
+    public void setChartRangeMode(ChartRangeMode chartRangeMode) {
+        chart.setChartRangeMode(chartRangeMode);
+        chartControlPanel.refreshStateFromChart();
     }
 
     public int getDividerLocation() {
@@ -134,24 +156,26 @@ public class TimeSeriesVisualizer extends JPanel {
         splitPane.setDividerLocation(location);
     }
 
+    public void setShowLegendOnChart(boolean showLegendOnChart) {
+        chart.setShowLegend(showLegendOnChart);
+        chartControlPanel.refreshStateFromChart();        
+    }
+
+    public boolean isShowLegendOnChart() {
+        return chart.isShowLegend();
+    }
+
     public VisualizerConfiguration getConfiguration() {
         return new VisualizerConfiguration(
                 getChartsTitle(),
                 getDisplayNamePatterns(),
                 isTableSelectorVisible(),
                 getChartConfigs(),
-                isMultipleRangeChart(),
-                getDividerLocation()
+                getChartRangeMode(),
+                getDividerLocation(),
+                isShowLegendOnChart(),
+                chart.getChartBackgroundColor()
         );
-    }
-
-    public void setConfiguration(VisualizerConfiguration c) {
-        setChartsTitle(c.getChartsTitle());
-        setDisplayNamePatterns(c.getDisplayNamePatterns());
-        setTableSelectorVisible(c.isTableSelectorVisible());
-        addChartConfigs(c.getChartConfigs());
-        setMultipleRangeChart(c.isMultipleRangeChart());
-        setDividerLocation(c.getDividorLocation());
     }
 
     public static void setStartOfDayOffsetMinutes(int mins) {
@@ -176,7 +200,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private JPanel createChartPanel() {
         JPanel chartPanel = new JPanel();
         chartPanel.setLayout(new BorderLayout());
-        chartPanel.add(contextTimeSeriesChart, BorderLayout.CENTER);
+        chartPanel.add(chart, BorderLayout.CENTER);
         chartPanel.add(chartControlPanel, BorderLayout.SOUTH);
         return chartPanel;
     }
@@ -214,33 +238,9 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.addSelectionListener(new TimeSeriesSelectorListener() {
 
             public void selectionChanged(List<RemoteChartingTimeSeries> newSelection) {
-                contextTimeSeriesChart.setSeries(newSelection);
+                chart.setSeries(newSelection);
             }
         });
-    }
-
-    private class ChartControlPanel extends JPanel {
-
-        JCheckBox useMultipleRangeCheckbox = new JCheckBox("Use Multiple Ranges", true);
-
-        public ChartControlPanel() {
-            setLayout(new BorderLayout());
-            Box b = Box.createHorizontalBox();
-            b.add(Box.createHorizontalGlue());
-            b.add(useMultipleRangeCheckbox);
-            add(b, BorderLayout.CENTER);
-
-            useMultipleRangeCheckbox.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    contextTimeSeriesChart.setMultipleRange(useMultipleRangeCheckbox.isSelected());
-                }
-            });
-        }
-
-
-        public void setMultipleRange(boolean multipleRange) {
-            this.useMultipleRangeCheckbox.setSelected(multipleRange);
-        }
     }
 
 }

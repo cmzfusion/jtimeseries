@@ -148,20 +148,19 @@ public class JTimeSeriesDemo {
     }
 
     private void createVisualizer(UdpPingHttpServerDictionary serverDictionary) throws FileNotFoundException {
-        visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
+        VisualizerConfiguration v = loadVisualizerConfig();
+        visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary, v);
         loadVisualizerConfig();
     }
 
-    private void loadVisualizerConfig() throws FileNotFoundException {
+    private VisualizerConfiguration loadVisualizerConfig() throws FileNotFoundException {
         VisualizerConfiguration v = null;
         File configFile = getTimeSeriesDemoConfigFile();
         if ( configFile.exists() ) {
             XMLDecoder d = new XMLDecoder(new FileInputStream(configFile));
             v = (VisualizerConfiguration)d.readObject();
         }
-        if ( v != null ) {
-            visualizer.setConfiguration(v);
-        }
+        return v;
     }
 
 

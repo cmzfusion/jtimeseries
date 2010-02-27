@@ -16,24 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui;
+package com.od.jtimeseries.ui.chart;
 
-import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
-import com.od.jtimeseries.chart.TimeSeriesXYDataset;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleInsets;
 
 import javax.swing.*;
@@ -63,8 +56,9 @@ public class TimeSeriesChart extends JPanel {
     private List<RemoteChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
     private ChartPanel chartPanel;
     private JPanel noChartsPanel = new JPanel();
-    private boolean multipleRange = true;
+    private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
     private DateFormat dateFormat = new SimpleDateFormat("MMMdd HH:mm");
+    private Color chartBackgroundColor = Color.WHITE;
 
     private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -72,6 +66,7 @@ public class TimeSeriesChart extends JPanel {
         }
     };
     private JFreeChart chart;
+    private boolean showLegend = true;
 
     public TimeSeriesChart(String title) {
         this.title = title;
@@ -110,6 +105,15 @@ public class TimeSeriesChart extends JPanel {
         repaint();
     }
 
+    public void setChartBackgroundColor(Color c) {
+        chartBackgroundColor = c;
+        createAndSetChart();
+    }
+
+    public Color getChartBackgroundColor() {
+        return chartBackgroundColor;
+    }
+
     private void addPropertyListener(List<RemoteChartingTimeSeries> newSelection) {
         for ( RemoteChartingTimeSeries s : newSelection) {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
@@ -126,15 +130,26 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
-    public boolean isMultipleRange() {
-        return multipleRange;
+    public ChartRangeMode getChartRangeMode() {
+        return chartRangeMode;
     }
 
-    public void setMultipleRange(boolean multipleRange) {
-        if ( this.multipleRange != multipleRange ) {
-            this.multipleRange = multipleRange;
+    public void setChartRangeMode(ChartRangeMode m ) {
+        if ( this.chartRangeMode != m ) {
+            this.chartRangeMode = m;
             createAndSetChart();
         }
+    }
+
+    public void setShowLegend(boolean showLegend) {
+        if ( this.showLegend != showLegend) {
+            this.showLegend = showLegend;
+            createAndSetChart();
+        }
+    }
+
+    public boolean isShowLegend() {
+        return this.showLegend;
     }
 
     private void createAndSetChart() {
@@ -149,61 +164,28 @@ public class TimeSeriesChart extends JPanel {
     private JFreeChart createNewChart() {
         JFreeChart chart = createChart();
         XYPlot plot = (XYPlot)chart.getPlot();
+        plot.setBackgroundPaint(chartBackgroundColor);
         plot.setAxisOffset(new RectangleInsets(5,5,5,5));
         addSeries(chart);
-        setColors(plot);
         return chart;
     }
 
-    private void setColors(XYPlot plot) {
-        for ( int loop=0; loop < timeSeriesList.size(); loop++) {
-            setSeriesColor(plot, loop, timeSeriesList.get(loop));
-        }
-    }
-
     private void addSeries(JFreeChart chart) {
-        for ( int loop=1; loop < timeSeriesList.size(); loop++) {
-            addSeriesToChart(chart, timeSeriesList.get(loop), loop);
-        }
-    }
-
-    private void addSeriesToChart(JFreeChart chart, RemoteChartingTimeSeries contextTimeSeries, int seriesId) {
-        XYDataset dataSet = createDataSet(contextTimeSeries);
-        XYPlot plot = (XYPlot)chart.getPlot();
-        plot.setDataset(seriesId, dataSet);
-        XYItemRenderer renderer2 = new StandardXYItemRenderer();
-        plot.setRenderer(seriesId, renderer2);
-        if ( multipleRange) {
-            NumberAxis axis = new NumberAxis(contextTimeSeries.getDisplayName());
-            plot.setRangeAxis(seriesId, axis);
-            plot.setRangeAxisLocation(seriesId, seriesId % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
-            plot.mapDatasetToRangeAxis(seriesId, seriesId);
-        } else {
-            plot.setRangeAxis(0, new NumberAxis("values"));
-        }
-        setSeriesColor(plot, seriesId, contextTimeSeries);
-    }
-
-    private void setSeriesColor(XYPlot plot, int series, RemoteChartingTimeSeries remoteChartingTimeSeries) {
-        Color seriesColor = remoteChartingTimeSeries.getColor();
-        XYItemRenderer renderer = plot.getRenderer(series);
-        renderer.setSeriesPaint(0, seriesColor);
-        if ( multipleRange) {
-            plot.getRangeAxis(series).setLabelPaint(seriesColor);
-            plot.getRangeAxis(series).setTickLabelPaint(seriesColor);
+        ChartSeriesPopulator c = new ChartSeriesPopulator(chart, chartRangeMode);
+        for ( int loop=0; loop < timeSeriesList.size(); loop++) {
+            RemoteChartingTimeSeries series = timeSeriesList.get(loop);
+            System.out.println("Adding series " + series.getId());
+            c.addSeriesToChart(series, loop);
         }
     }
 
     private JFreeChart createChart() {
-
-        RemoteChartingTimeSeries m = getPrimaryTimeSeries();
-
         final JFreeChart chart = ChartFactory.createTimeSeriesChart(
             title,
             "Time of Day",
-            m.getDisplayName(),
-            createDataSet(m),
-            true,
+            null,
+            null,
+            showLegend,
             true,
             false
         );
@@ -235,14 +217,4 @@ public class TimeSeriesChart extends JPanel {
             chart.setTitle(title);
         }
     }
-
-    private RemoteChartingTimeSeries getPrimaryTimeSeries() {
-        return timeSeriesList.get(0);
-    }
-
-    private XYDataset createDataSet(RemoteChartingTimeSeries contextTimeSeries) {
-        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(contextTimeSeries);
-        return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
-    }
-
 }

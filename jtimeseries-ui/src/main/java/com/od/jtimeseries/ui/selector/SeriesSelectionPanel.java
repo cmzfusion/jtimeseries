@@ -24,6 +24,8 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
+import com.od.jtimeseries.ui.selector.table.ColumnSelectionDialog;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.time.Time;
@@ -57,6 +59,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private SeriesDescriptionPanel seriesDescriptionPanel = new SeriesDescriptionPanel();
     private JRadioButton useTreeRadio = new JRadioButton("Tree", true);
     private JRadioButton useTableRadio = new JRadioButton("Table");
+    private JButton columnSelectorButton = new JButton("Columns");
     private TreeSelector treeSelector;
     private TableSelector tableSelector;
     private JPanel selectorPanel;
@@ -101,11 +104,33 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         useTreeRadio.addActionListener(radioListener);
         useTableRadio.addActionListener(radioListener);
 
+        columnSelectorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showColumnSelectionDialog();
+            }
+        });
+
         ButtonGroup group = new ButtonGroup();
         group.add(useTreeRadio);
         group.add(useTableRadio);
         titleBox.add(useTreeRadio);
         titleBox.add(useTableRadio);
+        titleBox.add(Box.createHorizontalStrut(10));
+        titleBox.add(columnSelectorButton);
+    }
+
+    private void showColumnSelectionDialog() {
+        ColumnSelectionDialog d = new ColumnSelectionDialog(getWindowForComponent(this), tableSelector.getTableColumnManager());
+        d.setLocation(getX(), getY());
+        d.setVisible(true);
+        d.dispose();
+    }
+
+    private Window getWindowForComponent(Component parentComponent) throws HeadlessException {
+
+        if (parentComponent instanceof Frame || parentComponent instanceof Dialog)
+            return (Window)parentComponent;
+        return getWindowForComponent(parentComponent.getParent());
     }
 
     private void createSelectorPanel() {
@@ -155,6 +180,14 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
 
     public void setSelectedTimeSeries(List<RemoteChartingTimeSeries> selections) {
         selectionList.setSelectedTimeSeries(selections);
+    }
+
+    public void setColumns(List<ColumnSettings> columnSettings) {
+        tableSelector.setColumns(columnSettings);
+    }
+
+    public List<ColumnSettings> getColumns() {
+        return tableSelector.getColumns();
     }
 
     public void refresh() {
@@ -229,8 +262,10 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         public void actionPerformed(ActionEvent e) {
             if ( useTreeRadio.isSelected()) {
                 SeriesSelectionPanel.this.showTree();
+                columnSelectorButton.setEnabled(false);
             } else {
                 SeriesSelectionPanel.this.showTable();
+                columnSelectorButton.setEnabled(true);
             }
         }
     }

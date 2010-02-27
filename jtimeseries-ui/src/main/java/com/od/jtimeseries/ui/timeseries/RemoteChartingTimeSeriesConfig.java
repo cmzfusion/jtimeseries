@@ -37,8 +37,8 @@ public class RemoteChartingTimeSeriesConfig {
     private String displayName;
     private Color color;
 
-    public RemoteChartingTimeSeriesConfig() {
-    }
+    //no params constructor required for bean xml persistence
+    public RemoteChartingTimeSeriesConfig() {}
 
     public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, int maxDaysHistory, boolean selected, String displayName, Color color) {
         this.parentPath = parentPath;

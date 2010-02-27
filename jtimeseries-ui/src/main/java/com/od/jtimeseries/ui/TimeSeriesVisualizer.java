@@ -28,6 +28,7 @@ import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -158,6 +159,14 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public Color getChartBackgroundColor() {
         return chart.getChartBackgroundColor();
+    }
+
+    public List<ColumnSettings> getColumns() {
+        return seriesSelectionPanel.getColumns();
+    }
+
+    public void setColumns(List<ColumnSettings> columnSettings) {
+        seriesSelectionPanel.setColumns(columnSettings);
     }
 
     public static void setStartOfDayOffsetMinutes(int mins) {

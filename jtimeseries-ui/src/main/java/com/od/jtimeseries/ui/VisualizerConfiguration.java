@@ -21,8 +21,10 @@ package com.od.jtimeseries.ui;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.chart.ChartRangeMode;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.awt.*;
 
 /**
@@ -43,12 +45,13 @@ public class VisualizerConfiguration {
     private boolean showLegendOnChart = true;
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
     private Color chartBackgroundColor = Color.WHITE;
+    private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
 
     public VisualizerConfiguration() {
     }
 
     public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<RemoteChartingTimeSeriesConfig> chartConfigs,
-                                   ChartRangeMode chartRangeMode, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor ) {
+                                   ChartRangeMode chartRangeMode, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
         this.chartsTitle = chartsTitle;
         this.displayNamePatterns = displayNamePatterns;
         this.tableSelectorVisible = tableSelectorVisible;
@@ -57,6 +60,7 @@ public class VisualizerConfiguration {
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
         this.chartBackgroundColor = chartBackgroundColor;
+        this.tableColumns = columnSettings;
     }
 
     public String getChartsTitle() {
@@ -126,5 +130,13 @@ public class VisualizerConfiguration {
 
     public void setChartBackgroundColor(Color chartBackgroundColor) {
         this.chartBackgroundColor = chartBackgroundColor;
+    }
+
+    public List<ColumnSettings> getTableColumns() {
+        return tableColumns;
+    }
+
+    public void setTableColumns(List<ColumnSettings> columnSettings) {
+        this.tableColumns = columnSettings;
     }
 }

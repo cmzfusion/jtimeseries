@@ -50,6 +50,7 @@ public class TableSelector extends SelectorPanel {
     private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
     private SortableTable timeSeriesTable;
     private JPopupMenu tablePopupMenu;
+    public TableColumnManager tableColumnManager;
 
     public TableSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel,
                          TimeSeriesContext rootContext,
@@ -68,6 +69,18 @@ public class TableSelector extends SelectorPanel {
         addSeriesSelectionListener();
     }
 
+    public TableColumnManager getTableColumnManager() {
+        return tableColumnManager;
+    }
+
+    public void setColumns(List<ColumnSettings> columnSettings) {
+        tableColumnManager.setColumns(columnSettings);
+    }
+
+    public List<ColumnSettings> getColumns() {
+        return tableColumnManager.getColumns();
+    }
+
     private void createPopupMenu() {
         tablePopupMenu = new JPopupMenu("Series Actions");
         for ( Action a : seriesActions) {
@@ -82,7 +95,7 @@ public class TableSelector extends SelectorPanel {
     private void createTable() {
         TableModelCreator tableModelCreator = new TableModelCreator(selectionText);
         tableModel = tableModelCreator.createTableModel();
-        TableColumnManager tableColumnManager = new TableColumnManager(tableModel, tableModelCreator, selectionText);
+        tableColumnManager = new TableColumnManager(tableModel, tableModelCreator, selectionText);
         timeSeriesTable = new TimeSeriesTable(tableModel, tableColumnManager);
     }
 

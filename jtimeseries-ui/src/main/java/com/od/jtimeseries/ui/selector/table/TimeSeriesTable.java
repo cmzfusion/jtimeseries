@@ -38,6 +38,7 @@ class TimeSeriesTable extends SortableTable {
         header.setShowFilterName(true);
         header.setAllowMultipleValues(true);
         header.setShowFilterNameAsToolTip(true);
+        setAutoCreateColumnsFromModel(false);
         setTableHeader(header);
         setModel(tableModel);
     }
@@ -56,9 +57,7 @@ class TimeSeriesTable extends SortableTable {
         return c;
     }
 
+    //stop the creation of initial columns
     public void createDefaultColumnsFromModel() {
-        if (columnManager != null) {
-            columnManager.tableModelStructureChanged();
-        }
     }
 }

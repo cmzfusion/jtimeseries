@@ -48,7 +48,6 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
 
     private void addSummaryProperty(String propertyName) {
         propertyNamesList.add(propertyName);
-        Collections.sort(propertyNamesList);
     }
 
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {

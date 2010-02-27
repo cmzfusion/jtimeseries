@@ -193,7 +193,8 @@ public class JTimeSeriesDemo {
                 visualizer.getChartRangeMode(),
                 visualizer.getDividerLocation(),
                 visualizer.isShowLegendOnChart(),
-                visualizer.getChartBackgroundColor()
+                visualizer.getChartBackgroundColor(),
+                visualizer.getColumns()
         );
     }
 
@@ -206,6 +207,7 @@ public class JTimeSeriesDemo {
         visualizer.setShowLegendOnChart(config.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(config.getChartBackgroundColor());
         visualizer.addChartConfigs(config.getChartConfigs());
+        visualizer.setColumns(config.getTableColumns());
     }
 
     public class DemoMainFrame extends JFrame {

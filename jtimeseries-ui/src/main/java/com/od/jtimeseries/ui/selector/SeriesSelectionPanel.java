@@ -145,7 +145,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     }
 
     private void addComponents() {
-        seriesDescriptionPanel.setPreferredSize(new Dimension(WIDTH, 150));
+        seriesDescriptionPanel.setPreferredSize(new Dimension(WIDTH, 110));
         setLayout(new BorderLayout());
         add(titleBox,BorderLayout.NORTH);
         add(selectorPanel, BorderLayout.CENTER);

@@ -120,8 +120,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     }
 
     private void showColumnSelectionDialog() {
-        ColumnSelectionDialog d = new ColumnSelectionDialog(getWindowForComponent(this), tableSelector.getTableColumnManager());
-        d.setLocation(getX(), getY());
+        ColumnSelectionDialog d = new ColumnSelectionDialog(getWindowForComponent(this), this, tableSelector.getTableColumnManager());
         d.setVisible(true);
         d.dispose();
     }

@@ -6,6 +6,7 @@ import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -21,12 +22,12 @@ public class TableColumnManager {
 
     private TableColumnModel columnModel = new DefaultTableColumnModel();
     private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
-    private ColumnWidthDefaults columnWidthDefaults;
+    private DefaultColumnSettings defaultColumnSettings;
 
-    public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, ColumnWidthDefaults columnWidthDefaults, String selectedColumnName) {
+    public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, DefaultColumnSettings defaultColumnSettings, String selectionColumnName) {
         this.tableModel = tableModel;
-        this.columnWidthDefaults = columnWidthDefaults;
-        addColumn(selectedColumnName);
+        this.defaultColumnSettings = defaultColumnSettings;
+        addColumn(selectionColumnName);
     }
 
     public TableColumnModel getColumnModel() {
@@ -41,6 +42,13 @@ public class TableColumnManager {
         }
     }
 
+    private void removeAllColumns() {
+        for ( int loop=columnModel.getColumnCount() - 1; loop >=0 ; loop --) {
+            columnModel.removeColumn(columnModel.getColumn(loop));
+        }
+    }
+
+
     public List<ColumnSettings> getColumns() {
         List<ColumnSettings> l = new ArrayList<ColumnSettings>();
         for ( int col = 0; col < columnModel.getColumnCount(); col ++ ) {
@@ -53,10 +61,12 @@ public class TableColumnManager {
         return l;
     }
 
-    private void removeAllColumns() {
-        for ( int loop=columnModel.getColumnCount() - 1; loop >=0 ; loop --) {
-            columnModel.removeColumn(columnModel.getColumn(loop));
+    public String[] getAllColumnNames() {
+        java.util.List<String> columnNames = new ArrayList<String>();
+        for ( int col=0; col < tableModel.getColumnCount(); col ++) {
+            columnNames.add(tableModel.getColumnName(col));
         }
+        return columnNames.toArray(new String[columnNames.size()]);
     }
 
     public TableColumn addColumn(String columnName) {
@@ -69,11 +79,37 @@ public class TableColumnManager {
         return newColumn;
     }
 
+    public void removeColumn(String columnName) {
+        for ( int col = 0; col < columnModel.getColumnCount(); col++) {
+            TableColumn column = columnModel.getColumn(col);
+            if ( tableModel.getColumnName(column.getModelIndex()).equals(columnName) ) {
+                columnModel.removeColumn(column);
+                break;
+            }
+        }
+    }
+
+    public boolean isInTable(String columnName) {
+        boolean result = false;
+        for ( int col = 0; col < columnModel.getColumnCount(); col++) {
+            TableColumn column = columnModel.getColumn(col);
+            if ( tableModel.getColumnName(column.getModelIndex()).equals(columnName) ) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
     private TableColumn createColumn(String columnName) {
         TableColumn newColumn = new TableColumn(
             getColumnIndex(columnName),
-            columnWidthDefaults.getDefaultColumnWidth(columnName)
+            defaultColumnSettings.getDefaultColumnWidth(columnName)
         );
+        TableCellRenderer r = defaultColumnSettings.getCellRenderer(columnName);
+        if ( r != null ) {
+            newColumn.setCellRenderer(r);
+        }
         setColumnIdentifier(columnName, newColumn);
         return newColumn;
     }
@@ -83,16 +119,6 @@ public class TableColumnManager {
         //handle the special stats column names
         String id = ContextProperties.isSummaryStatsProperty(columnName) ? ContextProperties.parseStatisticName(columnName) : columnName;
         newColumn.setHeaderValue(id);
-    }
-
-    public void removeColumn(String columnName) {
-        for ( int col = 0; col < columnModel.getColumnCount(); col++) {
-            TableColumn column = columnModel.getColumn(col);
-            if ( tableModel.getColumnName(column.getModelIndex()).equals(columnName) ) {
-                columnModel.removeColumn(column);
-                break;
-            }
-        }
     }
 
     private void addDynamicColumnIfRequired(String columnName) {
@@ -126,30 +152,20 @@ public class TableColumnManager {
         return result;
     }
 
-    private void setColumnRenderers(TableColumnModel columnModel) {
-//        columnModel.getColumn(7).setCellRenderer(new TimeRenderer());
-//        columnModel.getColumn(8).setCellRenderer(new ColorCellRenderer() {{setColorValueVisible(false);}});
-    }
-
     //we don't currently persist users changes to column order/sizes, but perhaps we should..
     private void sizeColumns(TableColumnModel m) {
         Enumeration<TableColumn> e = m.getColumns();
         while(e.hasMoreElements()) {
             TableColumn col = e.nextElement();
             String name = tableModel.getColumnName(col.getModelIndex());
-            col.setPreferredWidth(columnWidthDefaults.getDefaultColumnWidth(name));
+            col.setPreferredWidth(defaultColumnSettings.getDefaultColumnWidth(name));
         }
     }
 
-    public String[] getAllColumnNames() {
-        java.util.List<String> columnNames = new ArrayList<String>();
-        for ( int col=0; col < tableModel.getColumnCount(); col ++) {
-            columnNames.add(tableModel.getColumnName(col));
-        }
-        return columnNames.toArray(new String[columnNames.size()]);
-    }
+    public static interface DefaultColumnSettings {
 
-    public static interface ColumnWidthDefaults {
         int getDefaultColumnWidth(String columnName);
+
+        TableCellRenderer getCellRenderer(String columnName);
     }
 }

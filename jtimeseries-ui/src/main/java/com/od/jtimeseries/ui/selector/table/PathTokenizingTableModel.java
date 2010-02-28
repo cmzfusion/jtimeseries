@@ -63,7 +63,7 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
     }
 
     protected boolean isDynamicColumnInThisModel(String columnName) {
-        return columnName.matches("path\\d+");
+        return columnName.matches("Path \\d+");
     }
 
     public int getDynamicColumnCount() {
@@ -71,7 +71,7 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
     }
 
     protected String getDynamicColumnName(int extraColsIndex) {
-        return String.valueOf("path " + extraColsIndex);
+        return String.valueOf("Path " + extraColsIndex);
     }
 
     protected Class<?> getDynamicColumnClass(int extraColsIndex) {

@@ -20,12 +20,13 @@ public class ColumnSelectionDialog extends JDialog {
 
     private TableColumnManager tableColumnManager;
 
-    public ColumnSelectionDialog(Window owner, TableColumnManager tableColumnManager) {
+    public ColumnSelectionDialog(Window owner, JComponent parentComponent, TableColumnManager tableColumnManager) {
         super(owner);
         setTitle("Choose Columns");
         setModal(true);
         this.tableColumnManager = tableColumnManager;
         buildDialog();
+        setLocationRelativeTo(parentComponent);
     }
 
     private void buildDialog() {
@@ -57,7 +58,7 @@ public class ColumnSelectionDialog extends JDialog {
         String[] columnNames = tableColumnManager.getAllColumnNames();
         Arrays.sort(columnNames);
 
-        int rows = 6;
+        int rows = 8;
         int cols = (int)Math.ceil(columnNames.length / (double)rows);
         columnPanel.setLayout(new GridLayout(rows, cols, 10, 10));
 
@@ -67,7 +68,7 @@ public class ColumnSelectionDialog extends JDialog {
             if (ContextProperties.isSummaryStatsProperty(displayName)) {
                 displayName = ContextProperties.parseStatisticName(displayName);
             }
-            final JCheckBox checkBox = new JCheckBox(displayName);
+            final JCheckBox checkBox = new JCheckBox(displayName, tableColumnManager.isInTable(name));
             columnPanel.add(checkBox);
 
             checkBox.addActionListener(new ActionListener() {

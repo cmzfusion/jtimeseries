@@ -1,8 +1,10 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.BeanTableModel;
+import com.jidesoft.grid.ColorCellRenderer;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 
+import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.beans.IntrospectionException;
  * Time: 15:49:53
  * To change this template use File | Settings | File Templates.
  */
-public class TableModelCreator implements TableColumnManager.ColumnWidthDefaults {
+public class TableModelCreator implements TableColumnManager.DefaultColumnSettings {
 
     private java.util.List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
 
@@ -52,6 +54,16 @@ public class TableModelCreator implements TableColumnManager.ColumnWidthDefaults
         return i == null ? 75 : i;
     }
 
+    public TableCellRenderer getCellRenderer(String columnName) {
+        TableCellRenderer result = null;
+        for ( ColumnInfo i : columns) {
+            if ( i.getDisplayName().equals(columnName)) {
+                result = i.getCellRenderer();
+            }
+        }
+        return result;
+    }
+
     //jide BeanTableModel requires the propertyNames and column display names as a String[]
     private String[] generateColumnConfigStringForBeanTableModel() {
         java.util.List<String> colConfigStrings = new LinkedList<String>();
@@ -76,8 +88,8 @@ public class TableModelCreator implements TableColumnManager.ColumnWidthDefaults
         columns.add(new ColumnInfo("refreshTimeSeconds", "Refresh(s)", 100));
         columns.add(new ColumnInfo("path", "Path", 100));
         columns.add(new ColumnInfo("URL", "URL", 100));
-        columns.add(new ColumnInfo("lastRefreshTime", "Last Refresh", 50));
-        columns.add(new ColumnInfo("color", "Colour", 50));
+        columns.add(new ColumnInfo("lastRefreshTime", "Last Refresh", 50, new TimeRenderer()));
+        columns.add(new ColumnInfo("color", "Colour", 50, new ColorCellRenderer() {{setColorValueVisible(false);}}));
         populateColumnWidthsMap();
     }
 
@@ -91,11 +103,21 @@ public class TableModelCreator implements TableColumnManager.ColumnWidthDefaults
         private String propertyName;
         private String displayName;
         private int defaultWidth;
+        private TableCellRenderer cellRenderer;
 
         private ColumnInfo(String propertyName, String displayName, int defaultWidth) {
+            this(propertyName, displayName, defaultWidth, null);
+        }
+
+        private ColumnInfo(String propertyName, String displayName, int defaultWidth, TableCellRenderer cellRenderer) {
             this.propertyName = propertyName;
             this.displayName = displayName;
             this.defaultWidth = defaultWidth;
+            this.cellRenderer = cellRenderer;
+        }
+
+        public TableCellRenderer getCellRenderer() {
+            return cellRenderer;
         }
 
         public String getPropertyName() {

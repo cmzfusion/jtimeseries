@@ -27,14 +27,18 @@ public interface BeanPerRowModel<E> extends TableModel {
 
     void addDynamicColumn(String columnName);
 
+    boolean isDynamicColumn(int colIndex);
+
+    String getColumnDescription(int colIndex);
+
     /**
      * Wrap the jide model as a BeanPerRowModel
      */
-    public static class JideBeanModelWrapper<E> extends AbstractTableModel implements BeanPerRowModel<E>  {
+    public static class JideBeanModelWrapper extends AbstractTableModel implements BeanPerRowModel<RemoteChartingTimeSeries>  {
 
-        private BeanTableModel<E> wrappedModel;
+        private FixedColumnsBeanModel wrappedModel;
 
-        public JideBeanModelWrapper(BeanTableModel<E> wrappedModel) {
+        public JideBeanModelWrapper(FixedColumnsBeanModel wrappedModel) {
             this.wrappedModel = wrappedModel;
 
             //interpose this model as the source for events
@@ -73,7 +77,7 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.setValueAt(aValue, rowIndex, columnIndex);
         }
 
-        public E getObject(int row) {
+        public RemoteChartingTimeSeries getObject(int row) {
             return wrappedModel.getObject(row);
         }
 
@@ -81,11 +85,11 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.clear();
         }
 
-        public void addObjects(List<E> timeSeries) {
+        public void addObjects(List<RemoteChartingTimeSeries> timeSeries) {
             wrappedModel.addObjects(timeSeries);
         }
 
-        public void removeObject(E s) {
+        public void removeObject(RemoteChartingTimeSeries s) {
             wrappedModel.removeObject(s);
         }
 
@@ -94,6 +98,15 @@ public interface BeanPerRowModel<E> extends TableModel {
             //no decorator models managed to handle this - so we failed to add this dynamic column
             throw new UnsupportedOperationException();
         }
+
+        public boolean isDynamicColumn(int colIndex) {
+            return false;
+        }
+
+        public String getColumnDescription(int colIndex) {
+            return wrappedModel.getColumnDescription(colIndex);
+        }
+
 
     }
 }

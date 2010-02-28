@@ -20,12 +20,16 @@ package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.selector.table.FixedColumns;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,7 +80,9 @@ public class SelectRemoteSeriesPanel extends AbstractDownloadWizardPanel {
 
     private JComponent createSeriesSelector(TimeSeriesContext timeSeriesContext) {
         seriesSelectionPanel = new SeriesSelectionPanel(timeSeriesContext);
-        seriesSelectionPanel.showTable();
+        java.util.List<ColumnSettings> defaultColumnSettings = getDefaultColumnSettings();
+        seriesSelectionPanel.setColumns(defaultColumnSettings);
+        seriesSelectionPanel.addAllDynamicColumns();
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setLeftComponent(seriesSelectionPanel);
         splitPane.setRightComponent(seriesSelectionPanel.getSelectionList());
@@ -86,4 +92,14 @@ public class SelectRemoteSeriesPanel extends AbstractDownloadWizardPanel {
         return splitPane;
     }
 
+    public List<ColumnSettings> getDefaultColumnSettings() {
+        List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
+        addFixedColumn(columns, FixedColumns.Selected);
+        addFixedColumn(columns, FixedColumns.DisplayName);
+        return columns;
+    }
+
+    private void addFixedColumn(List<ColumnSettings> columns, FixedColumns fixedColumn) {
+        columns.add(new ColumnSettings(fixedColumn.getColumnName(), fixedColumn.getDefaultWidth()));
+    }
 }

@@ -5,11 +5,12 @@ import com.jidesoft.grid.EditorContext;
 import com.jidesoft.grid.BooleanCheckBoxCellEditor;
 import com.jidesoft.converter.ConverterContext;
 
-import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
 import java.util.List;
+import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,11 +24,10 @@ import java.util.List;
 public class EditableColumnsTableModel<E> extends AbstractTableModel implements BeanPerRowModel<E>, ContextSensitiveTableModel {
 
     private BeanPerRowModel<E> wrappedModel;
-    private int[] editableColumnIndexes;
+    private FixedColumns[] fixedColumns = FixedColumns.values();
 
-    public EditableColumnsTableModel(BeanPerRowModel<E> wrappedModel, int[] editableColumnIndexes) {
+    public EditableColumnsTableModel(BeanPerRowModel<E> wrappedModel) {
         this.wrappedModel = wrappedModel;
-        this.editableColumnIndexes = editableColumnIndexes;
         wrappedModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
                 fireTableChanged(
@@ -55,11 +55,8 @@ public class EditableColumnsTableModel<E> extends AbstractTableModel implements 
 
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         boolean result = false;
-        for (int col : editableColumnIndexes) {
-            if ( col == columnIndex) {
-                result = true;
-                break;
-            }
+        if ( fixedColumns.length > columnIndex ) {
+            result = fixedColumns[columnIndex].isEditable();
         }
         return result;
     }
@@ -102,6 +99,14 @@ public class EditableColumnsTableModel<E> extends AbstractTableModel implements 
 
     public void addDynamicColumn(String columnName) {
         wrappedModel.addDynamicColumn(columnName);
+    }
+
+    public boolean isDynamicColumn(int colIndex) {
+        return wrappedModel.isDynamicColumn(colIndex);
+    }
+
+    public String getColumnDescription(int colIndex) {
+        return wrappedModel.getColumnDescription(colIndex);
     }
 
 }

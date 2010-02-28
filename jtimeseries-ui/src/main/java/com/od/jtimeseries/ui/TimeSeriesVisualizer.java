@@ -162,7 +162,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public List<ColumnSettings> getColumns() {
-        return seriesSelectionPanel.getColumns();
+        return seriesSelectionPanel.getColumnSettings();
     }
 
     public void setColumns(List<ColumnSettings> columnSettings) {

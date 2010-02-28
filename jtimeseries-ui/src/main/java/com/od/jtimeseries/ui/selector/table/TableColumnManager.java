@@ -8,7 +8,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -22,12 +21,11 @@ public class TableColumnManager {
 
     private TableColumnModel columnModel = new DefaultTableColumnModel();
     private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
-    private DefaultColumnSettings defaultColumnSettings;
+    private String selectionColumnName;
 
-    public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, DefaultColumnSettings defaultColumnSettings, String selectionColumnName) {
+    public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, String selectionColumnName) {
         this.tableModel = tableModel;
-        this.defaultColumnSettings = defaultColumnSettings;
-        addColumn(selectionColumnName);
+        this.selectionColumnName = selectionColumnName;
     }
 
     public TableColumnModel getColumnModel() {
@@ -49,7 +47,7 @@ public class TableColumnManager {
     }
 
 
-    public List<ColumnSettings> getColumns() {
+    public List<ColumnSettings> getColumnSettings() {
         List<ColumnSettings> l = new ArrayList<ColumnSettings>();
         for ( int col = 0; col < columnModel.getColumnCount(); col ++ ) {
             TableColumn c = columnModel.getColumn(col);
@@ -104,9 +102,9 @@ public class TableColumnManager {
     private TableColumn createColumn(String columnName) {
         TableColumn newColumn = new TableColumn(
             getColumnIndex(columnName),
-            defaultColumnSettings.getDefaultColumnWidth(columnName)
+            FixedColumns.getDefaultColumnWidth(columnName)
         );
-        TableCellRenderer r = defaultColumnSettings.getCellRenderer(columnName);
+        TableCellRenderer r = FixedColumns.getCellRenderer(columnName);
         if ( r != null ) {
             newColumn.setCellRenderer(r);
         }
@@ -114,12 +112,17 @@ public class TableColumnManager {
         return newColumn;
     }
 
-
     private void setColumnIdentifier(String columnName, TableColumn newColumn) {
+        //support special column name for selected column
+        String columnIdentifier = columnName;
+        if ( columnName.equals(FixedColumns.Selected.getColumnName())) {
+            columnIdentifier = selectionColumnName;
+        }
         //handle the special stats column names
-        String id = ContextProperties.isSummaryStatsProperty(columnName) ? ContextProperties.parseStatisticName(columnName) : columnName;
+        String id = ContextProperties.isSummaryStatsProperty(columnIdentifier) ? ContextProperties.parseStatisticName(columnIdentifier) : columnIdentifier;
         newColumn.setHeaderValue(id);
     }
+
 
     private void addDynamicColumnIfRequired(String columnName) {
         int index = getColumnIndex(columnName);
@@ -152,20 +155,19 @@ public class TableColumnManager {
         return result;
     }
 
-    //we don't currently persist users changes to column order/sizes, but perhaps we should..
-    private void sizeColumns(TableColumnModel m) {
-        Enumeration<TableColumn> e = m.getColumns();
-        while(e.hasMoreElements()) {
-            TableColumn col = e.nextElement();
-            String name = tableModel.getColumnName(col.getModelIndex());
-            col.setPreferredWidth(defaultColumnSettings.getDefaultColumnWidth(name));
-        }
+    public String getColumnDescription(String columnName) {
+        int index = getColumnIndex(columnName);
+        return tableModel.getColumnDescription(index);
     }
 
-    public static interface DefaultColumnSettings {
-
-        int getDefaultColumnWidth(String columnName);
-
-        TableCellRenderer getCellRenderer(String columnName);
+    public void addAllDynamicColumns() {
+        for ( int col = 0; col < tableModel.getColumnCount(); col ++ ) {
+            if ( tableModel.isDynamicColumn(col)) {
+                String colName = tableModel.getColumnName(col);
+                if ( ! existsInColumnModel(colName)) {
+                    addColumn(colName);
+                }
+            }
+        }
     }
 }

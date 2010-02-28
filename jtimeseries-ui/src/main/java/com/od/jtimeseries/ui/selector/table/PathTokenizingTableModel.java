@@ -49,13 +49,26 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
         return oldMax != maxPathElements;
     }
 
+    protected String doGetColumnDescription(int extraColsIndex) {
+        int segment = getSegmentNumber(extraColsIndex);
+        String segName;
+        switch(segment) {
+            case(1) : segName = "1st"; break;
+            case(2) : segName = "2nd"; break;
+            case(3) : segName = "3rd"; break;
+            default :
+            segName = segment + "th";
+        }
+        return "The " + segName + " segment of the full path which identifies the time series, this can be useful for filtering the data";
+    }
+
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
         List<String> pathElements = (getObject(rowIndex)).getPathElements();
         return pathElements.size() > extraColsIndex ?  pathElements.get(extraColsIndex) : null;
     }
 
     protected void doAddDynamicColumn(String columnName) {
-        int elementNumber = Integer.parseInt(columnName.substring(4));
+        int elementNumber = Integer.parseInt(columnName.substring(5));
         if ( maxPathElements < elementNumber ) {
             maxPathElements = elementNumber;
             fireTableStructureChanged();
@@ -71,7 +84,11 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
     }
 
     protected String getDynamicColumnName(int extraColsIndex) {
-        return String.valueOf("Path " + extraColsIndex);
+        return String.valueOf("Path " + getSegmentNumber(extraColsIndex));
+    }
+
+    private int getSegmentNumber(int extraColsIndex) {
+        return (extraColsIndex + 1);  //segments start from 1
     }
 
     protected Class<?> getDynamicColumnClass(int extraColsIndex) {

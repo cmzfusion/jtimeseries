@@ -27,8 +27,6 @@ import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -77,8 +75,8 @@ public class TableSelector extends SelectorPanel {
         tableColumnManager.setColumns(columnSettings);
     }
 
-    public List<ColumnSettings> getColumns() {
-        return tableColumnManager.getColumns();
+    public List<ColumnSettings> getColumnSettings() {
+        return tableColumnManager.getColumnSettings();
     }
 
     private void createPopupMenu() {
@@ -93,9 +91,8 @@ public class TableSelector extends SelectorPanel {
     }
 
     private void createTable() {
-        TableModelCreator tableModelCreator = new TableModelCreator(selectionText);
-        tableModel = tableModelCreator.createTableModel();
-        tableColumnManager = new TableColumnManager(tableModel, tableModelCreator, selectionText);
+        tableModel = new TableModelCreator().createTableModel();
+        tableColumnManager = new TableColumnManager(tableModel, selectionText);
         timeSeriesTable = new TimeSeriesTable(tableModel, tableColumnManager);
     }
 
@@ -133,4 +130,7 @@ public class TableSelector extends SelectorPanel {
         }
     }
 
+    public void addAllDynamicColumns() {
+        tableColumnManager.addAllDynamicColumns();    
+    }
 }

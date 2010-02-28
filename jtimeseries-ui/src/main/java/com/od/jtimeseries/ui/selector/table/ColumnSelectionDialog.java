@@ -69,6 +69,7 @@ public class ColumnSelectionDialog extends JDialog {
                 displayName = ContextProperties.parseStatisticName(displayName);
             }
             final JCheckBox checkBox = new JCheckBox(displayName, tableColumnManager.isInTable(name));
+            checkBox.setToolTipText(tableColumnManager.getColumnDescription(name));
             columnPanel.add(checkBox);
 
             checkBox.addActionListener(new ActionListener() {

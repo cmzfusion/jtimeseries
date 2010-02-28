@@ -185,14 +185,18 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         tableSelector.setColumns(columnSettings);
     }
 
-    public List<ColumnSettings> getColumns() {
-        return tableSelector.getColumns();
+    public List<ColumnSettings> getColumnSettings() {
+        return tableSelector.getColumnSettings();
     }
 
     public void refresh() {
         setupTimeseries(rootContext.findAllTimeSeries().getAllMatches());
         treeSelector.refreshSeries();
         tableSelector.refreshSeries();
+    }
+
+    public void addAllDynamicColumns() {
+        tableSelector.addAllDynamicColumns();
     }
 
     private void setupTimeseries(List<IdentifiableTimeSeries> l) {
@@ -232,29 +236,6 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
             s.removePropertyChangeListener(selectionPropertyListener);
             s.removePropertyChangeListener(seriesConnectionPropertyListener);
         }
-    }
-
-    public static void main(String[] args) throws MalformedURLException {
-        final TimeSeriesContext root = JTimeSeries.createRootContext();
-        TimeSeriesContext a = root.createContextForPath("prod.client.test");
-        TimeSeriesContext b = root.createContextForPath("prod.server.test");
-        TimeSeriesContext c = root.createContextForPath("uat.server.test");
-        TimeSeriesContext d = root.createContextForPath("uat.client.test");
-        a.addChild(new RemoteChartingTimeSeries("aseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
-        b.addChild(new RemoteChartingTimeSeries("bseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
-        c.addChild(new RemoteChartingTimeSeries("cseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
-        d.addChild(new RemoteChartingTimeSeries("dseries", "test", new URL("http://localhost"), Time.minutes(5), 1));
-
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                SeriesSelectionPanel s = new SeriesSelectionPanel(root);
-                JFrame f = new JFrame();
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                f.setSize(1024,768);
-                f.getContentPane().add(s);
-                f.setVisible(true);
-            }
-        });
     }
 
     private class RadioButtonSelectionListener implements ActionListener {

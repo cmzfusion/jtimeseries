@@ -53,10 +53,21 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         if (isColumnInWrappedModel(columnIndex)) {
             return wrappedModel.getColumnName(columnIndex);
         } else {
-            int extraColsIndex = getExtraColsIndex(columnIndex);
-            return getDynamicColumnName(extraColsIndex);
+            int dynamicColsIndex = getDynamicColsIndex(columnIndex);
+            return getDynamicColumnName(dynamicColsIndex);
         }
     }
+
+    public String getColumnDescription(int columnIndex) {
+        if ( isColumnInWrappedModel(columnIndex)) {
+            return wrappedModel.getColumnDescription(columnIndex);
+        } else {
+            int dynamicColsIndex = getDynamicColsIndex(columnIndex);
+            return doGetColumnDescription(dynamicColsIndex);
+        }
+    }
+
+    protected abstract String doGetColumnDescription(int columnIndex);
 
     protected abstract String getDynamicColumnName(int extraColsIndex);
 
@@ -64,8 +75,8 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         if ( isColumnInWrappedModel(columnIndex)) {
             return wrappedModel.getColumnClass(columnIndex);
         } else {
-            int extraColsIndex = getExtraColsIndex(columnIndex);
-            return getDynamicColumnClass(extraColsIndex);
+            int dynamicColsIndex = getDynamicColsIndex(columnIndex);
+            return getDynamicColumnClass(dynamicColsIndex);
         }
     }
 
@@ -79,8 +90,8 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         if ( isColumnInWrappedModel(columnIndex)) {
             return wrappedModel.getValueAt(rowIndex, columnIndex);
         } else {
-            int extraColsIndex = getExtraColsIndex(columnIndex);
-            return getValueForDynamicColumn(rowIndex, extraColsIndex);
+            int dynamicColsIndex = getDynamicColsIndex(columnIndex);
+            return getValueForDynamicColumn(rowIndex, dynamicColsIndex);
         }
     }
 
@@ -114,12 +125,16 @@ public abstract class DynamicColumnsTableModel<E> extends AbstractTableModel imp
         eventDispatcher.removeTableModelListener(l);
     }
 
-    private int getExtraColsIndex(int columnIndex) {
+    private int getDynamicColsIndex(int columnIndex) {
         return columnIndex - wrappedModel.getColumnCount();
     }
 
     private boolean isColumnInWrappedModel(int columnIndex) {
         return columnIndex < wrappedModel.getColumnCount();
+    }
+
+    public boolean isDynamicColumn(int columnIndex) {
+        return ! isColumnInWrappedModel(columnIndex) || wrappedModel.isDynamicColumn(columnIndex);
     }
 
     public void clear() {

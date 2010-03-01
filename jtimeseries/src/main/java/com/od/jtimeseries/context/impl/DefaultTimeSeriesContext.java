@@ -650,15 +650,13 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
 
     private <E extends Identifiable> void checkUniqueIdAndAdd(E identifiable) {
         synchronized (getTreeLock()) {
-            synchronized (children) {
-                if ( childrenById.containsKey(identifiable.getId())) {
-                    throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
-                } else {
-                    children.add(identifiable);
-                    childrenById.put(identifiable.getId(), identifiable);
-                }
-                identifiable.setParent(this);
+            if ( childrenById.containsKey(identifiable.getId())) {
+                throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
+            } else {
+                children.add(identifiable);
+                childrenById.put(identifiable.getId(), identifiable);
             }
+            identifiable.setParent(this);
         }
     }
 

@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.*;
@@ -28,7 +27,6 @@ import com.od.jtimeseries.ui.selector.table.ColumnSelectionDialog;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.time.Time;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
@@ -39,8 +37,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -120,16 +116,14 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     }
 
     private void showColumnSelectionDialog() {
-        ColumnSelectionDialog d = new ColumnSelectionDialog(getWindowForComponent(this), this, tableSelector.getTableColumnManager());
+        ColumnSelectionDialog d = new ColumnSelectionDialog(getFrameForComponent(this), this, tableSelector.getTableColumnManager());
         d.setVisible(true);
         d.dispose();
     }
 
-    private Window getWindowForComponent(Component parentComponent) throws HeadlessException {
-
-        if (parentComponent instanceof Frame || parentComponent instanceof Dialog)
-            return (Window)parentComponent;
-        return getWindowForComponent(parentComponent.getParent());
+    private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {
+        if (parentComponent instanceof Frame)  return (Frame)parentComponent;
+        return getFrameForComponent(parentComponent.getParent());
     }
 
     private void createSelectorPanel() {

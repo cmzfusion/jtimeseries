@@ -150,7 +150,9 @@ public class JTimeSeriesDemo {
     private void createVisualizer(UdpPingHttpServerDictionary serverDictionary) throws FileNotFoundException {
         visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
         VisualizerConfiguration config = loadVisualizerConfig();
-        configureVisualizer(config);
+        if ( config != null) {
+            configureVisualizer(config);
+        }
     }
 
     private VisualizerConfiguration loadVisualizerConfig() throws FileNotFoundException {

@@ -20,7 +20,7 @@ public class ColumnSelectionDialog extends JDialog {
 
     private TableColumnManager tableColumnManager;
 
-    public ColumnSelectionDialog(Window owner, JComponent parentComponent, TableColumnManager tableColumnManager) {
+    public ColumnSelectionDialog(Frame owner, JComponent parentComponent, TableColumnManager tableColumnManager) {
         super(owner);
         setTitle("Choose Columns");
         setModal(true);

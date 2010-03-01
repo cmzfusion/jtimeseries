@@ -35,7 +35,7 @@ public class IdentifiableBase implements Identifiable {
     /**
      * A lock for the context tree structure which should be held while changing or traversing the tree structure, to ensure integrity
      */
-    private final Object TREE_LOCK = new Object();
+    private static final Object TREE_LOCK = new Object();
 
     protected static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
     protected static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";

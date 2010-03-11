@@ -87,7 +87,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()), config.getMaxDaysHistory());
         setSelected(config.isSelected());
         this.displayName = config.getDisplayName();
-        this.color = config.getColor();
+        this.color = config.getColor() != null ? config.getColor() : color;  //old persisted configs did not include color
     }
 
     public RemoteChartingTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime, int maxDaysHistory) {
@@ -268,6 +268,7 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
                 protected void doInEventThread() throws Exception {
                     errorCount = 0;
+                    setLastRefreshTime(new Date());
                 }
             };
         }

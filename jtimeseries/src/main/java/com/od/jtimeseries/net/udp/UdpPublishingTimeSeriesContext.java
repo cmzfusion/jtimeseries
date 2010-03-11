@@ -4,6 +4,7 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
@@ -27,6 +28,13 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
     private Map<Identifiable, PublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, PublishingTimeSeriesListener>();
     private UdpClient udpClient;
     private int minSendIntervalMillis;
+
+    /**
+     * Create a UdpPublishingTimeSeriesContext as a root context 
+     */
+    public UdpPublishingTimeSeriesContext(UdpClient udpClient) {
+        this(udpClient, null, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID);
+    }
 
     public UdpPublishingTimeSeriesContext(UdpClient udpClient, TimeSeriesContext parent, String id, String description) {
         this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, parent, id, description);

@@ -29,6 +29,7 @@ import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTi
 import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.ui.TimeSeriesVisualizer;
 import com.od.jtimeseries.ui.VisualizerConfiguration;
+import com.od.jtimeseries.ui.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.util.BenchmarkingRepaintManager;
 import com.od.jtimeseries.util.time.Time;
 
@@ -204,7 +205,7 @@ public class JTimeSeriesDemo {
         visualizer.setDisplayNamePatterns(config.getDisplayNamePatterns());
         visualizer.setTableSelectorVisible(config.isTableSelectorVisible());
         visualizer.setDividerLocation(config.getDividorLocation());
-        visualizer.setChartRangeMode(config.getChartRangeMode());
+        visualizer.setChartRangeMode(ChartRangeMode.valueOf(config.getChartRangeMode()));
         visualizer.setChartsTitle(config.getChartsTitle());
         visualizer.setShowLegendOnChart(config.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(config.getChartBackgroundColor());

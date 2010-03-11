@@ -43,8 +43,8 @@ public class VisualizerConfiguration {
     private List<RemoteChartingTimeSeriesConfig> chartConfigs;
     private int dividorLocation;
     private boolean showLegendOnChart = true;
-    private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
-    private Color chartBackgroundColor = Color.WHITE;
+    private String chartRangeMode = ChartRangeMode.RangePerId.name(); //1.5.x bean persistence does not support enums, unfortunately!
+    private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
 
     public VisualizerConfiguration() {
@@ -56,7 +56,7 @@ public class VisualizerConfiguration {
         this.displayNamePatterns = displayNamePatterns;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
-        this.chartRangeMode = chartRangeMode;
+        this.chartRangeMode = chartRangeMode.name();
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
         this.chartBackgroundColor = chartBackgroundColor;
@@ -95,17 +95,12 @@ public class VisualizerConfiguration {
         this.chartConfigs = chartConfigs;
     }
 
-    public ChartRangeMode getChartRangeMode() {
+    public String getChartRangeMode() {
         return chartRangeMode;
     }
 
-    public void setChartRangeMode(ChartRangeMode chartRangeMode) {
+    public void setChartRangeMode(String chartRangeMode) {
         this.chartRangeMode = chartRangeMode;
-    }
-
-    //for backwards compatibility
-    public void setMultipleRangeChart(boolean isMultipleRange) {
-        setChartRangeMode(isMultipleRange ? ChartRangeMode.RangePerSeries : ChartRangeMode.SingleRange);
     }
 
     public int getDividorLocation() {
@@ -139,4 +134,29 @@ public class VisualizerConfiguration {
     public void setTableColumns(List<ColumnSettings> columnSettings) {
         this.tableColumns = columnSettings;
     }
+
+    public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
+        return new VisualizerConfiguration( visualizer.getChartsTitle(),
+            visualizer.getDisplayNamePatterns(),
+            visualizer.isTableSelectorVisible(),
+            visualizer.getChartConfigs(),
+            visualizer.getChartRangeMode(),
+            visualizer.getDividerLocation(),
+            visualizer.isShowLegendOnChart(),
+            visualizer.getChartBackgroundColor(),
+            visualizer.getColumns()
+        );
+    }
+
+    public static void setVisualizerConfiguration(TimeSeriesVisualizer visualizer, VisualizerConfiguration c) {
+        visualizer.setDisplayNamePatterns(c.getDisplayNamePatterns());
+        visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
+        visualizer.addChartConfigs(c.getChartConfigs());
+        visualizer.setChartRangeMode(ChartRangeMode.valueOf(c.getChartRangeMode()));
+        visualizer.setDividerLocation(c.getDividorLocation());
+        visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
+        visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
+        visualizer.setColumns(c.getTableColumns());
+    }
+
 }

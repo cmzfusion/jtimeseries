@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * Time: 19:52:23
  * To change this template use File | Settings | File Templates.
  */
-public class AppendToSeriesPerformanceTest {
+public class AppendToSeriesPerformanceHarness {
 
     private static long messagesSent = 0;
     private static final int NUMBER_OF_SERIES = 10000;
@@ -29,7 +29,7 @@ public class AppendToSeriesPerformanceTest {
     private List<String> seriesPaths = new ArrayList<String>();
     public UdpClient udpClient = new UdpClient(new UdpClient.ClientConfig(InetAddress.getByName("localhost"), 18081));
 
-    public AppendToSeriesPerformanceTest() throws UnknownHostException {
+    public AppendToSeriesPerformanceHarness() throws UnknownHostException {
         generateSeriesPaths();
         ScheduledExecutorService s = Executors.newSingleThreadScheduledExecutor();
         s.scheduleAtFixedRate(new Runnable() {
@@ -66,6 +66,6 @@ public class AppendToSeriesPerformanceTest {
     }
 
     public static void main(String[] args) throws UnknownHostException {
-        new AppendToSeriesPerformanceTest();
+        new AppendToSeriesPerformanceHarness();
     }
 }

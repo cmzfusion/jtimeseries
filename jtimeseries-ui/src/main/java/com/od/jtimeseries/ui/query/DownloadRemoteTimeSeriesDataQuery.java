@@ -66,7 +66,6 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
             public void endDocument() {
                 destinationSeries.addAll(itemsToAdd);
                 itemsToAdd.clear();
-                destinationSeries.setLastRefreshTime(new Date());
             }
         };
     }

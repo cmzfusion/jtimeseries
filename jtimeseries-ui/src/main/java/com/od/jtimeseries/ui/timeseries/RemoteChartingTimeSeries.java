@@ -61,8 +61,9 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private static int startOfDayOffsetMinutes = 0;
     private static final int ONE_DAY_MILLIS = 24*60*60*1000;
     private static ColorRotator colorRotator = new ColorRotator();
+    private static final int STATS_ONLY_REFRESH_TIME_SECONDS = 60 * 30;
+    private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
-    private int MIN_REFRESH_TIME_SECONDS = 10;
     private URL timeSeriesUrl;
     private LogMethods logMethods = LogUtils.getLogMethods(RemoteChartingTimeSeries.class);
     private boolean selected;
@@ -222,9 +223,11 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
             }
         };
 
+        //if the user has not selected to chart the series, we only refresh the stats, and much less frequently
+        int refreshTime = isSelected() ? this.refreshTimeSeconds : STATS_ONLY_REFRESH_TIME_SECONDS;
         if ( ! neverRefresh) {
             refreshTask = refreshExecutor.scheduleAtFixedRate(
-                runCommandTask, 0, (long) this.refreshTimeSeconds, TimeUnit.SECONDS
+                runCommandTask, 0, refreshTime, TimeUnit.SECONDS
             );
         }
     }

@@ -31,7 +31,7 @@ import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
-import com.od.jtimeseries.ui.util.JideInitialization;
+import com.od.jtimeseries.ui.JideInitialization;
 import com.od.jtimeseries.ui.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.chart.TimeSeriesChart;
 import com.od.jtimeseries.ui.chart.ChartRangeMode;
@@ -64,6 +64,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public TimeSeriesVisualizer(String title, RemoteServerDictionary remoteServerDictionary) {
         JideInitialization.applyLicense();
+        JideInitialization.setupJide();
 
         this.remoteServerDictionary = remoteServerDictionary;
         chart = new TimeSeriesChart(title);

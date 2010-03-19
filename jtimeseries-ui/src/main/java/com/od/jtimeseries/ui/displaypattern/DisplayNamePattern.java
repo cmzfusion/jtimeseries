@@ -61,4 +61,24 @@ public class DisplayNamePattern {
     public boolean isValid() {
         return pattern != null && pattern.length() > 0 && replacement != null && replacement.length() > 0;
     }
+
+    //nb. equals is on pattern only, so that we can check a rule for a pattern exists but not replace
+    //it if the user has defined their own custom replacement
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DisplayNamePattern that = (DisplayNamePattern) o;
+
+        if (pattern != null ? !pattern.equals(that.pattern) : that.pattern != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = pattern != null ? pattern.hashCode() : 0;
+        result = 31 * result + (replacement != null ? replacement.hashCode() : 0);
+        return result;
+    }
 }

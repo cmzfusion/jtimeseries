@@ -24,7 +24,7 @@ public class AppendToSeriesPerformanceHarness {
 
     private static long messagesSent = 0;
     private static final int NUMBER_OF_SERIES = 10000;
-    private static final int MESSAGES_PER_SECOND = 500;
+    private static final int MESSAGES_PER_SECOND = 1000;
 
     private List<String> seriesPaths = new ArrayList<String>();
     public UdpClient udpClient = new UdpClient(new UdpClient.ClientConfig(InetAddress.getByName("localhost"), 18081));

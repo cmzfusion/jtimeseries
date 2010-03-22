@@ -22,6 +22,7 @@ import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -110,6 +111,17 @@ public class UdpServer {
 
     public class UdpReceiveThread extends Thread {
 
+        private PropertiesUtil propertiesUtil;
+
+        public UdpReceiveThread() {
+            try {
+                propertiesUtil = new PropertiesUtil();
+            } catch (ParserConfigurationException e) {
+                limitedLogger.logError("Failed to PropertiesUtil, cannot continue starting UDP server", e);
+                throw new RuntimeException("Cannot create PropertiesUtil, cannot continue starting UDP server", e);
+            }
+        }
+
         public void run() {
             byte[] buffer = new byte[MAX_PACKET_SIZE];
             try {
@@ -129,8 +141,7 @@ public class UdpServer {
                     byte[] receivedData = new byte[packet.getLength()];
                     System.arraycopy(buffer, 0, receivedData, 0, packet.getLength());
                     ByteArrayInputStream bos = new ByteArrayInputStream(receivedData);
-                    final Properties p = new Properties();
-                    p.loadFromXML(bos);
+                    Properties p = propertiesUtil.loadFromXML(bos);
                     fireMessageToListeners(p);
                 }
                 catch (Throwable t) {

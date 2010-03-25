@@ -72,6 +72,10 @@ public class ColumnSelectionDialog extends JDialog {
             checkBox.setToolTipText(tableColumnManager.getColumnDescription(name));
             columnPanel.add(checkBox);
 
+            if (isMandatoryColumn(name)) {
+                checkBox.setEnabled(false);
+            }
+
             checkBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if ( checkBox.isSelected() ) {
@@ -83,6 +87,11 @@ public class ColumnSelectionDialog extends JDialog {
             });
         }
         return columnPanel;
+    }
+
+    //without the 'selected' column, you can't select the series, or enable charting
+    private boolean isMandatoryColumn(String name) {
+        return "Selected".equals(name);
     }
 
 

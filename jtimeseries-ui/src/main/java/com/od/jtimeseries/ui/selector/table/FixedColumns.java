@@ -5,6 +5,7 @@ import com.jidesoft.grid.ColorCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -17,15 +18,15 @@ import java.util.HashMap;
 */
 public enum FixedColumns {
 
-    Selected("selected", "Selected", 65, true, "Select a series"),
+    Selected("selected", "Selected", 110, true, "Select a series"),
     DisplayName("displayName", "Display Name", 175, true, "Name to use when displaying series in chart"),
-    Id("id", "Id", 75, false, "Series ID"),
-    MaxDaysHistory("maxDaysHistory", "Max Days", 100, true, "Maximum number of days of data to display in chart"),
-    RefreshTimeSeconds("refreshTimeSeconds", "Refresh(s)", 100, true, "Frequency of series data refresh"),
-    Path("path", "Path", 100, false, "Full path identifying series"),
-    Url("URL", "URL", 100, false, "URL for series data subscription"),
-    LastRefreshTime("lastRefreshTime", "Last Refresh", 50, new TimeRenderer(), false, "Last series data refresh time"),
-    Color("color", "Colour", 50, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
+    Id("id", "Id", 150, false, "Series ID"),
+    MaxDaysHistory("maxDaysHistory", "Max Days", 120, true, "Maximum number of days of data to display in chart"),
+    RefreshTimeSeconds("refreshTimeSeconds", "Refresh(s)", 120, true, "Frequency of series data refresh"),
+    Path("path", "Path", 120, false, "Full path identifying series"),
+    Url("URL", "URL", 120, false, "URL for series data subscription"),
+    LastRefreshTime("lastRefreshTime", "Last Refresh", 120, new TimeRenderer(), false, "Last series data refresh time"),
+    Color("color", "Colour", 110, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
 
     private static Map<String, Integer> columnWidths = new HashMap<String,Integer>();
     static {
@@ -91,5 +92,9 @@ public enum FixedColumns {
 
     public String getDescription() {
         return description;
+    }
+
+    public static void addFixedColumn(List<ColumnSettings> columns, FixedColumns fixedColumn) {
+        columns.add(new ColumnSettings(fixedColumn.getColumnName(), fixedColumn.getDefaultWidth()));
     }
 }

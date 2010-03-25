@@ -57,7 +57,7 @@ public class ChartSeriesPopulator {
                 String id = contextTimeSeries.getId();
                 axis = getOrCreateAxis(id);
                 int axisIndex = getAxisIndex(id);
-                plot.setRangeAxis(seriesId, axis);
+                plot.setRangeAxis(axisIndex, axis);
                 plot.mapDatasetToRangeAxis(seriesId, axisIndex);
                 break;
             default :

@@ -92,14 +92,11 @@ public class SelectRemoteSeriesPanel extends AbstractDownloadWizardPanel {
         return splitPane;
     }
 
-    public List<ColumnSettings> getDefaultColumnSettings() {
+    private List<ColumnSettings> getDefaultColumnSettings() {
         List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
-        addFixedColumn(columns, FixedColumns.Selected);
-        addFixedColumn(columns, FixedColumns.DisplayName);
+        FixedColumns.addFixedColumn(columns, FixedColumns.Selected);
+        FixedColumns.addFixedColumn(columns, FixedColumns.DisplayName);
         return columns;
     }
 
-    private void addFixedColumn(List<ColumnSettings> columns, FixedColumns fixedColumn) {
-        columns.add(new ColumnSettings(fixedColumn.getColumnName(), fixedColumn.getDefaultWidth()));
-    }
 }

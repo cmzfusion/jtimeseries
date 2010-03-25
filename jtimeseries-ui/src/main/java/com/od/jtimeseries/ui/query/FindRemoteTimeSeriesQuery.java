@@ -65,7 +65,11 @@ public class FindRemoteTimeSeriesQuery extends AbstractRemoteQuery {
                 String id = attributes.getValue(AttributeName.id.name());
                 String description = attributes.getValue(AttributeName.description.name());
                 String parentPath = attributes.getValue(AttributeName.parentPath.name());
+
                 String summaryStats = attributes.getValue(AttributeName.summaryStats.name());
+                //older clients pre version 1.0.9 may not provide summary stats attribute
+                summaryStats = summaryStats == null ? "" : summaryStats;
+
                 RemoteTimeSeries series = new RemoteTimeSeries(parentPath, id, description, seriesUrl, summaryStats);
                 result.add(series);
             }

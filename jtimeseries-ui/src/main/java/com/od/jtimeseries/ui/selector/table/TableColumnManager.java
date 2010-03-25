@@ -26,6 +26,11 @@ public class TableColumnManager {
     public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, String selectionColumnName) {
         this.tableModel = tableModel;
         this.selectionColumnName = selectionColumnName;
+        setupDefaultColumns();
+    }
+
+    private void setupDefaultColumns() {
+        setColumns(getDefaultColumnSettings());
     }
 
     public TableColumnModel getColumnModel() {
@@ -169,5 +174,13 @@ public class TableColumnManager {
                 }
             }
         }
+    }
+
+    private List<ColumnSettings> getDefaultColumnSettings() {
+        List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
+        FixedColumns.addFixedColumn(columns, FixedColumns.Selected);
+        FixedColumns.addFixedColumn(columns, FixedColumns.DisplayName);
+        FixedColumns.addFixedColumn(columns, FixedColumns.Color);
+        return columns;
     }
 }

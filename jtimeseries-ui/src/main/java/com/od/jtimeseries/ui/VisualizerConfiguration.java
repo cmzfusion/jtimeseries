@@ -43,7 +43,7 @@ public class VisualizerConfiguration {
     private List<RemoteChartingTimeSeriesConfig> chartConfigs;
     private int dividorLocation;
     private boolean showLegendOnChart = true;
-    private String chartRangeMode = ChartRangeMode.RangePerId.name(); //1.5.x bean persistence does not support enums, unfortunately!
+    private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
 

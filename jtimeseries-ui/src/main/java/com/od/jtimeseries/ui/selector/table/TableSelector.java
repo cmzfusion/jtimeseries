@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.SortableTable;
+import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
@@ -102,8 +103,9 @@ public class TableSelector extends SelectorPanel {
         timeSeriesTable.getSelectionModel().addListSelectionListener(
             new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    if ( timeSeriesTable.getSelectedRow() > -1 ) {
-                        RemoteChartingTimeSeries series = tableModel.getObject(timeSeriesTable.getSelectedRow());
+                    if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
+                        int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),timeSeriesTable.getSelectedRow());
+                        RemoteChartingTimeSeries series = tableModel.getObject(modelRow);
                         getSeriesActionModel().setSelected(series);
                         fireSelectedForDescription(series);
                     }

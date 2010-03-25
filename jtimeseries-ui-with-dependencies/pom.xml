@@ -17,7 +17,7 @@
 	        <artifactId>maven-assembly-plugin</artifactId>
 	        <configuration>
 					<descriptors>
-            <descriptor>src/assemble/with-dependencies.xml</descriptor>
+            <descriptor>src/assemble/no-jfreechart.xml</descriptor>
             <descriptor>src/assemble/all-dependencies.xml</descriptor>
           </descriptors>
 	        </configuration>

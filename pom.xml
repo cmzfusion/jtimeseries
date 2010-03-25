@@ -25,7 +25,7 @@
                         <include>src/main/java/**</include>
                     </includes>
                     <properties>
-                        <year>2009</year>
+                        <year>2010</year>
                     </properties>
                 </configuration>
             </plugin>

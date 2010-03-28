@@ -16,39 +16,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.timeseries;
+package com.od.jtimeseries.ui.visualizer.selector.shared;
 
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
- * User: nick
- * Date: 26-Feb-2010
- * Time: 22:33:54
+ * User: Nick Ebbutt
+ * Date: 07-Jan-2009
+ * Time: 11:03:45
  */
-public class ColorRotator {
+public class TitleLabelPanel extends JPanel {
 
-    private static Color[] seriesColors = new Color[] {
-            Color.BLUE.darker(),
-            Color.GREEN.darker(),
-            Color.RED.darker(),
-            Color.GRAY,
-            Color.CYAN.darker(),
-            Color.DARK_GRAY,
-            Color.MAGENTA,
-            Color.ORANGE,
-            Color.YELLOW.darker(),
-            Color.PINK,
-            Color.BLUE,
-            Color.CYAN,
-            Color.BLUE.brighter(),
-            Color.GREEN.darker(),
-            Color.MAGENTA.darker()
-    };
-
-    private int lastColor;
-
-    public Color getNextColor() {
-        return seriesColors[lastColor++ % seriesColors.length];
+    public JLabel createTitleLabel(String text) {
+        JLabel l = new JLabel(text);
+        l.setBorder(new EmptyBorder(3,3,3,3));
+        l.setForeground(Color.BLUE.darker());
+        return l;
     }
 }

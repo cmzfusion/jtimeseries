@@ -30,7 +30,7 @@ import java.util.*;
  * Date: 13-Jan-2009
  * Time: 12:37:59
  */
-public class UdpPingHttpServerDictionary implements RemoteServerDictionary, UdpServer.UdpMessageListener {
+public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, UdpServer.UdpMessageListener {
 
     private final Set<RemoteHttpServer> serverSet = Collections.synchronizedSet(new TreeSet<RemoteHttpServer>());
     private LogMethods logMethods = LogUtils.getLogMethods(UdpPingHttpServerDictionary.class);

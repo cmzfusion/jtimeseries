@@ -16,39 +16,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.timeseries;
-
-import java.awt.*;
+package com.od.jtimeseries.ui.visualizer.chart;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 26-Feb-2010
- * Time: 22:33:54
+ * Time: 23:39:08
+ * To change this template use File | Settings | File Templates.
  */
-public class ColorRotator {
+public enum ChartRangeMode {
+    
+    SingleRange("Single Range"),
+    RangePerId("Range Per Id"),
+    RangePerSeries("Range Per Series");
 
-    private static Color[] seriesColors = new Color[] {
-            Color.BLUE.darker(),
-            Color.GREEN.darker(),
-            Color.RED.darker(),
-            Color.GRAY,
-            Color.CYAN.darker(),
-            Color.DARK_GRAY,
-            Color.MAGENTA,
-            Color.ORANGE,
-            Color.YELLOW.darker(),
-            Color.PINK,
-            Color.BLUE,
-            Color.CYAN,
-            Color.BLUE.brighter(),
-            Color.GREEN.darker(),
-            Color.MAGENTA.darker()
-    };
+    private String description;
 
-    private int lastColor;
-
-    public Color getNextColor() {
-        return seriesColors[lastColor++ % seriesColors.length];
+    private ChartRangeMode(String description) {
+        this.description = description;
     }
+
+    public String toString() {
+        return description;
+    }
+
 }

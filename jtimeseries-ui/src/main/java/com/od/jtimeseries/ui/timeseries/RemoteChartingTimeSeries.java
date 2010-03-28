@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.net.httpd.HttpParameterName;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
-import com.od.jtimeseries.ui.query.DownloadRemoteTimeSeriesDataQuery;
+import com.od.jtimeseries.ui.timeseries.DownloadRemoteTimeSeriesDataQuery;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.Time;

@@ -16,39 +16,31 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.timeseries;
+package com.od.jtimeseries.ui.visualizer.selector.table;
 
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.*;
+import java.text.SimpleDateFormat;
 import java.awt.*;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
- * User: nick
- * Date: 26-Feb-2010
- * Time: 22:33:54
- */
-public class ColorRotator {
+* User: nick
+* Date: 21-Feb-2010
+* Time: 18:35:05
+* To change this template use File | Settings | File Templates.
+*/
+class TimeRenderer extends DefaultTableCellRenderer {
 
-    private static Color[] seriesColors = new Color[] {
-            Color.BLUE.darker(),
-            Color.GREEN.darker(),
-            Color.RED.darker(),
-            Color.GRAY,
-            Color.CYAN.darker(),
-            Color.DARK_GRAY,
-            Color.MAGENTA,
-            Color.ORANGE,
-            Color.YELLOW.darker(),
-            Color.PINK,
-            Color.BLUE,
-            Color.CYAN,
-            Color.BLUE.brighter(),
-            Color.GREEN.darker(),
-            Color.MAGENTA.darker()
-    };
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
 
-    private int lastColor;
-
-    public Color getNextColor() {
-        return seriesColors[lastColor++ % seriesColors.length];
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        Date d = (Date) value;
+        if ( d != null) {
+            setText(timeFormat.format(d));
+        }
+        return this;
     }
 }

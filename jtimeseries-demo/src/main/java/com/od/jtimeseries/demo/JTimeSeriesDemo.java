@@ -27,9 +27,9 @@ import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.timeseries.aggregation.AggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.net.udp.*;
-import com.od.jtimeseries.ui.TimeSeriesVisualizer;
-import com.od.jtimeseries.ui.VisualizerConfiguration;
-import com.od.jtimeseries.ui.chart.ChartRangeMode;
+import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
+import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
+import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.util.BenchmarkingRepaintManager;
 import com.od.jtimeseries.util.time.Time;
 

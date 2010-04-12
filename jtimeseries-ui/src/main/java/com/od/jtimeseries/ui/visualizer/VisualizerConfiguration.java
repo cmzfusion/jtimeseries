@@ -156,7 +156,11 @@ public class VisualizerConfiguration {
         visualizer.setDividerLocation(c.getDividorLocation());
         visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
-        visualizer.setColumns(c.getTableColumns());
+
+        //if there are no columns, assume we will use the default column set
+        if ( c.getTableColumns().size() > 0) {
+            visualizer.setColumns(c.getTableColumns());
+        }
     }
 
 }

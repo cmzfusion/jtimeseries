@@ -1,7 +1,9 @@
-package com.od.jtimeseries.ui;
+package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousMainFrame;
+import com.od.jtimeseries.ui.timeserious.config.ConfigUtils;
+import com.od.jtimeseries.ui.timeserious.config.SavedConfig;
+import com.od.jtimeseries.ui.util.JideInitialization;
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
 import javax.swing.*;
@@ -31,10 +33,17 @@ public class TimeSerious {
                 JideInitialization.setupJide();
                 JideInitialization.setupJideLookAndFeel();
 
+//                ConfigUtils configUtils = new ConfigUtils();
+//                SavedConfig savedConfig = configUtils.getSelectedConfig();
+//
+
                 TimeSeriousMainFrame t = new TimeSeriousMainFrame();
                 t.setSize(new Dimension(1024,768));
                 t.setVisible(true);
             }
         });
     }
+
+
+
 }

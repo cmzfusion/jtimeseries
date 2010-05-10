@@ -28,7 +28,7 @@ class Hour extends AbstractTimePeriod {
 
     private static int millis = 60 * 60 * 1000;
 
-    public Hour(int hours) {
+    public Hour(long hours) {
         super(millis * hours);
     }
 

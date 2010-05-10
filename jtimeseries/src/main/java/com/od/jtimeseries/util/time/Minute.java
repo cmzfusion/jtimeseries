@@ -28,7 +28,7 @@ class Minute extends AbstractTimePeriod {
 
     private static final int millis = 60 * 1000;
 
-    public Minute(int mins) {
+    public Minute(long mins) {
         super(mins * millis);
     }
 

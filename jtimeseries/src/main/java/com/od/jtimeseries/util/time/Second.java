@@ -28,7 +28,7 @@ class Second extends AbstractTimePeriod {
 
     private int millis = 1000;
 
-    public Second(int seconds) {
+    public Second(long seconds) {
         super(seconds * 1000);
     }
 

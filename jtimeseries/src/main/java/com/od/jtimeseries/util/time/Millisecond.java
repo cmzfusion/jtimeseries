@@ -26,7 +26,7 @@ package com.od.jtimeseries.util.time;
  */
 class Millisecond extends AbstractTimePeriod {
 
-    public Millisecond(int lengthInMillis) {
+    public Millisecond(long lengthInMillis) {
         super(lengthInMillis);
     }
 

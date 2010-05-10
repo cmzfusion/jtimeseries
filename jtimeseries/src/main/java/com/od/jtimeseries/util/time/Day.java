@@ -28,7 +28,7 @@ class Day extends AbstractTimePeriod {
 
     private static final int millis = 24 * 60 * 60 * 1000;
 
-    public Day(int days) {
+    public Day(long days) {
         super(millis * days);
     }
 

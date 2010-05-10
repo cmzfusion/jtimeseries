@@ -14,6 +14,9 @@ import java.util.List;
  * Date: 21-Nov-2009
  * Time: 17:58:54
  * To change this template use File | Settings | File Templates.
+ *
+ * TODO - This test will probably fail on linux OS since the granularity of the file timestamps
+ * appears to be 1000ms, which is less than Windows - not sure if this holds true for all linux
  */
 public class TestFileReaper extends TestCase {
 

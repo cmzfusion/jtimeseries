@@ -26,40 +26,24 @@ package com.od.jtimeseries.util.time;
  */
 public class Time {
 
-    /**
-     * @return number of milliseconds in the given number of seconds
-     */
-    public static TimePeriod milliseconds(int millis) {
+    public static TimePeriod milliseconds(long millis) {
         return new Millisecond(millis);
     }
 
-    /**
-     * @return number of milliseconds in the given number of seconds
-     */
-    public static TimePeriod seconds(int seconds) {
+    public static TimePeriod seconds(long seconds) {
         return new Second(seconds);
     }
 
-     /**
-     * @return number of milliseconds in the given number of minutes
-     */
-    public static TimePeriod minutes(int minutes) {
+    public static TimePeriod minutes(long minutes) {
         return new Minute(minutes);
     }
 
-     /**
-     * @return number of milliseconds in the given number of hours
-     */
-    public static TimePeriod hours(int hours) {
+    public static TimePeriod hours(long hours) {
         return new Hour(hours);
     }
 
-     /**
-     * @return number of milliseconds in the given number of days
-     */
-    public static TimePeriod days(int days) {
+    public static TimePeriod days(long days) {
         return new Day(days);
     }
-
 
 }

@@ -26,9 +26,9 @@ package com.od.jtimeseries.util.time;
  */
 class AbstractTimePeriod implements TimePeriod {
 
-    private int lengthInMillis;
+    private long lengthInMillis;
 
-    public AbstractTimePeriod(int lengthInMillis) {
+    public AbstractTimePeriod(long lengthInMillis) {
         this.lengthInMillis = lengthInMillis;
     }
 

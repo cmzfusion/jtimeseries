@@ -69,10 +69,15 @@ public class FileReaper {
         this.maxCumulativeSize = maxCumulativeSize;
         this.maxAgeInMillis = maxAgeInMillis;
         pattern = java.util.regex.Pattern.compile(fileSearchRegExp);
-        nameTimerThread();
+        log.logInfo("Created FileReaper " + name + " for timeseries dir " + parentDirectory.getPath() +
+                ", pattern [" + fileSearchRegExp + "], max file count " + maxFileCount +
+                ", maxCumulativeSize " + maxCumulativeSize + ", maxAge " + maxAgeInMillis);
+
+        setNameOnTimerThread();
     }
 
-    private void nameTimerThread() {
+    private void setNameOnTimerThread() {
+        //only way to access the timer thread is to run a task to do it?
         timer.execute(new Runnable() {
             public void run() {
                 Thread.currentThread().setName("FileReaperTimer " + id.getAndIncrement());
@@ -105,16 +110,24 @@ public class FileReaper {
 
             File[] files = getFilesByModifiedDate();
 
-            long currentFileLength = 0, cumulativeSize = 0, reapCount = 0, reapFail = 0, sizeDeletes = 0, ageDeletes = 0, countDeletes = 0, matches = 0;
+            long currentFileLength = 0, currentFileAge = 0, cumulativeSize = 0, reapCount = 0, reapFail = 0, sizeDeletes = 0, ageDeletes = 0, countDeletes = 0, matches = 0;
             File currentFile;
             for ( int fileCount=0; fileCount < files.length; fileCount ++ ) {
                 currentFile = files[fileCount];
                 if ( pattern.matcher(currentFile.getName()).matches()) {
                     matches++;
-                    log.logDebug("FileReaper " + name + "checking matching file " + currentFile);
                     currentFileLength = currentFile.length();
                     cumulativeSize += currentFileLength;
-                    ReaperAction a = shouldDeleteFile(currentFile, fileCount, cumulativeSize);
+                    currentFileAge = System.currentTimeMillis() - currentFile.lastModified();
+
+                    ReaperAction a = shouldDeleteFile(currentFile, fileCount, cumulativeSize, currentFileAge);
+                    log.logDebug("checked file " + currentFile +
+                            " size " + currentFileLength +
+                            " (cumulativeSize now " + cumulativeSize + ")" +
+                            ", file count " + fileCount +
+                            ", age is " + currentFileAge +
+                            ", action chosen is " + a);
+
                     if ( a != ReaperAction.NO_DELETE ) {
                         if ( currentFile.delete() ) {
                             reapCount++;
@@ -153,11 +166,11 @@ public class FileReaper {
         return files;
     }
 
-    private ReaperAction shouldDeleteFile(File file, int currentFileIndex, long cumulativeSize) {
+    private ReaperAction shouldDeleteFile(File file, int currentFileIndex, long cumulativeSize, long currentFileAge) {
         ReaperAction result = ReaperAction.NO_DELETE;
         result = (isDeleteByCumulativeFileSize() && cumulativeSize > maxCumulativeSize) ? ReaperAction.SIZE_DELETE : result;
         result = isDeleteByMaxCount() && currentFileIndex >= maxFileCount ? ReaperAction.COUNT_DELETE : result;
-        result = isDeleteByMaxAge() && System.currentTimeMillis() - file.lastModified() > maxAgeInMillis ? ReaperAction.AGE_DELETE : result;
+        result = isDeleteByMaxAge() && currentFileAge > maxAgeInMillis ? ReaperAction.AGE_DELETE : result;
         return result;
     }
 

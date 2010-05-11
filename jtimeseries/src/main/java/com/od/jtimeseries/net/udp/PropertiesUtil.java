@@ -46,7 +46,7 @@ import java.util.Properties;
  * <p/>
  * The logic is the same as Properties.loadFromXml() but builderFactory etc. is cached for reuse.
  */
-public class PropertiesUtil {
+class PropertiesUtil {
 
     // The required DTD URI for exported properties
     private static final String PROPS_DTD_URI =

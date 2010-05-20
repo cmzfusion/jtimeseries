@@ -1,21 +1,26 @@
 <assembly>
   <id>bin</id>
   <formats>
-    <format>tar.gz</format>
+    <format>zip</format>
   </formats>
   <fileSets>
     <fileSet>
+      <directory>target</directory>
+      <outputDirectory></outputDirectory>
       <includes>
-        <include>${project.basedir}/src/etc/COPYING.txt</include>
-        <include>${project.basedir}/src/etc/start.bat</include>
+        <include>start.bat</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}</directory>
+      <directory>src/main/resources</directory>
       <outputDirectory></outputDirectory>
       <includes>
-        <include>jtimeseries-server-${project.version}.jar</include>
+        <include>*.xml</include>
       </includes>
+    </fileSet>
+    <fileSet>
+      <directory>src/etc/assemblydir</directory>
+       <outputDirectory></outputDirectory>
     </fileSet>
   </fileSets>
   <dependencySets>

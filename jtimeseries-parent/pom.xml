@@ -6,7 +6,7 @@
     <version>1.0.11-SNAPSHOT</version>
     <artifactId>jtimeseries-parent</artifactId>
     <packaging>pom</packaging>
-    <name>JTimeseries Project</name>
+    <name>JTimeseries Parent POM</name>
     <build>
         <plugins>
             <plugin>

@@ -65,31 +65,27 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
         setContextFactory(new UdpPublishingContextFactory());
     }
 
-    public TimeSeriesContext addChild(Identifiable... identifiables) {
-        synchronized (getTreeLock()) {
-            TimeSeriesContext t = super.addChild(identifiables);
-            for ( Identifiable i : identifiables) {
-                if ( i instanceof IdentifiableTimeSeries) {
-                    PublishingTimeSeriesListener listener = new PublishingTimeSeriesListener(udpClient, (IdentifiableTimeSeries) i, minSendIntervalMillis);
-                    listenersByIdentifiable.put(i, listener);
-                    ((IdentifiableTimeSeries)i).addTimeSeriesListener(listener);
-                }
+    public TimeSeriesContext addChild_Locked(Identifiable... identifiables) {
+        TimeSeriesContext t = super.addChild(identifiables);
+        for ( Identifiable i : identifiables) {
+            if ( i instanceof IdentifiableTimeSeries) {
+                PublishingTimeSeriesListener listener = new PublishingTimeSeriesListener(udpClient, (IdentifiableTimeSeries) i, minSendIntervalMillis);
+                listenersByIdentifiable.put(i, listener);
+                ((IdentifiableTimeSeries)i).addTimeSeriesListener(listener);
             }
-            return t;
         }
+        return t;
     }
 
-    public boolean removeChild(Identifiable identifiable) {
-        synchronized (getTreeLock()) {
-            boolean result = super.removeChild(identifiable);
-            if (result) {
-                PublishingTimeSeriesListener l = listenersByIdentifiable.get(identifiable);
-                if ( l != null) {
-                    ((IdentifiableTimeSeries)identifiable).removeTimeSeriesListener(l);
-                }
+    public boolean removeChild_Locked(Identifiable identifiable) {
+        boolean result = super.removeChild(identifiable);
+        if (result) {
+            PublishingTimeSeriesListener l = listenersByIdentifiable.get(identifiable);
+            if ( l != null) {
+                ((IdentifiableTimeSeries)identifiable).removeTimeSeriesListener(l);
             }
-            return result;
         }
+        return result;
     }
 
     /**

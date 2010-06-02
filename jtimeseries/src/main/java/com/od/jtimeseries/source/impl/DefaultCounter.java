@@ -25,6 +25,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -101,8 +102,8 @@ public class DefaultCounter implements Counter {
         return simpleSource.removeChild(c);
     }
 
-    public Object getTreeLock() {
-        return simpleSource.getTreeLock();
+    public ReentrantReadWriteLock getContextLock() {
+        return simpleSource.getContextLock();
     }
 
     public Identifiable getRoot() {

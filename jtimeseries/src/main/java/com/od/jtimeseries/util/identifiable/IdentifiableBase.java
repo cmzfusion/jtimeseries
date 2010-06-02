@@ -30,18 +30,13 @@ import java.util.*;
  *
  * A base class implementing the Identifiable interface
  */
-public class IdentifiableBase implements Identifiable {
-
-    /**
-     * A lock for the context tree structure which should be held while changing or traversing the tree structure, to ensure integrity
-     */
-    private static final Object TREE_LOCK = new Object();
+public class IdentifiableBase extends LockingIdentifiable {
 
     protected static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
     protected static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
     private volatile String id;
     private volatile String description;
-    private Identifiable parent;
+    private volatile Identifiable parent;
     private Properties properties = new Properties();
 
     private static List<Identifiable> EMPTY_CHILD_LIST = Collections.unmodifiableList(new ArrayList<Identifiable>());
@@ -60,103 +55,84 @@ public class IdentifiableBase implements Identifiable {
         return id;
     }
 
-    public String getParentPath() {
-        synchronized (getTreeLock()) {
-            String result;
-            if ( parent == null) {
-                result = ""; //root context has no id in namespace path
-            } else {
-                result = parent.getPath();
-            }
-            return result;
+    public String getParentPath_Locked() {
+        String result;
+        if ( parent == null) {
+            result = ""; //root context has no id in namespace path
+        } else {
+            result = parent.getPath();
         }
+        return result;
     }
 
-    public String getPath() {
-        synchronized (getTreeLock()) {
-            StringBuilder path = new StringBuilder(getParentPath());
-            if ( path.length() > 0) {
-                path.append(".");
-            }
-            path.append(parent == null ? "" : getId());
-            return path.toString();
+    public String getPath_Locked() {
+        StringBuilder path = new StringBuilder(getParentPath());
+        if ( path.length() > 0) {
+            path.append(".");
         }
+        path.append(parent == null ? "" : getId());
+        return path.toString();
     }
 
     public String getDescription() {
         return description;
     }
 
+
     public Identifiable getParent() {
         return parent;
     }
 
-    public Identifiable setParent(Identifiable parent) {
-        synchronized (getTreeLock()) {
-            Identifiable oldParent = this.parent;
-            this.parent = parent;
-            return oldParent;
-        }
+    public Identifiable setParent_Locked(Identifiable parent) {
+        Identifiable oldParent = this.parent;
+        this.parent = parent;
+        return oldParent;
     }
 
-    public boolean removeChild(Identifiable c) {
+    public boolean removeChild_Locked(Identifiable c) {
         return false;
     }
 
-    public boolean containsChildWithId(String id) {
+    public boolean containsChildWithId_Locked(String id) {
         return false;
     }
 
-    public boolean containsChild(Identifiable i) {
+    public boolean containsChild_Locked(Identifiable i) {
         return false;
     }
 
-    public String getProperty(String propertyName) {
-        synchronized (getTreeLock()) {
-            return properties.getProperty(propertyName);
-        }
+    public String getProperty_Locked(String propertyName) {
+        return properties.getProperty(propertyName);
     }
 
-    public Properties getProperties() {
-        synchronized (getTreeLock()) {
+    public Properties getProperties_Locked() {
             Properties p = new Properties();
             p.putAll(properties);
             return p;
-        }
     }
 
-    public void putAllProperties(Properties p) {
-        synchronized (getTreeLock()) {
-            properties.putAll(p);
-        }
+    public void putAllProperties_Locked(Properties p) {
+        properties.putAll(p);
     }
 
-    public String findProperty(String propertyName) {
-        synchronized (getTreeLock()) {
-            String property = getProperty(propertyName);
-            if ( property == null && ! isRoot() ) {
-                property = getParent().findProperty(propertyName);
-            }
-            return property;
+    public String findProperty_Locked(String propertyName) {
+        String property = getProperty(propertyName);
+        if ( property == null && ! isRoot() ) {
+            property = getParent().findProperty(propertyName);
         }
+        return property;
     }
 
-    public String setProperty(String propertyName, String value) {
-        synchronized (getTreeLock()) {
-            return (String)properties.setProperty(propertyName,  value);
-        }
+    public String setProperty_Locked(String propertyName, String value) {
+        return (String)properties.setProperty(propertyName,  value);
     }
 
-    public List<Identifiable> getChildren() {
+    public List<Identifiable> getChildren_Locked() {
         return EMPTY_CHILD_LIST;
     }
 
-    public <E extends Identifiable> List<E> getChildren(Class<E> classType) {
+    public <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
         return (List<E>)EMPTY_CHILD_LIST;
-    }
-
-    public Object getTreeLock() {
-       return TREE_LOCK;
     }
 
     public void setDescription(String description) {
@@ -188,20 +164,23 @@ public class IdentifiableBase implements Identifiable {
     }
 
     public Identifiable getRoot() {
-        synchronized (getTreeLock()) {
+        try {
+            getContextLock().readLock().lock();
             return isRoot() ? this : getParent().getRoot();
+        } finally {
+            getContextLock().readLock().unlock();
         }
     }
 
-    public boolean isRoot() {
+    public boolean isRoot_Locked() {
         return getParent() == null;
     }
 
-    public Identifiable get(String id) {
+    public Identifiable get_Locked(String id) {
         return null;
     }
 
-    public <E extends Identifiable> E get(String id, Class<E> classType) {
+    public <E extends Identifiable> E get_Locked(String id, Class<E> classType) {
         return null;
     }
 

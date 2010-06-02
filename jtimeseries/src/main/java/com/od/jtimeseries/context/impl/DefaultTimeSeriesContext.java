@@ -33,7 +33,6 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 
@@ -45,7 +44,7 @@ import java.util.*;
  * Date: 18-Dec-2008
  * Time: 10:17:44
  */
-public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSeriesContext {
+public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     private final List<Identifiable> children = Collections.synchronizedList(new ArrayList<Identifiable>());
     private final Map<String, Identifiable> childrenById = Collections.synchronizedMap(new HashMap<String, Identifiable>());
@@ -95,103 +94,88 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
     }
 
-
-    public TimeSeriesContext getRoot() {
-        synchronized (getTreeLock()) {
-            return isRoot() ? this : getParent().getRoot();
-        }
-    }
-
-    public List<ValueSource> getSources() {
+    public List<ValueSource> getSources_Locked() {
         return getChildren(ValueSource.class);
     }
 
-    public List<Capture> getCaptures() {
+    public List<Capture> getCaptures_Locked() {
         return getChildren(Capture.class);
     }
 
-    public List<TimeSeriesContext> getChildContexts() {
+    public List<TimeSeriesContext> getChildContexts_Locked() {
         return getChildren(TimeSeriesContext.class);
     }
 
-    public List<IdentifiableTimeSeries> getTimeSeries() {
+    public List<IdentifiableTimeSeries> getTimeSeries_Locked() {
         return getChildren(IdentifiableTimeSeries.class);
     }
 
-    public <E extends Identifiable> List<E> getChildren(Class<E> classType) {
-        synchronized (getTreeLock()) {
-            List<E> list = new ArrayList<E>();
-            for ( Identifiable i : children) {
-                if ( classType.isAssignableFrom(i.getClass())) {
-                    list.add((E)i);
-                }
+    public <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
+        List<E> list = new ArrayList<E>();
+        for ( Identifiable i : children) {
+            if ( classType.isAssignableFrom(i.getClass())) {
+                list.add((E)i);
             }
-            return list;
         }
+        return list;
     }
 
-    public TimeSeriesContext addChild(Identifiable... identifiables) {
-        synchronized (getTreeLock()) {
-            checkIdCharacters(identifiables);
-            for ( Identifiable i : identifiables) {
-                if ( i instanceof Scheduler) {
-                    doSetScheduler((Scheduler)i);
-                }
-                if ( i instanceof ValueSourceFactory) {
-                    removeUniqueChildInstance(ValueSourceFactory.class);
-                }
-                if ( i instanceof ContextFactory) {
-                    removeUniqueChildInstance(ContextFactory.class);
-                }
-                if ( i instanceof CaptureFactory) {
-                    removeUniqueChildInstance(CaptureFactory.class);
-                }
-                if ( i instanceof TimeSeriesFactory) {
-                    removeUniqueChildInstance(TimeSeriesFactory.class);
-                }
-                if ( i instanceof Triggerable ) {
-                    getScheduler().addTriggerable((Triggerable)i);
-                }
-                if ( i instanceof Capture ) {
-                    if (Boolean.parseBoolean(findProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY))) {
-                        ((Capture)i).start();
-                    }
-                }
-                checkUniqueIdAndAdd(i);
+    public TimeSeriesContext addChild_Locked(Identifiable... identifiables) {
+        checkIdCharacters(identifiables);
+        for ( Identifiable i : identifiables) {
+            if ( i instanceof Scheduler) {
+                doSetScheduler((Scheduler)i);
             }
-            return this;
+            if ( i instanceof ValueSourceFactory) {
+                removeUniqueChildInstance(ValueSourceFactory.class);
+            }
+            if ( i instanceof ContextFactory) {
+                removeUniqueChildInstance(ContextFactory.class);
+            }
+            if ( i instanceof CaptureFactory) {
+                removeUniqueChildInstance(CaptureFactory.class);
+            }
+            if ( i instanceof TimeSeriesFactory) {
+                removeUniqueChildInstance(TimeSeriesFactory.class);
+            }
+            if ( i instanceof Triggerable ) {
+                getScheduler().addTriggerable((Triggerable)i);
+            }
+            if ( i instanceof Capture ) {
+                if (Boolean.parseBoolean(findProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY))) {
+                    ((Capture)i).start();
+                }
+            }
+            checkUniqueIdAndAdd(i);
         }
+        return this;
     }
 
-    public boolean removeChild(Identifiable e) {
-        synchronized (getTreeLock()) {
-            boolean removed = children.remove(e);
-            if ( removed) {
-                e.setParent(null);
-                childrenById.remove(e.getId());
-            }
-            return removed;
+    public boolean removeChild_Locked(Identifiable e) {
+        boolean removed = children.remove(e);
+        if ( removed) {
+            e.setParent(null);
+            childrenById.remove(e.getId());
         }
+        return removed;
     }
 
     private void doSetScheduler(Scheduler scheduler) {
-        synchronized (getTreeLock()) {
-            if ( isSchedulerStarted() ) {
-                throw new UnsupportedOperationException("Cannot setScheduler while the existing scheduler is running");
-            } else {
-                Scheduler oldSchedulerForThisContext = removeUniqueChildInstance(Scheduler.class);
-                if (oldSchedulerForThisContext == null) {
-                    oldSchedulerForThisContext = getScheduler();  //this context was using the parent scheduler
-                }
-                moveTriggerablesFromOldToNewScheduler(oldSchedulerForThisContext, scheduler);
+        if ( isSchedulerStarted() ) {
+            throw new UnsupportedOperationException("Cannot setScheduler while the existing scheduler is running");
+        } else {
+            Scheduler oldSchedulerForThisContext = removeUniqueChildInstance(Scheduler.class);
+            if (oldSchedulerForThisContext == null) {
+                oldSchedulerForThisContext = getScheduler();  //this context was using the parent scheduler
             }
+            moveTriggerablesFromOldToNewScheduler(oldSchedulerForThisContext, scheduler);
         }
     }
 
     //If any capture from this context in the hierarchy downwards is assoicated with the old scheduler, remove it
     //and add it to the new scheduler
     private void moveTriggerablesFromOldToNewScheduler(Scheduler oldScheduler, Scheduler newScheduler) {
-        for ( Triggerable t : findAllChildren(Triggerable.class).getAllMatches()) {
+        for ( Triggerable t : findAll(Triggerable.class).getAllMatches()) {
             if ( oldScheduler != null && oldScheduler.containsTriggerable(t)) {
                 oldScheduler.removeTriggerable(t);
                 newScheduler.addTriggerable(t);
@@ -215,253 +199,207 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         return result;
     }
 
-    public IdentifiableTimeSeries getTimeSeries(String id) {
+    public IdentifiableTimeSeries getTimeSeries_Locked(String id) {
         return get(id, IdentifiableTimeSeries.class);
     }
 
-    public ValueSource getSource(String id) {
+    public ValueSource getSource_Locked(String id) {
         return get(id, ValueSource.class);
     }
 
-    public TimeSeriesContext getChildContext(String id) {
+    public TimeSeriesContext getChildContext_Locked(String id) {
         return get(id, TimeSeriesContext.class);
     }
 
-    public Capture getCapture(String id) {
+    public Capture getCapture_Locked(String id) {
         return get(id, Capture.class);
     }
 
-    public Identifiable get(String id) {
+    public Identifiable get_Locked(String id) {
         return childrenById.get(id);
     }
 
-    public <E extends Identifiable> E get(String id, Class<E> classType) {
-        synchronized (getTreeLock()) {
-            Identifiable i = childrenById.get(id);
-            if ( i != null && classType.isAssignableFrom(i.getClass())) {
-                return (E)i;
-            }
-            return null;
+    public <E extends Identifiable> E get_Locked(String id, Class<E> classType) {
+        Identifiable i = childrenById.get(id);
+        if ( i != null && classType.isAssignableFrom(i.getClass())) {
+            return (E)i;
         }
+        return null;
     }
 
-    public boolean containsChildWithId(String id) {
-        synchronized (getTreeLock()) {
-            return childrenById.containsKey(id);
-        }
+    public boolean containsChildWithId_Locked(String id) {
+        return childrenById.containsKey(id);
     }
 
-    public boolean containsChild(Identifiable child) {
-        synchronized (getTreeLock()) {
-            return children.contains(child);
-        }
+    public boolean containsChild_Locked(Identifiable child) {
+        return children.contains(child);
     }
 
-    public Scheduler getScheduler() {
-        synchronized (getTreeLock()) {
-            Scheduler result = getUniqueChild(Scheduler.class);
-            if ( result == null && ! isRoot() ) {
-                result = getParent().getScheduler();
-            }
-            return result;
+    public Scheduler getScheduler_Locked() {
+        Scheduler result = getUniqueChild(Scheduler.class);
+        if ( result == null && ! isRoot() ) {
+            result = getParent().getScheduler();
         }
+        return result;
     }
 
-    public TimeSeriesContext setScheduler(Scheduler scheduler) {
+    public TimeSeriesContext setScheduler_Locked(Scheduler scheduler) {
         addChild(scheduler);
         return this;
     }
 
-    public boolean isSchedulerStarted() {
-        synchronized (getTreeLock()) {
-            //can be null only if the root context during construction
-            return getScheduler() != null && getScheduler().isStarted();
-        }
+    public boolean isSchedulerStarted_Locked() {
+        //can be null only if the root context during construction
+        return getScheduler() != null && getScheduler().isStarted();
     }
 
-    public TimeSeriesContext startScheduling() {
-        synchronized (getTreeLock()) {
-            for (Scheduler s : findAllSchedulers().getAllMatches()) {
-                s.start();
-            }
-            return this;
+    public TimeSeriesContext startScheduling_Locked() {
+        for (Scheduler s : findAllSchedulers().getAllMatches()) {
+            s.start();
         }
+        return this;
     }
 
-    public TimeSeriesContext stopScheduling() {
-        synchronized (getTreeLock()) {
-            for (Scheduler s : findAllSchedulers().getAllMatches()) {
-                s.stop();
-            }
-            return this;
+    public TimeSeriesContext stopScheduling_Locked() {
+        for (Scheduler s : findAllSchedulers().getAllMatches()) {
+            s.stop();
         }
+        return this;
     }
 
-    public TimeSeriesContext startDataCapture() {
-        synchronized (getTreeLock()) {
-            List<Capture> allCaptures = findAllCaptures().getAllMatches();
-            for ( Capture c : allCaptures) {
-                c.start();
-            }
-            return this;
+    public TimeSeriesContext startDataCapture_Locked() {
+        List<Capture> allCaptures = findAllCaptures().getAllMatches();
+        for ( Capture c : allCaptures) {
+            c.start();
         }
+        return this;
     }
 
-    public TimeSeriesContext stopDataCapture() {
-        synchronized (getTreeLock()) {
-            List<Capture> allCaptures = findAllCaptures().getAllMatches();
-            for ( Capture c : allCaptures) {
-                c.stop();
-            }
-            return this;
+    public TimeSeriesContext stopDataCapture_Locked() {
+        List<Capture> allCaptures = findAllCaptures().getAllMatches();
+        for ( Capture c : allCaptures) {
+            c.stop();
         }
+        return this;
     }
 
-    public TimeSeriesContext setTimeSeriesFactory(TimeSeriesFactory seriesFactory) {
+    public TimeSeriesContext setTimeSeriesFactory_Locked(TimeSeriesFactory seriesFactory) {
         addChild(seriesFactory);
         return this;
     }
 
-    public TimeSeriesFactory getTimeSeriesFactory() {
-        synchronized (getTreeLock()) {
-            TimeSeriesFactory result = getUniqueChild(TimeSeriesFactory.class);
-            if ( result == null && ! isRoot() ) {
-                result = getParent().getTimeSeriesFactory();
-            }
-            return result;
+    public TimeSeriesFactory getTimeSeriesFactory_Locked() {
+        TimeSeriesFactory result = getUniqueChild(TimeSeriesFactory.class);
+        if ( result == null && ! isRoot() ) {
+            result = getParent().getTimeSeriesFactory();
         }
+        return result;
     }
 
-    public TimeSeriesContext setCaptureFactory(CaptureFactory captureFactory) {
+    public TimeSeriesContext setCaptureFactory_Locked(CaptureFactory captureFactory) {
         addChild(captureFactory);
         return this;
     }
 
-    public CaptureFactory getCaptureFactory() {
-        synchronized (getTreeLock()) {
-            CaptureFactory result = getUniqueChild(CaptureFactory.class);
-            if ( result == null && ! isRoot() ) {
-                result = getParent().getCaptureFactory();
-            }
-            return result;
+    public CaptureFactory getCaptureFactory_Locked() {
+        CaptureFactory result = getUniqueChild(CaptureFactory.class);
+        if ( result == null && ! isRoot() ) {
+            result = getParent().getCaptureFactory();
         }
+        return result;
     }
 
-    public TimeSeriesContext setValueSourceFactory(ValueSourceFactory sourceFactory) {
+    public TimeSeriesContext setValueSourceFactory_Locked(ValueSourceFactory sourceFactory) {
         addChild(sourceFactory);
         return this;
     }
 
-    public ValueSourceFactory getValueSourceFactory() {
-        synchronized (getTreeLock()) {
-            ValueSourceFactory result = getUniqueChild(ValueSourceFactory.class);
-            if ( result == null && ! isRoot() ) {
-                result = getParent().getValueSourceFactory();
-            }
-            return result;
+    public ValueSourceFactory getValueSourceFactory_Locked() {
+        ValueSourceFactory result = getUniqueChild(ValueSourceFactory.class);
+        if ( result == null && ! isRoot() ) {
+            result = getParent().getValueSourceFactory();
         }
+        return result;
     }
 
-     public TimeSeriesContext setContextFactory(ContextFactory contextFactory) {
+     public TimeSeriesContext setContextFactory_Locked(ContextFactory contextFactory) {
         addChild(contextFactory);
         return this;
     }
 
-    public ContextFactory getContextFactory() {
-        synchronized (getTreeLock()) {
-            ContextFactory result = getUniqueChild(ContextFactory.class);
-            if ( result == null && ! isRoot() ) {
-                result = getParent().getContextFactory();
-            }
-            return result;
+    public ContextFactory getContextFactory_Locked() {
+        ContextFactory result = getUniqueChild(ContextFactory.class);
+        if ( result == null && ! isRoot() ) {
+            result = getParent().getContextFactory();
         }
+        return result;
     }
 
-    public IdentifiableTimeSeries createTimeSeriesForPath(String path, String description) {
-        synchronized (getTreeLock()) {
+    public IdentifiableTimeSeries createTimeSeriesForPath_Locked(String path, String description) {
+        List<String> contextIds = splitPath(path);
+        TimeSeriesContext parentContext = ( contextIds.size() > 1) ? createContextRecursive(this, contextIds.subList(0, contextIds.size() -1)) : this;
+        String id = contextIds.get(contextIds.size()-1);
+        IdentifiableTimeSeries s = parentContext.getTimeSeries(id);
+        if ( s == null) {
+            s = parentContext.createTimeSeries(id, description);
+        }
+        return s;
+    }
+
+    public IdentifiableTimeSeries createTimeSeries_Locked(String id, String description) {
+        IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description);
+        addChild(i);
+        return i;
+    }
+
+    public Capture createCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series) {
+        Capture c = getCaptureFactory().createCapture(this, getPathForChild(id), id, source, series);
+        addChild(c);
+        return c;
+    }
+
+    public TimedCapture createTimedCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
+        TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
+        addChild(c);
+        return c;
+    }
+
+    public ValueRecorder createValueRecorder_Locked(String id, String description) {
+        ValueRecorder v = getValueSourceFactory().createValueRecorder(this, getPathForChild(id), id, description);
+        addChild(v);
+        return v;
+    }
+
+    public QueueTimer createQueueTimer_Locked(String id, String description) {
+        QueueTimer q = getValueSourceFactory().createQueueTimer(this, getPathForChild(id), id, description);
+        addChild(q);
+        return q;
+    }
+
+    public Counter createCounter_Locked(String id, String description) {
+        Counter c = getValueSourceFactory().createCounter(this, getPathForChild(id), id, description);
+        addChild(c);
+        return c;
+    }
+
+    public EventTimer createEventTimer_Locked(String id, String description) {
+        EventTimer e = getValueSourceFactory().createEventTimer(this, getPathForChild(id), id, description);
+        addChild(e);
+        return e;
+    }
+
+    public TimedValueSource createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSource t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
+        addChild(t);
+        return t;
+    }
+
+    public TimeSeriesContext createContextForPath_Locked(String path) {
+        if ( path.equals("")) {
+            return this;
+        } else {
             List<String> contextIds = splitPath(path);
-            TimeSeriesContext parentContext = ( contextIds.size() > 1) ? createContextRecursive(this, contextIds.subList(0, contextIds.size() -1)) : this;
-            String id = contextIds.get(contextIds.size()-1);
-            IdentifiableTimeSeries s = parentContext.getTimeSeries(id);
-            if ( s == null) {
-                s = parentContext.createTimeSeries(id, description);
-            }
-            return s;
-        }
-    }
-
-    public IdentifiableTimeSeries createTimeSeries(String id, String description) {
-        synchronized (getTreeLock()) {
-            IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description);
-            addChild(i);
-            return i;
-        }
-    }
-
-    public Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
-        synchronized (getTreeLock()) {
-            Capture c = getCaptureFactory().createCapture(this, getPathForChild(id), id, source, series);
-            addChild(c);
-            return c;
-        }
-    }
-
-    public TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
-        synchronized (getTreeLock()) {
-            TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
-            addChild(c);
-            return c;
-        }
-    }
-
-    public ValueRecorder createValueRecorder(String id, String description) {
-        synchronized (getTreeLock()) {
-            ValueRecorder v = getValueSourceFactory().createValueRecorder(this, getPathForChild(id), id, description);
-            addChild(v);
-            return v;
-        }
-    }
-
-    public QueueTimer createQueueTimer(String id, String description) {
-        synchronized (getTreeLock()) {
-            QueueTimer q = getValueSourceFactory().createQueueTimer(this, getPathForChild(id), id, description);
-            addChild(q);
-            return q;
-        }
-    }
-
-    public Counter createCounter(String id, String description) {
-        synchronized (getTreeLock()) {
-            Counter c = getValueSourceFactory().createCounter(this, getPathForChild(id), id, description);
-            addChild(c);
-            return c;
-        }
-    }
-
-    public EventTimer createEventTimer(String id, String description) {
-        synchronized (getTreeLock()) {
-            EventTimer e = getValueSourceFactory().createEventTimer(this, getPathForChild(id), id, description);
-            addChild(e);
-            return e;
-        }
-    }
-
-    public TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        synchronized (getTreeLock()) {
-            TimedValueSource t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
-            addChild(t);
-            return t;
-        }
-    }
-
-    public TimeSeriesContext createContextForPath(String path) {
-        synchronized (getTreeLock()) {
-            if ( path.equals("")) {
-                return this;
-            } else {
-                List<String> contextIds = splitPath(path);
-                return createContextRecursive(this, contextIds);
-            }
+            return createContextRecursive(this, contextIds);
         }
     }
 
@@ -482,183 +420,126 @@ public class DefaultTimeSeriesContext extends IdentifiableBase implements TimeSe
         return child;
     }
 
-    public TimeSeriesContext createChildContext(String id) {
+    public TimeSeriesContext createChildContext_Locked(String id) {
         return createChildContext(id, id);
     }
 
-    public TimeSeriesContext createChildContext(String id, String description) {
-        synchronized (getTreeLock()) {
-            TimeSeriesContext timeSeriesContext = getContextFactory().createContext(this, id, description);
-            synchronized (getTreeLock()) {
-                checkUniqueIdAndAdd(timeSeriesContext);
-            }
-            return timeSeriesContext;
-        }
+    public TimeSeriesContext createChildContext_Locked(String id, String description) {
+        TimeSeriesContext timeSeriesContext = getContextFactory().createContext(this, id, description);
+        checkUniqueIdAndAdd(timeSeriesContext);
+        return timeSeriesContext;
     }
 
-    public ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
-        synchronized (getTreeLock()) {
-            return defaultMetricCreator.createValueRecorderSeries(this, getPathForChild(id), id, description, captureFunctions);
-        }
+    public ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
+        return defaultMetricCreator.createValueRecorderSeries(this, getPathForChild(id), id, description, captureFunctions);
     }
 
-    public QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        synchronized (getTreeLock()) {
-            return defaultMetricCreator.createQueueTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
-        }
+    public QueueTimer createQueueTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
+        return defaultMetricCreator.createQueueTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
     }
 
-    public Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
-        synchronized (getTreeLock()) {
-            return defaultMetricCreator.createCounterSeries(this, getPathForChild(id), id, description, captureFunctions);
-        }
+    public Counter createCounterSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
+        return defaultMetricCreator.createCounterSeries(this, getPathForChild(id), id, description, captureFunctions);
     }
 
-    public EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        synchronized (getTreeLock()) {
-            return defaultMetricCreator.createEventTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
-        }
+    public EventTimer createEventTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
+        return defaultMetricCreator.createEventTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
     }
 
-    public TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSource createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         return defaultMetricCreator.createValueSupplierSeries(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
     }
 
-    public QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findTimeSeries(criteria);
-        }
+    public QueryResult<IdentifiableTimeSeries> findTimeSeries_Locked(CaptureCriteria criteria) {
+        return contextQueries.findTimeSeries(criteria);
     }
 
-    public QueryResult<IdentifiableTimeSeries> findTimeSeries(ValueSource source) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findTimeSeries(source);
-        }
+    public QueryResult<IdentifiableTimeSeries> findTimeSeries_Locked(ValueSource source) {
+        return contextQueries.findTimeSeries(source);
     }
 
-    public QueryResult<IdentifiableTimeSeries> findTimeSeries(String searchPattern) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findTimeSeries(searchPattern);
-        }
+    public QueryResult<IdentifiableTimeSeries> findTimeSeries_Locked(String searchPattern) {
+        return contextQueries.findTimeSeries(searchPattern);
     }
 
-    public QueryResult<IdentifiableTimeSeries> findAllTimeSeries() {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllTimeSeries();
-        }
+    public QueryResult<IdentifiableTimeSeries> findAllTimeSeries_Locked() {
+        return contextQueries.findAllTimeSeries();
     }
 
-    public QueryResult<Capture> findCaptures(String searchPattern) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findCaptures(searchPattern);
-        }
+    public QueryResult<Capture> findCaptures_Locked(String searchPattern) {
+        return contextQueries.findCaptures(searchPattern);
     }
 
-    public QueryResult<Capture> findCaptures(CaptureCriteria criteria) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findCaptures(criteria);
-        }
+    public QueryResult<Capture> findCaptures_Locked(CaptureCriteria criteria) {
+        return contextQueries.findCaptures(criteria);
     }
 
-    public QueryResult<Capture> findCaptures(ValueSource valueSource) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findCaptures(valueSource);
-        }
+    public QueryResult<Capture> findCaptures_Locked(ValueSource valueSource) {
+        return contextQueries.findCaptures(valueSource);
     }
 
-    public QueryResult<Capture> findCaptures(IdentifiableTimeSeries timeSeries) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findCaptures(timeSeries);
-        }
+    public QueryResult<Capture> findCaptures_Locked(IdentifiableTimeSeries timeSeries) {
+        return contextQueries.findCaptures(timeSeries);
     }
 
-    public QueryResult<Capture> findAllCaptures() {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllCaptures();
-        }
+    public QueryResult<Capture> findAllCaptures_Locked() {
+        return contextQueries.findAllCaptures();
     }
 
-    public QueryResult<ValueSource> findValueSources(CaptureCriteria criteria) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findValueSources(criteria);
-        }
+    public QueryResult<ValueSource> findValueSources_Locked(CaptureCriteria criteria) {
+        return contextQueries.findValueSources(criteria);
     }
 
-    public QueryResult<ValueSource> findValueSources(IdentifiableTimeSeries timeSeries) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findValueSources(timeSeries);
-        }
+    public QueryResult<ValueSource> findValueSources_Locked(IdentifiableTimeSeries timeSeries) {
+        return contextQueries.findValueSources(timeSeries);
     }
 
-    public QueryResult<ValueSource> findValueSources(String searchPattern) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findValueSources(searchPattern);
-        }
+    public QueryResult<ValueSource> findValueSources_Locked(String searchPattern) {
+        return contextQueries.findValueSources(searchPattern);
     }
 
-    public QueryResult<ValueSource> findAllValueSources() {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllValueSources();
-        }
+    public QueryResult<ValueSource> findAllValueSources_Locked() {
+        return contextQueries.findAllValueSources();
     }
 
-    public QueryResult<Scheduler> findAllSchedulers() {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllSchedulers();
-        }
+    public QueryResult<Scheduler> findAllSchedulers_Locked() {
+        return contextQueries.findAllSchedulers();
     }
 
-    public QueryResult<Scheduler> findSchedulers(String searchPattern) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findSchedulers(searchPattern);
-        }
+    public QueryResult<Scheduler> findSchedulers_Locked(String searchPattern) {
+        return contextQueries.findSchedulers(searchPattern);
     }
 
-    public QueryResult<Scheduler> findSchedulers(Triggerable triggerable) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findSchedulers(triggerable);
-        }
+    public QueryResult<Scheduler> findSchedulers_Locked(Triggerable triggerable) {
+        return contextQueries.findSchedulers(triggerable);
     }
 
-    public <E> QueryResult<E> findAllChildren(Class<E> assignableToClass) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllChildren(assignableToClass);
-        }
+    public <E> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass) {
+        return contextQueries.findAll(assignableToClass);
     }
 
-    public <E> QueryResult<E> findAllChildren(String searchPattern, Class<E> assignableToClass) {
-        synchronized (getTreeLock()) {
-            return contextQueries.findAllChildren(searchPattern, assignableToClass);
-        }
+    public <E> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass) {
+        return contextQueries.findAll(searchPattern, assignableToClass);
     }
 
     public String toString() {
         return "Context " + getId();
     }
 
-    public List<Identifiable> getChildren() {
-        synchronized (getTreeLock()) {
-            List<Identifiable> children = new ArrayList<Identifiable>();
-            children.addAll(this.children);
-            return children;
-        }
-    }
-
-    public TimeSeriesContext getParent() {
-        return (TimeSeriesContext)super.getParent();
+    public List<Identifiable> getChildren_Locked() {
+        List<Identifiable> children = new ArrayList<Identifiable>();
+        children.addAll(this.children);
+        return children;
     }
 
     private <E extends Identifiable> void checkUniqueIdAndAdd(E identifiable) {
-        synchronized (getTreeLock()) {
-            if ( childrenById.containsKey(identifiable.getId())) {
-                throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
-            } else {
-                children.add(identifiable);
-                childrenById.put(identifiable.getId(), identifiable);
-            }
-            identifiable.setParent(this);
+        if (childrenById.containsKey(identifiable.getId())) {
+            throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
+        } else {
+            children.add(identifiable);
+            childrenById.put(identifiable.getId(), identifiable);
         }
+        identifiable.setParent(this);
     }
-
 
 }

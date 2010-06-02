@@ -125,8 +125,11 @@ public class TreeSelector extends SelectorPanel {
         seriesToNodeMap.clear();
 
         //hold the context tree lock so that the context tree doesn't change while we are constructing the nodes
-        synchronized (rootContext.getTreeLock()) {
+        try {
+            rootContext.getContextLock().readLock().lock();
             rootNode = buildTreeNode(rootContext);
+        } finally {
+            rootContext.getContextLock().readLock().unlock();
         }
         treeModel.setRoot(rootNode);
 

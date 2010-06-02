@@ -206,15 +206,15 @@ public class DefaultContextQueries implements ContextQueries {
         return result;
     }
 
-    public <E> QueryResult<E> findAllChildren(Class<E> assignableToClass) {
+    public <E> QueryResult<E> findAll(Class<E> assignableToClass) {
         List<E> children = new ArrayList<E>();
         addAllIdentifiableMatchingClassRecursive(children, timeSeriesContext, assignableToClass);
         return new DefaultQueryResult<E>(children);
     }
 
-    public <E> QueryResult<E> findAllChildren(String searchPattern, Class<E> assignableToClass) {
+    public <E> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         return new DefaultQueryResult<E>(
-            findAllMatchingSearchPattern(searchPattern, findAllChildren(assignableToClass).getAllMatches())
+            findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
         );
     }
 

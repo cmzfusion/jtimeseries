@@ -25,6 +25,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  *
@@ -85,8 +86,8 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.setParent(parent);
     }
 
-    public Object getTreeLock() {
-        return timingSource.getTreeLock();
+    public ReentrantReadWriteLock getContextLock() {
+        return timingSource.getContextLock();
     }
 
     public Identifiable getRoot() {

@@ -79,9 +79,9 @@ public interface ContextQueries {
     QueryResult<Scheduler> findSchedulers(Triggerable triggerable);
 
 
-    <E> QueryResult<E> findAllChildren(Class<E> assignableToClass);
+    <E> QueryResult<E> findAll(Class<E> assignableToClass);
 
-    <E> QueryResult<E> findAllChildren(String searchPattern, Class<E> assignableToClass);
+    <E> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
 
 
     public static interface CaptureCriteria {

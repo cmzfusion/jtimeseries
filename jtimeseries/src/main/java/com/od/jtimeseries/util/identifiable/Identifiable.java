@@ -20,13 +20,19 @@ package com.od.jtimeseries.util.identifiable;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 04-Jan-2009
  * Time: 15:22:20
- * To change this template use File | Settings | File Templates.
+ *
+ * JTimeseries API supports a tree of Identifiables, where an Identifiable instance is a node of
+ * the tree structure, which has a String id
+ *
+ * The path is the path through the tree taking each id, and terminating with the id of this
+ * node, with a '.' separator between ids
  */
 public interface Identifiable {
 
@@ -58,9 +64,9 @@ public interface Identifiable {
 
     /**
      * Structural changes made to the context tree structure should be made
-     * while holding the lock on this Object
+     * while holding the write lock on this Object
      */
-    Object getTreeLock();
+    ReentrantReadWriteLock getContextLock();
 
     Identifiable getRoot();
 

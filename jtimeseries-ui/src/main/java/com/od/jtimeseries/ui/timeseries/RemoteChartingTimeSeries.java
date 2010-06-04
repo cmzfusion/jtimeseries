@@ -57,6 +57,8 @@ import java.awt.*;
  */
 public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(RemoteChartingTimeSeries.class);
+
     private static ScheduledExecutorService refreshExecutor = Executors.newSingleThreadScheduledExecutor();
     private static int startOfDayOffsetMinutes = 0;
     private static final int ONE_DAY_MILLIS = 24*60*60*1000;
@@ -65,7 +67,6 @@ public class RemoteChartingTimeSeries extends DefaultIdentifiableTimeSeries {
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
     private URL timeSeriesUrl;
-    private LogMethods logMethods = LogUtils.getLogMethods(RemoteChartingTimeSeries.class);
     private boolean selected;
     private List<String> pathElements;
     private long startOfDay = calcStartOfDay();

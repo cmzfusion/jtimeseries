@@ -34,8 +34,9 @@ import java.net.URL;
  */
 public abstract class AbstractRemoteQuery {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractRemoteQuery.class);    
+
     private URL url;
-    private LogMethods logMethods = LogUtils.getLogMethods(AbstractRemoteQuery.class);
 
     public URL getQueryUrl() {
         return url;

@@ -31,9 +31,10 @@ import java.util.*;
  * Time: 12:37:59
  */
 public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, UdpServer.UdpMessageListener {
+    
+    private static LogMethods logMethods = LogUtils.getLogMethods(UdpPingHttpServerDictionary.class);
 
     private final Set<RemoteHttpServer> serverSet = Collections.synchronizedSet(new TreeSet<RemoteHttpServer>());
-    private LogMethods logMethods = LogUtils.getLogMethods(UdpPingHttpServerDictionary.class);
 
     public List<RemoteHttpServer> getKnownTimeSeriesServer() {
         ArrayList<RemoteHttpServer> servers = new ArrayList<RemoteHttpServer>();

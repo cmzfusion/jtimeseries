@@ -56,12 +56,13 @@ import java.util.List;
  */
 public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(SelectServerPanel.class);
+
     private static final long HIDE_SERVERS_WITH_LAST_PING_OLDER_THAN_MILLIS = 1000 * 60 * 10;
     private JList knownServersList;
     private JTextField serverTextField = new JTextField();
     private ListSelectionActionModel<RemoteHttpServer> listSelectionActionModel = new ListSelectionActionModel<RemoteHttpServer>();
     private JButton downloadButton = new JButton(new DownloadAction());
-    private LogMethods logMethods = LogUtils.getLogMethods(SelectServerPanel.class);
     private LoadSelectedSeriesCommand loadSelectedSeriesCommand = new LoadSelectedSeriesCommand();
     private TimeSeriesContext remoteSeriesContext;
     private DisplayNameCalculator displayNameCalculator;

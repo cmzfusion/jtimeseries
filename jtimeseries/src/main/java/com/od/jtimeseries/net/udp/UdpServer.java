@@ -42,6 +42,8 @@ import java.util.concurrent.Executors;
  */
 public class UdpServer {
 
+    private static LogMethods logMethods = LogUtils.getLogMethods(UdpServer.class);
+
     public static final int MAX_PACKET_SIZE = 8192;
     private static final int RESTART_WAIT = 600000; //10 mins
 
@@ -55,11 +57,7 @@ public class UdpServer {
     private Thread receiveThread;
 
     public UdpServer(int port) {
-        this(LogUtils.getLogMethods(UdpServer.class), port);
-    }
-
-    public UdpServer(LogMethods log, int port) {
-        limitedLogger = new LimitedErrorLogger(log, 10, 100);
+        limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
         startReceive();
     }

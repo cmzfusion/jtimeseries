@@ -39,6 +39,7 @@ import java.util.concurrent.Executor;
 abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractListTimeSeries.class);
+    
     private final OrderValidatingRandomAccessDeque series;
     private final TimeSeriesListenerSupport timeSeriesListenerSupport = new TimeSeriesListenerSupport();
 

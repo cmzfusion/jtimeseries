@@ -34,10 +34,11 @@ import java.util.Properties;
  */
 public class UdpMessage extends Properties {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(UdpMessage.class);
+
     public static final String MESSAGE_TYPE_PROPERTY = "MESSAGE_TYPE";
     public static final String SOURCE_INETADDRESS_KEY = "INETADDRESS";
     public static final String SOURCE_HOSTNAME_KEY = "INETHOST";
-    private static LogMethods logMethods = LogUtils.getLogMethods(UdpMessage.class);
 
     public UdpMessage(Properties p) {
         putAll(p);

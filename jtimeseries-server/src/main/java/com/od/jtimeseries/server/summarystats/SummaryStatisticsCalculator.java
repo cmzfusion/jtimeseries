@@ -39,7 +39,7 @@ import java.text.DecimalFormat;
  */
 public class SummaryStatisticsCalculator {
 
-    private static LogMethods logMethods = LogUtils.getLogMethods(SummaryStatisticsCalculator.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(SummaryStatisticsCalculator.class);
 
     private TimeSeriesContext rootContext;
     private List<SummaryStatistic> statistics;

@@ -54,6 +54,8 @@ import java.util.concurrent.*;
  */
 public class FilesystemTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, ListTimeSeries {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
+
     private static ScheduledExecutorService clearCacheExecutor = Executors.newSingleThreadScheduledExecutor();
     private Executor eventExecutor = TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     private SoftReference<RoundRobinTimeSeries> softSeriesReference = new SoftReference<RoundRobinTimeSeries>(null);
@@ -65,7 +67,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private WriteBehindCache writeBehindCache;
     private long lastTimestamp = -1;
     private ScheduledFuture nextFlushTask;
-    private LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
     private volatile boolean persistenceStopped = false;
 
     public FilesystemTimeSeries(Identifiable parentContext, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {

@@ -39,7 +39,8 @@ import java.io.FilenameFilter;
  */
 public class SeriesDirectoryManager {
 
-    private LogMethods logMethods = LogUtils.getLogMethods(SeriesDirectoryManager.class);
+    private static LogMethods logMethods = LogUtils.getLogMethods(SeriesDirectoryManager.class);
+
     private File seriesDirectory;
     private RoundRobinSerializer roundRobinSerializer;
     private TimeSeriesContext rootContext;

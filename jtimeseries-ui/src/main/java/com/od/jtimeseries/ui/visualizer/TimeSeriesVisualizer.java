@@ -58,12 +58,13 @@ import java.util.List;
  */
 public class TimeSeriesVisualizer extends JPanel {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesVisualizer.class);
+
     private JToolBar toolbar;
     private TimeSeriesChart chart;
     private SeriesSelectionPanel seriesSelectionPanel;
     private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
-    private LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesVisualizer.class);
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     private final ChartControlPanel chartControlPanel;

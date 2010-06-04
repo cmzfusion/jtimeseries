@@ -38,7 +38,7 @@ import com.od.jtimeseries.util.logging.LogUtils;
  */
 public class LoggingPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer {
 
-    private static LogMethods m = LogUtils.getLogMethods(LoggingPropertyPlaceholderConfigurer.class);
+    private static final LogMethods m = LogUtils.getLogMethods(LoggingPropertyPlaceholderConfigurer.class);
 
     protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
         super.processProperties(beanFactoryToProcess, props);

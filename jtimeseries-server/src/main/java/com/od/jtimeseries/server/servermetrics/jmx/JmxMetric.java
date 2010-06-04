@@ -55,7 +55,8 @@ import java.io.IOException;
  */
 public class JmxMetric implements ServerMetric {
 
-    private static LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
+
     private static JmxExecutorService jmxExecutorService = new DefaultJmxExecutorService(10, 60000);
     private static final AtomicInteger triggerableId = new AtomicInteger();
 

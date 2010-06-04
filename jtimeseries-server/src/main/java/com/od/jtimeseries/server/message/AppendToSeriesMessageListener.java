@@ -51,6 +51,8 @@ import java.util.concurrent.TimeUnit;
 */
 public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListener {
 
+    private static LogMethods logMethod = LogUtils.getLogMethods(AppendToSeriesMessageListener.class);
+
     public static final TimePeriod STALE_SERIES_DELAY = Time.hours(1);
 
     private static volatile Counter updateMessagesReceivedCounter;
@@ -58,7 +60,6 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
 
     private final Map<String, Long> liveSeriesLastUpdateMap = new HashMap<String, Long>();
 
-    private LogMethods logMethod = LogUtils.getLogMethods(AppendToSeriesMessageListener.class);
     private TimeSeriesContext rootContext;
 
     public AppendToSeriesMessageListener(TimeSeriesContext rootContext) {

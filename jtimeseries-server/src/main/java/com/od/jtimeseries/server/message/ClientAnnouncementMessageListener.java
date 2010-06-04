@@ -37,8 +37,9 @@ import java.net.UnknownHostException;
  */
 public class ClientAnnouncementMessageListener implements UdpServer.UdpMessageListener {
 
+    private static LogMethods logMethod = LogUtils.getLogMethods(ClientAnnouncementMessageListener.class);
+
     private UdpClient clientToSendUdpServerAnnouncePings;
-    private LogMethods logMethod = LogUtils.getLogMethods(ClientAnnouncementMessageListener.class);
 
     public ClientAnnouncementMessageListener(UdpClient clientToSendUdpServerAnnouncePings) {
         this.clientToSendUdpServerAnnouncePings = clientToSendUdpServerAnnouncePings;

@@ -41,7 +41,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class UdpClient {
 
-    private final LogMethods logMethods = LogUtils.getLogMethods(UdpClient.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(UdpClient.class);
+    
     private final LimitedErrorLogger limitedLogger = new LimitedErrorLogger(logMethods, 5, 100);
     private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 

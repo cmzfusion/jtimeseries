@@ -46,6 +46,8 @@ import java.util.Properties;
  */
 public class RoundRobinSerializer {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(RoundRobinSerializer.class);    
+
     private static final String VERSION_STRING = "TSVERSION001";
     private static final int VERSION_STRING_LENGTH = 12;
     private static final int CURRENT_HEAD_OFFSET = 20;
@@ -56,7 +58,6 @@ public class RoundRobinSerializer {
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
-    private final LogMethods logMethods = LogUtils.getLogMethods(RoundRobinSerializer.class);
     private final Object writeLock = new Object();
     private volatile boolean shutdown;
 

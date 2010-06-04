@@ -55,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultJmxExecutorService implements JmxExecutorService {
 
-    private static LogMethods logMethods = LogUtils.getLogMethods(DefaultJmxExecutorService.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultJmxExecutorService.class);
 
     private Map<String, ?> connectorEnvironment;
 

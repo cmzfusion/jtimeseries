@@ -70,7 +70,7 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
     }
 
     public TimeSeriesContext addChild_Locked(Identifiable... identifiables) {
-        TimeSeriesContext t = super.addChild(identifiables);
+        TimeSeriesContext t = super.addChild_Locked(identifiables);
         for ( Identifiable i : identifiables) {
             if ( i instanceof IdentifiableTimeSeries) {
                 PublishingTimeSeriesListener listener = new PublishingTimeSeriesListener(udpClient, (IdentifiableTimeSeries) i, minSendIntervalMillis);
@@ -82,7 +82,7 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
     }
 
     public boolean removeChild_Locked(Identifiable identifiable) {
-        boolean result = super.removeChild(identifiable);
+        boolean result = super.removeChild_Locked(identifiable);
         if (result) {
             PublishingTimeSeriesListener l = listenersByIdentifiable.get(identifiable);
             if ( l != null) {

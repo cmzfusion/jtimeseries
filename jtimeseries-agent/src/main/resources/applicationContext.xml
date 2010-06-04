@@ -12,10 +12,6 @@
     <import resource="serverMetrics.xml"/>
     <!-- <import resource="inputHandlers.xml"/>  -->
 
-    <bean id="seriesDirectory" class="java.io.File">
-        <constructor-arg value="${seriesDirectory}"/>
-    </bean>
-
     <bean id="logFileDirectory" class="java.io.File">
         <constructor-arg value="${logDirectory}${file.separator}${logFileName}"/>
     </bean>
@@ -54,7 +50,7 @@
         <constructor-arg value="${jmxHttpdPort}"/>
     </bean>
 
-    <bean id="timeSeriesServer" class="com.od.jtimeseries.agent.JTimeSeriesAgent">
+    <bean id="timeSeriesAgent" class="com.od.jtimeseries.agent.JTimeSeriesAgent">
         <property name="rootContext" ref="rootContext"/>
         <property name="httpdServer" ref="httpdServer"/>
         <property name="udpClient" ref="udpClient"/>

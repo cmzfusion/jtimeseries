@@ -18,18 +18,13 @@
  */
 package com.od.jtimeseries.agent.jmx;
 
-import com.od.jtimeseries.net.udp.UdpClient;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
  * Date: 11-Jun-2009
  * Time: 15:05:09
  */
-public class AgentConfigJmx implements ServerConfigJmxMBean {
+public class AgentConfigJmx implements AgentConfigJmxMBean {
 
     private String agentName;
     private int httpdDaemonPort;

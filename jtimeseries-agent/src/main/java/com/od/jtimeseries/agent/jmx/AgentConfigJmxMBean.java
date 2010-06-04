@@ -24,7 +24,7 @@ package com.od.jtimeseries.agent.jmx;
  * Date: 11-Jun-2009
  * Time: 15:03:18
  */
-public interface ServerConfigJmxMBean {
+public interface AgentConfigJmxMBean {
 
     String getAgentName();
 

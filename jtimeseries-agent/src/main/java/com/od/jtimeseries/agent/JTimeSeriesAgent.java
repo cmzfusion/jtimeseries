@@ -30,11 +30,9 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     public static long startTime = System.currentTimeMillis();
 
-    private int serverAnnouncementPingPeriodSeconds = 30;
     private int jmxManagementPort;
     private TimeSeriesContext rootContext;
     private UdpClient udpClient;
-    private HttpServerAnnouncementMessage serverAnnouncementMessage;
     private AgentConfigJmx agentConfigJmx;
     private ManagedMetricInitializer managedMetricInitializer;
     private HtmlAdaptorServer htmlAdaptorServer;
@@ -60,7 +58,6 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     private void doStartup() throws IOException {
         startJmxManagementServer();
         setupManagedMetrics();
-        startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
 
@@ -79,11 +76,6 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
         } catch (IOException e) {
             logMethods.logError("Error creating jmx server", e);
         }
-    }
-
-    private void startServerAnnouncementPings() {
-        logMethods.logInfo("Starting Server Announcement Pings");
-        udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
     }
 
     private void setupManagedMetrics() {
@@ -110,20 +102,12 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
         httpdServer.start();
     }
 
-    public void setServerAnnouncementPingPeriodSeconds(int serverAnnouncementPingPeriodSeconds) {
-        this.serverAnnouncementPingPeriodSeconds = serverAnnouncementPingPeriodSeconds;
-    }
-
     public void setRootContext(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
     }
 
     public void setUdpClient(UdpClient udpClient) {
         this.udpClient = udpClient;
-    }
-
-    public void setServerAnnouncementMessage(HttpServerAnnouncementMessage announceMessage) {
-        this.serverAnnouncementMessage = announceMessage;
     }
 
     public void setAgentConfigJmx(AgentConfigJmx agentConfigJmx) {

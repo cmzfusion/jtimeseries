@@ -1,8 +1,7 @@
 package com.od.jtimeseries.server.timeseries;
 
-import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.impl.AbstractListTimeSeriesTest;
-import com.od.jtimeseries.server.serialization.RoundRobinTimeSeries;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
 import org.junit.Test;
 

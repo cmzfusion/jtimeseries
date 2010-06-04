@@ -4,6 +4,7 @@ import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.ServerDefaults;
 import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;

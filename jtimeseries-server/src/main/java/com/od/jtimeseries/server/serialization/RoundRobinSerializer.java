@@ -19,6 +19,7 @@
 package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;

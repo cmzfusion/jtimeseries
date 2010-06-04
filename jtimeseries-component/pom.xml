@@ -8,9 +8,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>od</groupId>
-    <artifactId>jtimeseries-server</artifactId>
-    <name>jtimeseries-server</name>
-    <description>JTimeSeries Server</description>
+    <artifactId>jtimeseries-component</artifactId>
+    <name>jtimeseries-component</name>
+    <description>JTimeSeries Component</description>
     <packaging>jar</packaging>
     <build>
         <plugins>
@@ -63,11 +63,6 @@
         <dependency>
             <groupId>od</groupId>
             <artifactId>jtimeseries</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>od</groupId>
-            <artifactId>jtimeseries-component</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

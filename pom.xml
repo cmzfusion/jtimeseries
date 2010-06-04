@@ -8,12 +8,13 @@
 	<packaging>pom</packaging>
 	<name>JTimeseries Project</name>
 	<modules>
-    <module>jtimeseries-parent</module>
+  <module>jtimeseries-parent</module>
 	<module>jtimeseries</module>
+	<module>jtimeseries-component</module>
+  <module>jtimeseries-agent</module>
 	<module>jtimeseries-server</module>
-    <module>jtimeseries-agent</module>
 	<module>jtimeseries-ui</module>
-    <module>jtimeseries-demo</module>
+  <module>jtimeseries-demo</module>
 	</modules>
     <build>
         <plugins>

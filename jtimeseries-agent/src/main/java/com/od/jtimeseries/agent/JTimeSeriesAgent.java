@@ -1,36 +1,13 @@
-/**
- * Copyright (C) 2009 (nick @ objectdefinitions.com)
- *
- * This file is part of JTimeseries.
- *
- * JTimeseries is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * JTimeseries is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
- */
-package com.od.jtimeseries.server;
+package com.od.jtimeseries.agent;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
-import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
-import com.od.jtimeseries.net.udp.UdpClient;
-import com.od.jtimeseries.net.udp.UdpServer;
-import com.od.jtimeseries.server.jmx.ServerConfigJmx;
-import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
-import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
-import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
+import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
+import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
+import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
+import com.od.jtimeseries.agent.jmx.AgentConfigJmx;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -45,12 +22,11 @@ import java.lang.management.ManagementFactory;
 
 /**
  * Created by IntelliJ IDEA.
- * User: nick
- * Date: 16-May-2009
- * Time: 15:32:19
- *
+ * User: Nick Ebbutt
+ * Date: 04-Jun-2010
+ * Time: 11:00:39
  */
-public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
+public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     public static long startTime = System.currentTimeMillis();
 
@@ -58,45 +34,38 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     private int jmxManagementPort;
     private TimeSeriesContext rootContext;
     private UdpClient udpClient;
-    private RoundRobinSerializer fileSerializer;
     private HttpServerAnnouncementMessage serverAnnouncementMessage;
-    private ServerConfigJmx serverConfigJmx;
-    private UdpServer udpServer;
+    private AgentConfigJmx agentConfigJmx;
     private ManagedMetricInitializer managedMetricInitializer;
-    private SummaryStatisticsCalculator summaryStatisticsCalculator;
     private HtmlAdaptorServer htmlAdaptorServer;
     private JTimeSeriesHttpd httpdServer;
 
+
     static {
-        initialize(JTimeSeriesServer.class);
+        initialize(JTimeSeriesAgent.class);
     }
 
-    public JTimeSeriesServer() {}
+    public JTimeSeriesAgent() {}
 
     private void startup() {
-        logMethods.logInfo("Starting JTimeSeriesServer");
+        logMethods.logInfo("Starting JTimeSeriesAgent");
         try {
             doStartup();
-            logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
+            logMethods.logInfo("JTimeSeriesAgent is up.");
         } catch ( Throwable t) {
-            logMethods.logError("Error starting JTimeseriesServer", t);
+            logMethods.logError("Error starting JTimeSeriesAgent", t);
         }
     }
 
     private void doStartup() throws IOException {
-        startSeriesDirectoryManager();
         startJmxManagementServer();
-        setupServerMetrics();
-        startSummaryStats();
-        addUdpMessageListeners();
+        setupManagedMetrics();
         startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
-
-        serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
     }
 
     private void startJmxManagementServer() {
@@ -117,27 +86,9 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
     }
 
-    private void addUdpMessageListeners() {
-        logMethods.logInfo("Adding UDP message listeners");
-        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
-        udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
-    }
-
-    private void setupServerMetrics() {
+    private void setupManagedMetrics() {
         logMethods.logInfo("Setting up server metrics series");
         managedMetricInitializer.initializeServerMetrics();
-    }
-
-    private void startSummaryStats() {
-        logMethods.logInfo("Starting summary stats");
-        summaryStatisticsCalculator.start();
-    }
-
-    private void startSeriesDirectoryManager() {
-        logMethods.logInfo("Starting Series Directory Manager");
-        SeriesDirectoryManager seriesDirectoryManager = (SeriesDirectoryManager)ctx.getBean("seriesDirectoryManager");
-        seriesDirectoryManager.removeOldTimeseriesFiles();
-        seriesDirectoryManager.loadExistingSeries();
     }
 
     private void startJmx() {
@@ -146,7 +97,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
             ObjectName configMBeanName = new ObjectName("JTimeSeriesServerConfig:name=JTimeSeriesServerConfig");
-            mBeanServer.registerMBean(serverConfigJmx, configMBeanName);
+            mBeanServer.registerMBean(agentConfigJmx, configMBeanName);
             mBeanServer.registerMBean(htmlAdaptorServer, new ObjectName("adaptor:protocol=HTTP"));
 
             htmlAdaptorServer.start();
@@ -171,28 +122,16 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         this.udpClient = udpClient;
     }
 
-    public void setFileSerializer(RoundRobinSerializer roundRobinSerializer) {
-        this.fileSerializer = roundRobinSerializer;
-    }
-
     public void setServerAnnouncementMessage(HttpServerAnnouncementMessage announceMessage) {
         this.serverAnnouncementMessage = announceMessage;
     }
 
-    public void setServerConfigJmx(ServerConfigJmx serverConfigJmx) {
-        this.serverConfigJmx = serverConfigJmx;
-    }
-
-    public void setUdpServer(UdpServer udpServer) {
-        this.udpServer = udpServer;
+    public void setAgentConfigJmx(AgentConfigJmx agentConfigJmx) {
+        this.agentConfigJmx = agentConfigJmx;
     }
 
     public void setManagedMetricInitializer(ManagedMetricInitializer metricInitializer) {
         this.managedMetricInitializer = metricInitializer;
-    }
-
-    public void setSummaryStatisticsCalculator(SummaryStatisticsCalculator summaryStatisticsCalculator) {
-        this.summaryStatisticsCalculator = summaryStatisticsCalculator;
     }
 
     public void setHtmlAdaptorServer(HtmlAdaptorServer htmlAdaptorServer) {
@@ -208,7 +147,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     public static void main(String[] args) throws IOException {
-        JTimeSeriesServer server = (JTimeSeriesServer)ctx.getBean("timeSeriesServer");
+        JTimeSeriesAgent server = (JTimeSeriesAgent)ctx.getBean("timeSeriesAgent");
         server.startup();
     }
 }

@@ -54,6 +54,10 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
         this(udpClient, null, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID);
     }
 
+    public UdpPublishingTimeSeriesContext(UdpClient udpClient, String id, String description) {
+        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, null, id, description);
+    }
+
     public UdpPublishingTimeSeriesContext(UdpClient udpClient, TimeSeriesContext parent, String id, String description) {
         this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, parent, id, description);
     }

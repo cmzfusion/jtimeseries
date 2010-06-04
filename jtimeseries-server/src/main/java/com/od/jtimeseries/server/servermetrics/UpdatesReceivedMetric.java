@@ -23,6 +23,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +32,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 19:47:38
  * To change this template use File | Settings | File Templates.
  */
-public class UpdatesReceivedMetric extends AbstractServerMetric {
+public class UpdatesReceivedMetric extends AbstractManagedMetric {
 
     private static final String SERIES_ID = "UdpSeriesUpdates";
     private TimePeriod countPeriod;

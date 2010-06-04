@@ -13,15 +13,11 @@
         <property name="location" value="/jtimeseries-server.properties"/>
     </bean>
 
-    <bean id="seriesDirectory" class="java.io.File">
-        <constructor-arg value="${seriesDirectory}"/>
-    </bean>
-
     <bean id="logFileDirectory" class="java.io.File">
         <constructor-arg value="${logDirectory}${file.separator}${logFileName}"/>
     </bean>
 
-    <bean id="logMethodsFactory" class="com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory">
+    <bean id="logMethodsFactory" class="com.od.jtimeseries.component.JavaUtilLoggingLogMethodsFactory">
         <constructor-arg ref="logFileDirectory"/>
         <constructor-arg value="${logLevel}"/>
         <constructor-arg value="${maxLogFileSizeInBytes}"/>

@@ -23,6 +23,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +32,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * Time: 21:43:01
  * To change this template use File | Settings | File Templates.
  */
-public class GarbageCollectedSeriesMetric extends AbstractServerMetric {
+public class GarbageCollectedSeriesMetric extends AbstractManagedMetric {
 
     private TimePeriod countPeriod;
     private static final String id = "SeriesGarbageCollected";

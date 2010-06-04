@@ -21,6 +21,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +30,7 @@ import com.od.jtimeseries.source.ValueRecorder;
  * Time: 19:33:20
  * To change this template use File | Settings | File Templates.
  */
-public class LiveSeriesMetric extends AbstractServerMetric {
+public class LiveSeriesMetric extends AbstractManagedMetric {
 
     private static final String id = "TotalLiveSeries";
     private String parentContextPath;

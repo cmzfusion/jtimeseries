@@ -23,6 +23,7 @@ import com.od.jtimeseries.source.ValueSupplier;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
+import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +32,7 @@ import com.od.jtimeseries.util.numeric.LongNumeric;
  * Time: 19:53:14
  * To change this template use File | Settings | File Templates.
  */
-public class TotalSeriesMetric extends AbstractServerMetric {
+public class TotalSeriesMetric extends AbstractManagedMetric {
 
     private static final String id = "TotalSeries";
     private String parentContextPath;

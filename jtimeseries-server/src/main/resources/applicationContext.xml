@@ -5,7 +5,7 @@
 	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
-	<bean id="propertyConfigurer" class="com.od.jtimeseries.server.util.LoggingPropertyPlaceholderConfigurer">
+	<bean id="propertyConfigurer" class="com.od.jtimeseries.component.LoggingPropertyPlaceholderConfigurer">
         <property name="location" value="/jtimeseries-server.properties"/>
     </bean>
 
@@ -14,17 +14,6 @@
 
     <bean id="seriesDirectory" class="java.io.File">
         <constructor-arg value="${seriesDirectory}"/>
-    </bean>
-
-    <bean id="logFileDirectory" class="java.io.File">
-        <constructor-arg value="${logDirectory}${file.separator}${logFileName}"/>
-    </bean>
-
-    <bean id="logMethodsFactory" class="com.od.jtimeseries.server.util.JavaUtilLoggingLogMethodsFactory">
-        <constructor-arg ref="logFileDirectory"/>
-        <constructor-arg value="${logLevel}"/>
-        <constructor-arg value="${maxLogFileSizeInBytes}"/>
-        <constructor-arg value="${maxLogFileCount}"/>
     </bean>
 
     <bean id="timeSeriesFactory" class="com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory">
@@ -100,7 +89,7 @@
         <property name="fileSerializer" ref="fileSerializer"/>
         <property name="serverAnnouncementMessage" ref="serverAnnouncementMessage"/>
         <property name="serverConfigJmx" ref="serverConfigJmx"/>
-        <property name="serverMetricInitializer" ref="serverMetricInitializer"/>
+        <property name="managedMetricInitializer" ref="serverMetricInitializer"/>
         <property name="summaryStatisticsCalculator" ref="summaryStatsCalculator"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>

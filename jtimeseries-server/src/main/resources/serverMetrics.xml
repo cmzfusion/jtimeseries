@@ -5,7 +5,7 @@
 	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 
-    <bean id="serverMetricInitializer" class="com.od.jtimeseries.server.ServerMetricInitializer">
+    <bean id="serverMetricInitializer" class="com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer">
         <constructor-arg ref="rootContext"/>
         <constructor-arg>
             <list>
@@ -13,7 +13,7 @@
                 <!-- The following DefaultMetricSource defines some useful server monitoring metrics, but you could add other sources
                 or define extra JmxMetric within this source to capture stats from third party processes which support jmx management service,
                 for example -->
-                <bean id="serverMetrics" class="com.od.jtimeseries.server.servermetrics.DefaultMetricSource">
+                <bean id="serverMetrics" class="com.od.jtimeseries.component.managedmetric.DefaultMetricSource">
                     <constructor-arg>
                         <!-- list of the default timeseries-server metrics -->
                         <list>
@@ -40,7 +40,7 @@
                             </bean>
 
                              <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.jmx.JmxMetric">
+                            <bean class="com.od.jtimeseries.component.jmx.JmxMetric">
                                 <constructor-arg>
                                     <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
                                         <constructor-arg value="1"/>  <!-- connect to jmx service to take measurements every 5 mins -->
@@ -50,19 +50,19 @@
                                 <constructor-arg>
                                     <list>
                                         <!-- Read memory Usage -->
-                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="heapMemoryUsage">
+                                        <bean class="com.od.jtimeseries.component.jmx.measurement.JmxMeasurements" factory-method="heapMemoryUsage">
                                             <constructor-arg value="${serverMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read CPU percentage -->
-                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="cpuTimePercentage">
+                                        <bean class="com.od.jtimeseries.component.jmx.measurement.JmxMeasurements" factory-method="cpuTimePercentage">
                                             <constructor-arg value="${serverMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read Percentage time in GC -->
-                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="gcTimePercentage">
+                                        <bean class="com.od.jtimeseries.component.jmx.measurement.JmxMeasurements" factory-method="gcTimePercentage">
                                             <constructor-arg value="${serverMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read Percentage of Max Memory -->
-                                        <bean class="com.od.jtimeseries.server.servermetrics.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
+                                        <bean class="com.od.jtimeseries.component.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
                                             <constructor-arg value="${serverMetricsContextPath}"/>
                                         </bean>
                                     </list>
@@ -75,7 +75,7 @@
             </list>
         </constructor-arg>
         <constructor-arg>
-            <bean class="com.od.jtimeseries.server.servermetrics.jmx.DefaultJmxExecutorService">
+            <bean class="com.od.jtimeseries.component.jmx.DefaultJmxExecutorService">
                 <constructor-arg value="${jmxConnectionCountLimit}"/>
                 <constructor-arg value="${jmxConnectionMaxAgeMillis}"/>
             </bean>

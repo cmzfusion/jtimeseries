@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.component.jmx;
+package com.od.jtimeseries.component.managedmetric.jmx;
 
-import com.od.jtimeseries.component.jmx.measurement.JmxMeasurement;
-import com.od.jtimeseries.component.jmx.value.JmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
+import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.scheduling.Triggerable;

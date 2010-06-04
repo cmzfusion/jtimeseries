@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.component.jmx.measurement;
+package com.od.jtimeseries.component.managedmetric.jmx.measurement;
 
 /**
  * Created by IntelliJ IDEA.

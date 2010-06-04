@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.component.jmx.measurement;
+package com.od.jtimeseries.component.managedmetric.jmx.measurement;
 
-import com.od.jtimeseries.component.jmx.value.CompositeDataJmxValue;
-import com.od.jtimeseries.component.jmx.value.JmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.value.CompositeDataJmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
 
 /**
  * Created by IntelliJ IDEA.

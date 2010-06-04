@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.component.jmx.value;
+package com.od.jtimeseries.component.managedmetric.jmx.value;
 
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 

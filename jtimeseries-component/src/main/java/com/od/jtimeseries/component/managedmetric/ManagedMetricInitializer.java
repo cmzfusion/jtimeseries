@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.component.managedmetric;
 
-import com.od.jtimeseries.component.jmx.JmxExecutorService;
-import com.od.jtimeseries.component.jmx.JmxMetric;
+import com.od.jtimeseries.component.managedmetric.jmx.JmxExecutorService;
+import com.od.jtimeseries.component.managedmetric.jmx.JmxMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;

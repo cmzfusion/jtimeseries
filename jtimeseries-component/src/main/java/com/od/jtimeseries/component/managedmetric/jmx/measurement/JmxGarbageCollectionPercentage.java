@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.component.jmx.measurement;
+package com.od.jtimeseries.component.managedmetric.jmx.measurement;
 
-import com.od.jtimeseries.component.jmx.value.JmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 
 import java.util.LinkedList;
@@ -27,25 +27,23 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 04-Feb-2010
- * Time: 10:00:24
+ * Date: 03-Feb-2010
+ * Time: 17:55:59
  */
-class JmxCpuTimePercentage extends JmxMeasurement {
+class JmxGarbageCollectionPercentage extends JmxMeasurement {
 
-    private JmxCpuTimePercentage(String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
+    private JmxGarbageCollectionPercentage(String parentContextPath, String id, String description, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
         super(parentContextPath, id, description, listOfJmxValue, aggregateFunction);
     }
 
-    static JmxCpuTimePercentage createJmxCpuTimePercentage(String parentContextPath, String id, String description) {
+    static JmxGarbageCollectionPercentage createJmxGarbageCollectionPercentage(String parentContextPath, String id, String description) {
         //memory usage is the sum of the heap and non-heap memory
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
-
+        
         //The collection count attribute on all GarbageCollection type mbeans
-        jmxValue.add(new JmxValue("java.lang:type=OperatingSystem", "ProcessCpuTime"));
+        jmxValue.add(new JmxValue("java.lang:type=GarbageCollector,*", "CollectionTime"));
 
-        JmxCpuTimePercentage jmxCpuTimePercentage = new JmxCpuTimePercentage(parentContextPath, id, description, jmxValue, new JmxPercentageOfTimeFunction());
-        jmxCpuTimePercentage.setDivisor(1000000); //cpu times appear to be nanoseconds, we need milliseconds
-        return jmxCpuTimePercentage;
+        return new JmxGarbageCollectionPercentage(parentContextPath, id, description, jmxValue, new JmxPercentageOfTimeFunction());
     }
 
 }

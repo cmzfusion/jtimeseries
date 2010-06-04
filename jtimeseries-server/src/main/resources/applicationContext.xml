@@ -5,7 +5,7 @@
 	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
-	<bean id="propertyConfigurer" class="com.od.jtimeseries.component.LoggingPropertyPlaceholderConfigurer">
+	<bean id="propertyConfigurer" class="com.od.jtimeseries.component.logging.LoggingPropertyPlaceholderConfigurer">
         <property name="location" value="/jtimeseries-server.properties"/>
     </bean>
 

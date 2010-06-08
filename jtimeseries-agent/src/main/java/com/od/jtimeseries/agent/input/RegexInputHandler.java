@@ -1,7 +1,12 @@
 package com.od.jtimeseries.agent.input;
 
-import java.util.List;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,15 +16,26 @@ import java.util.ArrayList;
  */
 public class RegexInputHandler implements InputHandler {
 
-    private String inputPattern;
+    protected static LogMethods logMethods = LogUtils.getLogMethods(InputHandler.class);
+
+    private Pattern pattern;
     private List<RegexValueHandler> valueHandlers = new ArrayList<RegexValueHandler>();
 
-    public RegexInputHandler(String inputPatter) {
-        this.inputPattern = inputPattern;
+    public RegexInputHandler(String inputPattern) {
+        pattern = Pattern.compile(inputPattern);
     }
 
     public void parseInput(String input) {
-
+        Matcher m = pattern.matcher(input);
+        if ( m.matches() ) {
+            for ( RegexValueHandler h : valueHandlers ) {
+                try {
+                    h.parseInputValue(m);
+                } catch ( Throwable t) {
+                    logMethods.logError("RegexValueHandler " + h + " failed to process value from input " + input, t);
+                }
+            }
+        }
     }
 
     public void addRegexValueHandler(RegexValueHandler r) {

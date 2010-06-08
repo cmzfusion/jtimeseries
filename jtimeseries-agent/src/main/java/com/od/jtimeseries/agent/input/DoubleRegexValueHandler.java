@@ -1,9 +1,8 @@
 package com.od.jtimeseries.agent.input;
 
 import com.od.jtimeseries.capture.function.CaptureFunction;
-import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.source.ValueRecorder;
 
 import java.util.regex.Matcher;
 
@@ -15,15 +14,17 @@ import java.util.regex.Matcher;
  */
 public class DoubleRegexValueHandler implements RegexValueHandler {
 
-    private String destinationSeries;
+    private String destinationSeriesPath;
     private CaptureFunction captureFunction;
     private TimeSeriesContext rootContext;
+    private String seriesDescription;
     private int captureGroup;
 
-    public DoubleRegexValueHandler(TimeSeriesContext rootContext, String destinationSeries, CaptureFunction captureFunction, int captureGroup) {
+    public DoubleRegexValueHandler(TimeSeriesContext rootContext, String destinationSeriesPath, String seriesDescription, CaptureFunction captureFunction, int captureGroup) {
         this.rootContext = rootContext;
+        this.seriesDescription = seriesDescription;
         this.captureGroup = captureGroup;
-        this.destinationSeries = destinationSeries;
+        this.destinationSeriesPath = destinationSeriesPath;
         this.captureFunction = captureFunction;
     }
 
@@ -33,7 +34,7 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
     }
 
     public String getDestinationSeries() {
-        return destinationSeries;
+        return "";
     }
 
     public CaptureFunction getCaptureFunction() {

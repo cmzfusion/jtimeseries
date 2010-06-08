@@ -7,6 +7,8 @@ import java.util.List;
  * User: Nick Ebbutt
  * Date: 04-Jun-2010
  * Time: 17:21:28
+ *
+ * Just supplies InputHandler from a list
  */
 public class DefaultInputHandlerSource implements InputHandlerSource {
 

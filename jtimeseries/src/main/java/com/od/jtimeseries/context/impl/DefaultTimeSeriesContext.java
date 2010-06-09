@@ -395,12 +395,13 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     public TimeSeriesContext createContext_Locked(String path, String description) {
         TimeSeriesContext result;
-        if ( path.trim().equals("") ) {
+        PathParser pathParser = new PathParser(path);
+        if ( pathParser.isEmpty() ) {
             result = this;
         } else {
-            PathParser pathParser = new PathParser(path);
             String firstChild = pathParser.removeFirstNode();
             //only want to apply the description to the last node in the path, otherwise use the id
+            //as the description for each intermediate node
             String desc = pathParser.isEmpty() ? description : firstChild;
             TimeSeriesContext c = getOrCreateContext(firstChild, desc);
             result = c.createContext(pathParser.getRemainingPath(), description);

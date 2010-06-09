@@ -60,6 +60,8 @@ import java.util.List;
  */
 public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
+    <E extends Identifiable> E create(String id, String description, Class<E> clazz);
+
     TimeSeriesContext getParent();
 
     TimeSeriesContext getRoot();
@@ -74,7 +76,7 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     TimeSeriesContext addChild(Identifiable... identifiables);
 
-    IdentifiableTimeSeries getTimeSeries(String id);
+    IdentifiableTimeSeries getTimeSeries(String path);
 
     ValueSource getSource(String id);
 

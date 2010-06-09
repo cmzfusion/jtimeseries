@@ -47,7 +47,11 @@ public class UdpRemoteTimeSeriesFactory extends IdentifiableBase implements Time
         this.udpClient = udpClient;
     }
 
-    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description) {
-        return new UdpRemoteTimeSeries(id, description, udpClient);
+    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
+        if ( classType.equals(IdentifiableTimeSeries.class) || classType.equals(UdpRemoteTimeSeries.class)) {
+            return (E)new UdpRemoteTimeSeries(id, description, udpClient);
+        } else {
+            throw new UnsupportedOperationException("Cannot create timeseries of class " + classType);
+        }
     }
 }

@@ -32,8 +32,7 @@ public abstract class LockingIdentifiable implements Identifiable {
             getContextLock().readLock().unlock();                
         }
     }
-    
-    public abstract String getParentPath_Locked();
+    protected abstract String getParentPath_Locked();
     
     public final String getPath() {
         try {
@@ -43,7 +42,6 @@ public abstract class LockingIdentifiable implements Identifiable {
             getContextLock().readLock().unlock();                
         }
     }
-
     protected abstract String getPath_Locked();
 
     public final Identifiable setParent(Identifiable parent) {
@@ -101,16 +99,16 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract boolean isRoot_Locked();
 
-    public final Identifiable get(String id) {
+    public final Identifiable get(String path) {
         try {
             getContextLock().readLock().lock();
-            return get_Locked(id);
+            return get_Locked(path);
         } finally {
             getContextLock().readLock().unlock();
         }
     }
 
-    protected abstract Identifiable get_Locked(String id);
+    protected abstract Identifiable get_Locked(String path);
 
     public final <E extends Identifiable> E get(String id, Class<E> classType) {
         try {
@@ -120,8 +118,7 @@ public abstract class LockingIdentifiable implements Identifiable {
             getContextLock().readLock().unlock();
         }
     }
-
-    protected abstract <E extends Identifiable> E get_Locked(String id, Class<E> classType);
+    protected abstract <E extends Identifiable> E get_Locked(String path, Class<E> classType);
 
     public final boolean containsChildWithId(String id) {
         try {

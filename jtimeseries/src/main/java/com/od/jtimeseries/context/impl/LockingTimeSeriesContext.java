@@ -51,6 +51,16 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return (TimeSeriesContext) super.getParent();
     }
 
+    public <E extends Identifiable> E create(String id, String description, Class<E> clazz) {
+        try {
+            getContextLock().writeLock().lock();
+            return create_Locked(id, description, clazz);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E create_Locked(String id, String description, Class<E> clazz);
+
     public final List<ValueSource> getSources() {
         try {
             getContextLock().readLock().lock();
@@ -108,17 +118,16 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract TimeSeriesContext addChild_Locked(Identifiable... identifiables);
 
-    public final IdentifiableTimeSeries getTimeSeries(String id) {
+    public final IdentifiableTimeSeries getTimeSeries(String path) {
         try {
             getContextLock().readLock().lock();
-            return getTimeSeries_Locked(id);
+            return getTimeSeries_Locked(path);
         } finally {
             getContextLock().readLock().unlock();
         }
     }
+    protected abstract IdentifiableTimeSeries getTimeSeries_Locked(String path);
 
-
-    protected abstract IdentifiableTimeSeries getTimeSeries_Locked(String id);
 
     public final ValueSource getSource(String id) {
         try {
@@ -128,7 +137,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract ValueSource getSource_Locked(String id);
 
     public final TimeSeriesContext getChildContext(String id) {
@@ -139,7 +147,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext getChildContext_Locked(String id);
 
     public final Capture getCapture(String id) {

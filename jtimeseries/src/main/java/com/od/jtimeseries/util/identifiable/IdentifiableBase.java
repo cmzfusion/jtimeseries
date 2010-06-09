@@ -55,7 +55,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         return id;
     }
 
-    public String getParentPath_Locked() {
+    protected String getParentPath_Locked() {
         String result;
         if ( parent == null) {
             result = ""; //root context has no id in namespace path
@@ -65,7 +65,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         return result;
     }
 
-    public String getPath_Locked() {
+    protected String getPath_Locked() {
         StringBuilder path = new StringBuilder(getParentPath());
         if ( path.length() > 0) {
             path.append(".");
@@ -83,39 +83,39 @@ public class IdentifiableBase extends LockingIdentifiable {
         return parent;
     }
 
-    public Identifiable setParent_Locked(Identifiable parent) {
+    protected Identifiable setParent_Locked(Identifiable parent) {
         Identifiable oldParent = this.parent;
         this.parent = parent;
         return oldParent;
     }
 
-    public boolean removeChild_Locked(Identifiable c) {
+    protected boolean removeChild_Locked(Identifiable c) {
         return false;
     }
 
-    public boolean containsChildWithId_Locked(String id) {
+    protected boolean containsChildWithId_Locked(String id) {
         return false;
     }
 
-    public boolean containsChild_Locked(Identifiable i) {
+    protected boolean containsChild_Locked(Identifiable i) {
         return false;
     }
 
-    public String getProperty_Locked(String propertyName) {
+    protected String getProperty_Locked(String propertyName) {
         return properties.getProperty(propertyName);
     }
 
-    public Properties getProperties_Locked() {
+    protected Properties getProperties_Locked() {
             Properties p = new Properties();
             p.putAll(properties);
             return p;
     }
 
-    public void putAllProperties_Locked(Properties p) {
+    protected void putAllProperties_Locked(Properties p) {
         properties.putAll(p);
     }
 
-    public String findProperty_Locked(String propertyName) {
+    protected String findProperty_Locked(String propertyName) {
         String property = getProperty(propertyName);
         if ( property == null && ! isRoot() ) {
             property = getParent().findProperty(propertyName);
@@ -123,15 +123,15 @@ public class IdentifiableBase extends LockingIdentifiable {
         return property;
     }
 
-    public String setProperty_Locked(String propertyName, String value) {
+    protected String setProperty_Locked(String propertyName, String value) {
         return (String)properties.setProperty(propertyName,  value);
     }
 
-    public List<Identifiable> getChildren_Locked() {
+    protected List<Identifiable> getChildren_Locked() {
         return EMPTY_CHILD_LIST;
     }
 
-    public <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
+    protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
         return (List<E>)EMPTY_CHILD_LIST;
     }
 
@@ -172,15 +172,15 @@ public class IdentifiableBase extends LockingIdentifiable {
         }
     }
 
-    public boolean isRoot_Locked() {
+    protected boolean isRoot_Locked() {
         return getParent() == null;
     }
 
-    public Identifiable get_Locked(String id) {
+    protected Identifiable get_Locked(String path) {
         return null;
     }
 
-    public <E extends Identifiable> E get_Locked(String id, Class<E> classType) {
+    protected <E extends Identifiable> E get_Locked(String id, Class<E> classType) {
         return null;
     }
 

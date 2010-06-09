@@ -72,9 +72,9 @@ public interface Identifiable {
 
     boolean isRoot();
 
-    Identifiable get(String id);
+    Identifiable get(String path);
 
-    <E extends Identifiable> E get(String id, Class<E> classType);
+    <E extends Identifiable> E get(String path, Class<E> classType);
 
     boolean containsChildWithId(String id);
 

@@ -100,7 +100,7 @@ public class SeriesDirectoryManager {
 
             //the type of time series which will be created depends on the TimeSeriesFactory set on the context
             //we are expecting FilesystemTimeSeries, but it may be something else
-            rootContext.createTimeSeriesForPath(h.getPath(), h.getDescription());
+            rootContext.createTimeSeries(h.getPath(), h.getDescription());
             loadCount++;
         } catch (SerializationException e) {
             logMethods.logError("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);

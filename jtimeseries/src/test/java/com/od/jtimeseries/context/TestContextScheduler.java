@@ -23,8 +23,8 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
     private Counter grandchildCounter;
 
     protected void doExtraSetUp() {
-        childContext = rootContext.createChildContext("child");
-        grandchildContext = childContext.createChildContext("granchild");
+        childContext = rootContext.createContext("child");
+        grandchildContext = childContext.createContext("granchild");
 
         counter = rootContext.createCounterSeries("counter", "counter", CaptureFunctions.MEAN(capturePeriod));
         childcounter = childContext.createCounterSeries("childcounter", "childcounter", CaptureFunctions.MEAN(capturePeriod));

@@ -37,7 +37,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
     }
 
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
-        TimeSeriesContext context = new DefaultTimeSeriesContext().createContextForPath(TEST_CONTEXT);
+        TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
         FilesystemTimeSeries s = new FilesystemTimeSeries(context, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
         File file = roundRobinSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();
@@ -123,7 +123,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
 
     @Test
     public void testMaximumSize() throws SerializationException {
-        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
+        TimeSeriesContext c = new DefaultTimeSeriesContext().createContext("test");
         int maxSize = 3;
         FilesystemTimeSeries series = new FilesystemTimeSeries(c, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, maxSize, Time.seconds(10), Time.seconds(10));
 
@@ -190,7 +190,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         series.flush();
         assertEquals(3, series.getFileHeader().getMostRecentItemTimestamp());
 
-        TimeSeriesContext context = new DefaultTimeSeriesContext().createContextForPath(TEST_CONTEXT);
+        TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
         FilesystemTimeSeries s = new FilesystemTimeSeries(context, series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
         assertEquals(3, s.getLatestTimestamp());
     }

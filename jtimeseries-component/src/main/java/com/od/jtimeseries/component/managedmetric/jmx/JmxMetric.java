@@ -127,7 +127,7 @@ public class JmxMetric implements ManagedMetric {
 
     private void createJmxTasks(TimeSeriesContext rootContext) {
         for (JmxMeasurement m : jmxMeasurements) {
-            TimeSeriesContext c = rootContext.createContextForPath(m.getParentContextPath());
+            TimeSeriesContext c = rootContext.createContext(m.getParentContextPath());
             ValueRecorder r = c.createValueRecorderSeries(m.getId(), m.getDescription());
             measurementTasks.add(new JmxMeasurementTask(r, m));
         }

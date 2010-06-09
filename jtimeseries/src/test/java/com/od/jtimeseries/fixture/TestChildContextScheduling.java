@@ -4,7 +4,6 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
-import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 
 import org.junit.Test;
@@ -23,8 +22,8 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
 
     protected void doExtraSetUp() {
-        childContext = rootContext.createChildContext("child1");
-        childContext2 = childContext.createChildContext("child2", "child 2 description");
+        childContext = rootContext.createContext("child1");
+        childContext2 = childContext.createContext("child2", "child 2 description");
 
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description", CaptureFunctions.CHANGE(capturePeriod));
         valueRecorder = childContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));

@@ -48,8 +48,8 @@ public class TimeSeriesUdpClient {
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
         rootContext.setTimeSeriesFactory(new UdpRemoteTimeSeriesFactory(udpClient));
 
-        TimeSeriesContext fooContext = rootContext.createChildContext("Udp Context", "A context for foo");
-        TimeSeriesContext testContext = rootContext.createContextForPath("Udp Context.test");
+        TimeSeriesContext fooContext = rootContext.createContext("Udp Context", "A context for foo");
+        TimeSeriesContext testContext = rootContext.createContext("Udp Context.test");
 
         ValueRecorder v = fooContext.createValueRecorderSeries("Foo Benchmark", "Foo Benchmark Description", CaptureFunctions.MAX(Time.seconds(1)));
         ValueRecorder f = testContext.createValueRecorderSeries("Wibble Benchmark", "Wibble Benchmark Description", CaptureFunctions.MEAN(Time.seconds(2)));

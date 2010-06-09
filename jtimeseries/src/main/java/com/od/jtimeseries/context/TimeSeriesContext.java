@@ -113,29 +113,19 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
     ContextFactory getContextFactory();
 
     /**
-     * Get or create context for the given path, creating any missing context nodes
-     */
-    TimeSeriesContext createContextForPath(String path);
-
-    /**
-     * Get or create timeseries for the given path, creating any missing context nodes
-     */
-    IdentifiableTimeSeries createTimeSeriesForPath(String path, String description);
-
-    /**
      * Create a child context with the given id, which will also be used for the description
      */
-    TimeSeriesContext createChildContext(String id);
+    TimeSeriesContext createContext(String path);
 
     /**
      * Create a child context with the given id and description
      */
-    TimeSeriesContext createChildContext(String id, String description);
+    TimeSeriesContext createContext(String path, String description);
 
     /**
      * Create a new IdentifiableTimeSeries and add it to this context
      */
-    IdentifiableTimeSeries createTimeSeries(String id, String description);
+    IdentifiableTimeSeries createTimeSeries(String path, String description);
 
     /**
      * Create a new Capture to capture values from source into series, and add it to this context

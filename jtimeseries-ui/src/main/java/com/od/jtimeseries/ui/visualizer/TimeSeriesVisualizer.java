@@ -225,7 +225,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private void addChartsFromConfigs(List<RemoteChartingTimeSeriesConfig> configs) {
         for ( RemoteChartingTimeSeriesConfig c : configs) {
-            TimeSeriesContext context = rootContext.createContextForPath(c.getParentPath());
+            TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
                 context.addChild(new RemoteChartingTimeSeries(c));
             } catch (MalformedURLException e) {

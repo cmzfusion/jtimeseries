@@ -324,60 +324,31 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract ContextFactory getContextFactory_Locked();
 
-    public final TimeSeriesContext createContextForPath(String path) {
+    public final TimeSeriesContext createContext(String path) {
+        return createContext(path, new PathParser(path).removeLastNode());
+    }
+
+    public final TimeSeriesContext createContext(String path, String description) {
         try {
             getContextLock().writeLock().lock();
-            return createContextForPath_Locked(path);
+            return createContext_Locked(path, description);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+    protected abstract TimeSeriesContext createContext_Locked(String path, String description);
+
+
+    public final IdentifiableTimeSeries createTimeSeries(String path, String description) {
+        try {
+            getContextLock().writeLock().lock();
+            return createTimeSeries_Locked(path, description);
         } finally {
             getContextLock().writeLock().unlock();
         }
     }
 
-    protected abstract TimeSeriesContext createContextForPath_Locked(String path);
-
-    public final IdentifiableTimeSeries createTimeSeriesForPath(String path, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createTimeSeriesForPath_Locked(path, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-
-    protected abstract IdentifiableTimeSeries createTimeSeriesForPath_Locked(String path, String description);
-
-    public final TimeSeriesContext createChildContext(String id) {
-        try {
-            getContextLock().writeLock().lock();
-            return createChildContext_Locked(id);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-
-    protected abstract TimeSeriesContext createChildContext_Locked(String id);
-
-    public final TimeSeriesContext createChildContext(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createChildContext_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-
-    protected abstract TimeSeriesContext createChildContext_Locked(String id, String description);
-
-    public final IdentifiableTimeSeries createTimeSeries(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createTimeSeries_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-
-    protected abstract IdentifiableTimeSeries createTimeSeries_Locked(String id, String description);
+    protected abstract IdentifiableTimeSeries createTimeSeries_Locked(String path, String description);
 
     public final Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
         try {

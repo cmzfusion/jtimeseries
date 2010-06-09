@@ -133,7 +133,7 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public void testFilesystemTimeSeries() throws SerializationException {
-        TimeSeriesContext c = new DefaultTimeSeriesContext().createContextForPath("test");
+        TimeSeriesContext c = new DefaultTimeSeriesContext().createContext("test");
         FilesystemTimeSeries series = new FilesystemTimeSeries(c, "id", "description", serializer, SERIES_LENGTH, Time.seconds(10), Time.seconds(10));
         FileHeader fileHeader = series.getFileHeader();
         assertEquals(4, series.size());

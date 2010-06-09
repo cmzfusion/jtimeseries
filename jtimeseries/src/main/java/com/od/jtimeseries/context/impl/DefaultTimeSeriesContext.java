@@ -21,20 +21,20 @@ package com.od.jtimeseries.context.impl;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.TimedCapture;
-import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.context.*;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
 
 import java.util.*;
 
@@ -335,21 +335,20 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return result;
     }
 
-    public IdentifiableTimeSeries createTimeSeriesForPath_Locked(String path, String description) {
-        List<String> contextIds = splitPath(path);
-        TimeSeriesContext parentContext = ( contextIds.size() > 1) ? createContextRecursive(this, contextIds.subList(0, contextIds.size() -1)) : this;
-        String id = contextIds.get(contextIds.size()-1);
-        IdentifiableTimeSeries s = parentContext.getTimeSeries(id);
-        if ( s == null) {
-            s = parentContext.createTimeSeries(id, description);
+    public IdentifiableTimeSeries createTimeSeries_Locked(String path, String description) {
+        PathParser p = new PathParser(path);
+        if ( p.isSingleNode() ) {
+            IdentifiableTimeSeries s = getTimeSeries(path);
+            if ( s == null) {
+                s = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(path), path, description);
+                addChild(s);
+            }
+            return s;
+        } else {
+            String nextContext = p.removeFirstNode();
+            TimeSeriesContext c = getOrCreateContext(nextContext, nextContext);
+            return c.createTimeSeries(p.getRemainingPath(), description);
         }
-        return s;
-    }
-
-    public IdentifiableTimeSeries createTimeSeries_Locked(String id, String description) {
-        IdentifiableTimeSeries i = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description);
-        addChild(i);
-        return i;
     }
 
     public Capture createCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series) {
@@ -394,40 +393,28 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return t;
     }
 
-    public TimeSeriesContext createContextForPath_Locked(String path) {
-        if ( path.equals("")) {
-            return this;
+    public TimeSeriesContext createContext_Locked(String path, String description) {
+        TimeSeriesContext result;
+        if ( path.trim().equals("") ) {
+            result = this;
         } else {
-            List<String> contextIds = splitPath(path);
-            return createContextRecursive(this, contextIds);
+            PathParser pathParser = new PathParser(path);
+            String firstChild = pathParser.removeFirstNode();
+            //only want to apply the description to the last node in the path, otherwise use the id
+            String desc = pathParser.isEmpty() ? description : firstChild;
+            TimeSeriesContext c = getOrCreateContext(firstChild, desc);
+            result = c.createContext(pathParser.getRemainingPath(), description);
         }
+        return result;
     }
 
-    private TimeSeriesContext createContextRecursive(TimeSeriesContext context, List<String> pathContextIds) {
-        String nextId = pathContextIds.remove(0);
-        TimeSeriesContext child = getOrCreateChildContext(context, nextId);
-        if ( pathContextIds.size() > 0) {
-            child = createContextRecursive(child, pathContextIds);
+    private TimeSeriesContext getOrCreateContext(String id, String description) {
+        TimeSeriesContext c = getChildContext(id);
+        if ( c == null ) {
+            c = getContextFactory().createContext(this, id, description);
+            checkUniqueIdAndAdd(c);
         }
-        return child;
-    }
-
-    private TimeSeriesContext getOrCreateChildContext(TimeSeriesContext context, String nextId) {
-        TimeSeriesContext child = context.getChildContext(nextId);
-        if ( child == null) {
-            child = context.createChildContext(nextId);
-        }
-        return child;
-    }
-
-    public TimeSeriesContext createChildContext_Locked(String id) {
-        return createChildContext(id, id);
-    }
-
-    public TimeSeriesContext createChildContext_Locked(String id, String description) {
-        TimeSeriesContext timeSeriesContext = getContextFactory().createContext(this, id, description);
-        checkUniqueIdAndAdd(timeSeriesContext);
-        return timeSeriesContext;
+        return c;
     }
 
     public ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {

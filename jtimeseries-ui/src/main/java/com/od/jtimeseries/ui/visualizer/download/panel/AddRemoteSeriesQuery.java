@@ -53,7 +53,7 @@ public class AddRemoteSeriesQuery {
     }
 
     private void createTimeSeries(FindRemoteTimeSeriesQuery.RemoteTimeSeries timeSeriesResult) {
-        TimeSeriesContext c = parent.createContextForPath(timeSeriesResult.getParentPath());
+        TimeSeriesContext c = parent.createContext(timeSeriesResult.getParentPath());
         RemoteChartingTimeSeries series = new RemoteChartingTimeSeries(
                 timeSeriesResult.getId(),
                 timeSeriesResult.getDescription(),

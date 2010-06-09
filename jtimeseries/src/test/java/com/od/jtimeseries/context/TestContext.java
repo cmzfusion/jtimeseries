@@ -34,7 +34,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer");
         queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer");
 
-        childContext = rootContext.createChildContext("Child");
+        childContext = rootContext.createContext("Child");
     }
 
     @Test
@@ -130,7 +130,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         TimeSeriesFactory timeSeriesFactory = rootContext.getTimeSeriesFactory();
         ContextFactory contextFactory = rootContext.getContextFactory();
 
-        rootContext.createChildContext("newchild");
+        rootContext.createContext("newchild");
         TimeSeriesContext child = rootContext.getChildContext("newchild");
         assertSame(sourceFactory, child.getValueSourceFactory());
         assertSame(captureFactory, child.getCaptureFactory());
@@ -215,16 +215,26 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testCreateContextRecursive() {
-        rootContext.createContextForPath("child2.grandchild1");
+        rootContext.createContext("child2.grandchild1");
         assertNotNull(rootContext.getChildContext("child2"));
         assertNotNull(rootContext.getChildContext("child2").getChildContext("grandchild1"));
+        assertEquals("child2", rootContext.getChildContext("child2").getDescription());
+        assertEquals("grandchild1", rootContext.getChildContext("child2").getChildContext("grandchild1").getDescription());
+
+        rootContext.createContext("child2.grandchild2.greatgrandchild1", "wibble");
+        assertEquals("child2", rootContext.getChildContext("child2").getDescription());
+        assertEquals("grandchild2", rootContext.getChildContext("child2").getChildContext("grandchild2").getDescription());
+        assertEquals("wibble", rootContext.getChildContext("child2").getChildContext("grandchild2").getChildContext("greatgrandchild1").getDescription());
+
+        //creating a context with a "" path just returns the current context
+        assertEquals(rootContext, rootContext.createContext("", ""));
     }
 
     @Test
     public void testStartCaptureStartsAllCapturesRecursivelyFromLocalContextDown() {
         childContext.createCounterSeries("counter", "counter");
 
-        TimeSeriesContext grandchildcontext = childContext.createChildContext("grandchild");
+        TimeSeriesContext grandchildcontext = childContext.createContext("grandchild");
         grandchildcontext.createCounterSeries("counter", "counter");
 
         childContext.startDataCapture();
@@ -251,5 +261,25 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         assertTrue(childContext.findCaptures(c).getFirstMatch().getState() == CaptureState.STARTED);
     }
 
+    @Test
+    public void testCreateTimeSeries() {
+        IdentifiableTimeSeries s = rootContext.createTimeSeries("timeSeries", "testDescription");
+        assertEquals("timeSeries", s.getId());
+        assertEquals("testDescription", s.getDescription());
+
+        try {
+            s = rootContext.createTimeSeries("", "");
+            fail("Should not be able to create a timeseries with no id");
+        } catch (Exception e) {}
+    }
+
+    @Test
+    public void testCreateTimeSeriesRecursive() {
+        IdentifiableTimeSeries s = rootContext.createTimeSeries("child1.timeSeries", "testDescription");
+        assertFalse(rootContext.containsChildWithId("timeSeries"));
+        assertTrue(rootContext.getChildContext("child1").containsChildWithId("timeSeries"));
+        assertEquals("timeSeries", s.getId());
+        assertEquals("testDescription", s.getDescription());
+    }
 
 }

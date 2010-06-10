@@ -27,14 +27,14 @@ import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
-import com.od.jtimeseries.source.*;
+import com.od.jtimeseries.source.ValueSource;
+import com.od.jtimeseries.source.ValueSourceFactory;
 import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.util.*;
 
@@ -340,9 +340,30 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, classType, parameters);
         }
         else if ( ValueSource.class.isAssignableFrom(classType) ) {
-            result = getValueSourceFactory().createValueSource(this, getPathForChild(id), id, description, classType, parameters);
+            result = createValueSource(id, description, classType, parameters);
         } else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + classType);
+        }
+        return result;
+    }
+
+    //here we have to cater for just creating the individual source, or creating a capture and series as well using MetricCreator,
+    // depending on whether the are CaptureFunctions as parameters
+    private <E extends Identifiable> E createValueSource(String id, String description, Class<E> classType, Object... parameters) {
+        E result;
+        if ( parameters.length == 0 || ! (parameters[0] instanceof CaptureFunction)) {
+            result = getValueSourceFactory().createValueSource(this, getPathForChild(id), id, description, classType, parameters);
+        } else {
+            List<CaptureFunction> functions = new ArrayList<CaptureFunction>();
+            List<Object> params = new ArrayList<Object>();
+            for ( Object o : parameters ) {
+                if ( o instanceof CaptureFunction ) {
+                    functions.add((CaptureFunction)o);
+                } else {
+                    params.add(o);
+                }
+            }
+            result = defaultMetricCreator.createValueSourceSeries(this, getPathForChild(id), id, description, classType, functions, params.toArray(new Object[params.size()]));
         }
         return result;
     }
@@ -358,26 +379,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
         addChild(c);
         return c;
-    }
-
-    protected ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
-        return defaultMetricCreator.createValueRecorderSeries(this, getPathForChild(id), id, description, captureFunctions);
-    }
-
-    protected QueueTimer createQueueTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
-        return defaultMetricCreator.createQueueTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
-    }
-
-    protected Counter createCounterSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
-        return defaultMetricCreator.createCounterSeries(this, getPathForChild(id), id, description, captureFunctions);
-    }
-
-    protected EventTimer createEventTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {
-        return defaultMetricCreator.createEventTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
-    }
-
-    protected TimedValueSupplier createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return defaultMetricCreator.createValueSupplierSeries(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
     }
 
     protected QueryResult<IdentifiableTimeSeries> findTimeSeries_Locked(CaptureCriteria criteria) {

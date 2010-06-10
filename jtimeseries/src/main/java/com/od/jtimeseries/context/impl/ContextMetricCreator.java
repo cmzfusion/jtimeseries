@@ -23,6 +23,8 @@ import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -32,14 +34,5 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface ContextMetricCreator {
 
-    ValueRecorder createValueRecorderSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions);
-
-    QueueTimer createQueueTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions);
-
-    Counter createCounterSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions);
-
-    EventTimer createEventTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions);
-
-    TimedValueSupplier createValueSupplierSeries(Identifiable parent, String path,String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
-
+    <E extends Identifiable> E createValueSourceSeries(Identifiable defaultTimeSeriesContext, String pathForChild, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters);
 }

@@ -27,6 +27,8 @@ import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.List;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,49 +60,21 @@ class DefaultMetricCreator implements ContextMetricCreator {
         this.timeSeriesContext = timeSeriesContext;
     }
 
-    public ValueRecorder createValueRecorderSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
-        ValueRecorder v = timeSeriesContext.createValueRecorder(SOURCE_PREFIX + id, description);
-        createSeriesAndCapturesForSource(id, description, v, captureFunctions);
-        return v;
+    public <E extends Identifiable> E createValueSourceSeries(Identifiable parent, String path, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters) {
+        E result = timeSeriesContext.getValueSourceFactory().createValueSource(parent, path, SOURCE_PREFIX + id, description, classType, parameters);
+        createSeriesAndCapturesForSource(id, description, (ValueSource)result, functions);
+        return result;
     }
 
-    public QueueTimer createQueueTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
-        QueueTimer q = timeSeriesContext.createQueueTimer(SOURCE_PREFIX + id, description);
-        createSeriesAndCapturesForSource(id, description, q, captureFunctions);
-        return q;
-    }
-
-    public Counter createCounterSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
-        Counter c = timeSeriesContext.createCounter(SOURCE_PREFIX + id, description);
-        createSeriesAndCapturesForSource(id, description, c, captureFunctions);
-        return c;
-    }
-
-    public EventTimer createEventTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions) {
-        EventTimer m = timeSeriesContext.createEventTimer(SOURCE_PREFIX + id, description);
-        createSeriesAndCapturesForSource(id, description, m, captureFunctions);
-        return m;
-    }
-
-    public TimedValueSupplier createValueSupplierSeries(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSupplier s = timeSeriesContext.createTimedValueSupplier(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
-        createSeriesAndCapturesForSource(id, description, s);
-        return s;
-    }
-
-    private void createSeriesAndCapturesForSource(String id, String description, ValueSource source, CaptureFunction... captureFunctions) {
+    private void createSeriesAndCapturesForSource(String id, String description, ValueSource source, List<CaptureFunction> captureFunctions) {
         //if no functions are specified, assume that means we want to capture the raw values to a time series
-        if (captureFunctions.length == 0) {
-            createRawValueSeriesAndCapture(id, description, source);
-        } else {
-            for (CaptureFunction captureFunction : captureFunctions) {
-                //handle the special 'RAW Values' functon which can be added to the list to mean
-                //'in addition to these time based function, we also want to capture the raw values'
-                if ( captureFunction == CaptureFunctions.RAW_VALUES) {
-                    createRawValueSeriesAndCapture(id, description, source);
-                } else {
-                    createCaptureFunctionSeriesAndCapture(id, description, source, captureFunction);
-                }
+        for (CaptureFunction captureFunction : captureFunctions) {
+            //handle the special 'RAW Values' functon which can be added to the list to mean
+            //'in addition to these time based function, we also want to capture the raw values'
+            if ( captureFunction == CaptureFunctions.RAW_VALUES) {
+                createRawValueSeriesAndCapture(id, description, source);
+            } else {
+                createCaptureFunctionSeriesAndCapture(id, description, source, captureFunction);
             }
         }
     }

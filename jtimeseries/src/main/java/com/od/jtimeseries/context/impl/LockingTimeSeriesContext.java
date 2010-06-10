@@ -4,6 +4,7 @@ import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.scheduling.Scheduler;
@@ -330,60 +331,30 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
-        try {
-            getContextLock().writeLock().lock();
-            return createValueRecorderSeries_Locked(id, description, captureFunctions);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, ValueRecorder.class, getFunctions(captureFunctions));
     }
-
-    protected abstract ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions);
 
     public final QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        try {
-            getContextLock().writeLock().lock();
-            return createQueueTimerSeries_Locked(id, description, captureFunctions);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, QueueTimer.class, getFunctions(captureFunctions));
     }
-
-    protected abstract QueueTimer createQueueTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions);
-
 
     public final Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
-        try {
-            getContextLock().writeLock().lock();
-            return createCounterSeries_Locked(id, description, captureFunctions);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, Counter.class, getFunctions(captureFunctions));
     }
-
-    protected abstract Counter createCounterSeries_Locked(String id, String description, CaptureFunction... captureFunctions);
 
     public final EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        try {
-            getContextLock().writeLock().lock();
-            return createEventTimerSeries_Locked(id, description, captureFunctions);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, EventTimer.class, getFunctions(captureFunctions));
     }
-
-    protected abstract EventTimer createEventTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions);
 
     public final TimedValueSupplier createTimedValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        try {
-            getContextLock().writeLock().lock();
-            return createValueSupplierSeries_Locked(id, description, valueSupplier, timePeriod);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
     }
 
-    protected abstract TimedValueSupplier createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    //here we need to make sure we send RawValues as the function if none is specified, so that we end up creating a capture/timesries
+    //otherwise the request to create the value source will be interpreted as just that, rather than a request to create a capture/series too
+    private CaptureFunction[] getFunctions(CaptureFunction... captureFunctions) {
+        return captureFunctions.length == 0 ? new CaptureFunction[] {CaptureFunctions.RAW_VALUES} : captureFunctions;
+    }
 
     public final QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {
         try {

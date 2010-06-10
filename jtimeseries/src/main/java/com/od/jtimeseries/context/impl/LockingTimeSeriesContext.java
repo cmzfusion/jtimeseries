@@ -250,23 +250,23 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path, description, ValueRecorder.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, getFunctions(captureFunctions));
     }
 
     public final QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path, description, QueueTimer.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, QueueTimer.class, getFunctions(captureFunctions));
     }
 
     public final Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path, description, Counter.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, Counter.class, getFunctions(captureFunctions));
     }
 
     public final EventTimer createEventTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path, description, EventTimer.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, EventTimer.class, getFunctions(captureFunctions));
     }
 
     public final TimedValueSupplier createTimedValueSupplierSeries(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return create(path, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
     }
 
     //here we need to make sure we send RawValues as the function if none is specified, so that we end up creating a capture/timesries

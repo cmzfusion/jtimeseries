@@ -34,5 +34,10 @@ import java.util.List;
  */
 public interface ContextMetricCreator {
 
+    //the user passes in just one id, which will be used for the timeseries, but the value source and
+    //capture also require ids. We create these by adding a suffix to the timeseries id supplied.
+    public static final String SOURCE_SUFFIX = "_Source";
+    public static final String CAPTURE_SUFFIX = "_Capture";
+
     <E extends Identifiable> E createValueSourceSeries(Identifiable defaultTimeSeriesContext, String pathForChild, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters);
 }

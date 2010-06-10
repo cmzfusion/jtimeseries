@@ -23,12 +23,10 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;
-import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,18 +49,14 @@ class DefaultMetricCreator implements ContextMetricCreator {
     private TimeSeriesContext timeSeriesContext;
     protected static AtomicLong captureUniqueId = new AtomicLong(0);
 
-    //the user passes in just one id, which will be used for the timeseries, but the value source and
-    //capture also require ids. We create these by adding a prefix to the timeseries id supplied.
-    private static String SOURCE_PREFIX = "Source_";
-    private static String CAPTURE_PREFIX = "Capture_";
-
     public DefaultMetricCreator(TimeSeriesContext timeSeriesContext) {
         this.timeSeriesContext = timeSeriesContext;
     }
 
     public <E extends Identifiable> E createValueSourceSeries(Identifiable parent, String path, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters) {
-        E result = timeSeriesContext.getValueSourceFactory().createValueSource(parent, path, SOURCE_PREFIX + id, description, classType, parameters);
-        createSeriesAndCapturesForSource(id, description, (ValueSource)result, functions);
+        E result = timeSeriesContext.getValueSourceFactory().createValueSource(parent, path, id, description, classType, parameters);
+        String seriesId = id.substring(0, id.length() - SOURCE_SUFFIX.length());
+        createSeriesAndCapturesForSource(seriesId, description, (ValueSource)result, functions);
         return result;
     }
 
@@ -106,7 +100,7 @@ class DefaultMetricCreator implements ContextMetricCreator {
     }
 
     private String getNextCaptureId(String id) {
-        return CAPTURE_PREFIX + id + "_" + captureUniqueId.incrementAndGet();
+        return id + CAPTURE_SUFFIX + "_" + captureUniqueId.incrementAndGet();
     }
 
 }

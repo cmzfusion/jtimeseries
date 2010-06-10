@@ -209,7 +209,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             result = c == null ? null : c.get(p.getRemainingPath(), classType);
         }
         if ( result != null && ! classType.isAssignableFrom(result.getClass())) {
-            throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from clss " + result.getClass() + " to " + classType);
+            throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from " + result.getClass() + " to " + classType);
         }
         return (E)result;
     }

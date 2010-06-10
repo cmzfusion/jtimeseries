@@ -451,7 +451,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract QueryResult<Scheduler> findSchedulers_Locked(Triggerable triggerable);
 
-    public final <E> QueryResult<E> findAll(Class<E> assignableToClass) {
+    public final <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
         try {
             getContextLock().readLock().lock();
             return findAllChildren_Locked(assignableToClass);
@@ -460,9 +460,9 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         }
     }
 
-    protected abstract <E> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass);
+    protected abstract <E extends Identifiable> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass);
 
-    public final <E> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
+    public final <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         try {
             getContextLock().readLock().lock();
             return findAllChildren_Locked(searchPattern, assignableToClass);
@@ -471,5 +471,5 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         }
     }
 
-    protected abstract <E> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass);
+    protected abstract <E extends Identifiable> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass);
 }

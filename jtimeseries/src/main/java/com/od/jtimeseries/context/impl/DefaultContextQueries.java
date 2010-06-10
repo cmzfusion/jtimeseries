@@ -206,30 +206,30 @@ public class DefaultContextQueries implements ContextQueries {
         return result;
     }
 
-    public <E> QueryResult<E> findAll(Class<E> assignableToClass) {
+    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
         List<E> children = new ArrayList<E>();
         addAllIdentifiableMatchingClassRecursive(children, timeSeriesContext, assignableToClass);
         return new DefaultQueryResult<E>(children);
     }
 
-    public <E> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
+    public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         return new DefaultQueryResult<E>(
             findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
         );
     }
 
-    private <E> List<E> findAllMatchingSearchPattern(String searchPattern, List<E> identifiables) {
+    private <E extends Identifiable> List<E> findAllMatchingSearchPattern(String searchPattern, List<E> identifiables) {
         Pattern p = Pattern.compile(searchPattern);
         List<E> result = new ArrayList<E>();
         for ( E i : identifiables) {
-            if ( p.matcher(((Identifiable)i).getPath()).find() ) {
+            if ( p.matcher((i).getPath()).find() ) {
                 result.add(i);
             }
         }
         return result;
     }
 
-    private <E> void addAllIdentifiableMatchingClassRecursive(List<E> valueSources, Identifiable identifiable, Class<E> clazz) {
+    private <E extends Identifiable> void addAllIdentifiableMatchingClassRecursive(List<E> valueSources, Identifiable identifiable, Class<E> clazz) {
         for ( Identifiable i : identifiable.getChildren()) {
             if ( clazz.isAssignableFrom(i.getClass())) {
                 valueSources.add((E)i);
@@ -238,7 +238,7 @@ public class DefaultContextQueries implements ContextQueries {
         }
     }
 
-    private abstract class QueryByCapture<E> {
+    private abstract class QueryByCapture<E extends Identifiable> {
 
         public List<E> findByCaptures() {
             List<E> identifiables = new ArrayList<E>();
@@ -260,13 +260,8 @@ public class DefaultContextQueries implements ContextQueries {
         abstract boolean meetsCriteria(Capture c);
     }
 
-    private static class DefaultQueryResult<E> implements QueryResult<E> {
+    private static class DefaultQueryResult<E extends Identifiable> implements QueryResult<E> {
         private List<E> results;
-
-        public DefaultQueryResult(E result) {
-            this.results = new LinkedList<E>();
-            results.add(result);
-        }
 
         public DefaultQueryResult(List<E> results) {
             this.results = new LinkedList<E>(results);

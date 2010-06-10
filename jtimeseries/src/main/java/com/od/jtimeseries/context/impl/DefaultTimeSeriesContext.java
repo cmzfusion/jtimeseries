@@ -379,11 +379,11 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return contextQueries.findSchedulers(triggerable);
     }
 
-    protected <E> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass) {
+    protected <E extends Identifiable> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass) {
         return contextQueries.findAll(assignableToClass);
     }
 
-    protected <E> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass) {
+    protected <E extends Identifiable> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass) {
         return contextQueries.findAll(searchPattern, assignableToClass);
     }
 

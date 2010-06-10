@@ -33,5 +33,10 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  */
 public interface CaptureFactory extends Identifiable {
 
+     /**
+     * All CaptureFactory should use this ID, to make sure only one CaptureFactory can exist per context
+     */
+    public static final String ID = "CaptureFactory";
+
     <E extends Identifiable> E createCapture(Identifiable parent, String pathForChild, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters);
 }

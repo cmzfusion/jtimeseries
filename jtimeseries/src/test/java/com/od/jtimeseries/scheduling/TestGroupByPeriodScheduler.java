@@ -18,7 +18,7 @@ public class TestGroupByPeriodScheduler extends AbstractSchedulerTest {
     private long firstGroupCaptureTime;
 
     protected Scheduler createCaptureScheduler() {
-        return new GroupByPeriodScheduler("TestId", "TestDescription");
+        return new GroupByPeriodScheduler();
     }
 
     @Test

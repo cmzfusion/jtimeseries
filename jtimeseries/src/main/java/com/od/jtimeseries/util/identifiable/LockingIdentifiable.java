@@ -88,6 +88,20 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract boolean removeChild_Locked(Identifiable c);
 
+    public Identifiable remove(String path) {
+        return remove(path, Identifiable.class);
+    }
+
+    public <E extends Identifiable> E remove(String path, Class<E> classType) {
+        try {
+            getContextLock().writeLock().lock();
+            return remove_Locked(path, classType);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E remove_Locked(String path, Class<E> classType);
+
     public final boolean isRoot() {
         try {
             getContextLock().readLock().lock();
@@ -100,14 +114,8 @@ public abstract class LockingIdentifiable implements Identifiable {
     protected abstract boolean isRoot_Locked();
 
     public final Identifiable get(String path) {
-        try {
-            getContextLock().readLock().lock();
-            return get_Locked(path);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return get(path, Identifiable.class);
     }
-    protected abstract Identifiable get_Locked(String path);
 
     public final <E extends Identifiable> E get(String path, Class<E> classType) {
         try {

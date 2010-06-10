@@ -26,30 +26,27 @@ import com.od.jtimeseries.util.time.TimePeriod;
 public class DefaultValueSourceFactory extends IdentifiableBase implements ValueSourceFactory {
 
     public DefaultValueSourceFactory() {
-        this("DefaultValueSourceFactory", "DefaultValueSourceFactory");
+        super(ID, ID);
+        setDescription(getClass().getName());
     }
 
-    public DefaultValueSourceFactory(String id, String description) {
-        super(id, description);
-    }
-
-    public ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description, Object... parameters) {
+    protected ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultValueRecorder(id, description);
     }
 
-    public QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
+    protected QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultQueueTimer(id, description);
     }
 
-    public Counter createCounter(Identifiable parent, String path, String id, String description, Object... parameters) {
+    protected Counter createCounter(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultCounter(id, description);
     }
 
-    public EventTimer createEventTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
+    protected EventTimer createEventTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultEventTimer(id, description);
     }
 
-    public TimedValueSupplier createTimedValueSupplier(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod, Object... parameters) {
+    protected TimedValueSupplier createTimedValueSupplier(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod, Object... parameters) {
         return new DefaultTimedValueSupplier(id, description, valueSupplier, timePeriod);
     }
 

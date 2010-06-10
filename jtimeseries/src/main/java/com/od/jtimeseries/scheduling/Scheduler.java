@@ -32,6 +32,11 @@ import java.util.List;
  */
 public interface Scheduler extends Identifiable {
 
+    /**
+     * All Scheduler should use this ID, to make sure only one Scheduler can exist per context
+     */
+    public static final String ID = "Scheduler";
+
     boolean addTriggerable(Triggerable c);
 
     boolean removeTriggerable(Triggerable c);

@@ -39,11 +39,8 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFactory {
 
     public DefaultCaptureFactory() {
-        this("DefaultCaptureFactory", "DefaultCaptureFactory");
-    }
-
-    public DefaultCaptureFactory(String id, String description) {
-        super(id, description);
+        super(ID, ID);
+        setDescription(getClass().getName());
     }
 
     public <E extends Identifiable> E createCapture(Identifiable parent, String path, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters) {

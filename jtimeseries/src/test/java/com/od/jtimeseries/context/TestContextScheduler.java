@@ -49,7 +49,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForGrandchildPicksUpTheGrandchildCaptures() {
-        grandchildContext.setScheduler(new DefaultScheduler("test", "test"));
+        grandchildContext.setScheduler(new DefaultScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertFalse(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
         assertTrue(grandchildContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
@@ -57,7 +57,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForChildPicksUpTheChildAndGrandchildCapturesIfGranchildDoesNotHaveItsOwnScheduler() {
-        childContext.setScheduler(new DefaultScheduler("test", "test"));
+        childContext.setScheduler(new DefaultScheduler());
 
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
@@ -73,8 +73,8 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testSettingNewSchedulerForChildDoesNotPickUpGrandchildCapturesIfGrandchildHasItsOwnScheduler() {
-        grandchildContext.setScheduler(new DefaultScheduler("grandchildsched", "grandchildsched"));
-        childContext.setScheduler(new DefaultScheduler("childsched", "childsched"));
+        grandchildContext.setScheduler(new DefaultScheduler());
+        childContext.setScheduler(new DefaultScheduler());
 
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
@@ -91,8 +91,8 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
    @Test
     public void testStartAndStoppingSchedulingAffectsLocalSchedulerAndThoseForChildNodes() {
-        grandchildContext.setScheduler(new DefaultScheduler("grandchildsched", "grandchildsched"));
-        childContext.setScheduler(new DefaultScheduler("childsched", "childsched"));
+        grandchildContext.setScheduler(new DefaultScheduler());
+        childContext.setScheduler(new DefaultScheduler());
         childContext.startScheduling();
 
         assertFalse(rootContext.getScheduler().isStarted());

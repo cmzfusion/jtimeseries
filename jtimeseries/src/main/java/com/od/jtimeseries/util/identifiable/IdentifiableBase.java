@@ -93,6 +93,10 @@ public class IdentifiableBase extends LockingIdentifiable {
         return false;
     }
 
+    protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {
+        return null;
+    }
+
     protected boolean containsChildWithId_Locked(String id) {
         return false;
     }
@@ -174,10 +178,6 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     protected boolean isRoot_Locked() {
         return getParent() == null;
-    }
-
-    protected Identifiable get_Locked(String path) {
-        return null;
     }
 
     protected <E extends Identifiable> E get_Locked(String id, Class<E> classType) {

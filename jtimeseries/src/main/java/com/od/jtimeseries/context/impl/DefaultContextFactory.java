@@ -40,11 +40,8 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 public class DefaultContextFactory extends IdentifiableBase implements ContextFactory{
 
     public DefaultContextFactory() {
-        this("DefaultContextFactory", "DefaultContextFactory");
-    }
-
-    public DefaultContextFactory(String id, String description) {
-        super(id, description);
+        super(ID, ID);
+        setDescription(getClass().getName());
     }
 
     public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {

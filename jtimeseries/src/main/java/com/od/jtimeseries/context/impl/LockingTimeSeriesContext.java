@@ -52,6 +52,16 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return (TimeSeriesContext) super.getParent();
     }
 
+    public <E extends Identifiable> E getFromAncestors(String id, Class<E> classType) {
+        try {
+            getContextLock().readLock().lock();
+            return getFromAncestors_Locked(id, classType);
+        } finally {
+            getContextLock().readLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType);
+
     public final TimeSeriesContext addChild(Identifiable... identifiables) {
         try {
             getContextLock().writeLock().lock();
@@ -105,26 +115,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return get(path, Capture.class);
     }
 
-    public final Scheduler getScheduler() {
-        try {
-            getContextLock().readLock().lock();
-            return getScheduler_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-    protected abstract Scheduler getScheduler_Locked();
-
-    public final TimeSeriesContext setScheduler(Scheduler scheduler) {
-        try {
-            getContextLock().writeLock().lock();
-            return setScheduler_Locked(scheduler);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-    protected abstract TimeSeriesContext setScheduler_Locked(Scheduler scheduler);
-
     public final boolean isSchedulerStarted() {
         try {
             getContextLock().readLock().lock();
@@ -175,85 +165,49 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
     protected abstract TimeSeriesContext stopDataCapture_Locked();
 
-    public final TimeSeriesContext setValueSourceFactory(ValueSourceFactory sourceFactory) {
-        try {
-            getContextLock().writeLock().lock();
-            return setValueSourceFactory_Locked(sourceFactory);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+    public final TimeSeriesContext setScheduler(Scheduler scheduler) {
+        addChild(scheduler);
+        return this;
     }
-    protected abstract TimeSeriesContext setValueSourceFactory_Locked(ValueSourceFactory sourceFactory);
 
-    public final ValueSourceFactory getValueSourceFactory() {
-        try {
-            getContextLock().readLock().lock();
-            return getValueSourceFactory_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+    public final Scheduler getScheduler() {
+        return getFromAncestors(Scheduler.ID, Scheduler.class);
     }
-    protected abstract ValueSourceFactory getValueSourceFactory_Locked();
+
+    public final TimeSeriesContext setValueSourceFactory(ValueSourceFactory sourceFactory) {
+        addChild(sourceFactory);
+        return this;
+    }
+    public final ValueSourceFactory getValueSourceFactory() {
+        return getFromAncestors(ValueSourceFactory.ID, ValueSourceFactory.class);
+    }
 
     public final TimeSeriesContext setTimeSeriesFactory(TimeSeriesFactory seriesFactory) {
-        try {
-            getContextLock().writeLock().lock();
-            return setTimeSeriesFactory_Locked(seriesFactory);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        addChild(seriesFactory);
+        return this;
     }
-    protected abstract TimeSeriesContext setTimeSeriesFactory_Locked(TimeSeriesFactory seriesFactory);
 
     public final TimeSeriesFactory getTimeSeriesFactory() {
-        try {
-            getContextLock().readLock().lock();
-            return getTimeSeriesFactory_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return getFromAncestors(TimeSeriesFactory.ID, TimeSeriesFactory.class);
     }
-    protected abstract TimeSeriesFactory getTimeSeriesFactory_Locked();
 
     public final TimeSeriesContext setCaptureFactory(CaptureFactory captureFactory) {
-        try {
-            getContextLock().writeLock().lock();
-            return setCaptureFactory_Locked(captureFactory);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        addChild(captureFactory);
+        return this;
     }
-    protected abstract TimeSeriesContext setCaptureFactory_Locked(CaptureFactory captureFactory);
 
     public final CaptureFactory getCaptureFactory() {
-        try {
-            getContextLock().readLock().lock();
-            return getCaptureFactory_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return getFromAncestors(CaptureFactory.ID, CaptureFactory.class);
     }
-    protected abstract CaptureFactory getCaptureFactory_Locked();
 
     public final TimeSeriesContext setContextFactory(ContextFactory contextFactory) {
-        try {
-            getContextLock().writeLock().lock();
-            return setContextFactory_Locked(contextFactory);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        addChild(contextFactory);
+        return this;
     }
-    protected abstract TimeSeriesContext setContextFactory_Locked(ContextFactory contextFactory);
 
     public final ContextFactory getContextFactory() {
-        try {
-            getContextLock().readLock().lock();
-            return getContextFactory_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return getFromAncestors(ContextFactory.ID, ContextFactory.class);
     }
-    protected abstract ContextFactory getContextFactory_Locked();
 
     public final TimeSeriesContext createContext(String path) {
         return createContext(path, new PathParser(path).removeLastNode());

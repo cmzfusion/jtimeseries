@@ -61,6 +61,8 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);
 
+    <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);
+
     TimeSeriesContext getParent();
 
     TimeSeriesContext getRoot();

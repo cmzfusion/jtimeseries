@@ -24,5 +24,10 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 public interface ValueSourceFactory extends Identifiable {
 
+    /**
+     * All ValueSourceFactory should use this ID, to make sure only one ValueSourceFactory can exist per context
+     */
+    public static final String ID = "ValueSourceFactory";
+
     <E extends Identifiable> E createValueSource(Identifiable parent, String pathForChild, String id, String description, Class<E> clazz, Object... parameters);
 }

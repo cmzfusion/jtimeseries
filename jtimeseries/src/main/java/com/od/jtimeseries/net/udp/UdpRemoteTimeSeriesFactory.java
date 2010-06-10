@@ -40,11 +40,6 @@ public class UdpRemoteTimeSeriesFactory extends DefaultTimeSeriesFactory {
     private UdpClient udpClient;
 
     public UdpRemoteTimeSeriesFactory(UdpClient udpClient) {
-        this("UdpRemoteTimeSeriesFactory", "UdpRemoteTimeSeriesFactory", udpClient);
-    }
-    
-    public UdpRemoteTimeSeriesFactory(String id, String description, UdpClient udpClient) {
-        super(id, description);
         this.udpClient = udpClient;
     }
 

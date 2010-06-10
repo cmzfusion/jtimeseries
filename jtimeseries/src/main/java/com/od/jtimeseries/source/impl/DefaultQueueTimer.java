@@ -153,4 +153,12 @@ public class DefaultQueueTimer implements QueueTimer {
     public void putAllProperties(Properties p) {
         timingSource.putAllProperties(p);
     }
+
+    public Identifiable remove(String path) {
+        return timingSource.remove(path);
+    }
+
+    public <E extends Identifiable> E remove(String path, Class<E> classType) {
+        return timingSource.remove(path, classType);
+    }
 }

@@ -20,9 +20,7 @@ package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
-import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
@@ -78,17 +76,25 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         super(parentContext, id, description);
         checkId(id);
         if ( parentContext == null) {
-            createRootContextResources(id);
+            createRootContextResources();
         }
     }
 
-    private void createRootContextResources(String id) {
-        setScheduler(new DefaultScheduler(id + " Scheduler", id + "Scheduler"));
+    private void createRootContextResources() {
+        setScheduler(new DefaultScheduler());
         setTimeSeriesFactory(new DefaultTimeSeriesFactory());
         setValueSourceFactory(new DefaultValueSourceFactory());
         setCaptureFactory(new DefaultCaptureFactory());
         setContextFactory(new DefaultContextFactory());
         setDefaultContextProperties();
+    }
+
+    protected <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType) {
+        E result = get(id, classType);
+        if (result == null && ! isRoot()) {
+            result = getParent().getFromAncestors(id, classType);
+        }
+        return result;
     }
 
     private void setDefaultContextProperties() {
@@ -105,6 +111,12 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return list;
     }
 
+    protected List<Identifiable> getChildren_Locked() {
+        List<Identifiable> children = new ArrayList<Identifiable>();
+        children.addAll(this.children);
+        return children;
+    }
+
     protected TimeSeriesContext addChild_Locked(Identifiable... identifiables) {
         checkIdCharacters(identifiables);
         for ( Identifiable i : identifiables) {
@@ -112,16 +124,16 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
                 doSetScheduler((Scheduler)i);
             }
             if ( i instanceof ValueSourceFactory) {
-                removeUniqueChildInstance(ValueSourceFactory.class);
+                remove(ValueSourceFactory.ID);
             }
             if ( i instanceof ContextFactory) {
-                removeUniqueChildInstance(ContextFactory.class);
+                remove(ContextFactory.ID);
             }
             if ( i instanceof CaptureFactory) {
-                removeUniqueChildInstance(CaptureFactory.class);
+                remove(CaptureFactory.ID);
             }
             if ( i instanceof TimeSeriesFactory) {
-                removeUniqueChildInstance(TimeSeriesFactory.class);
+                remove(TimeSeriesFactory.ID);
             }
             if ( i instanceof Triggerable ) {
                 getScheduler().addTriggerable((Triggerable)i);
@@ -145,11 +157,27 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return removed;
     }
 
+    protected <E extends Identifiable> E remove_locked(String path, Class<E> classType) {
+        PathParser p = new PathParser(path);
+        E result;
+        if (p.isSingleNode()) {
+            result = get(path, classType);
+            if ( result != null ) {
+                removeChild(result);
+            }
+        } else {
+            String childContext = p.removeFirstNode();
+            TimeSeriesContext c = getContext(childContext);
+            result = c == null ? null : c.remove(p.getRemainingPath(), classType);
+        }
+        return result;
+    }
+
     private void doSetScheduler(Scheduler scheduler) {
         if ( isSchedulerStarted() ) {
             throw new UnsupportedOperationException("Cannot setScheduler while the existing scheduler is running");
         } else {
-            Scheduler oldSchedulerForThisContext = removeUniqueChildInstance(Scheduler.class);
+            Scheduler oldSchedulerForThisContext = remove(Scheduler.ID, Scheduler.class);
             if (oldSchedulerForThisContext == null) {
                 oldSchedulerForThisContext = getScheduler();  //this context was using the parent scheduler
             }
@@ -168,25 +196,9 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         }
     }
 
-    private <E extends Identifiable> E getUniqueChild(Class<E> classType) {
-        List<E> child = getChildren(classType);
-        if ( child.size() == 1 ) {
-            return child.get(0);
-        }
-        return null;
-    }
-
-    private <E extends Identifiable> E removeUniqueChildInstance(Class<E> uniqueChildClass) {
-        E result = getUniqueChild(uniqueChildClass);
-        if ( result != null ) {
-            removeChild(result);
-        }
-        return result;
-    }
-
-    protected Identifiable get_Locked(String path) {
-        Identifiable result;
+    protected <E extends Identifiable> E get_Locked(String path, Class<E> classType) {
         PathParser p = new PathParser(path);
+        Identifiable result;
         if (p.isEmpty()) {
             result = this;
         } else if (p.isSingleNode()) {
@@ -194,13 +206,8 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         } else {
             String childContext = p.removeFirstNode();
             TimeSeriesContext c = getContext(childContext);
-            result = c == null ? null : c.get(p.getRemainingPath());
+            result = c == null ? null : c.get(p.getRemainingPath(), classType);
         }
-        return result;
-    }
-
-    protected <E extends Identifiable> E get_Locked(String path, Class<E> classType) {
-        Identifiable result = get(path);
         if ( result != null && ! classType.isAssignableFrom(result.getClass())) {
             throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from clss " + result.getClass() + " to " + classType);
         }
@@ -213,19 +220,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     protected boolean containsChild_Locked(Identifiable child) {
         return children.contains(child);
-    }
-
-    protected Scheduler getScheduler_Locked() {
-        Scheduler result = getUniqueChild(Scheduler.class);
-        if ( result == null && ! isRoot() ) {
-            result = getParent().getScheduler();
-        }
-        return result;
-    }
-
-    protected TimeSeriesContext setScheduler_Locked(Scheduler scheduler) {
-        addChild(scheduler);
-        return this;
     }
 
     protected boolean isSchedulerStarted_Locked() {
@@ -261,58 +255,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             c.stop();
         }
         return this;
-    }
-
-    protected TimeSeriesContext setTimeSeriesFactory_Locked(TimeSeriesFactory seriesFactory) {
-        addChild(seriesFactory);
-        return this;
-    }
-
-    protected TimeSeriesFactory getTimeSeriesFactory_Locked() {
-        TimeSeriesFactory result = getUniqueChild(TimeSeriesFactory.class);
-        if ( result == null && ! isRoot() ) {
-            result = getParent().getTimeSeriesFactory();
-        }
-        return result;
-    }
-
-    protected TimeSeriesContext setCaptureFactory_Locked(CaptureFactory captureFactory) {
-        addChild(captureFactory);
-        return this;
-    }
-
-    protected CaptureFactory getCaptureFactory_Locked() {
-        CaptureFactory result = getUniqueChild(CaptureFactory.class);
-        if ( result == null && ! isRoot() ) {
-            result = getParent().getCaptureFactory();
-        }
-        return result;
-    }
-
-    protected TimeSeriesContext setValueSourceFactory_Locked(ValueSourceFactory sourceFactory) {
-        addChild(sourceFactory);
-        return this;
-    }
-
-    protected ValueSourceFactory getValueSourceFactory_Locked() {
-        ValueSourceFactory result = getUniqueChild(ValueSourceFactory.class);
-        if ( result == null && ! isRoot() ) {
-            result = getParent().getValueSourceFactory();
-        }
-        return result;
-    }
-
-    protected TimeSeriesContext setContextFactory_Locked(ContextFactory contextFactory) {
-        addChild(contextFactory);
-        return this;
-    }
-
-    protected ContextFactory getContextFactory_Locked() {
-        ContextFactory result = getUniqueChild(ContextFactory.class);
-        if ( result == null && ! isRoot() ) {
-            result = getParent().getContextFactory();
-        }
-        return result;
     }
 
     protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters) {
@@ -447,12 +389,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     public String toString() {
         return "Context " + getId();
-    }
-
-    protected List<Identifiable> getChildren_Locked() {
-        List<Identifiable> children = new ArrayList<Identifiable>();
-        children.addAll(this.children);
-        return children;
     }
 
     private <E extends Identifiable> void checkUniqueIdAndAdd(E identifiable) {

@@ -29,6 +29,11 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 public interface ContextFactory extends Identifiable {
 
     /**
+     * All ContextFactory should use this ID, to make sure only one ContextFactory can exist per context
+     */
+    public static final String ID = "ContextFactory";
+
+    /**
      * @param parent, may be null in which case a root context should be created.
      */
     <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters);

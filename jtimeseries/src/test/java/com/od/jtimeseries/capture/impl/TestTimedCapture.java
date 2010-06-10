@@ -23,12 +23,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestTimedCapture extends TestCase {
 
-    private Scheduler s = new DefaultScheduler("Test Scheduler", "Test Scheduler");
+    private Scheduler s = new DefaultScheduler();
     public TimedCapture timedCapture;
     public CountDownLatch latch;
 
     public void setUp() {
-        s = new DefaultScheduler("Test Scheduler", "Test Scheduler");
+        s = new DefaultScheduler();
         latch = new CountDownLatch(1);
         ValueSource valueRecorder = new DefaultValueRecorder("test recorder", "test recorder");
         DefaultIdentifiableTimeSeries timeSeries = new DefaultIdentifiableTimeSeries("timeseries", "timeseries") {

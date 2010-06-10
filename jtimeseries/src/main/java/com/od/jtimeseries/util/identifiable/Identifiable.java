@@ -60,6 +60,14 @@ public interface Identifiable {
 
     <E extends Identifiable> List<E> getChildren(Class<E> classType);
 
+    Identifiable get(String path);
+
+    <E extends Identifiable> E get(String path, Class<E> classType);
+
+    Identifiable remove(String path);
+
+    <E extends Identifiable> E remove(String path, Class<E> classType); 
+
     boolean removeChild(Identifiable c);
 
     /**
@@ -71,10 +79,6 @@ public interface Identifiable {
     Identifiable getRoot();
 
     boolean isRoot();
-
-    Identifiable get(String path);
-
-    <E extends Identifiable> E get(String path, Class<E> classType);
 
     boolean containsChildWithId(String id);
 

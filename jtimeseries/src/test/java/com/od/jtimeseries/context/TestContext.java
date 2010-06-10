@@ -146,22 +146,22 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testChangingRootFactoriesAffectsChildContextWhenChildHasNoLocalFactory() {
-        ValueSourceFactory newSourceFactory = new DefaultValueSourceFactory("newSourceFactory", "test");
+        ValueSourceFactory newSourceFactory = new DefaultValueSourceFactory();
         rootContext.setValueSourceFactory(newSourceFactory);
         assertSame(newSourceFactory, rootContext.getValueSourceFactory());
         assertSame(newSourceFactory, childContext.getValueSourceFactory());
 
-        CaptureFactory newCaptureFactory = new DefaultCaptureFactory("newCaptureFactory", "test");
+        CaptureFactory newCaptureFactory = new DefaultCaptureFactory();
         rootContext.setCaptureFactory(newCaptureFactory);
         assertSame(newCaptureFactory, rootContext.getCaptureFactory());
         assertSame(newCaptureFactory, childContext.getCaptureFactory());
 
-        TimeSeriesFactory newTimeSeriesFactory = new DefaultTimeSeriesFactory("newTimeSeriesFactory", "test");
+        TimeSeriesFactory newTimeSeriesFactory = new DefaultTimeSeriesFactory();
         rootContext.setTimeSeriesFactory(newTimeSeriesFactory);
         assertSame(newTimeSeriesFactory, rootContext.getTimeSeriesFactory());
         assertSame(newTimeSeriesFactory, childContext.getTimeSeriesFactory());
 
-        ContextFactory newContextFactory = new DefaultContextFactory("newContextFactory", "test");
+        ContextFactory newContextFactory = new DefaultContextFactory();
         rootContext.setContextFactory(newContextFactory);
         assertSame(newContextFactory, rootContext.getContextFactory());
         assertSame(newContextFactory, childContext.getContextFactory());
@@ -169,19 +169,19 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testChangingChildContextFactoriesDoesNotAffectRootContext() {
-        ValueSourceFactory newSourceFactory = new DefaultValueSourceFactory("newSourceFactory", "test");
+        ValueSourceFactory newSourceFactory = new DefaultValueSourceFactory();
         childContext.setValueSourceFactory(newSourceFactory);
         assertNotSame(rootContext.getValueSourceFactory(), childContext.getValueSourceFactory());
 
-        CaptureFactory newCaptureFactory = new DefaultCaptureFactory("newCaptureFactory", "test");
+        CaptureFactory newCaptureFactory = new DefaultCaptureFactory();
         childContext.setCaptureFactory(newCaptureFactory);
         assertNotSame(rootContext.getCaptureFactory(), childContext.getCaptureFactory());
 
-        TimeSeriesFactory newTimeSeriesFactory = new DefaultTimeSeriesFactory("newTimeSeriesFactory", "test");
+        TimeSeriesFactory newTimeSeriesFactory = new DefaultTimeSeriesFactory();
         childContext.setTimeSeriesFactory(newTimeSeriesFactory);
         assertNotSame(rootContext.getTimeSeriesFactory(), childContext.getTimeSeriesFactory());
 
-        ContextFactory newContextFactory = new DefaultContextFactory("newContextFactory", "test");
+        ContextFactory newContextFactory = new DefaultContextFactory();
         childContext.setContextFactory(newContextFactory);
         assertNotSame(rootContext.getContextFactory(), childContext.getContextFactory());
     }
@@ -189,22 +189,22 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     @Test
     public void testAddingFactoryInstanceToContextReplacesExistingFactory() {
         ValueSourceFactory valueSourceFactory = rootContext.getValueSourceFactory();
-        rootContext.addChild(new DefaultValueSourceFactory("valueSourceFactory", "test"));
+        rootContext.addChild(new DefaultValueSourceFactory());
         assertNotSame(valueSourceFactory, rootContext.getValueSourceFactory());
         assertEquals(1, rootContext.getChildren(ValueSourceFactory.class).size());
 
         CaptureFactory captureFactory = rootContext.getCaptureFactory();
-        rootContext.addChild(new DefaultCaptureFactory("captureFactory", "test"));
+        rootContext.addChild(new DefaultCaptureFactory());
         assertNotSame(captureFactory, rootContext.getCaptureFactory());
         assertEquals(1, rootContext.getChildren(CaptureFactory.class).size());
 
         TimeSeriesFactory seriesFactory = rootContext.getTimeSeriesFactory();
-        rootContext.addChild(new DefaultTimeSeriesFactory("seriesFactory", "test"));
+        rootContext.addChild(new DefaultTimeSeriesFactory());
         assertNotSame(seriesFactory, rootContext.getTimeSeriesFactory());
         assertEquals(1, rootContext.getChildren(TimeSeriesFactory.class).size());
 
         ContextFactory contextFactory = rootContext.getContextFactory();
-        rootContext.addChild(new DefaultContextFactory("contextFactory", "test"));
+        rootContext.addChild(new DefaultContextFactory());
         assertNotSame(contextFactory, rootContext.getContextFactory());
         assertEquals(1, rootContext.getChildren(ContextFactory.class).size());
     }
@@ -213,7 +213,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     public void testCannotChangesSchedulerIfSchedulerStarted() {
         rootContext.startScheduling();
         try {
-            rootContext.setScheduler(new DefaultScheduler("test", "test"));
+            rootContext.setScheduler(new DefaultScheduler());
             fail("Should not be able to set scheduler");
         } catch (RuntimeException r) {
         }

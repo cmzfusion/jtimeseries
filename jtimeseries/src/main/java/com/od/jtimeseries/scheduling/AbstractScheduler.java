@@ -40,8 +40,9 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     private ScheduledExecutorService captureTimer;
     private int threadCount;
 
-    public AbstractScheduler(String id, String description, int threadCount) {
-        super(id, description);
+    public AbstractScheduler(int threadCount) {
+        super(ID, ID);
+        setDescription(getClass().getName());
         this.threadCount = threadCount;
     }
 

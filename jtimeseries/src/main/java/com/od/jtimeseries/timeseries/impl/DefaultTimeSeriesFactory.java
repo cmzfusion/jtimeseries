@@ -32,13 +32,9 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 public class DefaultTimeSeriesFactory extends IdentifiableBase implements TimeSeriesFactory {
 
     public DefaultTimeSeriesFactory() {
-        this("DefaultTimeSeriesFactory", "DefaultTimeSeriesFactory");
+        super(ID, ID);
+        setDescription(getClass().getName());
     }
-
-    public DefaultTimeSeriesFactory(String id, String description) {
-        super(id, description);
-    }
-    
 
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
         if ( classType.isAssignableFrom(DefaultIdentifiableTimeSeries.class)) {

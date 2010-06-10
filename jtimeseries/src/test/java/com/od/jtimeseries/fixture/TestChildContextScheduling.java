@@ -40,7 +40,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
     public void whenAChildContextHasItsOwnSchedulerStartingParentContextSchedulingAlsoStartsTheChildScheduler() {
 
         //set a new child scheduler on context2
-        childContext2.setScheduler(new DefaultScheduler("SchedulerId", "SchedulerDescription"));
+        childContext2.setScheduler(new DefaultScheduler());
 
         //the new scheduler should now own the eventTimer capture
         assertTrue(childContext2.getScheduler().containsTriggerable(

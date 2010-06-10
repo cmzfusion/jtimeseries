@@ -16,6 +16,6 @@ import com.od.jtimeseries.scheduling.DefaultScheduler;
 public class TestDefaultScheduler extends AbstractSchedulerTest {
 
     protected Scheduler createCaptureScheduler() {
-        return new DefaultScheduler("TestId", "TestDescription");
+        return new DefaultScheduler();
     }
 }

@@ -28,5 +28,10 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface TimeSeriesFactory extends Identifiable {
 
+    /**
+     * All TimeSeriesFactory should use this ID, to make sure only one TimeSeriesFactory can exist per context
+     */
+    public static final String ID = "TimeSeriesFactory";
+    
     <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters);
 }

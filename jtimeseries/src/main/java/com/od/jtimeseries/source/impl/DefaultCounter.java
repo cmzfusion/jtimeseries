@@ -154,4 +154,11 @@ public class DefaultCounter implements Counter {
         return simpleSource.toString();
     }
 
+    public Identifiable remove(String path) {
+        return simpleSource.remove(path);
+    }
+
+    public <E extends Identifiable> E remove(String path, Class<E> classType) {
+        return simpleSource.remove(path, classType);
+    }
 }

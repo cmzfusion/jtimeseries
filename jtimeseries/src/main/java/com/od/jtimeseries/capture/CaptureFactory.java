@@ -22,6 +22,7 @@ import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,23 +33,5 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  */
 public interface CaptureFactory extends Identifiable {
 
-    /**
-     * @param path, full context path including the id
-     * @param id, context id for this capture
-     * @param source, source from which to listen for values
-     * @param timeSeries, series to capture values
-     * @return new Capture
-     */
-    Capture createCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries);
-
-     /**
-     * @param path, full context path including the id
-     * @param id, context id for this capture
-     * @param source, source from which to listen for values
-     * @param timeSeries, series to capture values
-     * @param captureFunction, function and time period to process source values
-     * @return new TimedCapture
-     */
-    TimedCapture createTimedCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction);
-
+    <E extends Identifiable> E createCapture(Identifiable parent, String pathForChild, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters);
 }

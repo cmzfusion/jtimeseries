@@ -82,13 +82,13 @@ class DefaultMetricCreator implements ContextMetricCreator {
     private void createCaptureFunctionSeriesAndCapture(String id, String description, ValueSource source, CaptureFunction captureFunction) {
         IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, captureFunction);
         String captureId = getNextCaptureId(id);
-        timeSeriesContext.createTimedCapture(captureId, source, series, captureFunction);
+        timeSeriesContext.createTimedCapture(captureId, description, source, series, captureFunction);
     }
 
     private void createRawValueSeriesAndCapture(String id, String description, ValueSource source) {
         IdentifiableTimeSeries series = createTimeSeriesIfNotPresent(id, description, null);
         String captureId = getNextCaptureId(id);
-        timeSeriesContext.createCapture(captureId, source, series);
+        timeSeriesContext.createCapture(captureId, description, source, series);
     }
 
     private IdentifiableTimeSeries createTimeSeriesIfNotPresent(String id, String description, CaptureFunction captureFunction) {

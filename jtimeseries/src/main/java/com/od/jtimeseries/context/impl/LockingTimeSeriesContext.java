@@ -113,7 +113,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract Scheduler getScheduler_Locked();
 
     public final TimeSeriesContext setScheduler(Scheduler scheduler) {
@@ -124,7 +123,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext setScheduler_Locked(Scheduler scheduler);
 
     public final boolean isSchedulerStarted() {
@@ -135,8 +133,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
-
     protected abstract boolean isSchedulerStarted_Locked();
 
     public final TimeSeriesContext startScheduling() {
@@ -147,8 +143,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
-
     protected abstract TimeSeriesContext startScheduling_Locked();
 
     public final TimeSeriesContext stopScheduling() {
@@ -159,8 +153,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
-
     protected abstract TimeSeriesContext stopScheduling_Locked();
 
     public final TimeSeriesContext startDataCapture() {
@@ -171,8 +163,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
-
     protected abstract TimeSeriesContext startDataCapture_Locked();
 
     public final TimeSeriesContext stopDataCapture() {
@@ -183,7 +173,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext stopDataCapture_Locked();
 
     public final TimeSeriesContext setValueSourceFactory(ValueSourceFactory sourceFactory) {
@@ -194,8 +183,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
-
     protected abstract TimeSeriesContext setValueSourceFactory_Locked(ValueSourceFactory sourceFactory);
 
     public final ValueSourceFactory getValueSourceFactory() {
@@ -206,8 +193,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
-
     protected abstract ValueSourceFactory getValueSourceFactory_Locked();
 
     public final TimeSeriesContext setTimeSeriesFactory(TimeSeriesFactory seriesFactory) {
@@ -218,7 +203,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext setTimeSeriesFactory_Locked(TimeSeriesFactory seriesFactory);
 
     public final TimeSeriesFactory getTimeSeriesFactory() {
@@ -229,7 +213,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract TimeSeriesFactory getTimeSeriesFactory_Locked();
 
     public final TimeSeriesContext setCaptureFactory(CaptureFactory captureFactory) {
@@ -240,7 +223,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext setCaptureFactory_Locked(CaptureFactory captureFactory);
 
     public final CaptureFactory getCaptureFactory() {
@@ -251,7 +233,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract CaptureFactory getCaptureFactory_Locked();
 
     public final TimeSeriesContext setContextFactory(ContextFactory contextFactory) {
@@ -262,7 +243,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext setContextFactory_Locked(ContextFactory contextFactory);
 
     public final ContextFactory getContextFactory() {
@@ -273,7 +253,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract ContextFactory getContextFactory_Locked();
 
     public final TimeSeriesContext createContext(String path) {
@@ -288,66 +267,52 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return create(path, description, IdentifiableTimeSeries.class);
     }
 
-    public final Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
-        try {
-            getContextLock().writeLock().lock();
-            return createCapture_Locked(id, source, series);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+    public final Capture createCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series) {
+        return create(path, description, Capture.class, source, series, CaptureFunctions.RAW_VALUES);
     }
 
-    protected abstract Capture createCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series);
-
-    public final TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
-        try {
-            getContextLock().writeLock().lock();
-            return createTimedCapture_Locked(id, source, series, captureFunction);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+    public final TimedCapture createTimedCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
+        return create(path, description, TimedCapture.class, source, series, captureFunction);
     }
 
-    protected abstract TimedCapture createTimedCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
-
-    public final ValueRecorder createValueRecorder(String id, String description) {
-        return create(id, description, ValueRecorder.class);
+    public final ValueRecorder createValueRecorder(String path, String description) {
+        return create(path, description, ValueRecorder.class);
     }
 
     public final QueueTimer createQueueTimer(String id, String description) {
         return create(id, description, QueueTimer.class);
     }
 
-    public final Counter createCounter(String id, String description) {
-        return create(id, description, Counter.class);
+    public final Counter createCounter(String path, String description) {
+        return create(path, description, Counter.class);
     }
 
-    public final EventTimer createEventTimer(String id, String description) {
-        return create(id, description, EventTimer.class);
+    public final EventTimer createEventTimer(String path, String description) {
+        return create(path, description, EventTimer.class);
     }
 
-    public final TimedValueSupplier createTimedValueSupplier(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return create(id, description, TimedValueSupplier.class, valueSupplier, timePeriod);
+    public final TimedValueSupplier createTimedValueSupplier(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        return create(path, description, TimedValueSupplier.class, valueSupplier, timePeriod);
     }
 
-    public final ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
-        return create(id, description, ValueRecorder.class, getFunctions(captureFunctions));
+    public final ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions) {
+        return create(path, description, ValueRecorder.class, getFunctions(captureFunctions));
     }
 
-    public final QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        return create(id, description, QueueTimer.class, getFunctions(captureFunctions));
+    public final QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
+        return create(path, description, QueueTimer.class, getFunctions(captureFunctions));
     }
 
-    public final Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions) {
-        return create(id, description, Counter.class, getFunctions(captureFunctions));
+    public final Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions) {
+        return create(path, description, Counter.class, getFunctions(captureFunctions));
     }
 
-    public final EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions) {
-        return create(id, description, EventTimer.class, getFunctions(captureFunctions));
+    public final EventTimer createEventTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
+        return create(path, description, EventTimer.class, getFunctions(captureFunctions));
     }
 
-    public final TimedValueSupplier createTimedValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        return create(id, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
+    public final TimedValueSupplier createTimedValueSupplierSeries(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        return create(path, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
     }
 
     //here we need to make sure we send RawValues as the function if none is specified, so that we end up creating a capture/timesries

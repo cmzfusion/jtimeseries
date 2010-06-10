@@ -119,9 +119,9 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     IdentifiableTimeSeries createTimeSeries(String path, String description);
 
-    Capture createCapture(String path, ValueSource source, IdentifiableTimeSeries series);
+    Capture createCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series);
 
-    TimedCapture createTimedCapture(String path, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
+    TimedCapture createTimedCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
 
     ValueRecorder createValueRecorder(String path, String description);
 

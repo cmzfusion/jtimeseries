@@ -22,6 +22,7 @@ import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
@@ -341,14 +342,18 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         }
         else if ( ValueSource.class.isAssignableFrom(classType) ) {
             result = createValueSource(id, description, classType, parameters);
-        } else {
+        }
+        else if ( Capture.class.isAssignableFrom(classType)) {
+            result = getCaptureFactory().createCapture(this, getPathForChild(id), id, (ValueSource)parameters[0], (IdentifiableTimeSeries)parameters[1], (CaptureFunction)parameters[2], classType, parameters);
+        }
+        else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + classType);
         }
         return result;
     }
 
     //here we have to cater for just creating the individual source, or creating a capture and series as well using MetricCreator,
-    // depending on whether the are CaptureFunctions as parameters
+    //depending on whether there are CaptureFunctions as parameters
     private <E extends Identifiable> E createValueSource(String id, String description, Class<E> classType, Object... parameters) {
         E result;
         if ( parameters.length == 0 || ! (parameters[0] instanceof CaptureFunction)) {
@@ -366,19 +371,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             result = defaultMetricCreator.createValueSourceSeries(this, getPathForChild(id), id, description, classType, functions, params.toArray(new Object[params.size()]));
         }
         return result;
-    }
-
-
-    protected Capture createCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series) {
-        Capture c = getCaptureFactory().createCapture(this, getPathForChild(id), id, source, series);
-        addChild(c);
-        return c;
-    }
-
-    protected TimedCapture createTimedCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction) {
-        TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
-        addChild(c);
-        return c;
     }
 
     protected QueryResult<IdentifiableTimeSeries> findTimeSeries_Locked(CaptureCriteria criteria) {

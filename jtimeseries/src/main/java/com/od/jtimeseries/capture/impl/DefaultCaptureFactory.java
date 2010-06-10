@@ -22,10 +22,12 @@ import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,11 +46,11 @@ public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFa
         super(id, description);
     }
 
-    public Capture createCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
-        return new DefaultCapture(id, source, timeSeries);
-    }
-
-    public TimedCapture createTimedCapture(Identifiable parent, String path, String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
-        return new DefaultTimedCapture(id, source, timeSeries, captureFunction);
+    public <E extends Identifiable> E createCapture(Identifiable parent, String path, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters) {
+        if ( captureFunction == CaptureFunctions.RAW_VALUES ) {
+            return (E)new DefaultCapture(id, valueSource, identifiableTimeSeries);
+        } else {
+            return (E)new DefaultTimedCapture(id, valueSource, identifiableTimeSeries, captureFunction);
+        }
     }
 }

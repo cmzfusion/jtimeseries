@@ -20,31 +20,9 @@ package com.od.jtimeseries.source;
 
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 public interface ValueSourceFactory extends Identifiable {
 
-    /**
-     * @param path, full context path including id
-     */
-    ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description);
-
-    /**
-     * @param path, full context path including id
-     */
-    QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description);
-
-    /**
-     * @param path, full context path including id
-     */
-    Counter createCounter(Identifiable parent, String path, String id, String description);
-
-    /**
-     * @param path, full context path including id
-     */
-    EventTimer createEventTimer(Identifiable parent, String path, String id, String description);
-
-    /**
-     * @param path, full context path including id
-     */
-    TimedValueSupplier createTimedValueSource(Identifiable parent, String path, String s, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    <E extends Identifiable> E createValueSource(Identifiable parent, String pathForChild, String id, String description, Class<E> clazz, Object... parameters);
 }

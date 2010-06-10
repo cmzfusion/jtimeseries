@@ -331,15 +331,18 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         }
     }
 
-    private <E extends Identifiable> E doCreate(String id, String description, Class<E> clazz, Object... parameters) {
+    private <E extends Identifiable> E doCreate(String id, String description, Class<E> classType, Object... parameters) {
         E result;
-        if ( TimeSeriesContext.class.isAssignableFrom(clazz)) {
-            result = getContextFactory().createContext(this, id, description, clazz, parameters);
+        if ( TimeSeriesContext.class.isAssignableFrom(classType)) {
+            result = getContextFactory().createContext(this, id, description, classType, parameters);
         }
-        else if ( IdentifiableTimeSeries.class.isAssignableFrom(clazz)) {
-            result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, clazz, parameters);
+        else if ( IdentifiableTimeSeries.class.isAssignableFrom(classType)) {
+            result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, classType, parameters);
+        }
+        else if ( ValueSource.class.isAssignableFrom(classType) ) {
+            result = getValueSourceFactory().createValueSource(this, getPathForChild(id), id, description, classType, parameters);
         } else {
-            throw new UnsupportedOperationException("Cannot create identifiable of class " + clazz);
+            throw new UnsupportedOperationException("Cannot create identifiable of class " + classType);
         }
         return result;
     }
@@ -355,36 +358,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         TimedCapture c = getCaptureFactory().createTimedCapture(this, getPathForChild(id), id, source, series, captureFunction);
         addChild(c);
         return c;
-    }
-
-    protected ValueRecorder createValueRecorder_Locked(String id, String description) {
-        ValueRecorder v = getValueSourceFactory().createValueRecorder(this, getPathForChild(id), id, description);
-        addChild(v);
-        return v;
-    }
-
-    protected QueueTimer createQueueTimer_Locked(String id, String description) {
-        QueueTimer q = getValueSourceFactory().createQueueTimer(this, getPathForChild(id), id, description);
-        addChild(q);
-        return q;
-    }
-
-    protected Counter createCounter_Locked(String id, String description) {
-        Counter c = getValueSourceFactory().createCounter(this, getPathForChild(id), id, description);
-        addChild(c);
-        return c;
-    }
-
-    protected EventTimer createEventTimer_Locked(String id, String description) {
-        EventTimer e = getValueSourceFactory().createEventTimer(this, getPathForChild(id), id, description);
-        addChild(e);
-        return e;
-    }
-
-    protected TimedValueSupplier createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSupplier t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
-        addChild(t);
-        return t;
     }
 
     protected ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {

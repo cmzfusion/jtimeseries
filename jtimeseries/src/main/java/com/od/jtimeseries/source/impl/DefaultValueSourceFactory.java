@@ -33,24 +33,39 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
         super(id, description);
     }
 
-    public ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description) {
+    public ValueRecorder createValueRecorder(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultValueRecorder(id, description);
     }
 
-    public QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description) {
+    public QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultQueueTimer(id, description);
     }
 
-    public Counter createCounter(Identifiable parent, String path, String id, String description) {
+    public Counter createCounter(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultCounter(id, description);
     }
 
-    public EventTimer createEventTimer(Identifiable parent, String path, String id, String description) {
+    public EventTimer createEventTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultEventTimer(id, description);
     }
 
-    public TimedValueSupplier createTimedValueSource(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public TimedValueSupplier createTimedValueSupplier(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod, Object... parameters) {
         return new DefaultTimedValueSupplier(id, description, valueSupplier, timePeriod);
     }
 
+    public <E extends Identifiable> E createValueSource(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+        if ( classType.isAssignableFrom(ValueRecorder.class)) {
+            return (E)createValueRecorder(parent, path, id, description, parameters);
+        } else if ( classType.isAssignableFrom(QueueTimer.class)) {
+            return (E)createQueueTimer(parent, path, id, description, parameters);
+        } else if ( classType.isAssignableFrom(Counter.class)) {
+            return (E)createCounter(parent, path, id, description, parameters);
+        } else if ( classType.isAssignableFrom(EventTimer.class)) {
+            return (E)createEventTimer(parent, path, id, description, parameters);
+        } else if ( classType.isAssignableFrom(TimedValueSupplier.class)) {
+            return (E) createTimedValueSupplier(parent, path, id, description, (ValueSupplier)parameters[0], (TimePeriod)parameters[1], parameters);
+        } else {
+            throw new UnsupportedOperationException("Cannot create ValueSource of class type " + classType);
+        }
+    }
 }

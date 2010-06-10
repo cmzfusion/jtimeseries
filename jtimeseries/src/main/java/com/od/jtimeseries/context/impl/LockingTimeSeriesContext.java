@@ -310,59 +310,24 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     protected abstract TimedCapture createTimedCapture_Locked(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
 
     public final ValueRecorder createValueRecorder(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createValueRecorder_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, ValueRecorder.class);
     }
-
-    protected abstract ValueRecorder createValueRecorder_Locked(String id, String description);
 
     public final QueueTimer createQueueTimer(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createQueueTimer_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, QueueTimer.class);
     }
-
-    protected abstract QueueTimer createQueueTimer_Locked(String id, String description);
 
     public final Counter createCounter(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createCounter_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, Counter.class);
     }
-
-    protected abstract Counter createCounter_Locked(String id, String description);
 
     public final EventTimer createEventTimer(String id, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createEventTimer_Locked(id, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, EventTimer.class);
     }
-
-    protected abstract EventTimer createEventTimer_Locked(String id, String description);
 
     public final TimedValueSupplier createTimedValueSupplier(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        try {
-            getContextLock().writeLock().lock();
-            return createTimedValueSource_Locked(id, description, valueSupplier, timePeriod);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(id, description, TimedValueSupplier.class, valueSupplier, timePeriod);
     }
-
-    protected abstract TimedValueSupplier createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
     public final ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
         try {

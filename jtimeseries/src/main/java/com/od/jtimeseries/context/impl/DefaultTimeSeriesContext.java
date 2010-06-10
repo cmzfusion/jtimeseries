@@ -207,7 +207,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return get(path, ValueSource.class);
     }
 
-    protected TimeSeriesContext getChildContext_Locked(String path) {
+    protected TimeSeriesContext getContext_Locked(String path) {
         return get(path, TimeSeriesContext.class);
     }
 
@@ -222,7 +222,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             result = childrenById.get(path);
         } else {
             String childContext = p.removeFirstNode();
-            TimeSeriesContext c = getChildContext(childContext);
+            TimeSeriesContext c = getContext(childContext);
             result = c == null ? null : c.get(p.getRemainingPath());
         }
         return result;
@@ -434,7 +434,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     }
 
     private TimeSeriesContext getOrCreateContext(String id, String description) {
-        TimeSeriesContext c = getChildContext(id);
+        TimeSeriesContext c = getContext(id);
         if ( c == null ) {
             c = getContextFactory().createContext(this, id, description);
             checkUniqueIdAndAdd(c);

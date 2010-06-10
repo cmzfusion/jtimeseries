@@ -139,15 +139,15 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
     protected abstract ValueSource getSource_Locked(String id);
 
-    public final TimeSeriesContext getChildContext(String id) {
+    public final TimeSeriesContext getContext(String path) {
         try {
             getContextLock().readLock().lock();
-            return getChildContext_Locked(id);
+            return getContext_Locked(path);
         } finally {
             getContextLock().readLock().unlock();
         }
     }
-    protected abstract TimeSeriesContext getChildContext_Locked(String id);
+    protected abstract TimeSeriesContext getContext_Locked(String path);
 
     public final Capture getCapture(String id) {
         try {
@@ -157,7 +157,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract Capture getCapture_Locked(String id);
 
     public final Scheduler getScheduler() {

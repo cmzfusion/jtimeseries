@@ -80,7 +80,7 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     ValueSource getSource(String id);
 
-    TimeSeriesContext getChildContext(String id);
+    TimeSeriesContext getContext(String path);
 
     Capture getCapture(String id);
 

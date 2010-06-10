@@ -80,7 +80,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testGetChildContexts() {
-        assertSame(childContext, rootContext.getChildContext(childContext.getId()));
+        assertSame(childContext, rootContext.getContext(childContext.getId()));
 
         assertEquals(1, rootContext.getChildContexts().size());
         assertSame(childContext, rootContext.getChildContexts().get(0));
@@ -131,7 +131,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         ContextFactory contextFactory = rootContext.getContextFactory();
 
         rootContext.createContext("newchild");
-        TimeSeriesContext child = rootContext.getChildContext("newchild");
+        TimeSeriesContext child = rootContext.getContext("newchild");
         assertSame(sourceFactory, child.getValueSourceFactory());
         assertSame(captureFactory, child.getCaptureFactory());
         assertSame(timeSeriesFactory, child.getTimeSeriesFactory());
@@ -216,15 +216,15 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     @Test
     public void testCreateContextRecursive() {
         rootContext.createContext("child2.grandchild1");
-        assertNotNull(rootContext.getChildContext("child2"));
-        assertNotNull(rootContext.getChildContext("child2").getChildContext("grandchild1"));
-        assertEquals("child2", rootContext.getChildContext("child2").getDescription());
-        assertEquals("grandchild1", rootContext.getChildContext("child2").getChildContext("grandchild1").getDescription());
+        assertNotNull(rootContext.getContext("child2"));
+        assertNotNull(rootContext.getContext("child2").getContext("grandchild1"));
+        assertEquals("child2", rootContext.getContext("child2").getDescription());
+        assertEquals("grandchild1", rootContext.getContext("child2").getContext("grandchild1").getDescription());
 
         rootContext.createContext("child2.grandchild2.greatgrandchild1", "wibble");
-        assertEquals("child2", rootContext.getChildContext("child2").getDescription());
-        assertEquals("grandchild2", rootContext.getChildContext("child2").getChildContext("grandchild2").getDescription());
-        assertEquals("wibble", rootContext.getChildContext("child2").getChildContext("grandchild2").getChildContext("greatgrandchild1").getDescription());
+        assertEquals("child2", rootContext.getContext("child2").getDescription());
+        assertEquals("grandchild2", rootContext.getContext("child2").getContext("grandchild2").getDescription());
+        assertEquals("wibble", rootContext.getContext("child2").getContext("grandchild2").getContext("greatgrandchild1").getDescription());
 
         //creating a context with a "" path just returns the current context
         assertEquals(rootContext, rootContext.createContext("", ""));
@@ -277,7 +277,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     public void testCreateTimeSeriesRecursive() {
         IdentifiableTimeSeries s = rootContext.createTimeSeries("child1.timeSeries", "testDescription");
         assertFalse(rootContext.containsChildWithId("timeSeries"));
-        assertTrue(rootContext.getChildContext("child1").containsChildWithId("timeSeries"));
+        assertTrue(rootContext.getContext("child1").containsChildWithId("timeSeries"));
         assertEquals("timeSeries", s.getId());
         assertEquals("testDescription", s.getDescription());
     }

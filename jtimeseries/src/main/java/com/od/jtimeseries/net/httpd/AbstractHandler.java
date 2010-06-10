@@ -55,7 +55,7 @@ public abstract class AbstractHandler implements HttpHandler {
         while( st.hasMoreTokens()) {
             String nextToken = decodeUrl(st.nextToken());
             if ( st.hasMoreTokens() || uri.endsWith("/")) {  //otherwise this may be a file/image
-                currentContext = currentContext.getChildContext(nextToken);
+                currentContext = currentContext.getContext(nextToken);
             }
         }
         return currentContext;

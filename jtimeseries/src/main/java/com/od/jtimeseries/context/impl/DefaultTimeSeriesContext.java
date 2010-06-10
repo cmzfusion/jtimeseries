@@ -157,7 +157,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return removed;
     }
 
-    protected <E extends Identifiable> E remove_locked(String path, Class<E> classType) {
+    protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {
         PathParser p = new PathParser(path);
         E result;
         if (p.isSingleNode()) {

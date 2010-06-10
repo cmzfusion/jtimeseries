@@ -48,7 +48,7 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
         this.seriesLength = seriesLength;
     }
 
-    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
+    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
         if ( classType.isAssignableFrom(FilesystemTimeSeries.class)) {
             try {
                 return (E)new FilesystemTimeSeries(parent, id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
@@ -57,7 +57,7 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
                 throw new RuntimeException("Failed to create timeseries", e);
             }
         } else {
-            return super.createTimeSeries(parent, path, id, description, classType);
+            return super.createTimeSeries(parent, path, id, description, classType, parameters);
         }
     }
 }

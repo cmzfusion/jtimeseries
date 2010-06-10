@@ -314,12 +314,12 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return result;
     }
 
-    protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz) {
+    protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters) {
         PathParser p = new PathParser(path);
         if ( p.isSingleNode() || p.isEmpty() ) {
             E s = get(path, clazz);
             if ( s == null) {
-                s = doCreate(path, description, clazz);
+                s = doCreate(path, description, clazz, parameters);
                 addChild(s);
             }
             return s;
@@ -331,13 +331,13 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         }
     }
 
-    private <E extends Identifiable> E doCreate(String id, String description, Class<E> clazz) {
+    private <E extends Identifiable> E doCreate(String id, String description, Class<E> clazz, Object... parameters) {
         E result;
         if ( TimeSeriesContext.class.isAssignableFrom(clazz)) {
-            result = getContextFactory().createContext(this, id, description, clazz);
+            result = getContextFactory().createContext(this, id, description, clazz, parameters);
         }
         else if ( IdentifiableTimeSeries.class.isAssignableFrom(clazz)) {
-            result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, clazz);
+            result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, clazz, parameters);
         } else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + clazz);
         }
@@ -381,8 +381,8 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return e;
     }
 
-    protected TimedValueSource createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSource t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
+    protected TimedValueSupplier createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSupplier t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
         addChild(t);
         return t;
     }
@@ -403,7 +403,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return defaultMetricCreator.createEventTimerSeries(this, getPathForChild(id), id, description, captureFunctions);
     }
 
-    protected TimedValueSource createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    protected TimedValueSupplier createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         return defaultMetricCreator.createValueSupplierSeries(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
     }
 

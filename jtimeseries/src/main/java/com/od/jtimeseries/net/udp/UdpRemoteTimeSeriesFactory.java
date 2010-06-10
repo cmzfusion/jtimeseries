@@ -48,11 +48,11 @@ public class UdpRemoteTimeSeriesFactory extends DefaultTimeSeriesFactory {
         this.udpClient = udpClient;
     }
 
-    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
+    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
         if ( classType.isAssignableFrom(UdpRemoteTimeSeries.class)) {
             return (E)new UdpRemoteTimeSeries(id, description, udpClient);
         } else {
-            return super.createTimeSeries(parent, path, id, description, classType);
+            return super.createTimeSeries(parent, path, id, description, classType, parameters);
         }
     }
 }

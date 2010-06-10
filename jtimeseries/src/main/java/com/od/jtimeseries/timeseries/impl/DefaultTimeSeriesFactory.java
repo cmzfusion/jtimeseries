@@ -40,7 +40,7 @@ public class DefaultTimeSeriesFactory extends IdentifiableBase implements TimeSe
     }
     
 
-    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
+    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
         if ( classType.isAssignableFrom(DefaultIdentifiableTimeSeries.class)) {
             return (E)new DefaultIdentifiableTimeSeries(id, description);
         }

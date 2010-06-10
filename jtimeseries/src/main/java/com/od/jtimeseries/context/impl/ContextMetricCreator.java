@@ -40,6 +40,6 @@ public interface ContextMetricCreator {
 
     EventTimer createEventTimerSeries(Identifiable parent, String path, String id, String description, CaptureFunction... captureFunctions);
 
-    TimedValueSource createValueSupplierSeries(Identifiable parent, String path,String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSupplier createValueSupplierSeries(Identifiable parent, String path,String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
 }

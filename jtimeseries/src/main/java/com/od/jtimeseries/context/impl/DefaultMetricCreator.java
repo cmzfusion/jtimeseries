@@ -82,8 +82,8 @@ class DefaultMetricCreator implements ContextMetricCreator {
         return m;
     }
 
-    public TimedValueSource createValueSupplierSeries(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
-        TimedValueSource s = timeSeriesContext.createTimedValueSource(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
+    public TimedValueSupplier createValueSupplierSeries(Identifiable parent, String path, String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+        TimedValueSupplier s = timeSeriesContext.createTimedValueSupplier(SOURCE_PREFIX + id, description, valueSupplier, timePeriod);
         createSeriesAndCapturesForSource(id, description, s);
         return s;
     }

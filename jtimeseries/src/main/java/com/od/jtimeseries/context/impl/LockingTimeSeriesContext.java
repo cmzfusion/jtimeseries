@@ -61,15 +61,15 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
     protected abstract TimeSeriesContext addChild_Locked(Identifiable... identifiables);
 
-    public <E extends Identifiable> E create(String path, String description, Class<E> clazz) {
+    public <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters) {
         try {
             getContextLock().writeLock().lock();
-            return create_Locked(path, description, clazz);
+            return create_Locked(path, description, clazz, parameters);
         } finally {
             getContextLock().writeLock().unlock();
         }
     }
-    protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz);
+    protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters);
 
     public final List<ValueSource> getSources() {
         return getChildren(ValueSource.class);
@@ -353,7 +353,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract EventTimer createEventTimer_Locked(String id, String description);
 
-    public final TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public final TimedValueSupplier createTimedValueSupplier(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         try {
             getContextLock().writeLock().lock();
             return createTimedValueSource_Locked(id, description, valueSupplier, timePeriod);
@@ -362,7 +362,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         }
     }
 
-    protected abstract TimedValueSource createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    protected abstract TimedValueSupplier createTimedValueSource_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
     public final ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions) {
         try {
@@ -409,7 +409,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract EventTimer createEventTimerSeries_Locked(String id, String description, CaptureFunction... captureFunctions);
 
-    public final TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
+    public final TimedValueSupplier createTimedValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {
         try {
             getContextLock().writeLock().lock();
             return createValueSupplierSeries_Locked(id, description, valueSupplier, timePeriod);
@@ -418,7 +418,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         }
     }
 
-    protected abstract TimedValueSource createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    protected abstract TimedValueSupplier createValueSupplierSeries_Locked(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
     public final QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {
         try {

@@ -59,7 +59,7 @@ public class TotalSeriesMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        metricContext.createValueSupplierSeries(
+        metricContext.createTimedValueSupplierSeries(
             id,
             "Total number of series managed by the server",
             new TotalSeriesCountValueSupplier(),

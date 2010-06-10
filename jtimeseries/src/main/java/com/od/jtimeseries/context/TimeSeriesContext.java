@@ -28,7 +28,6 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.context.impl.ContextMetricCreator;
 
 import java.util.List;
 
@@ -60,7 +59,7 @@ import java.util.List;
  */
 public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
-    <E extends Identifiable> E create(String id, String description, Class<E> clazz);
+    <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);
 
     TimeSeriesContext getParent();
 
@@ -78,11 +77,11 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     IdentifiableTimeSeries getTimeSeries(String path);
 
-    ValueSource getSource(String id);
+    ValueSource getSource(String path);
 
     TimeSeriesContext getContext(String path);
 
-    Capture getCapture(String id);
+    Capture getCapture(String path);
 
     Scheduler getScheduler();
 
@@ -114,142 +113,33 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     ContextFactory getContextFactory();
 
-    /**
-     * Create a child context with the given id, which will also be used for the description
-     */
     TimeSeriesContext createContext(String path);
 
-    /**
-     * Create a child context with the given id and description
-     */
     TimeSeriesContext createContext(String path, String description);
 
-    /**
-     * Create a new IdentifiableTimeSeries and add it to this context
-     */
     IdentifiableTimeSeries createTimeSeries(String path, String description);
 
-    /**
-     * Create a new Capture to capture values from source into series, and add it to this context
-     */
-    Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series);
+    Capture createCapture(String path, ValueSource source, IdentifiableTimeSeries series);
 
-    /**
-     * Create a new TimedCapture to periodically capture values from source into series using the captureFunction, and add it to this context
-     */
-    TimedCapture createTimedCapture(String id, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
+    TimedCapture createTimedCapture(String path, ValueSource source, IdentifiableTimeSeries series, CaptureFunction captureFunction);
 
-    /**
-     * Create a ValueRecorder and add it to this context, without creating an associated Capture and TimeSeries
-     */
-    ValueRecorder createValueRecorder(String id, String description);
+    ValueRecorder createValueRecorder(String path, String description);
 
-    /**
-     * Create a QueueTimer and add it to this context, without creating an associated Capture and TimeSeries
-     */
-    QueueTimer createQueueTimer(String id, String description);
+    ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions);
 
-    /**
-     * Create a Counter and add it to this context, without creating an associated Capture and TimeSeries
-     */
-    Counter createCounter(String id, String description);
+    QueueTimer createQueueTimer(String path, String description);
 
-    /**
-     * Create a EventTimer and add it to this context, without creating an associated Capture and TimeSeries
-     */
-    EventTimer createEventTimer(String id, String description);
+    QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions);
 
-    /**
-     * Create a TimedValueSource and add it to this context, without creating an associated Capture and TimeSeries
-     */
-    TimedValueSource createTimedValueSource(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    Counter createCounter(String path, String description);
 
-    /**
-     * Create a valueRecorder, capture(s) and timeseries within this context
-     * The timeseries will be created they if do not yet exist, otherwise the valueRecorder will be bound to the existing series
-     *
-     * If no captureFunctions are specified, a single a capture and timeseries will be created to store the raw values from the
-     * valueRecorder. The timeseries will have the id and description provided.
-     *
-     * Alternatively, if captureFunction(s) are specified, a TimedCapture and timeseries will be created for each function.
-     * The TimedCapture uses the function to aggregate the values received from the valueRecorder, and stores the aggregate value
-     * into a timeseries periodically. (For example, the median value every 5 minutes).
-     * In this case, the id of the timeseries created will be derived from the supplied id and the choice of CaptureFunction
-     *
-     * @param id, id for the time series to be created
-     * @param description, description of the time series
-     * @param captureFunctions, functions to aggregate values across a time period
-     * @return new valueRecorder instance
-     */
-    ValueRecorder createValueRecorderSeries(String id, String description, CaptureFunction... captureFunctions);
+    Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions);
 
-    /**
-     * Create a queueTimer, capture(s) and timeseries within this context
-     * The timeseries will be created they if do not yet exist, otherwise the queueTimer will be bound to the existing series
-     *
-     * If no captureFunctions are specified, a single a capture and timeseries will be created to store the raw values from the
-     * queueTimer. The timeseries will have the id and description provided.
-     *
-     * Alternatively, if captureFunction(s) are specified, a TimedCapture and timeseries will be created for each function.
-     * The TimedCapture uses the function to aggregate the values received from the queueTimer, and stores the aggregate value
-     * into a timeseries periodically. (For example, the median value every 5 minutes).
-     * In this case, the id of the timeseries created will be derived from the supplied id and the choice of CaptureFunction
-     *
-     * @param id, base id for the time series to be created
-     * @param description, description of the time series
-     * @param captureFunctions, functions to aggregate values across a time period
-     * @return new queueTimer instance
-     */
-    QueueTimer createQueueTimerSeries(String id, String description, CaptureFunction... captureFunctions);
+    EventTimer createEventTimer(String path, String description);
 
-    /**
-     * Create a counter, capture(s) and timeseries within this context
-     * The timeseries will be created they if do not yet exist, otherwise the counter will be bound to the existing series
-     *
-     * If no captureFunctions are specified, a single a capture and timeseries will be created to store the raw values from the
-     * counter. The timeseries will have the id and description provided.
-     *
-     * Alternatively, if captureFunction(s) are specified, a TimedCapture and timeseries will be created for each function.
-     * The TimedCapture uses the function to aggregate the values received from the counter, and stores the aggregate value
-     * into a timeseries periodically. (For example, the median value every 5 minutes).
-     * In this case, the id of the timeseries created will be derived from the supplied id and the choice of CaptureFunction
-     *
-     * @param id, base id for the time series to be created
-     * @param description, description of the time series
-     * @param captureFunctions, functions to aggregate values across a time period
-     * @return new counter instance
-     */
-    Counter createCounterSeries(String id, String description, CaptureFunction... captureFunctions);
+    EventTimer createEventTimerSeries(String path, String description, CaptureFunction... captureFunctions);
 
-    /**
-     * Create a eventTimer, capture(s) and timeseries within this context
-     * The timeseries will be created they if do not yet exist, otherwise the eventTimer will be bound to the existing series
-     *
-     * If no captureFunctions are specified, a single a capture and timeseries will be created to store the raw values from the
-     * eventTimer. The timeseries will have the id and description provided.
-     *
-     * Alternatively, if captureFunction(s) are specified, a TimedCapture and timeseries will be created for each function.
-     * The TimedCapture uses the function to aggregate the values received from the eventTimer, and stores the aggregate value
-     * into a timeseries periodically. (For example, the median value every 5 minutes).
-     * In this case, the id of the timeseries created will be derived from the supplied id and the choice of CaptureFunction
-     *
-     * @param id, base id for the time series to be created
-     * @param description, description of the time series
-     * @param captureFunctions, functions to aggregate values across a time period
-     * @return new eventTimer instance
-     */
-    EventTimer createEventTimerSeries(String id, String description, CaptureFunction... captureFunctions);
+    TimedValueSupplier createTimedValueSupplier(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 
-    /**
-     * Create a timedValueSource, capture(s) and timeseries within this context
-     * The timeseries will be created they if do not yet exist, otherwise the timedValueSource will be bound to the existing series
-     *
-     * The timedValueSource periodically calls getValue() to obtain a value from the valueSupplier provided, and stores the value
-     * into a timeseries with the id and description provided
-     *
-     * @param id, id for the timeseries to be created
-     * @param description, description of the time series
-     * @return new timedValueSource instance
-     */
-    TimedValueSource createValueSupplierSeries(String id, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
+    TimedValueSupplier createTimedValueSupplierSeries(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod);
 }

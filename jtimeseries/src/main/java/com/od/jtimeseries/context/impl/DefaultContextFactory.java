@@ -47,7 +47,7 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
         super(id, description);
     }
 
-    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType) {
+    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
         if (classType.isAssignableFrom(DefaultTimeSeriesContext.class)) {
             return (E)new DefaultTimeSeriesContext(parent, id, description);
         } else {

@@ -31,6 +31,6 @@ public interface ContextFactory extends Identifiable {
     /**
      * @param parent, may be null in which case a root context should be created.
      */
-    TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description);
+    <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType);
 
 }

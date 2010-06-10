@@ -94,8 +94,14 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         assertSame(counter, rootContext.get(counter.getId(), ValueSource.class));
         assertNull(rootContext.get("Wibble", ValueSource.class));
 
-        //the identifiable with counter id is not a time series, so this should return null
-        assertNull(rootContext.get(counter.getId(), IdentifiableTimeSeries.class));
+        //the identifiable with counter id is not a time series, so this should throw an exception
+        try {
+            rootContext.get(counter.getId(), IdentifiableTimeSeries.class);
+            fail("Should throw a WrongClassTypeException");
+        } catch ( WrongClassTypeException w ) {
+        } catch ( Throwable t) {
+            fail("Expected WrongClassTypeException");
+        }
     }
 
     @Test

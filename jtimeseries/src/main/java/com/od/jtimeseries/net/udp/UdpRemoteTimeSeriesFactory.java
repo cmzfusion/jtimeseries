@@ -20,6 +20,7 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
@@ -34,7 +35,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  * These time series are just a proxy for series data stored on a remote time series server.
  * This is appropriate in the case where we want to maintain no local timeseries history.
  */
-public class UdpRemoteTimeSeriesFactory extends IdentifiableBase implements TimeSeriesFactory {
+public class UdpRemoteTimeSeriesFactory extends DefaultTimeSeriesFactory {
 
     private UdpClient udpClient;
 
@@ -48,10 +49,10 @@ public class UdpRemoteTimeSeriesFactory extends IdentifiableBase implements Time
     }
 
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
-        if ( classType.equals(IdentifiableTimeSeries.class) || classType.equals(UdpRemoteTimeSeries.class)) {
+        if ( classType.isAssignableFrom(UdpRemoteTimeSeries.class)) {
             return (E)new UdpRemoteTimeSeries(id, description, udpClient);
         } else {
-            throw new UnsupportedOperationException("Cannot create timeseries of class " + classType);
+            return super.createTimeSeries(parent, path, id, description, classType);
         }
     }
 }

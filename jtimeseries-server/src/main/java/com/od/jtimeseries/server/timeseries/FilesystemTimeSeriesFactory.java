@@ -49,7 +49,7 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
     }
 
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
-        if ( classType.equals(IdentifiableTimeSeries.class) || classType.equals(FilesystemTimeSeries.class)) {
+        if ( classType.isAssignableFrom(FilesystemTimeSeries.class)) {
             try {
                 return (E)new FilesystemTimeSeries(parent, id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
             } catch (SerializationException e) {
@@ -57,7 +57,7 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
                 throw new RuntimeException("Failed to create timeseries", e);
             }
         } else {
-            throw new UnsupportedOperationException("Cannot create timeseries of type " + classType);
+            return super.createTimeSeries(parent, path, id, description, classType);
         }
     }
 }

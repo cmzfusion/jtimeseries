@@ -51,62 +51,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return (TimeSeriesContext) super.getParent();
     }
 
-    public <E extends Identifiable> E create(String id, String description, Class<E> clazz) {
-        try {
-            getContextLock().writeLock().lock();
-            return create_Locked(id, description, clazz);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-    protected abstract <E extends Identifiable> E create_Locked(String id, String description, Class<E> clazz);
-
-    public final List<ValueSource> getSources() {
-        try {
-            getContextLock().readLock().lock();
-            return getSources_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-
-    protected abstract List<ValueSource> getSources_Locked();
-
-    public final List<Capture> getCaptures() {
-        try {
-            getContextLock().readLock().lock();
-            return getCaptures_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-
-    protected abstract List<Capture> getCaptures_Locked();
-
-
-    public final List<TimeSeriesContext> getChildContexts() {
-        try {
-            getContextLock().readLock().lock();
-            return getChildContexts_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-
-    protected abstract List<TimeSeriesContext> getChildContexts_Locked();
-
-
-    public final List<IdentifiableTimeSeries> getTimeSeries() {
-        try {
-            getContextLock().readLock().lock();
-            return getTimeSeries_Locked();
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-
-    protected abstract List<IdentifiableTimeSeries> getTimeSeries_Locked();
-
     public final TimeSeriesContext addChild(Identifiable... identifiables) {
         try {
             getContextLock().writeLock().lock();
@@ -115,49 +59,50 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
             getContextLock().writeLock().unlock();
         }
     }
-
     protected abstract TimeSeriesContext addChild_Locked(Identifiable... identifiables);
 
+    public <E extends Identifiable> E create(String path, String description, Class<E> clazz) {
+        try {
+            getContextLock().writeLock().lock();
+            return create_Locked(path, description, clazz);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz);
+
+    public final List<ValueSource> getSources() {
+        return getChildren(ValueSource.class);
+    }
+
+    public final List<Capture> getCaptures() {
+        return getChildren(Capture.class);
+    }
+
+    public final List<TimeSeriesContext> getChildContexts() {
+        return getChildren(TimeSeriesContext.class);
+    }
+
+
+    public final List<IdentifiableTimeSeries> getTimeSeries() {
+       return getChildren(IdentifiableTimeSeries.class);
+    }
+
     public final IdentifiableTimeSeries getTimeSeries(String path) {
-        try {
-            getContextLock().readLock().lock();
-            return getTimeSeries_Locked(path);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return get(path, IdentifiableTimeSeries.class);
     }
-    protected abstract IdentifiableTimeSeries getTimeSeries_Locked(String path);
 
-
-    public final ValueSource getSource(String id) {
-        try {
-            getContextLock().readLock().lock();
-            return getSource_Locked(id);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+    public final ValueSource getSource(String path) {
+        return get(path, ValueSource.class);
     }
-    protected abstract ValueSource getSource_Locked(String id);
 
     public final TimeSeriesContext getContext(String path) {
-        try {
-            getContextLock().readLock().lock();
-            return getContext_Locked(path);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+        return get(path, TimeSeriesContext.class);
     }
-    protected abstract TimeSeriesContext getContext_Locked(String path);
 
-    public final Capture getCapture(String id) {
-        try {
-            getContextLock().readLock().lock();
-            return getCapture_Locked(id);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
+    public final Capture getCapture(String path) {
+        return get(path, Capture.class);
     }
-    protected abstract Capture getCapture_Locked(String id);
 
     public final Scheduler getScheduler() {
         try {
@@ -335,26 +280,12 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final TimeSeriesContext createContext(String path, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createContext_Locked(path, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(path, description, TimeSeriesContext.class);
     }
-    protected abstract TimeSeriesContext createContext_Locked(String path, String description);
-
 
     public final IdentifiableTimeSeries createTimeSeries(String path, String description) {
-        try {
-            getContextLock().writeLock().lock();
-            return createTimeSeries_Locked(path, description);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
+        return create(path, description, IdentifiableTimeSeries.class);
     }
-
-    protected abstract IdentifiableTimeSeries createTimeSeries_Locked(String path, String description);
 
     public final Capture createCapture(String id, ValueSource source, IdentifiableTimeSeries series) {
         try {

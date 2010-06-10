@@ -107,13 +107,12 @@ public abstract class LockingIdentifiable implements Identifiable {
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract Identifiable get_Locked(String path);
 
-    public final <E extends Identifiable> E get(String id, Class<E> classType) {
+    public final <E extends Identifiable> E get(String path, Class<E> classType) {
         try {
             getContextLock().readLock().lock();
-            return get_Locked(id, classType);
+            return get_Locked(path, classType);
         } finally {
             getContextLock().readLock().unlock();
         }

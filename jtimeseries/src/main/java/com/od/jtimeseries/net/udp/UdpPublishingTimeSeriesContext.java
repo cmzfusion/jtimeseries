@@ -124,8 +124,15 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
 
     public class UdpPublishingContextFactory extends DefaultContextFactory {
 
-        public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description) {
-            return new UdpPublishingTimeSeriesContext(udpClient, minSendIntervalMillis, parent, id, description);
+        @Override
+        public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType) {
+            E result;
+            if ( classType.isAssignableFrom(UdpPublishingTimeSeriesContext.class)) {
+                result = (E)new UdpPublishingTimeSeriesContext(udpClient, minSendIntervalMillis, parent, id, description);
+            } else {
+                result = super.createContext(parent, id, description, classType);
+            }
+            return result;
         }
 
     }

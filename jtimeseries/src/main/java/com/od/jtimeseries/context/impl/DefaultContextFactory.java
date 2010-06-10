@@ -27,6 +27,7 @@ import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,7 +47,11 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
         super(id, description);
     }
 
-    public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description) {
-        return new DefaultTimeSeriesContext(parent, id, description);
+    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType) {
+        if (classType.isAssignableFrom(DefaultTimeSeriesContext.class)) {
+            return (E)new DefaultTimeSeriesContext(parent, id, description);
+        } else {
+            throw new UnsupportedOperationException("Cannot create a context of type " + classType);
+        }
     }
 }

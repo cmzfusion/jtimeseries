@@ -41,7 +41,7 @@ public class DefaultTimeSeriesFactory extends IdentifiableBase implements TimeSe
     
 
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType) {
-        if ( classType.equals(DefaultIdentifiableTimeSeries.class) || classType.equals(IdentifiableTimeSeries.class)) {
+        if ( classType.isAssignableFrom(DefaultIdentifiableTimeSeries.class)) {
             return (E)new DefaultIdentifiableTimeSeries(id, description);
         }
         throw new UnsupportedOperationException("Cannot create time series of class " + classType);

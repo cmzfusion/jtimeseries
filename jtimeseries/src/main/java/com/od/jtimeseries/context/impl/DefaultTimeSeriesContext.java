@@ -94,22 +94,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
     }
 
-    protected List<ValueSource> getSources_Locked() {
-        return getChildren(ValueSource.class);
-    }
-
-    protected List<Capture> getCaptures_Locked() {
-        return getChildren(Capture.class);
-    }
-
-    protected List<TimeSeriesContext> getChildContexts_Locked() {
-        return getChildren(TimeSeriesContext.class);
-    }
-
-    protected List<IdentifiableTimeSeries> getTimeSeries_Locked() {
-        return getChildren(IdentifiableTimeSeries.class);
-    }
-
     protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
         List<E> list = new ArrayList<E>();
         for ( Identifiable i : children) {
@@ -199,26 +183,12 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return result;
     }
 
-    protected IdentifiableTimeSeries getTimeSeries_Locked(String path) {
-        return get(path, IdentifiableTimeSeries.class);
-    }
-
-    protected ValueSource getSource_Locked(String path) {
-        return get(path, ValueSource.class);
-    }
-
-    protected TimeSeriesContext getContext_Locked(String path) {
-        return get(path, TimeSeriesContext.class);
-    }
-
-    protected Capture getCapture_Locked(String path) {
-        return get(path, Capture.class);
-    }
-
     protected Identifiable get_Locked(String path) {
         Identifiable result;
         PathParser p = new PathParser(path);
-        if (p.isSingleNode()) {
+        if (p.isEmpty()) {
+            result = this;
+        } else if (p.isSingleNode()) {
             result = childrenById.get(path);
         } else {
             String childContext = p.removeFirstNode();
@@ -231,7 +201,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     protected <E extends Identifiable> E get_Locked(String path, Class<E> classType) {
         Identifiable result = get(path);
         if ( result != null && ! classType.isAssignableFrom(result.getClass())) {
-            result = null;
+            throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from clss " + result.getClass() + " to " + classType);
         }
         return (E)result;
     }
@@ -344,13 +314,9 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return result;
     }
 
-    protected IdentifiableTimeSeries createTimeSeries_Locked(String path, String description) {
-       return create(path, description, IdentifiableTimeSeries.class);
-    }
-
     protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz) {
         PathParser p = new PathParser(path);
-        if ( p.isSingleNode() ) {
+        if ( p.isSingleNode() || p.isEmpty() ) {
             E s = get(path, clazz);
             if ( s == null) {
                 s = doCreate(path, description, clazz);
@@ -358,15 +324,19 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             }
             return s;
         } else {
-            String id = p.removeLastNode();
-            TimeSeriesContext c = createContext(p.getRemainingPath());
-            return c.create(id, description, clazz);
+            //create the next context in the path, and recusively call create
+            String nextContext = p.removeFirstNode();
+            TimeSeriesContext c = create(nextContext, nextContext, TimeSeriesContext.class);
+            return c.create(p.getRemainingPath(), description, clazz);
         }
     }
 
     private <E extends Identifiable> E doCreate(String id, String description, Class<E> clazz) {
         E result;
-        if ( IdentifiableTimeSeries.class.isAssignableFrom(clazz)) {
+        if ( TimeSeriesContext.class.isAssignableFrom(clazz)) {
+            result = getContextFactory().createContext(this, id, description, clazz);
+        }
+        else if ( IdentifiableTimeSeries.class.isAssignableFrom(clazz)) {
             result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, clazz);
         } else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + clazz);
@@ -415,31 +385,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         TimedValueSource t = getValueSourceFactory().createTimedValueSource(this, getPathForChild(id), id, description, valueSupplier, timePeriod);
         addChild(t);
         return t;
-    }
-
-    protected TimeSeriesContext createContext_Locked(String path, String description) {
-        TimeSeriesContext result;
-        PathParser pathParser = new PathParser(path);
-        if ( pathParser.isEmpty() ) {
-            result = this;
-        } else {
-            String firstChild = pathParser.removeFirstNode();
-            //only want to apply the description to the last node in the path, otherwise use the id
-            //as the description for each intermediate node
-            String desc = pathParser.isEmpty() ? description : firstChild;
-            TimeSeriesContext c = getOrCreateContext(firstChild, desc);
-            result = c.createContext(pathParser.getRemainingPath(), description);
-        }
-        return result;
-    }
-
-    private TimeSeriesContext getOrCreateContext(String id, String description) {
-        TimeSeriesContext c = getContext(id);
-        if ( c == null ) {
-            c = getContextFactory().createContext(this, id, description);
-            checkUniqueIdAndAdd(c);
-        }
-        return c;
     }
 
     protected ValueRecorder createValueRecorderSeries_Locked(String id, String description, CaptureFunction... captureFunctions) {

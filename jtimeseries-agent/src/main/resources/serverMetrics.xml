@@ -29,19 +29,19 @@
                                     <list>
                                         <!-- Read memory Usage -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="heapMemoryUsage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${agentMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read CPU percentage -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="cpuTimePercentage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${agentMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read Percentage time in GC -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="gcTimePercentage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${agentMetricsContextPath}"/>
                                         </bean>
                                         <!-- Read Percentage of Max Memory -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${agentMetricsContextPath}"/>
                                         </bean>
                                     </list>
                                 </constructor-arg>

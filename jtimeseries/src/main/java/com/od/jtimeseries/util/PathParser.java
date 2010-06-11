@@ -1,6 +1,4 @@
-package com.od.jtimeseries.context.impl;
-
-import com.od.jtimeseries.util.JTimeSeriesConstants;
+package com.od.jtimeseries.util;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,7 +6,7 @@ import com.od.jtimeseries.util.JTimeSeriesConstants;
 * Date: 09-Jun-2010
 * Time: 09:45:59
 */
-class PathParser {
+public class PathParser {
 
     private StringBuilder path;
 

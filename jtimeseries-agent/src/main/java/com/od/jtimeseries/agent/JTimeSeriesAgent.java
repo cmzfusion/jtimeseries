@@ -2,10 +2,10 @@ package com.od.jtimeseries.agent;
 
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
-import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.UdpClient;
-import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.agent.jmx.AgentConfigJmx;
 import com.od.jtimeseries.agent.input.InputHandlerSource;
@@ -40,7 +40,8 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     private HtmlAdaptorServer htmlAdaptorServer;
     private JTimeSeriesHttpd httpdServer;
     private InputHandlerSource inputHandlerSource;
-
+    private String agentMetricsContextPath;
+    private boolean sendAgentMetricsToServer;
 
     static {
         initialize(JTimeSeriesAgent.class);
@@ -89,7 +90,23 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     private void setupManagedMetrics() {
         logMethods.logInfo("Setting up server metrics series");
+        if ( !sendAgentMetricsToServer) {
+            logMethods.logInfo("Not sending agent self-monitoring stats to timeseries-server");
+            createStandardContextForMetrics();
+        }
         managedMetricInitializer.initializeServerMetrics();
+    }
+
+    //the metrics context must not be a UdpPublishing context, which would be the case by default
+    //since the root context is a UdpPublishing context.
+    //We don't want to send the agent's own stats to the timeseries-server.
+    private void createStandardContextForMetrics() {
+        PathParser p = new PathParser(agentMetricsContextPath);
+        String contextName = p.removeLastNode();
+        String parentPath = p.getRemainingPath();
+        TimeSeriesContext parentContext = rootContext.getContext(parentPath);
+        DefaultTimeSeriesContext metricsContext = new DefaultTimeSeriesContext(contextName, "Context for agent self-monitoring statistics");
+        parentContext.addChild(metricsContext);
     }
 
     private void startJmx() {
@@ -141,6 +158,14 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     public void setInputHandlerSource(InputHandlerSource inputHandlerSource) {
         this.inputHandlerSource = inputHandlerSource;
+    }
+
+    public void setAgentMetricsContextPath(String agentMetricsContextPath) {
+        this.agentMetricsContextPath = agentMetricsContextPath;
+    }
+
+    public void setSendAgentMetricsToServer(boolean sendAgentMetricsToServer) {
+        this.sendAgentMetricsToServer = sendAgentMetricsToServer;
     }
 
     public static void main(String[] args) throws IOException {

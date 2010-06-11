@@ -66,6 +66,8 @@
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>
         <property name="inputHandlerSource" ref="inputHandlerSource"/>
+        <property name="agentMetricsContextPath" value="${agentMetricsContextPath}"/>
+        <property name="sendAgentMetricsToServer" value="${sendAgentMetricsToServer}"/>
     </bean>
 
 </beans>

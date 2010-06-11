@@ -22,6 +22,13 @@
                             <constructor-arg>
                                 <list>
                                     <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="RAW_VALUES"/>
+                                    <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                        <constructor-arg>
+                                            <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                                <constructor-arg value="1"/>
+                                            </bean>
+                                        </constructor-arg>
+                                    </bean>
                                 </list>
                             </constructor-arg>
                         </bean>

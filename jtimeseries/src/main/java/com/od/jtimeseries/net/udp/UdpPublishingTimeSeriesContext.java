@@ -42,7 +42,7 @@ import java.util.IdentityHashMap;
 */
 public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
 
-    private static int DEFAULT_MIN_SEND_INTERVAL_MILLIS = 5000;
+    private static int DEFAULT_MIN_SEND_INTERVAL_MILLIS = 500;
     private Map<Identifiable, PublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, PublishingTimeSeriesListener>();
     private UdpClient udpClient;
     private int minSendIntervalMillis;

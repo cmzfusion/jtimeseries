@@ -104,7 +104,7 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
         PathParser p = new PathParser(agentMetricsContextPath);
         String contextName = p.removeLastNode();
         String parentPath = p.getRemainingPath();
-        TimeSeriesContext parentContext = rootContext.getContext(parentPath);
+        TimeSeriesContext parentContext = rootContext.createContext(parentPath);
         DefaultTimeSeriesContext metricsContext = new DefaultTimeSeriesContext(contextName, "Context for agent self-monitoring statistics");
         parentContext.addChild(metricsContext);
     }

@@ -225,7 +225,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         assertNotNull(rootContext.getContext("child2"));
         assertNotNull(rootContext.getContext("child2").getContext("grandchild1"));
         assertEquals("child2", rootContext.getContext("child2").getDescription());
-        assertEquals("grandchild1", rootContext.getContext("child2").getContext("grandchild1").getDescription());
+        assertEquals("TimeSeriesContext at child2.grandchild1", rootContext.getContext("child2").getContext("grandchild1").getDescription());
 
         rootContext.createContext("child2.grandchild2.greatgrandchild1", "wibble");
         assertEquals("child2", rootContext.getContext("child2").getDescription());

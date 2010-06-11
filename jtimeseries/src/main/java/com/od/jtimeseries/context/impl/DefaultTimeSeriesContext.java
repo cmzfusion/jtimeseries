@@ -270,7 +270,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
             //create the next context in the path, and recusively call create
             String nextContext = p.removeFirstNode();
             TimeSeriesContext c = create(nextContext, nextContext, TimeSeriesContext.class);
-            return c.create(p.getRemainingPath(), description, clazz);
+            return c.create(p.getRemainingPath(), description, clazz, parameters);
         }
     }
 

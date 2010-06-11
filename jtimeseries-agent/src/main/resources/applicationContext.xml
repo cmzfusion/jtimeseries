@@ -18,10 +18,15 @@
         </constructor-arg>
     </bean>
 
+     <bean id="timeSeriesFactory" class="com.od.jtimeseries.agent.RoundRobinSeriesFactory">
+        <constructor-arg value="${maxRoundRobinSeriesSize}"/>
+    </bean>
+
     <bean id="rootContext" class="com.od.jtimeseries.net.udp.UdpPublishingTimeSeriesContext">
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
         <constructor-arg ref="udpClient"/>
+        <property name="timeSeriesFactory" ref="timeSeriesFactory"/>
     </bean>
 
     <import resource="serverMetrics.xml"/>
@@ -36,10 +41,6 @@
         <constructor-arg value="${logLevel}"/>
         <constructor-arg value="${maxLogFileSizeInBytes}"/>
         <constructor-arg value="${maxLogFileCount}"/>
-    </bean>
-
-    <bean id="timeSeriesFactory" class="com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries">
-        <constructor-arg value="${maxSeriesSize}"/>
     </bean>
 
     <bean id="httpdServer" class="com.od.jtimeseries.net.httpd.JTimeSeriesHttpd">

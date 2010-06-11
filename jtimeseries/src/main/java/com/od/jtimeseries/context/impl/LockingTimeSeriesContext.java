@@ -211,7 +211,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final TimeSeriesContext createContext(String path) {
-        return createContext(path, new PathParser(path).removeLastNode());
+        return createContext(path, "TimeSeriesContext at " + path);
     }
 
     public final TimeSeriesContext createContext(String path, String description) {

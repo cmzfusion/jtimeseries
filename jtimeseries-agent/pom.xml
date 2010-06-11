@@ -35,6 +35,13 @@
                                     </includes>
                                     <filtering>true</filtering>
                                 </resource>
+                                <resource>
+                                    <directory>resources</directory>
+                                    <includes>
+                                        <include>jtimeseries-agent.properties</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>

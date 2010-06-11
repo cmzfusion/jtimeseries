@@ -8,6 +8,8 @@ import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.agent.jmx.AgentConfigJmx;
+import com.od.jtimeseries.agent.input.InputHandlerSource;
+import com.od.jtimeseries.agent.input.InputProcessor;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -37,6 +39,7 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     private ManagedMetricInitializer managedMetricInitializer;
     private HtmlAdaptorServer htmlAdaptorServer;
     private JTimeSeriesHttpd httpdServer;
+    private InputHandlerSource inputHandlerSource;
 
 
     static {
@@ -60,9 +63,15 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
         setupManagedMetrics();
         startJmx();
         startTimeSeriesHttpServer();
+        startInputHandler();
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
+    }
+
+    private void startInputHandler() {
+        InputProcessor inputProcessor = new InputProcessor(inputHandlerSource);
+        inputProcessor.start();
     }
 
     private void startJmxManagementServer() {
@@ -128,6 +137,10 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     public void setJmxManagementPort(int jmxManagementPort) {
         this.jmxManagementPort = jmxManagementPort;
+    }
+
+    public void setInputHandlerSource(InputHandlerSource inputHandlerSource) {
+        this.inputHandlerSource = inputHandlerSource;
     }
 
     public static void main(String[] args) throws IOException {

@@ -18,10 +18,7 @@
  */
 package com.od.jtimeseries.server.message;
 
-import com.od.jtimeseries.net.udp.ClientAnnouncementMessage;
-import com.od.jtimeseries.net.udp.UdpClient;
-import com.od.jtimeseries.net.udp.UdpMessage;
-import com.od.jtimeseries.net.udp.UdpServer;
+import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
@@ -50,7 +47,7 @@ public class ClientAnnouncementMessageListener implements UdpServer.UdpMessageLi
             ClientAnnouncementMessage c = (ClientAnnouncementMessage)m;
             try {
                 boolean added = clientToSendUdpServerAnnouncePings.addClientConfig(
-                    new UdpClient.ClientConfig(
+                    new UdpClientConfig(
                         InetAddress.getByName(c.getInetAddress()),
                         c.getPort()
                     )

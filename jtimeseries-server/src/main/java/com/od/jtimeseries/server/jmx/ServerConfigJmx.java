@@ -19,6 +19,7 @@
 package com.od.jtimeseries.server.jmx;
 
 import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.net.udp.UdpClientConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +94,7 @@ public class ServerConfigJmx implements ServerConfigJmxMBean {
 
     public String[] getPingHostnames() {
         List<String> hosts = new ArrayList<String>();
-        for (UdpClient.ClientConfig c : udpClientForServerAnnounceMessages.getClientConfigs()) {
+        for (UdpClientConfig c : udpClientForServerAnnounceMessages.getClientConfigs()) {
             hosts.add(c.toString());
         }
         return hosts.toArray(new String[hosts.size()]);

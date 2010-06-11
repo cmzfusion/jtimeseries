@@ -40,7 +40,7 @@ import java.net.UnknownHostException;
 public class TimeSeriesUdpClient {
 
     public static void main(String[] args) throws UnknownHostException {
-        UdpClient udpClient = new UdpClient(new UdpClient.ClientConfig(
+        UdpClient udpClient = new UdpClient(new UdpClientConfig(
                 InetAddress.getByName("localhost"),
                 18081
         ));

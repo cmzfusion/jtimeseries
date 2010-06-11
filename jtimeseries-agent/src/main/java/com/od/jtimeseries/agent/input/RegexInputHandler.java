@@ -38,7 +38,7 @@ public class RegexInputHandler implements InputHandler {
         }
     }
 
-    public void addRegexValueHandler(RegexValueHandler r) {
-        valueHandlers.add(r);
+    public void setRegexValueHandlers(List<RegexValueHandler> r) {
+        valueHandlers = new ArrayList<RegexValueHandler>(r);
     }
 }

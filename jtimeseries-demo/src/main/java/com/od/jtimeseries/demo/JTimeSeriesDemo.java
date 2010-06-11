@@ -109,7 +109,7 @@ public class JTimeSeriesDemo {
         udpServer.addUdpMessageListener(serverDictionary);
 
         //ping ourselves, to advertise our own server to appear in the local server dictionary
-        UdpClient udpClient = new UdpClient(new UdpClient.ClientConfig(
+        UdpClient udpClient = new UdpClient(new UdpClientConfig(
                 InetAddress.getLocalHost(),
                 UDP_SERVER_PORT
         ));

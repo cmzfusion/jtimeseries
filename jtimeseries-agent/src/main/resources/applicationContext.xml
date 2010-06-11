@@ -9,8 +9,23 @@
         <property name="location" value="/jtimeseries-agent.properties"/>
     </bean>
 
+    <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient">
+        <constructor-arg>
+            <bean class="com.od.jtimeseries.net.udp.UdpClientConfig">
+                <constructor-arg value="${timeSeriesServerHostname}"/>
+                <constructor-arg value="${timeSeriesServerUdpServerPort}"/>    
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="rootContext" class="com.od.jtimeseries.net.udp.UdpPublishingTimeSeriesContext">
+        <constructor-arg value="${rootContextName}"/>
+        <constructor-arg value="${rootContextDescription}"/>
+        <constructor-arg ref="udpClient"/>
+    </bean>
+
     <import resource="serverMetrics.xml"/>
-    <!-- <import resource="inputHandlers.xml"/>  -->
+    <import resource="inputHandlers.xml"/>
 
     <bean id="logFileDirectory" class="java.io.File">
         <constructor-arg value="${logDirectory}${file.separator}${logFileName}"/>
@@ -25,14 +40,6 @@
 
     <bean id="timeSeriesFactory" class="com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries">
         <constructor-arg value="${maxSeriesSize}"/>
-    </bean>
-
-    <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient"/>
-
-    <bean id="rootContext" class="com.od.jtimeseries.net.udp.UdpPublishingTimeSeriesContext">
-        <constructor-arg value="${rootContextName}"/>
-        <constructor-arg value="${rootContextDescription}"/>
-        <constructor-arg ref="udpClient"/>
     </bean>
 
     <bean id="httpdServer" class="com.od.jtimeseries.net.httpd.JTimeSeriesHttpd">
@@ -58,6 +65,7 @@
         <property name="managedMetricInitializer" ref="serverMetricInitializer"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>
+        <property name="inputHandlerSource" ref="inputHandlerSource"/>
     </bean>
 
 </beans>

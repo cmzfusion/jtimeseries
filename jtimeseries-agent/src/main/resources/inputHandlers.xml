@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+
+    <bean id="inputHandlerSource" class="com.od.jtimeseries.agent.input.DefaultInputHandlerSource">
+        <constructor-arg>
+            <!-- A list of InputHandler to process standard input to the agent -->
+            <list>
+                <bean class="com.od.jtimeseries.agent.input.RegexInputHandler">
+                    <constructor-arg value="(\d*)"/>
+
+                    <property name="regexValueHandlers">
+                    <list>
+                        <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                            <constructor-arg ref="rootContext"/>
+                            <constructor-arg value="test.series"/>
+                            <constructor-arg value="test series description"/>
+                            <constructor-arg value="1"/>
+                            <constructor-arg>
+                                <list>
+                                    <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="RAW_VALUES"/>
+                                </list>
+                            </constructor-arg>
+                        </bean>
+                    </list>
+                    </property>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+	
+</beans>

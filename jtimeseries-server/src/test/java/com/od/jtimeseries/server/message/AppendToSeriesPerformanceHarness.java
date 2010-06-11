@@ -2,6 +2,7 @@ package com.od.jtimeseries.server.message;
 
 import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.net.udp.UdpClientConfig;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -27,7 +28,7 @@ public class AppendToSeriesPerformanceHarness {
     private static final int MESSAGES_PER_SECOND = 1000;
 
     private List<String> seriesPaths = new ArrayList<String>();
-    public UdpClient udpClient = new UdpClient(new UdpClient.ClientConfig(InetAddress.getByName("localhost"), 18081));
+    public UdpClient udpClient = new UdpClient(new UdpClientConfig(InetAddress.getByName("localhost"), 18081));
 
     public AppendToSeriesPerformanceHarness() throws UnknownHostException {
         generateSeriesPaths();

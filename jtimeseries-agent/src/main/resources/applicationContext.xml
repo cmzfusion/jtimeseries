@@ -29,7 +29,7 @@
         <property name="timeSeriesFactory" ref="timeSeriesFactory"/>
     </bean>
 
-    <import resource="serverMetrics.xml"/>
+    <import resource="mangedMetrics.xml"/>
     <import resource="inputHandlers.xml"/>
 
     <bean id="logFileDirectory" class="java.io.File">
@@ -63,7 +63,7 @@
         <property name="httpdServer" ref="httpdServer"/>
         <property name="udpClient" ref="udpClient"/>
         <property name="agentConfigJmx" ref="agentConfigJmx"/>
-        <property name="managedMetricInitializer" ref="serverMetricInitializer"/>
+        <property name="managedMetricInitializer" ref="managedMetricInitializer"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>
         <property name="inputHandlerSource" ref="inputHandlerSource"/>

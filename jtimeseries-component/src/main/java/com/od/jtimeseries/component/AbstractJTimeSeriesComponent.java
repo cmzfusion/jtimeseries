@@ -65,7 +65,7 @@ public class AbstractJTimeSeriesComponent {
             result = InetAddress.getLocalHost().getHostName();
             int lastPeriod = result.indexOf(".");
             if ( lastPeriod > 0 ) {
-                result = result.substring(0, lastPeriod - 1);
+                result = result.substring(0, lastPeriod);
             }
         } catch (UnknownHostException e) {
             LogUtils.getLogMethods(logClass).logError("Failed to find hostname", e);

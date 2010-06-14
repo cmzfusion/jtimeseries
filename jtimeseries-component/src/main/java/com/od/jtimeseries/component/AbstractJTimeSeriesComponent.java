@@ -63,7 +63,7 @@ public class AbstractJTimeSeriesComponent {
         String result = "(Unknown Host)";
         try {
             result = InetAddress.getLocalHost().getHostName();
-            int lastPeriod = result.lastIndexOf(".");
+            int lastPeriod = result.indexOf(".");
             if ( lastPeriod > 0 ) {
                 result = result.substring(0, lastPeriod - 1);
             }

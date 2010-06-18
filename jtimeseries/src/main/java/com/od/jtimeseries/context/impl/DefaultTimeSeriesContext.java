@@ -46,8 +46,7 @@ import java.util.*;
  */
 public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
-    private final List<Identifiable> children = Collections.synchronizedList(new ArrayList<Identifiable>());
-    private final Map<String, Identifiable> childrenById = Collections.synchronizedMap(new HashMap<String, Identifiable>());
+    private final Map<String, Identifiable> childrenById = new TreeMap<String, Identifiable>();
     private ContextQueries contextQueries = new DefaultContextQueries(this);
     private DefaultMetricCreator defaultMetricCreator = new DefaultMetricCreator(this);
 
@@ -104,7 +103,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
         List<E> list = new ArrayList<E>();
-        for ( Identifiable i : children) {
+        for ( Identifiable i : childrenById.values()) {
             if ( classType.isAssignableFrom(i.getClass())) {
                 list.add((E)i);
             }
@@ -114,7 +113,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     protected List<Identifiable> getChildren_Locked() {
         List<Identifiable> children = new ArrayList<Identifiable>();
-        children.addAll(this.children);
+        children.addAll(this. childrenById.values());
         return children;
     }
 
@@ -150,10 +149,11 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     }
 
     protected boolean removeChild_Locked(Identifiable e) {
-        boolean removed = children.remove(e);
-        if ( removed) {
-            e.setParent(null);
+        boolean removed = false;
+        if ( containsChild_Locked(e) ) {
             childrenById.remove(e.getId());
+            e.setParent(null);
+            removed = true;
         }
         return removed;
     }
@@ -220,7 +220,11 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     }
 
     protected boolean containsChild_Locked(Identifiable child) {
-        return children.contains(child);
+        boolean result = false;
+        if ( child != null) {
+            result = childrenById.get(child.getId()) == child;
+        }
+        return result;
     }
 
     protected boolean isSchedulerStarted_Locked() {
@@ -396,7 +400,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         if (childrenById.containsKey(identifiable.getId())) {
             throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
         } else {
-            children.add(identifiable);
             childrenById.put(identifiable.getId(), identifiable);
         }
         identifiable.setParent(this);

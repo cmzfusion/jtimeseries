@@ -70,9 +70,15 @@ public abstract class AbstractHandler implements HttpHandler {
         return s;
     }
 
-    protected String encodeUrl(String s) {
+    protected String encodeUrlToken(String s) {
         try {
-            return URLEncoder.encode( s, "UTF-8" );
+            //when this gets to the browser, the browser will expand the escaped chars even if it is part
+            //of a URL, which requires the escaping to be valid. It seems we need to 'double' escape it,
+            //so that the result of the browser unescaping is actually a valid url with escapes!
+            //not 100% sure this is the best solution, but it seems to work OK
+            String result = URLEncoder.encode( s, "UTF-8" );
+            result = result.replaceAll("%", "%25");
+            return result;
         } catch (UnsupportedEncodingException uee ) {
             throw new InternalError("Should always be able to encode UTF-8");
         }
@@ -106,7 +112,7 @@ public abstract class AbstractHandler implements HttpHandler {
             sb.append("/");
         }
         if ( c != getRootContext()) {
-            sb.insert(0,"/" + encodeUrl(c.getId()));
+            sb.insert(0,"/" + encodeUrlToken(c.getId()));
             return createUrlForIdentifiable(c.getParent(), sb);
         } else {
             return sb.toString();
@@ -118,8 +124,8 @@ public abstract class AbstractHandler implements HttpHandler {
         builder.append(" ").append(AttributeName.parentPath).append("=\"").append(encodeXml(s.getParentPath())).append("\"");
         builder.append(" ").append(AttributeName.id).append("=\"").append(encodeXml(s.getId())).append("\"");
         builder.append(" ").append(AttributeName.description).append("=\"").append(encodeXml(s.getDescription())).append("\"");
-        builder.append(" ").append(AttributeName.seriesUrl).append("=\"").append(parentContextUrl).append(encodeUrl(s.getId())).append(SeriesHandler.SERIES_POSTFIX).append("\"");
-        builder.append(" ").append(AttributeName.chartImage).append("=\"").append(encodeUrl(s.getId())).append(ChartPngHandler.CHART_PNG_POSTFIX).append("\"");
+        builder.append(" ").append(AttributeName.seriesUrl).append("=\"").append(parentContextUrl).append(encodeUrlToken(s.getId())).append(SeriesHandler.SERIES_POSTFIX).append("\"");
+        builder.append(" ").append(AttributeName.chartImage).append("=\"").append(encodeUrlToken(s.getId())).append(ChartPngHandler.CHART_PNG_POSTFIX).append("\"");
         builder.append(" ").append(AttributeName.summaryStats).append("=\"").append(encodeXml(ContextProperties.getSummaryStatsStringRepresentation(s.getProperties()))).append("\"");
         builder.append("/>");
     }

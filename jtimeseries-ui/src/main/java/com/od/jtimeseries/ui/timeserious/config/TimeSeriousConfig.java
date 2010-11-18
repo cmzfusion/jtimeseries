@@ -1,5 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.config;
 
+import java.awt.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -8,4 +10,13 @@ package com.od.jtimeseries.ui.timeserious.config;
  */
 public class TimeSeriousConfig {
 
+    private Rectangle mainFrameLocation;
+
+    public Rectangle getMainFrameLocation() {
+        return mainFrameLocation;
+    }
+
+    public void setMainFrameLocation(Rectangle mainFrameLocation) {
+        this.mainFrameLocation = mainFrameLocation;
+    }
 }

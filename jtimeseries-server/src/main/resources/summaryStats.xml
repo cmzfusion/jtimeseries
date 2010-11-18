@@ -9,7 +9,7 @@
         <constructor-arg ref="rootContext"/>
         <constructor-arg>
             <!-- recalculate the stats for all the timeseries over this period -->
-            <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+            <bean class="com.od.jtimeseries.util.time.Time" factory-method="seconds">
                 <constructor-arg value="15"/>
             </bean>
         </constructor-arg>

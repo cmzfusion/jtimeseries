@@ -34,8 +34,9 @@ public class TimeSeriousConfigManager {
 
         if ( preferenceSettings.isConfigDirectorySet()) {
             createConfigManager();
-            if (configManager.configExists(MAIN_CONFIG_NAME)) {
-                result = configManager.loadConfig(MAIN_CONFIG_NAME);
+            TimeSeriousConfig loadedConfig = configManager.loadConfig(MAIN_CONFIG_NAME);
+            if ( loadedConfig != null ) {
+                result = loadedConfig;
             }
         }
         return result;

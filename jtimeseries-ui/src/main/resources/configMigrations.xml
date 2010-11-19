@@ -15,6 +15,19 @@
      </void>
     </object>
    </void>
+   <void method="add">
+    <object class="od.configutil.Migration">
+     <void property="arguments">
+      <array class="java.lang.String" length="0"/>
+     </void>
+     <void property="migrationStrategyClassName">
+      <string>od.configutil.NullMigrationStrategy</string>
+     </void>
+     <void property="versionTarget">
+      <long>201011190908</long>
+     </void>
+    </object>
+   </void>
   </void>
  </object>
 </java> 

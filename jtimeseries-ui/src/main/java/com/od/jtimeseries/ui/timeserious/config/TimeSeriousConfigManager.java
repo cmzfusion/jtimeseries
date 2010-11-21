@@ -1,7 +1,10 @@
 package com.od.jtimeseries.ui.timeserious.config;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import od.configutil.ConfigManager;
 import od.configutil.ConfigManagerException;
+import od.configutil.NoConfigFoundException;
 import od.configutil.PreferenceSettings;
 
 import javax.swing.*;
@@ -15,6 +18,8 @@ import java.io.File;
  * To change this template use File | Settings | File Templates.
  */
 public class TimeSeriousConfigManager {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousConfigManager.class);
 
     private final String MAIN_CONFIG_NAME = "timeSerious";
 
@@ -34,9 +39,10 @@ public class TimeSeriousConfigManager {
 
         if ( preferenceSettings.isConfigDirectorySet()) {
             createConfigManager();
-            TimeSeriousConfig loadedConfig = configManager.loadConfig(MAIN_CONFIG_NAME);
-            if ( loadedConfig != null ) {
-                result = loadedConfig;
+            try {
+                result = configManager.loadConfig(MAIN_CONFIG_NAME);
+            } catch (NoConfigFoundException n) {
+                logMethods.logWarning("Could not load config " + MAIN_CONFIG_NAME + ", will use default config");
             }
         }
         return result;

@@ -46,6 +46,7 @@ public class VisualizerConfiguration {
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
+    private Rectangle frameBounds;
 
     public VisualizerConfiguration() {
     }
@@ -133,6 +134,14 @@ public class VisualizerConfiguration {
 
     public void setTableColumns(List<ColumnSettings> columnSettings) {
         this.tableColumns = columnSettings;
+    }
+
+    public Rectangle getFrameBounds() {
+        return frameBounds;
+    }
+
+    public void setFrameBounds(Rectangle frameBounds) {
+        this.frameBounds = frameBounds;
     }
 
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {

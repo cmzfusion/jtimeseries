@@ -40,6 +40,7 @@ public class TimeSerious {
             mainFrame.setSize(1024, 768);
             mainFrame.setLocationRelativeTo(null);
         }
+        mainFrame.addVisualizers(config.getVisualizerConfigurations());
         mainFrame.setVisible(true);
 
         mainFrame.addWindowListener(new WindowAdapter() {
@@ -59,6 +60,7 @@ public class TimeSerious {
 
     private void prepareConfigForSave() {
         config.setMainFrameLocation(mainFrame.getBounds());
+        config.setVisualizerConfigurations(mainFrame.getVisualizerConfigurations());
     }
 
     public static void main(String[] args) {

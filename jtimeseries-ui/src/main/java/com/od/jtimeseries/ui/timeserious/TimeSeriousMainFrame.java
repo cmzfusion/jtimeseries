@@ -3,10 +3,13 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingHttpServerDictionary;
+import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,6 +54,14 @@ public class TimeSeriousMainFrame extends JFrame {
 
         JMenu windowMenu = new JMenu("Window");
         mainMenuBar.add(windowMenu);
+    }
+
+    public List<VisualizerConfiguration> getVisualizerConfigurations() {
+        return desktopPane.getVisualizerConfigurations();
+    }
+
+    public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
+        desktopPane.addVisualizers(visualizerConfigurations);
     }
 
     private class ExitAction extends AbstractAction {

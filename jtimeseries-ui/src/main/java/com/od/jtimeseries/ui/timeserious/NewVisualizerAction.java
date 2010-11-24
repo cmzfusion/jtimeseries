@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -13,9 +14,9 @@ import java.awt.event.ActionEvent;
  */
 public class NewVisualizerAction extends AbstractAction {
 
-    private TimeSeriesDesktopPane desktopPane;
+    private TimeSeriousDesktop desktopPane;
 
-    public NewVisualizerAction(TimeSeriesDesktopPane desktopPane) {
+    public NewVisualizerAction(TimeSeriousDesktop desktopPane) {
         super("New Visualizer", ImageUtils.SERIES_ICON_16x16);
         this.desktopPane = desktopPane;
     }

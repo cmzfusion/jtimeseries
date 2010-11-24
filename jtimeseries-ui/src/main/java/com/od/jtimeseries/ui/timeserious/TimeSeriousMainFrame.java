@@ -20,23 +20,18 @@ import java.util.List;
 public class TimeSeriousMainFrame extends JFrame {
 
     private JMenuBar mainMenuBar = new JMenuBar();
-    private JToolBar mainToolBar = new JToolBar();
-    private TimeSeriesServerDictionary timeSeriesServerDictionary = new UdpPingHttpServerDictionary();
-    private TimeSeriesDesktopPane desktopPane = new TimeSeriesDesktopPane(timeSeriesServerDictionary);
+    private DesktopPanel desktopPanel = new DesktopPanel();
+    private MainSeriesTreePanel seriesTreePanel = new MainSeriesTreePanel();
 
     public TimeSeriousMainFrame() {
         initializeFrame();
         createMenuBar();
-        createToolBar();
 
         setJMenuBar(mainMenuBar);
-        add(mainToolBar, BorderLayout.NORTH);
-        getContentPane().add(desktopPane, BorderLayout.CENTER);
-    }
-
-    private void createToolBar() {
-        NewVisualizerAction newVisualizerAction = new NewVisualizerAction(desktopPane);
-        mainToolBar.add(newVisualizerAction);
+        JSplitPane splitPane = new JSplitPane();
+        splitPane.setLeftComponent(seriesTreePanel);
+        splitPane.setRightComponent(desktopPanel);
+        getContentPane().add(splitPane, BorderLayout.CENTER);
     }
 
     private void initializeFrame() {
@@ -57,11 +52,11 @@ public class TimeSeriousMainFrame extends JFrame {
     }
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        return desktopPane.getVisualizerConfigurations();
+        return desktopPanel.getVisualizerConfigurations();
     }
 
     public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
-        desktopPane.addVisualizers(visualizerConfigurations);
+        desktopPanel.addVisualizers(visualizerConfigurations);
     }
 
     private class ExitAction extends AbstractAction {

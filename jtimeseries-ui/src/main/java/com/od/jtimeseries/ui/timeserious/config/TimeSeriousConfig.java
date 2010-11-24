@@ -32,4 +32,5 @@ public class TimeSeriousConfig {
     public void setVisualizerConfigurations(List<VisualizerConfiguration> visualizerConfigurations) {
         this.visualizerConfigurations = visualizerConfigurations;
     }
+
 }

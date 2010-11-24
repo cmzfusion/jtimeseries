@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingHttpServerDictionary;
@@ -18,6 +19,8 @@ import java.util.List;
  * Time: 15:14:34
  */
 public class TimeSeriousMainFrame extends JFrame {
+
+    public static final String MAIN_FRAME_NAME = "mainFrame";
 
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel = new DesktopPanel();
@@ -51,12 +54,22 @@ public class TimeSeriousMainFrame extends JFrame {
         mainMenuBar.add(windowMenu);
     }
 
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        return desktopPanel.getVisualizerConfigurations();
+    public void restoreConfig(TimeSeriousConfig config) {
+        Rectangle frameLocation = config.getFrameLocation(MAIN_FRAME_NAME);
+        if ( frameLocation != null) {
+            setBounds(frameLocation);
+            setExtendedState(config.getFrameExtendedState(MAIN_FRAME_NAME));
+        } else {
+            setSize(1024, 768);
+            setLocationRelativeTo(null);
+        }
+        desktopPanel.restoreConfig(config);
     }
 
-    public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
-        desktopPanel.addVisualizers(visualizerConfigurations);
+    public void prepareConfigForSave(TimeSeriousConfig config) {
+        config.setFrameLocation(MAIN_FRAME_NAME, getBounds());
+        config.setFrameExtendedState(MAIN_FRAME_NAME, getExtendedState());
+        desktopPanel.prepareConfigForSave(config);
     }
 
     private class ExitAction extends AbstractAction {

@@ -33,19 +33,12 @@ public class TimeSerious {
             e.printStackTrace();
         }
 
-        Rectangle frameLocation = config.getMainFrameLocation();
-        if ( frameLocation != null) {
-            mainFrame.setBounds(frameLocation);
-        } else {
-            mainFrame.setSize(1024, 768);
-            mainFrame.setLocationRelativeTo(null);
-        }
-        mainFrame.addVisualizers(config.getVisualizerConfigurations());
+        mainFrame.restoreConfig(config);      
         mainFrame.setVisible(true);
 
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                prepareConfigForSave();
+                prepareConfigForSave(config);
                 try {
                     configManager.saveConfig(config);
                 } catch (ConfigManagerException e1) {
@@ -58,9 +51,8 @@ public class TimeSerious {
         configManager.checkInitialized(mainFrame);
     }
 
-    private void prepareConfigForSave() {
-        config.setMainFrameLocation(mainFrame.getBounds());
-        config.setVisualizerConfigurations(mainFrame.getVisualizerConfigurations());
+    private void prepareConfigForSave(TimeSeriousConfig config) {
+        mainFrame.prepareConfigForSave(config);
     }
 
     public static void main(String[] args) {

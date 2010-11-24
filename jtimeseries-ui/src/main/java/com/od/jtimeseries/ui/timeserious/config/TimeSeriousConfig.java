@@ -14,15 +14,17 @@ import java.util.List;
  */
 public class TimeSeriousConfig {
 
-    private Rectangle mainFrameLocation;
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
 
-    public Rectangle getMainFrameLocation() {
-        return mainFrameLocation;
+    private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
+    private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
+
+    public Rectangle getFrameLocation(String frameName) {
+        return frameLocations.get(frameName);
     }
 
-    public void setMainFrameLocation(Rectangle mainFrameLocation) {
-        this.mainFrameLocation = mainFrameLocation;
+    public void setFrameLocation(String frameName, Rectangle location) {
+        frameLocations.put(frameName, location);
     }
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
@@ -33,4 +35,11 @@ public class TimeSeriousConfig {
         this.visualizerConfigurations = visualizerConfigurations;
     }
 
+    public void setFrameExtendedState(String frameName, int extendedState) {
+        frameExtendedStates.put(frameName, extendedState);
+    }
+
+    public Integer getFrameExtendedState(String frameName) {
+        return frameExtendedStates.get(frameName);
+    }
 }

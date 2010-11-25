@@ -32,8 +32,8 @@ import java.util.*;
  */
 public class IdentifiableBase extends LockingIdentifiable {
 
-    protected static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
-    protected static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
+    public static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
+    public static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
     private volatile String id;
     private volatile String description;
     private volatile Identifiable parent;
@@ -161,10 +161,6 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     public String toString() {
         return getId();
-    }
-
-    protected LinkedList<String> splitPath(String path) {
-        return new LinkedList<String>(Arrays.asList(path.split(NAMESPACE_REGEX_PATH_SEPARATOR)));
     }
 
     public Identifiable getRoot() {

@@ -20,8 +20,7 @@ package com.od.jtimeseries.ui.visualizer.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
-import com.od.jtimeseries.ui.visualizer.selector.shared.TitleLabelPanel;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.swing.action.ListSelectionActionModel;
 
 import java.util.ArrayList;
@@ -37,9 +36,9 @@ import java.util.List;
 public abstract class SelectorPanel extends TitleLabelPanel {
 
     protected java.util.List<SelectorPanelListener> seriesSelectionListeners = new ArrayList<SelectorPanelListener>();
-    private ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel;
+    private ListSelectionActionModel<ChartingTimeSeries> seriesActionModel;
 
-    public SelectorPanel(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel) {
+    public SelectorPanel(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel) {
         this.seriesActionModel = seriesActionModel;
     }
 
@@ -61,13 +60,13 @@ public abstract class SelectorPanel extends TitleLabelPanel {
         }
     }
 
-    protected ListSelectionActionModel<RemoteChartingTimeSeries> getSeriesActionModel() {
+    protected ListSelectionActionModel<ChartingTimeSeries> getSeriesActionModel() {
         return seriesActionModel;
     }
 
     public abstract void refreshSeries();
 
-    public abstract void removeSeries(List<RemoteChartingTimeSeries> series);
+    public abstract void removeSeries(List<ChartingTimeSeries> series);
 
     public static interface SelectorPanelListener {
         void seriesSelectedForDescription(IdentifiableTimeSeries s);

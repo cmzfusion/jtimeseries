@@ -22,11 +22,11 @@ import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.visualizer.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.visualizer.download.panel.SelectRemoteSeriesPanel;
 import com.od.jtimeseries.ui.visualizer.download.panel.SelectServerPanel;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.util.time.Time;
 import com.od.swing.progress.ProgressLayeredPane;
 
@@ -80,7 +80,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
                 );
             }
 
-            public void seriesSelected(java.util.List<RemoteChartingTimeSeries> remoteUrlTimeSeries) {
+            public void seriesSelected(java.util.List<ChartingTimeSeries> remoteUrlTimeSeries) {
                 addLocalTimeSeries(remoteUrlTimeSeries);
                 dispose();
             }
@@ -91,20 +91,19 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         };
     }
 
-    private void addLocalTimeSeries(java.util.List<RemoteChartingTimeSeries> selectedTimeSeries) {
+    private void addLocalTimeSeries(java.util.List<ChartingTimeSeries> selectedTimeSeries) {
         for ( IdentifiableTimeSeries s : selectedTimeSeries) {
             TimeSeriesContext c = contextToReceiveSeries.createContext(s.getParentPath());
 
-            RemoteChartingTimeSeries remoteSeries = (RemoteChartingTimeSeries)s;
+            ChartingTimeSeries remoteSeries = (ChartingTimeSeries)s;
 
             //TODO we may want to flag the conflict up to the user
             if ( ! c.containsChildWithId(s.getId())) {
-                RemoteChartingTimeSeries newLocalSeries = new RemoteChartingTimeSeries(
+                ChartingTimeSeries newLocalSeries = new ChartingTimeSeries(
                         remoteSeries.getId(),
                         remoteSeries.getDescription(),
-                        ((RemoteChartingTimeSeries) s).getURL(),
+                        ((ChartingTimeSeries) s).getURL(),
                         Time.seconds(remoteSeries.getRefreshTimeSeconds()),
-                        remoteSeries.getMaxDaysHistory()
                 );
                 newLocalSeries.putAllProperties(remoteSeries.getProperties());
                 newLocalSeries.setDisplayName(remoteSeries.getDisplayName());

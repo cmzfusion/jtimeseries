@@ -20,12 +20,12 @@ package com.od.jtimeseries.ui.visualizer.selector;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.selector.shared.*;
 import com.od.jtimeseries.ui.visualizer.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.visualizer.selector.table.TableSelector;
 import com.od.jtimeseries.ui.visualizer.selector.table.ColumnSelectionDialog;
 import com.od.jtimeseries.ui.visualizer.selector.table.ColumnSettings;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
@@ -62,8 +62,8 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private Box titleBox;
     private CardLayout cardLayout;
     private DiscriptionListener descriptionSettingSelectorListener = new DiscriptionListener();
-    private List<RemoteChartingTimeSeries> timeSeries = new ArrayList<RemoteChartingTimeSeries>();
-    private ListSelectionActionModel<RemoteChartingTimeSeries> seriesSelectionModel = new ListSelectionActionModel<RemoteChartingTimeSeries>();
+    private List<ChartingTimeSeries> timeSeries = new ArrayList<ChartingTimeSeries>();
+    private ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel = new ListSelectionActionModel<ChartingTimeSeries>();
     private RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
     private ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
     private PropertyChangeListener selectionPropertyListener = new SelectedSeriesPropertyChangeListener();
@@ -151,7 +151,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         return selectionList;
     }
 
-    public List<RemoteChartingTimeSeries> getSelectedTimeSeries() {
+    public List<ChartingTimeSeries> getSelectedTimeSeries() {
         return selectionList.getSelectedTimeSeries();
     }
 
@@ -163,15 +163,15 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         selectionList.removeSelectionListener(l);
     }
 
-    public void addSelection(RemoteChartingTimeSeries s) {
+    public void addSelection(ChartingTimeSeries s) {
         selectionList.addSelection(s);
     }
 
-    public void removeSelection(RemoteChartingTimeSeries s) {
+    public void removeSelection(ChartingTimeSeries s) {
         selectionList.removeSelection(s);
     }
 
-    public void setSelectedTimeSeries(List<RemoteChartingTimeSeries> selections) {
+    public void setSelectedTimeSeries(List<ChartingTimeSeries> selections) {
         selectionList.setSelectedTimeSeries(selections);
     }
 
@@ -200,9 +200,9 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     }
 
     private void updateSelections(List<IdentifiableTimeSeries> l) {
-        List<RemoteChartingTimeSeries> selections = new ArrayList<RemoteChartingTimeSeries>();
+        List<ChartingTimeSeries> selections = new ArrayList<ChartingTimeSeries>();
         for ( IdentifiableTimeSeries s : l) {
-            RemoteChartingTimeSeries r = (RemoteChartingTimeSeries)s;
+            ChartingTimeSeries r = (ChartingTimeSeries)s;
             if ( r.isSelected() ) {
                 selections.add(r);
             }
@@ -212,21 +212,21 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
 
     private void addPropertyListenerToNewSeries(List<IdentifiableTimeSeries> l) {
         for ( IdentifiableTimeSeries s : l) {
-            RemoteChartingTimeSeries r = (RemoteChartingTimeSeries)s;
+            ChartingTimeSeries r = (ChartingTimeSeries)s;
             r.addPropertyChangeListener(
-                    RemoteChartingTimeSeries.SELECTED_PROPERTY,
+                    ChartingTimeSeries.SELECTED_PROPERTY,
                     selectionPropertyListener
             );
 
             r.addPropertyChangeListener(
-                    RemoteChartingTimeSeries.SERIES_STALE_PROPERTY,
+                    ChartingTimeSeries.SERIES_STALE_PROPERTY,
                     seriesConnectionPropertyListener
             );
         }
     }
 
     private void removePropertyListenerFromCurrentSeries() {
-        for ( RemoteChartingTimeSeries s : timeSeries ) {
+        for ( ChartingTimeSeries s : timeSeries ) {
             s.removePropertyChangeListener(selectionPropertyListener);
             s.removePropertyChangeListener(seriesConnectionPropertyListener);
         }
@@ -276,7 +276,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private class SelectedSeriesPropertyChangeListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            RemoteChartingTimeSeries s = (RemoteChartingTimeSeries)evt.getSource();
+            ChartingTimeSeries s = (ChartingTimeSeries)evt.getSource();
             if (s.isSelected()) {
                 selectionList.addSelection(s);
             } else {
@@ -292,15 +292,15 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         }
     }
 
-    public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<RemoteChartingTimeSeries>> {
+    public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<ChartingTimeSeries>> {
 
-        public RemoveSeriesAction(ListSelectionActionModel<RemoteChartingTimeSeries> seriesSelectionModel) {
+        public RemoveSeriesAction(ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel) {
             super(seriesSelectionModel, "Remove Series", ImageUtils.REMOVE_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {
-            List<RemoteChartingTimeSeries> series = getActionModel().getSelected();
-            for ( RemoteChartingTimeSeries s : series) {
+            List<ChartingTimeSeries> series = getActionModel().getSelected();
+            for ( ChartingTimeSeries s : series) {
                 TimeSeriesContext c = (TimeSeriesContext)s.getParent();
                 s.setSelected(false);
                 c.removeChild(s);
@@ -310,15 +310,15 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         }
     }
 
-    public class ReconnectSeriesAction extends ModelDrivenAction<ListSelectionActionModel<RemoteChartingTimeSeries>> {
+    public class ReconnectSeriesAction extends ModelDrivenAction<ListSelectionActionModel<ChartingTimeSeries>> {
 
-        public ReconnectSeriesAction(ListSelectionActionModel<RemoteChartingTimeSeries> seriesSelectionModel) {
+        public ReconnectSeriesAction(ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel) {
             super(seriesSelectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {
-            List<RemoteChartingTimeSeries> series = getActionModel().getSelected();
-            for ( RemoteChartingTimeSeries s : series) {
+            List<ChartingTimeSeries> series = getActionModel().getSelected();
+            for ( ChartingTimeSeries s : series) {
                 if ( s.isSeriesStale()) {
                     s.setSeriesStale(false);
                 }
@@ -327,7 +327,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         }
 
         protected boolean isModelStateActionable() {
-            for ( RemoteChartingTimeSeries s : getActionModel().getSelected()) {
+            for ( ChartingTimeSeries s : getActionModel().getSelected()) {
                 if (s.isSeriesStale() ) {
                     return true;
                 }

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -48,12 +48,12 @@ import java.util.ArrayList;
 public class TimeSeriesChart extends JPanel {
 
     private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
-            RemoteChartingTimeSeries.DISPLAY_NAME_PROPERTY,
-            RemoteChartingTimeSeries.COLOUR_PROPERTY
+            ChartingTimeSeries.DISPLAY_NAME_PROPERTY,
+            ChartingTimeSeries.COLOUR_PROPERTY
     };
 
     private String title;
-    private List<RemoteChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
+    private List<ChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
     private ChartPanel chartPanel;
     private JPanel noChartsPanel = new JPanel();
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
@@ -83,11 +83,11 @@ public class TimeSeriesChart extends JPanel {
         noChartsPanel.add(noSeriesLabel);
     }
 
-    public void setSeries(List<RemoteChartingTimeSeries> newSelection) {
+    public void setSeries(List<ChartingTimeSeries> newSelection) {
         removePropertyListener(this.timeSeriesList);
 
         //our own copy guaranteed to be RandomAccess list
-        newSelection = new ArrayList<RemoteChartingTimeSeries>(newSelection);
+        newSelection = new ArrayList<ChartingTimeSeries>(newSelection);
         addPropertyListener(newSelection);
         this.timeSeriesList = newSelection;
         if ( timeSeriesList.size() == 0) {
@@ -114,16 +114,16 @@ public class TimeSeriesChart extends JPanel {
         return chartBackgroundColor;
     }
 
-    private void addPropertyListener(List<RemoteChartingTimeSeries> newSelection) {
-        for ( RemoteChartingTimeSeries s : newSelection) {
+    private void addPropertyListener(List<ChartingTimeSeries> newSelection) {
+        for ( ChartingTimeSeries s : newSelection) {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.addPropertyChangeListener(property, refreshChartPropertyListener);
             }
         }
     }
 
-    private void removePropertyListener(List<RemoteChartingTimeSeries> timeSeriesList) {
-        for ( RemoteChartingTimeSeries s : timeSeriesList) {
+    private void removePropertyListener(List<ChartingTimeSeries> timeSeriesList) {
+        for ( ChartingTimeSeries s : timeSeriesList) {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.removePropertyChangeListener(property, refreshChartPropertyListener);
             }
@@ -173,7 +173,7 @@ public class TimeSeriesChart extends JPanel {
     private void addSeries(JFreeChart chart) {
         ChartSeriesPopulator c = new ChartSeriesPopulator(chart, chartRangeMode);
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
-            RemoteChartingTimeSeries series = timeSeriesList.get(loop);
+            ChartingTimeSeries series = timeSeriesList.get(loop);
             c.addSeriesToChart(series, loop);
         }
     }

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.selector;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.util.List;
 
@@ -30,6 +30,6 @@ import java.util.List;
  */
 public interface TimeSeriesSelectorListener {
 
-    void selectionChanged(List<RemoteChartingTimeSeries> newSelection);
+    void selectionChanged(List<ChartingTimeSeries> newSelection);
 
 }

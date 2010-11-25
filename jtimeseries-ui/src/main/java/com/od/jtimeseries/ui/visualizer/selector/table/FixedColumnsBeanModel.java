@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
 import com.jidesoft.grid.BeanTableModel;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -32,9 +32,9 @@ import java.beans.IntrospectionException;
  * Time: 18:17:43
  * To change this template use File | Settings | File Templates.
  */
-public class FixedColumnsBeanModel extends BeanTableModel<RemoteChartingTimeSeries> {
+public class FixedColumnsBeanModel extends BeanTableModel<ChartingTimeSeries> {
 
-    public FixedColumnsBeanModel(ArrayList<RemoteChartingTimeSeries> arrayList, Class<RemoteChartingTimeSeries> remoteChartingTimeSeriesClass) throws IntrospectionException {
+    public FixedColumnsBeanModel(ArrayList<ChartingTimeSeries> arrayList, Class<ChartingTimeSeries> remoteChartingTimeSeriesClass) throws IntrospectionException {
         super(arrayList, remoteChartingTimeSeriesClass, generateColumnConfigStringForBeanTableModel());
     }
 

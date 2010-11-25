@@ -138,14 +138,6 @@ public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
         return wrappedTimeSeries.contains(o);
     }
 
-    public synchronized boolean equals(Object o) {
-        return wrappedTimeSeries.equals(o);
-    }
-
-    public synchronized int hashCode() {
-        return wrappedTimeSeries.hashCode();
-    }
-
     public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
         return wrappedTimeSeries.getSubSeries(startTimestamp, endTimestamp);
     }
@@ -168,5 +160,24 @@ public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
 
     public synchronized long getTimestampBefore(long timestamp) {
         return wrappedTimeSeries.getTimestampBefore(timestamp);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractDelegatingTimeSeries that = (AbstractDelegatingTimeSeries) o;
+
+        if (wrappedTimeSeries != null ? !wrappedTimeSeries.equals(that.wrappedTimeSeries) : that.wrappedTimeSeries != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = wrappedTimeSeries != null ? wrappedTimeSeries.hashCode() : 0;
+        return result;
     }
 }

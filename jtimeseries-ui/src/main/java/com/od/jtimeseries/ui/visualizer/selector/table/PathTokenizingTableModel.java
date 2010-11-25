@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.util.List;
 
@@ -31,11 +31,11 @@ import java.util.List;
  *
  * A dynamic columns table model to show the elements of the context path as additional columns
  */
-public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteChartingTimeSeries> {
+public class PathTokenizingTableModel extends DynamicColumnsTableModel<ChartingTimeSeries> {
 
     private int maxPathElements;
 
-    public PathTokenizingTableModel(BeanPerRowModel<RemoteChartingTimeSeries> wrappedModel) {
+    public PathTokenizingTableModel(BeanPerRowModel<ChartingTimeSeries> wrappedModel) {
         super(wrappedModel);
         initialize();
     }
@@ -43,7 +43,7 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<RemoteCha
     protected boolean updateRequiresStructureChange(int firstRow, int lastRow) {
         int oldMax = maxPathElements;
         for ( int row = firstRow; row <= lastRow; row++) {
-            RemoteChartingTimeSeries s = getObject(row);
+            ChartingTimeSeries s = getObject(row);
             maxPathElements = Math.max(maxPathElements, s.getPathElements().size());
         }
         return oldMax != maxPathElements;

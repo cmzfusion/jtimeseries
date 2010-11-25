@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.context.ContextProperties;
 
 import java.util.*;
@@ -29,11 +29,11 @@ import java.util.*;
  * Date: 24-Feb-2010
  * Time: 17:30:29
  */
-public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChartingTimeSeries> {
+public class SummaryStatsTableModel extends DynamicColumnsTableModel<ChartingTimeSeries> {
 
     private List<String> propertyNamesList = new ArrayList<String>();
 
-    public SummaryStatsTableModel(BeanPerRowModel<RemoteChartingTimeSeries> wrappedModel) {
+    public SummaryStatsTableModel(BeanPerRowModel<ChartingTimeSeries> wrappedModel) {
         super(wrappedModel);
         initialize();
     }
@@ -55,7 +55,7 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<RemoteChart
 
     private void addSummaryColumns(int firstRow, int lastRow) {
         for ( int row = firstRow; row <= lastRow; row++) {
-            RemoteChartingTimeSeries s = getObject(row);
+            ChartingTimeSeries s = getObject(row);
             for ( Object prop : s.getProperties().keySet()) {
                 String propertyName = (String) prop;
                 if (! propertyNamesList.contains(propertyName)) {

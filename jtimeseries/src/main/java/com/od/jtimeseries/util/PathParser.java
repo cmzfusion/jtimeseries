@@ -1,5 +1,10 @@
 package com.od.jtimeseries.util;
 
+import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+
 /**
  * Created by IntelliJ IDEA.
 * User: Nick Ebbutt
@@ -58,5 +63,9 @@ public class PathParser {
 
     public boolean isEmpty() {
         return path.toString().trim().length() == 0;
+    }
+
+    public static LinkedList<String> splitPath(String path) {
+        return new LinkedList<String>(Arrays.asList(path.split(IdentifiableBase.NAMESPACE_REGEX_PATH_SEPARATOR)));
     }
 }

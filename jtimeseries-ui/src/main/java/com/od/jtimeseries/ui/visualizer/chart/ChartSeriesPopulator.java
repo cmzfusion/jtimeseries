@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.AxisLocation;
@@ -25,7 +26,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYDataset;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
 import com.od.jtimeseries.chart.TimeSeriesXYDataset;
 
@@ -54,7 +54,7 @@ public class ChartSeriesPopulator {
         this.plot = (XYPlot)chart.getPlot();
     }
 
-    public void addSeriesToChart(RemoteChartingTimeSeries contextTimeSeries, int seriesId) {
+    public void addSeriesToChart(ChartingTimeSeries contextTimeSeries, int seriesId) {
         XYDataset dataSet = createDataSet(contextTimeSeries);
         plot.setDataset(seriesId, dataSet);
         XYItemRenderer renderer2 = new StandardXYItemRenderer();
@@ -63,7 +63,7 @@ public class ChartSeriesPopulator {
         setSeriesColor(plot, seriesId, contextTimeSeries);
     }
 
-    private void createRangeAxes(RemoteChartingTimeSeries contextTimeSeries, int seriesId, XYPlot plot) {
+    private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int seriesId, XYPlot plot) {
         switch(chartRangeMode) {
             case RangePerSeries:
                 NumberAxis axis = new NumberAxis(contextTimeSeries.getDisplayName());
@@ -100,7 +100,7 @@ public class ChartSeriesPopulator {
         return axisIndexBySeriesId.get(id);
     }
 
-    private void setSeriesColor(XYPlot plot, int series, RemoteChartingTimeSeries remoteChartingTimeSeries) {
+    private void setSeriesColor(XYPlot plot, int series, ChartingTimeSeries remoteChartingTimeSeries) {
         Color seriesColor = remoteChartingTimeSeries.getColor();
         XYItemRenderer renderer = plot.getRenderer(series);
         renderer.setSeriesPaint(0, seriesColor);
@@ -111,7 +111,7 @@ public class ChartSeriesPopulator {
     }
 
 
-    private XYDataset createDataSet(RemoteChartingTimeSeries contextTimeSeries) {
+    private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
         TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(contextTimeSeries);
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
     }

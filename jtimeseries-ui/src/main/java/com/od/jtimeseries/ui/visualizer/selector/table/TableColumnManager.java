@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
@@ -38,10 +38,10 @@ import java.util.List;
 public class TableColumnManager {
 
     private TableColumnModel columnModel = new DefaultTableColumnModel();
-    private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
+    private BeanPerRowModel<ChartingTimeSeries> tableModel;
     private String selectionColumnName;
 
-    public TableColumnManager(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, String selectionColumnName) {
+    public TableColumnManager(BeanPerRowModel<ChartingTimeSeries> tableModel, String selectionColumnName) {
         this.tableModel = tableModel;
         this.selectionColumnName = selectionColumnName;
         setupDefaultColumns();

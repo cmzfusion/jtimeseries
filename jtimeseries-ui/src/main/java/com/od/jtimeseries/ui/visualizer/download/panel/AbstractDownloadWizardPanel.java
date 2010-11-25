@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.download.panel;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -59,7 +59,7 @@ public class AbstractDownloadWizardPanel extends JPanel {
     public static interface WizardPanelListener {
         void seriesLoaded();
 
-        void seriesSelected(List<RemoteChartingTimeSeries> selectedTimeSeries);
+        void seriesSelected(List<ChartingTimeSeries> selectedTimeSeries);
 
         void downloadCancelled();
     }

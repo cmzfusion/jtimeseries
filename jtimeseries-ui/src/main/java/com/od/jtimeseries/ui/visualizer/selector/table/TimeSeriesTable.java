@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.visualizer.selector.table;
 
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.AutoFilterTableHeader;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -36,10 +36,10 @@ import java.awt.*;
 class TimeSeriesTable extends SortableTable {
 
     private static final Color STALE_SERIES_COLOR = new Color(248,165,169);
-    private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
+    private BeanPerRowModel<ChartingTimeSeries> tableModel;
     private TableColumnManager columnManager;
 
-    public TimeSeriesTable(BeanPerRowModel<RemoteChartingTimeSeries> tableModel, TableColumnManager columnManager) {
+    public TimeSeriesTable(BeanPerRowModel<ChartingTimeSeries> tableModel, TableColumnManager columnManager) {
         super(tableModel);
         setColumnModel(columnManager.getColumnModel());
         this.tableModel = tableModel;

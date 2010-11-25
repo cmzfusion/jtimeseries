@@ -23,7 +23,6 @@ import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -44,9 +43,9 @@ import java.util.Properties;
 public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
     private List<TimeSeriesItem> itemsToAdd = new ArrayList<TimeSeriesItem>();
-    private RemoteChartingTimeSeries destinationSeries;
+    private RemoteHttpTimeSeries destinationSeries;
 
-    public DownloadRemoteTimeSeriesDataQuery(RemoteChartingTimeSeries destinationSeries, URL url) {
+    public DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries destinationSeries, URL url) {
         super(url);
         this.destinationSeries = destinationSeries;
     }

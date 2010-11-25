@@ -29,7 +29,7 @@ import com.od.jtimeseries.ui.visualizer.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.visualizer.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.visualizer.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.visualizer.selector.table.ColumnSettings;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
@@ -178,10 +178,6 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.setColumns(columnSettings);
     }
 
-    public static void setStartOfDayOffsetMinutes(int mins) {
-        RemoteChartingTimeSeries.setStartOfDayOffsetMinutes(mins);
-    }
-
     private void createToolbar() {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
@@ -213,7 +209,7 @@ public class TimeSeriesVisualizer extends JPanel {
         List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
         List<RemoteChartingTimeSeriesConfig> configs = new ArrayList<RemoteChartingTimeSeriesConfig>();
         for ( IdentifiableTimeSeries i : l ) {
-            configs.add(((RemoteChartingTimeSeries)i).getConfig());
+            configs.add(((ChartingTimeSeries)i).getConfig());
         }
         return configs;
     }
@@ -227,7 +223,7 @@ public class TimeSeriesVisualizer extends JPanel {
         for ( RemoteChartingTimeSeriesConfig c : configs) {
             TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
-                context.addChild(new RemoteChartingTimeSeries(c));
+                context.addChild(new ChartingTimeSeries(c));
             } catch (MalformedURLException e) {
                 logMethods.logError("Failed to reload time series with URL " + c.getTimeSeriesUrl() + " - bad URL", e);
             }
@@ -237,7 +233,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private void addSeriesSelectionListener() {
         seriesSelectionPanel.addSelectionListener(new TimeSeriesSelectorListener() {
 
-            public void selectionChanged(List<RemoteChartingTimeSeries> newSelection) {
+            public void selectionChanged(List<ChartingTimeSeries> newSelection) {
                 chart.setSeries(newSelection);
             }
         });

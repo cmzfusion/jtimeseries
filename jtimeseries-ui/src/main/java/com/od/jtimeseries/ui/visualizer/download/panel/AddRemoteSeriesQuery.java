@@ -19,10 +19,15 @@
 package com.od.jtimeseries.ui.visualizer.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartSeriesEvent;
+import com.od.jtimeseries.ui.timeseries.ChartSeriesListener;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.visualizer.download.panel.FindRemoteTimeSeriesQuery;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.net.URL;
 
@@ -54,15 +59,14 @@ public class AddRemoteSeriesQuery {
 
     private void createTimeSeries(FindRemoteTimeSeriesQuery.RemoteTimeSeries timeSeriesResult) {
         TimeSeriesContext c = parent.createContext(timeSeriesResult.getParentPath());
-        RemoteChartingTimeSeries series = new RemoteChartingTimeSeries(
-                timeSeriesResult.getId(),
-                timeSeriesResult.getDescription(),
-                timeSeriesResult.getSeriesURL(),
-                Time.minutes(5),
-                1
+        ChartingTimeSeries series = new ChartingTimeSeries(
+            new RemoteHttpTimeSeries(timeSeriesResult.getId(), timeSeriesResult.getDescription(), timeSeriesResult.getSeriesURL(), Time.minutes(1)),
+            new ChartSeriesListener() { //the http series will not listen, is just being used to store the url
+                public void chartSeriesChanged(ChartSeriesEvent chartSeriesEvent) {
+                }
+            }
         );
         series.putAllProperties(timeSeriesResult.getSummaryStatsProperties());
-        series.setNeverLoadRemoteSeriesData(true);
         c.addChild(series);
 
         //must do this after adding the series to the context because the contextPath will not

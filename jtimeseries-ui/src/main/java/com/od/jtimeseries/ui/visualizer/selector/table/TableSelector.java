@@ -22,8 +22,8 @@ import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.selector.shared.SelectorPanel;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.action.ListSelectionActionModel;
 
@@ -46,12 +46,12 @@ public class TableSelector extends SelectorPanel {
     private TimeSeriesContext rootContext;
     private java.util.List<Action> seriesActions;
     private String selectionText;
-    private BeanPerRowModel<RemoteChartingTimeSeries> tableModel;
+    private BeanPerRowModel<ChartingTimeSeries> tableModel;
     private SortableTable timeSeriesTable;
     private JPopupMenu tablePopupMenu;
     public TableColumnManager tableColumnManager;
 
-    public TableSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel,
+    public TableSelector(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel,
                          TimeSeriesContext rootContext,
                          java.util.List<Action> seriesActions,
                          String selectionText) {
@@ -105,7 +105,7 @@ public class TableSelector extends SelectorPanel {
                 public void valueChanged(ListSelectionEvent e) {
                     if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
                         int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),timeSeriesTable.getSelectedRow());
-                        RemoteChartingTimeSeries series = tableModel.getObject(modelRow);
+                        ChartingTimeSeries series = tableModel.getObject(modelRow);
                         getSeriesActionModel().setSelected(series);
                         fireSelectedForDescription(series);
                     }
@@ -117,17 +117,17 @@ public class TableSelector extends SelectorPanel {
     public void refreshSeries() {
         tableModel.clear();
         List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
-        List<RemoteChartingTimeSeries> timeSeries = new ArrayList<RemoteChartingTimeSeries>();
+        List<ChartingTimeSeries> timeSeries = new ArrayList<ChartingTimeSeries>();
         for ( IdentifiableTimeSeries i : l) {
-            if ( i instanceof RemoteChartingTimeSeries ) {
-                timeSeries.add((RemoteChartingTimeSeries)i);
+            if ( i instanceof ChartingTimeSeries) {
+                timeSeries.add((ChartingTimeSeries)i);
             }
         }
         tableModel.addObjects(timeSeries);
     }
 
-    public void removeSeries(java.util.List<RemoteChartingTimeSeries> series) {
-        for (RemoteChartingTimeSeries s : series ) {
+    public void removeSeries(java.util.List<ChartingTimeSeries> series) {
+        for (ChartingTimeSeries s : series ) {
             tableModel.removeObject(s);
         }
     }

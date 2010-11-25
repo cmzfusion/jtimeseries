@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.visualizer.displaypattern;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
         this.rootContext = rootContext;
     }
 
-    public void setDisplayName(RemoteChartingTimeSeries s) {
+    public void setDisplayName(ChartingTimeSeries s) {
         String path = s.getPath();
         String displayName = s.getId();
         for (DisplayNamePattern p : patternMap.keySet()) {
@@ -78,7 +78,7 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
     public void applyPatternsToAllTimeseries() {
         List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
         for ( IdentifiableTimeSeries i : l) {
-            setDisplayName((RemoteChartingTimeSeries)i);
+            setDisplayName((ChartingTimeSeries)i);
         }
     }
 

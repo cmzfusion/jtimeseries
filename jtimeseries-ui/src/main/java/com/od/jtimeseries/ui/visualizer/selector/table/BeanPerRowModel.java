@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import javax.swing.table.TableModel;
 import javax.swing.table.AbstractTableModel;
@@ -51,7 +51,7 @@ public interface BeanPerRowModel<E> extends TableModel {
     /**
      * Wrap the jide model as a BeanPerRowModel
      */
-    public static class JideBeanModelWrapper extends AbstractTableModel implements BeanPerRowModel<RemoteChartingTimeSeries>  {
+    public static class JideBeanModelWrapper extends AbstractTableModel implements BeanPerRowModel<ChartingTimeSeries>  {
 
         private FixedColumnsBeanModel wrappedModel;
 
@@ -94,7 +94,7 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.setValueAt(aValue, rowIndex, columnIndex);
         }
 
-        public RemoteChartingTimeSeries getObject(int row) {
+        public ChartingTimeSeries getObject(int row) {
             return wrappedModel.getObject(row);
         }
 
@@ -102,11 +102,11 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.clear();
         }
 
-        public void addObjects(List<RemoteChartingTimeSeries> timeSeries) {
+        public void addObjects(List<ChartingTimeSeries> timeSeries) {
             wrappedModel.addObjects(timeSeries);
         }
 
-        public void removeObject(RemoteChartingTimeSeries s) {
+        public void removeObject(ChartingTimeSeries s) {
             wrappedModel.removeObject(s);
         }
 

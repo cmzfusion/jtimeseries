@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.visualizer.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.selector.shared.SelectorPanel;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -50,7 +50,7 @@ public class TreeSelector extends SelectorPanel {
     private JTree tree;
     private Map<IdentifiableTimeSeries, SeriesTreeNode> seriesToNodeMap = new HashMap<IdentifiableTimeSeries, SeriesTreeNode>();
 
-    public TreeSelector(ListSelectionActionModel<RemoteChartingTimeSeries> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
+    public TreeSelector(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
         super(seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
@@ -146,8 +146,8 @@ public class TreeSelector extends SelectorPanel {
         }
     }
 
-    public void removeSeries(java.util.List<RemoteChartingTimeSeries> series) {
-        for ( RemoteChartingTimeSeries s : series) {
+    public void removeSeries(java.util.List<ChartingTimeSeries> series) {
+        for ( ChartingTimeSeries s : series) {
             SeriesTreeNode n = seriesToNodeMap.get(s);
             treeModel.removeNodeFromParent(n);
         }
@@ -163,7 +163,7 @@ public class TreeSelector extends SelectorPanel {
 
         List<IdentifiableTimeSeries> timeSeries = sort(context.getTimeSeries());
         for ( IdentifiableTimeSeries s : timeSeries) {
-            SeriesTreeNode node = new SeriesTreeNode((RemoteChartingTimeSeries)s);
+            SeriesTreeNode node = new SeriesTreeNode((ChartingTimeSeries)s);
             seriesToNodeMap.put(s, node);
             n.add(node);
         }
@@ -231,8 +231,8 @@ public class TreeSelector extends SelectorPanel {
 
     //get the display name for an identifiable in the context tree
     private String getDisplayName(Identifiable i) {
-        if ( i instanceof RemoteChartingTimeSeries ) {
-            return ((RemoteChartingTimeSeries)i).getDisplayName();
+        if ( i instanceof ChartingTimeSeries) {
+            return ((ChartingTimeSeries)i).getDisplayName();
         } else {
             return i.getId();
         }
@@ -245,9 +245,9 @@ public class TreeSelector extends SelectorPanel {
 
     private static class SeriesTreeNode extends AbstractSeriesSelectionTreeNode {
 
-        private RemoteChartingTimeSeries series;
+        private ChartingTimeSeries series;
 
-        public SeriesTreeNode(RemoteChartingTimeSeries series) {
+        public SeriesTreeNode(ChartingTimeSeries series) {
             this.series = series;
         }
 
@@ -255,7 +255,7 @@ public class TreeSelector extends SelectorPanel {
             return series.toString();
         }
 
-        public RemoteChartingTimeSeries getTimeSeries() {
+        public ChartingTimeSeries getTimeSeries() {
             return series;
         }
 
@@ -299,7 +299,7 @@ public class TreeSelector extends SelectorPanel {
 
             Object o = path.getLastPathComponent();
             if ( o instanceof SeriesTreeNode) {
-                RemoteChartingTimeSeries m = ((SeriesTreeNode)o).getTimeSeries();
+                ChartingTimeSeries m = ((SeriesTreeNode)o).getTimeSeries();
                 m.setSelected(! m.isSelected());
                 tree.repaint();
             }

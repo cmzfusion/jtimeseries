@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
@@ -32,18 +32,18 @@ import java.util.ArrayList;
  */
 public class TableModelCreator {
 
-    public BeanPerRowModel<RemoteChartingTimeSeries> createTableModel() {
+    public BeanPerRowModel<ChartingTimeSeries> createTableModel() {
         FixedColumnsBeanModel beanTableModel = null;
         try {
-            beanTableModel = new FixedColumnsBeanModel(new ArrayList<RemoteChartingTimeSeries>(), RemoteChartingTimeSeries.class);
+            beanTableModel = new FixedColumnsBeanModel(new ArrayList<ChartingTimeSeries>(), ChartingTimeSeries.class);
         } catch (IntrospectionException e) {
             e.printStackTrace();
         }
 
-        BeanPerRowModel<RemoteChartingTimeSeries> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper(beanTableModel);
+        BeanPerRowModel<ChartingTimeSeries> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper(beanTableModel);
         PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(modelWrapper);
         SummaryStatsTableModel summaryStatsTableModel = new SummaryStatsTableModel(pathTokenizingTableModel);
-        return new EditableColumnsTableModel<RemoteChartingTimeSeries>(summaryStatsTableModel);
+        return new EditableColumnsTableModel<ChartingTimeSeries>(summaryStatsTableModel);
     }
 
 }

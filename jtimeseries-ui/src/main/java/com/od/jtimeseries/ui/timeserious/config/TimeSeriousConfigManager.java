@@ -41,8 +41,8 @@ public class TimeSeriousConfigManager {
             createConfigManager();
             try {
                 result = configManager.loadConfig(MAIN_CONFIG_NAME);
-            } catch (NoConfigFoundException n) {
-                logMethods.logWarning("Could not load config " + MAIN_CONFIG_NAME + ", will use default config");
+            } catch (ConfigManagerException n) {
+                logMethods.logWarning("Could not load config " + MAIN_CONFIG_NAME + ", will use default config", n);
             }
         }
         return result;

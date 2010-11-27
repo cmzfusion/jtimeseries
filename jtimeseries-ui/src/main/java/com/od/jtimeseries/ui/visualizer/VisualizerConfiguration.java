@@ -18,10 +18,10 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
-import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayNamePattern;
+import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
-import com.od.jtimeseries.ui.visualizer.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 
 import java.util.List;
 import java.util.ArrayList;

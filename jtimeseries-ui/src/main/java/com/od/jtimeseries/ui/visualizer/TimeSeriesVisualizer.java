@@ -23,13 +23,13 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
-import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayNamePattern;
-import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayPatternDialog;
-import com.od.jtimeseries.ui.visualizer.displaypattern.EditDisplayNamePatternsAction;
-import com.od.jtimeseries.ui.visualizer.download.ShowDownloadSeriesDialogAction;
-import com.od.jtimeseries.ui.visualizer.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.visualizer.selector.TimeSeriesSelectorListener;
-import com.od.jtimeseries.ui.visualizer.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
+import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
+import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
+import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -183,11 +183,11 @@ public class TimeSeriesVisualizer extends JPanel {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
             new ShowDownloadSeriesDialogAction(
-                    seriesSelectionPanel,
-                    rootContext,
-                    timeSeriesServerDictionary,
-                    editDisplayNameAction.getDisplayNameCalculator(),
-                    this
+                seriesSelectionPanel,
+                new AddToRootContextSelectionHandler(),
+                timeSeriesServerDictionary,
+                editDisplayNameAction.getDisplayNameCalculator(),
+                this
             )
         ));
         toolbar.add(Box.createHorizontalStrut(5));
@@ -241,4 +241,17 @@ public class TimeSeriesVisualizer extends JPanel {
         });
     }
 
+    private class AddToRootContextSelectionHandler implements ShowDownloadSeriesDialogAction.SeriesSelectionHandler {
+
+        public void seriesSelected(List<ChartingTimeSeries> selectedTimeSeries) {
+            for ( IdentifiableTimeSeries s : selectedTimeSeries) {
+                TimeSeriesContext c = rootContext.createContext(s.getParentPath());
+
+                //TODO we may want to flag the conflict up to the user
+                if ( ! c.containsChildWithId(s.getId())) {
+                    c.addChild(s);
+                }
+            }
+        }
+    }
 }

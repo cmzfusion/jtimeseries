@@ -39,10 +39,9 @@ public enum FixedColumns {
     Selected("selected", "Selected", 110, true, "Select a series"),
     DisplayName("displayName", "Display Name", 175, true, "Name to use when displaying series in chart"),
     Id("id", "Id", 150, false, "Series ID"),
-    MaxDaysHistory("maxDaysHistory", "Max Days", 120, true, "Maximum number of days of data to display in chart"),
     RefreshTimeSeconds("refreshTimeSeconds", "Refresh(s)", 120, true, "Frequency of series data refresh"),
     Path("path", "Path", 120, false, "Full path identifying series"),
-    Url("URL", "URL", 120, false, "URL for series data subscription"),
+    Url("timeSeriesURL", "URL", 120, false, "URL for series data subscription"),
     LastRefreshTime("lastRefreshTime", "Last Refresh", 120, new TimeRenderer(), false, "Last series data refresh time"),
     Color("color", "Colour", 110, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
 

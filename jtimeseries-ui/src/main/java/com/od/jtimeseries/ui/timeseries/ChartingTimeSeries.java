@@ -20,9 +20,10 @@ package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.PathParser;
-import com.od.jtimeseries.util.logging.LogUtils;
-import com.od.jtimeseries.util.logging.LogMethods;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.List;
 import java.util.Date;
 import java.awt.*;
@@ -37,10 +38,7 @@ import java.awt.*;
  */
 public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries implements IdentifiableTimeSeries {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
-
     public static final String SELECTED_PROPERTY = "selected";
-    public static final String SERIES_STALE_PROPERTY = "seriesStale";
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
     public static final String COLOUR_PROPERTY = "color";
 
@@ -50,13 +48,32 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     private List<String> pathElements;
     private String displayName;
     private Color color = colorRotator.getNextColor();
-    private volatile boolean seriesStale = false;
-    private Date lastRefreshTime;
-    private ChartSeriesListener chartSeriesListener;
+    private RemoteHttpTimeSeries wrappedSeries;
 
-    public ChartingTimeSeries(IdentifiableTimeSeries wrappedSeries, ChartSeriesListener chartSeriesListener) {
+    public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries) {
         super(wrappedSeries);
-        this.chartSeriesListener = chartSeriesListener;
+        this.wrappedSeries = wrappedSeries;
+        addPropertyListeners();
+    }
+
+    public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries, RemoteChartingTimeSeriesConfig c) {
+        super(wrappedSeries);
+        this.wrappedSeries = wrappedSeries;
+        setDisplayName(c.getDisplayName());
+        setColor(c.getColor());
+        setSelected(c.isSelected());
+    }
+
+    private void addPropertyListeners() {
+        //listen to and propagate the change events from wrapped series
+        addPropertyListener(RemoteHttpTimeSeries.URL_PROPERTY_NAME);
+        addPropertyListener(RemoteHttpTimeSeries.LAST_REFRESH_TIME_PROPERTY);
+        addPropertyListener(RemoteHttpTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
+        addPropertyListener(RemoteHttpTimeSeries.SERIES_STALE_PROPERTY);
+    }
+
+    private void addPropertyListener(String propertyName) {
+        wrappedSeries.addPropertyChangeListener(propertyName, new WrappedSeriesPropertyChangeListener(propertyName));
     }
 
     public String getDisplayName() {
@@ -72,15 +89,6 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
     }
 
-    public boolean isSeriesStale() {
-        return seriesStale;
-    }
-
-    public void setSeriesStale(boolean seriesStale) {
-        boolean oldValue = this.seriesStale;
-        this.seriesStale = seriesStale;
-        firePropertyChange(SERIES_STALE_PROPERTY, oldValue, this.seriesStale);
-    }
 
     public boolean isSelected() {
         return selected;
@@ -89,7 +97,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     public void setSelected(boolean selected) {
         boolean oldValue = this.selected;
         this.selected = selected;
-        chartSeriesListener.chartSeriesChanged(
+        wrappedSeries.chartSeriesChanged(
             new ChartSeriesEvent(this,
                 selected ?
                 ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_DISPLAYED :
@@ -97,16 +105,6 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
             )
         );
         firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
-    }
-
-    public Date getLastRefreshTime() {
-        return lastRefreshTime;
-    }
-
-    public void setLastRefreshTime(Date time) {
-        Date oldValue = lastRefreshTime;
-        this.lastRefreshTime = time;
-        firePropertyChange("lastRefreshTime", oldValue, time);
     }
 
     public Color getColor() {
@@ -119,10 +117,68 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         firePropertyChange(COLOUR_PROPERTY, oldValue, color);
     }
 
+    public URL getTimeSeriesURL() {
+        return wrappedSeries.getTimeSeriesURL();
+    }
+
+    public void getTimeSeriesURL(URL url) {
+        wrappedSeries.setTimeSeriesURL(url);
+    }
+
+    public boolean isSeriesStale() {
+        return wrappedSeries.isSeriesStale();
+    }
+
+    public void setSeriesStale(boolean seriesStale) {
+        wrappedSeries.setSeriesStale(seriesStale);
+    }
+
+    public int getRefreshTimeSeconds() {
+        return wrappedSeries.getRefreshTimeSeconds();
+    }
+
+    public void setLastRefreshTime(Date time) {
+        wrappedSeries.setLastRefreshTime(time);
+    }
+
+    public Date getLastRefreshTime() {
+        return wrappedSeries.getLastRefreshTime();
+    }
+
+    public void setRefreshTimeSeconds(int refreshTimeSeconds) {
+        wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
+    }
+
     public List<String> getPathElements() {
         if ( pathElements == null) {
             pathElements = PathParser.splitPath(getParentPath());
         }
         return pathElements;
+    }
+
+    public RemoteChartingTimeSeriesConfig getConfig() {
+        return new RemoteChartingTimeSeriesConfig(
+            getParentPath(),
+            getId(),
+            getDescription(),
+            getTimeSeriesURL().toExternalForm(),
+            getRefreshTimeSeconds(),
+            isSelected(), 
+            getDisplayName(),
+            getColor()
+        );
+    }
+
+    private class WrappedSeriesPropertyChangeListener implements PropertyChangeListener {
+
+        private String propertyName;
+
+        public WrappedSeriesPropertyChangeListener(String propertyName) {
+            this.propertyName = propertyName;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            firePropertyChange(propertyName, evt.getOldValue(), evt.getNewValue());
+        }
     }
 }

@@ -32,7 +32,6 @@ public class RemoteChartingTimeSeriesConfig {
     private String description;
     private String timeSeriesUrl;
     private int refreshTimeSeconds;
-    private int maxDaysHistory;
     private boolean selected;
     private String displayName;
     private Color color;
@@ -40,13 +39,12 @@ public class RemoteChartingTimeSeriesConfig {
     //no params constructor required for bean xml persistence
     public RemoteChartingTimeSeriesConfig() {}
 
-    public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, int maxDaysHistory, boolean selected, String displayName, Color color) {
+    public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, boolean selected, String displayName, Color color) {
         this.parentPath = parentPath;
         this.id = id;
         this.description = description;
         this.timeSeriesUrl = timeSeriesUrl;
         this.refreshTimeSeconds = refreshTimeSeconds;
-        this.maxDaysHistory = maxDaysHistory;
         this.selected = selected;
         this.displayName = displayName;
         this.color = color;
@@ -66,10 +64,6 @@ public class RemoteChartingTimeSeriesConfig {
 
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         this.refreshTimeSeconds = refreshTimeSeconds;
-    }
-
-    public void setMaxDaysHistory(int maxDaysHistory) {
-        this.maxDaysHistory = maxDaysHistory;
     }
 
     public void setSelected(boolean selected) {
@@ -94,10 +88,6 @@ public class RemoteChartingTimeSeriesConfig {
 
     public int getRefreshTimeSeconds() {
         return refreshTimeSeconds;
-    }
-
-    public int getMaxDaysHistory() {
-        return maxDaysHistory;
     }
 
     public boolean isSelected() {

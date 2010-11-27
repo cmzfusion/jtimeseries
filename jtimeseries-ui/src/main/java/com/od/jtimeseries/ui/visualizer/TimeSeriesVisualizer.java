@@ -22,6 +22,7 @@ import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.visualizer.displaypattern.DisplayPatternDialog;
 import com.od.jtimeseries.ui.visualizer.displaypattern.EditDisplayNamePatternsAction;
@@ -223,7 +224,8 @@ public class TimeSeriesVisualizer extends JPanel {
         for ( RemoteChartingTimeSeriesConfig c : configs) {
             TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
-                context.addChild(new ChartingTimeSeries(c));
+                RemoteHttpTimeSeries remoteHttpTimeSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(c);
+                context.addChild(new ChartingTimeSeries(remoteHttpTimeSeries, c));
             } catch (MalformedURLException e) {
                 logMethods.logError("Failed to reload time series with URL " + c.getTimeSeriesUrl() + " - bad URL", e);
             }

@@ -28,10 +28,8 @@ import swingcommand.SwingCommand;
 import swingcommand.Task;
 import swingcommand.TaskListenerAdapter;
 
-import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -56,6 +54,9 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
 
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
     public static final String SERIES_STALE_PROPERTY = "seriesStale";
+    public static final String LAST_REFRESH_TIME_PROPERTY = "lastRefreshTime";
+    public static final String REFRESH_TIME_SECONDS_PROPERTY = "refreshTimeSeconds";
+    public static final String URL_PROPERTY_NAME = "timeSeriesURL";
 
     private static ScheduledExecutorService refreshExecutor = Executors.newSingleThreadScheduledExecutor();
     private static final int STATS_ONLY_REFRESH_TIME_SECONDS = 60 * 30;
@@ -66,7 +67,6 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
     private volatile int refreshTimeSeconds;
     private String displayName;
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
-    private boolean neverRefresh;
     private Date lastRefreshTime;
     private volatile int displayedChartCount;
 
@@ -75,19 +75,26 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
     private volatile boolean seriesStale = false;
 
-    public RemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
+
+    private RemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()));
         this.displayName = config.getDisplayName();
     }
 
-    public RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
+    private RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
         super(id, description);
         this.timeSeriesUrl = timeSeriesUrl;
         this.refreshTimeSeconds = Math.max((int)(refreshTime.getLengthInMillis() / 1000), 10);
     }
 
-    public URL getURL() {
+    public URL getTimeSeriesURL() {
         return timeSeriesUrl;
+    }
+
+    public void setTimeSeriesURL(URL url) {
+        URL oldValue = this.timeSeriesUrl;
+        timeSeriesUrl = url;
+        firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
     }
 
     public String getDisplayName() {
@@ -100,7 +107,7 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
     public void setDisplayName(String displayName) {
         String oldValue = this.displayName;
         this.displayName = displayName;
-        firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
+        firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, displayName);
     }
 
     public boolean isSeriesStale() {
@@ -113,7 +120,7 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         if (! seriesStale) {
             errorCount = 0;
         }
-        firePropertyChange(SERIES_STALE_PROPERTY, oldValue, this.seriesStale);
+        firePropertyChange(SERIES_STALE_PROPERTY, oldValue, seriesStale);
     }
 
     public int getRefreshTimeSeconds() {
@@ -124,8 +131,8 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         long oldValue = this.refreshTimeSeconds;
         this.refreshTimeSeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
         logMethods.logInfo("Changing refresh time for series " + getId() + " to " + refreshTimeSeconds + " seconds");
-        scheduleRefreshTask();
-        firePropertyChange("refreshTimeSeconds", oldValue, this.refreshTimeSeconds);
+        scheduleRefresh();
+        firePropertyChange(REFRESH_TIME_SECONDS_PROPERTY, oldValue, refreshTimeSeconds);
     }
 
     public Date getLastRefreshTime() {
@@ -135,19 +142,11 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
     public void setLastRefreshTime(Date time) {
         Date oldValue = lastRefreshTime;
         this.lastRefreshTime = time;
-        firePropertyChange("lastRefreshTime", oldValue, time);
-    }
-
-    /**
-     * Set this timeseries so that the load data task will never run
-     * this is somtimes useful when using the series as a placeholder to represent a timeseries on a remote server only
-     */
-    public void setNeverLoadRemoteSeriesData(boolean neverRefresh) {
-        this.neverRefresh = neverRefresh;
+        firePropertyChange(LAST_REFRESH_TIME_PROPERTY, oldValue, time);
     }
 
     //Cancel any existing task and schedule a new one if series selected
-    private void scheduleRefreshTask() {
+    private void scheduleRefresh() {
         if ( refreshTask != null ) {
             refreshTask.cancel(false);
         }
@@ -159,25 +158,27 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         };
 
         //if the user has not selected to chart the series, we only refresh the stats, and much less frequently
-        int refreshTime = (displayedChartCount == 0) ? this.refreshTimeSeconds : STATS_ONLY_REFRESH_TIME_SECONDS;
-        if ( ! neverRefresh) {
-            refreshTask = refreshExecutor.scheduleAtFixedRate(
-                runCommandTask, 0, refreshTime, TimeUnit.SECONDS
-            );
-        }
+        int refreshTime = (displayedChartCount > 0) ? this.refreshTimeSeconds : STATS_ONLY_REFRESH_TIME_SECONDS;
+        refreshTask = refreshExecutor.scheduleAtFixedRate(
+            runCommandTask, 0, refreshTime, TimeUnit.SECONDS
+        );
     }
 
     public void chartSeriesChanged(ChartSeriesEvent e) {
         switch(e.getChartSeriesEventType()) {
             case SERIES_CHART_DISPLAYED:
                 displayedChartCount++;
+                if ( displayedChartCount == 1) {
+                    scheduleRefresh(); //may want to increase refresh rate
+                }
                 break;
             case SERIES_CHART_HIDDEN:
-                displayedChartCount--;
+                displayedChartCount = Math.max(0, displayedChartCount - 1);
                 break;
             default:
         }
     }
+
 
     private class RefreshDataCommand extends SwingCommand {
 
@@ -225,6 +226,20 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
                 setSeriesStale(true);
             }
         }
+    }
+
+    //Factory methods to construct, ensuring refresh is also scheduled after construction
+
+    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
+        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(id, description, timeSeriesUrl, refreshTime);
+        r.scheduleRefresh();
+        return r;
+    }
+
+    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
+        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
+        r.scheduleRefresh();
+        return r;
     }
 
 }

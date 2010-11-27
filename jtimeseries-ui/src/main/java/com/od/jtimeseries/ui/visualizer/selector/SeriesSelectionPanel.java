@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer.selector;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.visualizer.selector.shared.*;
 import com.od.jtimeseries.ui.visualizer.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.visualizer.selector.table.TableSelector;
@@ -61,7 +62,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private JPanel selectorPanel;
     private Box titleBox;
     private CardLayout cardLayout;
-    private DiscriptionListener descriptionSettingSelectorListener = new DiscriptionListener();
+    private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
     private List<ChartingTimeSeries> timeSeries = new ArrayList<ChartingTimeSeries>();
     private ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel = new ListSelectionActionModel<ChartingTimeSeries>();
     private RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
@@ -219,7 +220,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
             );
 
             r.addPropertyChangeListener(
-                    ChartingTimeSeries.SERIES_STALE_PROPERTY,
+                    RemoteHttpTimeSeries.SERIES_STALE_PROPERTY,
                     seriesConnectionPropertyListener
             );
         }
@@ -266,7 +267,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         cardLayout.show(selectorPanel, "tree");
     }
 
-    private class DiscriptionListener extends SelectorPanel.SelectorPanelListenerAdapter {
+    private class DescriptionListener extends SelectorPanel.SelectorPanelListenerAdapter {
 
         public void seriesSelectedForDescription(IdentifiableTimeSeries s) {
             seriesDescriptionPanel.setSelectedSeries(s);

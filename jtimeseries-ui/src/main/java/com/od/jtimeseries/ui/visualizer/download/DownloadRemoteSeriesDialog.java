@@ -95,19 +95,9 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         for ( IdentifiableTimeSeries s : selectedTimeSeries) {
             TimeSeriesContext c = contextToReceiveSeries.createContext(s.getParentPath());
 
-            ChartingTimeSeries remoteSeries = (ChartingTimeSeries)s;
-
             //TODO we may want to flag the conflict up to the user
             if ( ! c.containsChildWithId(s.getId())) {
-                ChartingTimeSeries newLocalSeries = new ChartingTimeSeries(
-                        remoteSeries.getId(),
-                        remoteSeries.getDescription(),
-                        ((ChartingTimeSeries) s).getURL(),
-                        Time.seconds(remoteSeries.getRefreshTimeSeconds()),
-                );
-                newLocalSeries.putAllProperties(remoteSeries.getProperties());
-                newLocalSeries.setDisplayName(remoteSeries.getDisplayName());
-                c.addChild(newLocalSeries);
+                c.addChild(s);
             }
         }
     }

@@ -18,7 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import java.util.List;
 
@@ -28,17 +29,17 @@ import java.util.List;
  * Date: 06-Jan-2009
  * Time: 17:49:42
  */
-public interface SelectionManager {
+public interface SelectionManager<E extends UIPropertiesTimeSeries> {
     
-    List<ChartingTimeSeries> getSelectedTimeSeries();
+    List<E> getSelectedTimeSeries();
 
-    void addSelectionListener(TimeSeriesSelectorListener l);
+    void addSelectionListener(TimeSeriesSelectorListener<E> l);
 
-    void removeSelectionListener(TimeSeriesSelectorListener l);
+    void removeSelectionListener(TimeSeriesSelectorListener<E> l);
 
-    void addSelection(ChartingTimeSeries s);
+    void addSelection(E s);
 
-    void removeSelection(ChartingTimeSeries s);
+    void removeSelection(E s);
 
-    void setSelectedTimeSeries(List<ChartingTimeSeries> selections);
+    void setSelectedTimeSeries(List<E> selections);
 }

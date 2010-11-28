@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.TitleLabelPanel;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +43,7 @@ public class SeriesDescriptionPanel extends TitleLabelPanel {
         add(descriptionScrollPane, BorderLayout.CENTER);
     }
 
-    public void setSelectedSeries(IdentifiableTimeSeries s) {
+    public void setSelectedSeries(UIPropertiesTimeSeries s) {
         if ( s != null) {
             description.setText("<html><body>" +
                     "<table><tr><th align='left'><font color='navy'>" + s.getId().trim() + "</font></th></tr>" +

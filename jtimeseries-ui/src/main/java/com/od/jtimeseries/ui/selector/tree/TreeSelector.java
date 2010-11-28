@@ -20,9 +20,10 @@ package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 
@@ -42,15 +43,15 @@ import java.util.List;
 * Date: 07-Jan-2009
 * Time: 10:56:35
 */
-public class TreeSelector extends SelectorPanel {
+public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPanel<E> {
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
     private List<Action> seriesActions;
     private JTree tree;
-    private Map<IdentifiableTimeSeries, SeriesTreeNode> seriesToNodeMap = new HashMap<IdentifiableTimeSeries, SeriesTreeNode>();
+    private Map<UIPropertiesTimeSeries, SeriesTreeNode> seriesToNodeMap = new HashMap<UIPropertiesTimeSeries, SeriesTreeNode>();
 
-    public TreeSelector(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
+    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
         super(seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
@@ -140,14 +141,14 @@ public class TreeSelector extends SelectorPanel {
 
     private void ensureSelectedNodesVisible() {
         for ( SeriesTreeNode n : seriesToNodeMap.values()) {
-            if ( n.getTimeSeries().isSelected()) {
+            if ( ((UIPropertiesTimeSeries)n.getTimeSeries()).isSelected()) {
                 tree.expandPath(new TreePath(n.getPath()).getParentPath());
             }
         }
     }
 
-    public void removeSeries(java.util.List<ChartingTimeSeries> series) {
-        for ( ChartingTimeSeries s : series) {
+    public void removeSeries(java.util.List<E> series) {
+        for ( E s : series) {
             SeriesTreeNode n = seriesToNodeMap.get(s);
             treeModel.removeNodeFromParent(n);
         }
@@ -163,8 +164,8 @@ public class TreeSelector extends SelectorPanel {
 
         List<IdentifiableTimeSeries> timeSeries = sort(context.getTimeSeries());
         for ( IdentifiableTimeSeries s : timeSeries) {
-            SeriesTreeNode node = new SeriesTreeNode((ChartingTimeSeries)s);
-            seriesToNodeMap.put(s, node);
+            SeriesTreeNode node = new SeriesTreeNode<E>((E)s);
+            seriesToNodeMap.put((E)s, node);
             n.add(node);
         }
         return n;
@@ -178,21 +179,6 @@ public class TreeSelector extends SelectorPanel {
             }
         });
         return identifiables;
-    }
-
-    /**
-     * @return ContextTimeSeries selected in the tree, or null if no time series is selected
-     */
-    public IdentifiableTimeSeries getSelectedSeries() {
-        IdentifiableTimeSeries result = null;
-        TreePath p = tree.getSelectionPath();
-        if ( p != null ) {
-            Object o = p.getLastPathComponent();
-            if ( o instanceof SeriesTreeNode) {
-                result = ((SeriesTreeNode)o).getTimeSeries();
-            }
-        }
-        return result;
     }
 
     public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
@@ -214,8 +200,11 @@ public class TreeSelector extends SelectorPanel {
                 removeAll();
                 if ( value instanceof SeriesTreeNode ) {
                     SeriesTreeNode seriesNode = (SeriesTreeNode)value;
-                    seriesSelectionCheckbox.setSelected(seriesNode.getTimeSeries().isSelected());
-                    delegateRenderer.setText(getDisplayName(((SeriesTreeNode)value).getTimeSeries()));
+                    Object timeSeries = seriesNode.getTimeSeries();
+                    if ( timeSeries instanceof UIPropertiesTimeSeries) {
+                        seriesSelectionCheckbox.setSelected(((UIPropertiesTimeSeries)timeSeries).isSelected());
+                    }
+                    delegateRenderer.setText(getDisplayName(((SeriesTreeNode<E>)value).getTimeSeries()));
                     add(seriesSelectionCheckbox, BorderLayout.WEST);
                     add(delegateRenderer, BorderLayout.CENTER);
                 } else {
@@ -243,11 +232,11 @@ public class TreeSelector extends SelectorPanel {
         protected abstract Icon getIcon();
     }
 
-    private static class SeriesTreeNode extends AbstractSeriesSelectionTreeNode {
+    private static class SeriesTreeNode<E> extends AbstractSeriesSelectionTreeNode {
 
-        private ChartingTimeSeries series;
+        private E series;
 
-        public SeriesTreeNode(ChartingTimeSeries series) {
+        public SeriesTreeNode(E series) {
             this.series = series;
         }
 
@@ -255,7 +244,7 @@ public class TreeSelector extends SelectorPanel {
             return series.toString();
         }
 
-        public ChartingTimeSeries getTimeSeries() {
+        public E getTimeSeries() {
             return series;
         }
 
@@ -286,7 +275,7 @@ public class TreeSelector extends SelectorPanel {
     }
 
 
-    private class SeriesSelectionMouseListener extends MouseAdapter {
+    private class SeriesSelectionMouseListener<E> extends MouseAdapter {
 
         private  int hotspot = new JCheckBox().getPreferredSize().width;
 
@@ -299,8 +288,11 @@ public class TreeSelector extends SelectorPanel {
 
             Object o = path.getLastPathComponent();
             if ( o instanceof SeriesTreeNode) {
-                ChartingTimeSeries m = ((SeriesTreeNode)o).getTimeSeries();
-                m.setSelected(! m.isSelected());
+                E m = ((SeriesTreeNode<E>)o).getTimeSeries();
+                if ( m instanceof UIPropertiesTimeSeries) {
+                    UIPropertiesTimeSeries s = (UIPropertiesTimeSeries)m;
+                    s.setSelected(!s.isSelected());
+                }
                 tree.repaint();
             }
         }
@@ -311,8 +303,8 @@ public class TreeSelector extends SelectorPanel {
         public void valueChanged(TreeSelectionEvent e) {
             Object o = e.getPath().getLastPathComponent();
             if ( o instanceof SeriesTreeNode ) {
-                getSeriesActionModel().setSelected(((SeriesTreeNode)o).getTimeSeries());
-                fireSelectedForDescription(((SeriesTreeNode)o).getTimeSeries());
+                getSeriesActionModel().setSelected(((SeriesTreeNode<E>)o).getTimeSeries());
+                fireSelectedForDescription(((SeriesTreeNode<E>)o).getTimeSeries());
             } else if ( o instanceof ContextTreeNode ) {
                 fireSelectedForDescription(((ContextTreeNode)o).getContext());
             }

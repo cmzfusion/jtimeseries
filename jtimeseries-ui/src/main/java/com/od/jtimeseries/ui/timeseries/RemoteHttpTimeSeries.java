@@ -48,12 +48,11 @@ import java.util.concurrent.TimeUnit;
  * to be called on the AWT only, and so there is no need for extra synchronization here. Furthermore property change
  * events should only be fired on the AWT
  */
-public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements ChartSeriesListener {
+public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements ChartSeriesListener, UIPropertiesTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
-    public static final String SERIES_STALE_PROPERTY = "seriesStale";
     public static final String LAST_REFRESH_TIME_PROPERTY = "lastRefreshTime";
     public static final String REFRESH_TIME_SECONDS_PROPERTY = "refreshTimeSeconds";
     public static final String URL_PROPERTY_NAME = "timeSeriesURL";
@@ -69,12 +68,12 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
     private Date lastRefreshTime;
     private volatile int displayedChartCount;
+    private boolean selected;
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private volatile int errorCount;
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
-    private volatile boolean seriesStale = false;
-
+    private volatile boolean stale = false;
 
     private RemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()));
@@ -110,17 +109,17 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, displayName);
     }
 
-    public boolean isSeriesStale() {
-        return seriesStale;
+    public boolean isStale() {
+        return stale;
     }
 
-    public void setSeriesStale(boolean seriesStale) {
-        boolean oldValue = this.seriesStale;
-        this.seriesStale = seriesStale;
-        if (! seriesStale) {
+    public void setStale(boolean stale) {
+        boolean oldValue = this.stale;
+        this.stale = stale;
+        if (!stale) {
             errorCount = 0;
         }
-        firePropertyChange(SERIES_STALE_PROPERTY, oldValue, seriesStale);
+        firePropertyChange(STALE_PROPERTY, oldValue, stale);
     }
 
     public int getRefreshTimeSeconds() {
@@ -143,6 +142,16 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         Date oldValue = lastRefreshTime;
         this.lastRefreshTime = time;
         firePropertyChange(LAST_REFRESH_TIME_PROPERTY, oldValue, time);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        boolean oldValue = this.selected;
+        this.selected = selected;
+        firePropertyChange(UIPropertiesTimeSeries.SELECTED_PROPERTY, oldValue, selected);
     }
 
     //Cancel any existing task and schedule a new one if series selected
@@ -192,7 +201,7 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         protected Task createTask() {
             return new BackgroundTask() {
                 protected void doInBackground() throws Exception {
-                    if ( ! isSeriesStale() ) {
+                    if ( ! isStale() ) {
                         URL urlForQuery = getUrlWithTimestamp();
                         new DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries.this, urlForQuery).runQuery();
                     }
@@ -223,7 +232,7 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         public void error(Task task, Throwable error) {
             errorCount++;
             if ( errorCount >= MAX_ERRORS_BEFORE_DISCONNECT) {
-                setSeriesStale(true);
+                setStale(true);
             }
         }
     }

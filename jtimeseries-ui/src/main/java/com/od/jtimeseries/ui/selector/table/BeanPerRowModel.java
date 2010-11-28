@@ -18,12 +18,10 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-
-import javax.swing.table.TableModel;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
 import java.util.List;
 
 /**
@@ -51,11 +49,11 @@ public interface BeanPerRowModel<E> extends TableModel {
     /**
      * Wrap the jide model as a BeanPerRowModel
      */
-    public static class JideBeanModelWrapper extends AbstractTableModel implements BeanPerRowModel<ChartingTimeSeries>  {
+    public static class JideBeanModelWrapper<E> extends AbstractTableModel implements BeanPerRowModel<E>  {
 
-        private FixedColumnsBeanModel wrappedModel;
+        private FixedColumnsBeanModel<E> wrappedModel;
 
-        public JideBeanModelWrapper(FixedColumnsBeanModel wrappedModel) {
+        public JideBeanModelWrapper(FixedColumnsBeanModel<E> wrappedModel) {
             this.wrappedModel = wrappedModel;
 
             //interpose this model as the source for events
@@ -94,7 +92,7 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.setValueAt(aValue, rowIndex, columnIndex);
         }
 
-        public ChartingTimeSeries getObject(int row) {
+        public E getObject(int row) {
             return wrappedModel.getObject(row);
         }
 
@@ -102,11 +100,11 @@ public interface BeanPerRowModel<E> extends TableModel {
             wrappedModel.clear();
         }
 
-        public void addObjects(List<ChartingTimeSeries> timeSeries) {
-            wrappedModel.addObjects(timeSeries);
+        public void addObjects(List<E> beans) {
+            wrappedModel.addObjects(beans);
         }
 
-        public void removeObject(ChartingTimeSeries s) {
+        public void removeObject(E s) {
             wrappedModel.removeObject(s);
         }
 

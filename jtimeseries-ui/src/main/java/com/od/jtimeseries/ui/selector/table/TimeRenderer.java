@@ -18,10 +18,10 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.*;
-import java.text.SimpleDateFormat;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**

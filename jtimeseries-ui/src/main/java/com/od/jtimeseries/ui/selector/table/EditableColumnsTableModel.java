@@ -18,14 +18,14 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
+import com.jidesoft.converter.ConverterContext;
+import com.jidesoft.grid.BooleanCheckBoxCellEditor;
 import com.jidesoft.grid.ContextSensitiveTableModel;
 import com.jidesoft.grid.EditorContext;
-import com.jidesoft.grid.BooleanCheckBoxCellEditor;
-import com.jidesoft.converter.ConverterContext;
 
-import javax.swing.table.AbstractTableModel;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 /**

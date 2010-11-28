@@ -21,9 +21,9 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.ColorCellRenderer;
 
 import javax.swing.table.TableCellRenderer;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

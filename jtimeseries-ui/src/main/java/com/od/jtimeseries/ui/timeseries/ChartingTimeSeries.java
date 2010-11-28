@@ -18,13 +18,9 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.PathParser;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
-import java.util.List;
 import java.util.Date;
 import java.awt.*;
 
@@ -36,16 +32,14 @@ import java.awt.*;
  *
  * A time series used by the visualizer
  */
-public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries implements IdentifiableTimeSeries {
+public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
 
-    public static final String SELECTED_PROPERTY = "selected";
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
     public static final String COLOUR_PROPERTY = "color";
 
     private static ColorRotator colorRotator = new ColorRotator();
 
     private boolean selected;
-    private List<String> pathElements;
     private String displayName;
     private Color color = colorRotator.getNextColor();
     private RemoteHttpTimeSeries wrappedSeries;
@@ -69,7 +63,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         addPropertyListener(RemoteHttpTimeSeries.URL_PROPERTY_NAME);
         addPropertyListener(RemoteHttpTimeSeries.LAST_REFRESH_TIME_PROPERTY);
         addPropertyListener(RemoteHttpTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
-        addPropertyListener(RemoteHttpTimeSeries.SERIES_STALE_PROPERTY);
+        addPropertyListener(STALE_PROPERTY);
     }
 
     private void addPropertyListener(String propertyName) {
@@ -125,12 +119,12 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         wrappedSeries.setTimeSeriesURL(url);
     }
 
-    public boolean isSeriesStale() {
-        return wrappedSeries.isSeriesStale();
+    public boolean isStale() {
+        return wrappedSeries.isStale();
     }
 
-    public void setSeriesStale(boolean seriesStale) {
-        wrappedSeries.setSeriesStale(seriesStale);
+    public void setStale(boolean seriesStale) {
+        wrappedSeries.setStale(seriesStale);
     }
 
     public int getRefreshTimeSeconds() {
@@ -147,13 +141,6 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
 
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
-    }
-
-    public List<String> getPathElements() {
-        if ( pathElements == null) {
-            pathElements = PathParser.splitPath(getParentPath());
-        }
-        return pathElements;
     }
 
     public RemoteChartingTimeSeriesConfig getConfig() {

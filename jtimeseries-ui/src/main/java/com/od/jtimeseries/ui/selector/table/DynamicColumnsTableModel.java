@@ -18,12 +18,12 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.util.TableModelEventParser;
 import com.od.jtimeseries.ui.util.TableEventDispatcher;
+import com.od.jtimeseries.ui.util.TableModelEventParser;
 
-import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
 /**

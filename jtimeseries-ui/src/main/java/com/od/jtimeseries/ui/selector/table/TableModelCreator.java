@@ -18,7 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
@@ -32,18 +33,18 @@ import java.util.ArrayList;
  */
 public class TableModelCreator {
 
-    public BeanPerRowModel<ChartingTimeSeries> createTableModel() {
-        FixedColumnsBeanModel beanTableModel = null;
+    public <E extends UIPropertiesTimeSeries> BeanPerRowModel<E> createTableModel(Class<E> clazz) {
+        FixedColumnsBeanModel<E> beanTableModel = null;
         try {
-            beanTableModel = new FixedColumnsBeanModel(new ArrayList<ChartingTimeSeries>(), ChartingTimeSeries.class);
+            beanTableModel = new FixedColumnsBeanModel<E>(new ArrayList<E>(), clazz);
         } catch (IntrospectionException e) {
             e.printStackTrace();
         }
 
-        BeanPerRowModel<ChartingTimeSeries> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper(beanTableModel);
-        PathTokenizingTableModel pathTokenizingTableModel = new PathTokenizingTableModel(modelWrapper);
-        SummaryStatsTableModel summaryStatsTableModel = new SummaryStatsTableModel(pathTokenizingTableModel);
-        return new EditableColumnsTableModel<ChartingTimeSeries>(summaryStatsTableModel);
+        BeanPerRowModel<E> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper<E>(beanTableModel);
+        PathTokenizingTableModel<E> pathTokenizingTableModel = new PathTokenizingTableModel<E>(modelWrapper);
+        SummaryStatsTableModel<E> summaryStatsTableModel = new SummaryStatsTableModel<E>(pathTokenizingTableModel);
+        return new EditableColumnsTableModel<E>(summaryStatsTableModel);
     }
 
 }

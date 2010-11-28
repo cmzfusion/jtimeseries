@@ -18,9 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.TitleLabelPanel;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -35,12 +34,12 @@ import java.util.List;
  * Date: 06-Jan-2009
  * Time: 18:04:17
  */
-public class SeriesSelectionList extends TitleLabelPanel implements SelectionManager {
+public class SeriesSelectionList<E extends UIPropertiesTimeSeries> extends TitleLabelPanel implements SelectionManager<E> {
 
     private DefaultListModel listModel = new DefaultListModel();
     private JList seriesList;
 
-    private List<TimeSeriesSelectorListener> listeners = new ArrayList<TimeSeriesSelectorListener>();
+    private List<TimeSeriesSelectorListener<E>> listeners = new ArrayList<TimeSeriesSelectorListener<E>>();
 
     public SeriesSelectionList() {
         setLayout(new BorderLayout());
@@ -55,14 +54,14 @@ public class SeriesSelectionList extends TitleLabelPanel implements SelectionMan
         seriesList.addListSelectionListener(l);
     }
 
-    public void addSelection(ChartingTimeSeries s) {
+    public void addSelection(E s) {
         if ( s != null && ! listModel.contains(s)) {
             listModel.addElement(s);
             fireSeriesSelectionChanged();
         }
     }
 
-    public void removeSelection(ChartingTimeSeries s) {
+    public void removeSelection(E s) {
         if ( s != null && listModel.contains(s)) {
             listModel.removeElement(s);
             fireSeriesSelectionChanged();
@@ -70,27 +69,23 @@ public class SeriesSelectionList extends TitleLabelPanel implements SelectionMan
     }
 
     @SuppressWarnings({"unchecked"})
-    public void setSelectedTimeSeries(List<ChartingTimeSeries> selections) {
+    public void setSelectedTimeSeries(List<E> selections) {
         Set newSet = new HashSet(selections);
         Set oldSet = new HashSet(Arrays.asList(listModel.toArray()));
         //don't bother refreshing if the same selections
         if ( ! newSet.equals(oldSet)) {
             listModel.removeAllElements();
-            for ( ChartingTimeSeries s : selections) {
+            for ( E s : selections) {
                 listModel.addElement(s);
             }
             fireSeriesSelectionChanged();
         }
     }
 
-    public IdentifiableTimeSeries getCurrentSelection() {
-        return (IdentifiableTimeSeries)seriesList.getSelectedValue();
-    }
-
-    public List<ChartingTimeSeries> getSelectedTimeSeries() {
-        List<ChartingTimeSeries> series = new ArrayList<ChartingTimeSeries>();
+    public List<E> getSelectedTimeSeries() {
+        List<E> series = new ArrayList<E>();
         for(int loop=0; loop<listModel.size(); loop++) {
-            series.add((ChartingTimeSeries)listModel.getElementAt(loop));
+            series.add((E)listModel.getElementAt(loop));
         }
         return series;
     }
@@ -104,9 +99,9 @@ public class SeriesSelectionList extends TitleLabelPanel implements SelectionMan
     }
 
     private void fireSeriesSelectionChanged() {
-        List<ChartingTimeSeries> newSeries = getSelectedTimeSeries();
-        List<TimeSeriesSelectorListener> listeners = new ArrayList<TimeSeriesSelectorListener>(this.listeners);
-        for ( TimeSeriesSelectorListener l : listeners )  {
+        List<E> newSeries = getSelectedTimeSeries();
+        List<TimeSeriesSelectorListener<E>> listeners = new ArrayList<TimeSeriesSelectorListener<E>>(this.listeners);
+        for ( TimeSeriesSelectorListener<E> l : listeners )  {
             l.selectionChanged(newSeries);
         }
     }

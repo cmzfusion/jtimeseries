@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.AutoFilterTableHeader;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.jidesoft.grid.SortableTable;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -33,17 +33,15 @@ import java.awt.*;
 * Time: 15:57:14
 * To change this template use File | Settings | File Templates.
 */
-class TimeSeriesTable extends SortableTable {
+class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
 
     private static final Color STALE_SERIES_COLOR = new Color(248,165,169);
-    private BeanPerRowModel<ChartingTimeSeries> tableModel;
-    private TableColumnManager columnManager;
+    private BeanPerRowModel<E> tableModel;
 
-    public TimeSeriesTable(BeanPerRowModel<ChartingTimeSeries> tableModel, TableColumnManager columnManager) {
+    public TimeSeriesTable(BeanPerRowModel<E> tableModel, TableColumnManager<E> columnManager) {
         super(tableModel);
         setColumnModel(columnManager.getColumnModel());
         this.tableModel = tableModel;
-        this.columnManager = columnManager;
         setClearSelectionOnTableDataChanges(false);
         setRowResizable(true);
         setVariousRowHeights(true);
@@ -63,7 +61,9 @@ class TimeSeriesTable extends SortableTable {
 
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
-        if (tableModel.getObject(row).isSeriesStale()) {
+
+        E object = tableModel.getObject(row);
+        if (object.isStale()) {
             c.setBackground(STALE_SERIES_COLOR);
         } else {
             if (isCellSelected(row, column)) {

@@ -19,14 +19,12 @@
 package com.od.jtimeseries.ui.selector;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
-import com.od.jtimeseries.ui.selector.shared.*;
-import com.od.jtimeseries.ui.selector.tree.TreeSelector;
-import com.od.jtimeseries.ui.selector.table.TableSelector;
+import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
 import com.od.jtimeseries.ui.selector.table.ColumnSelectionDialog;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.selector.table.TableSelector;
+import com.od.jtimeseries.ui.selector.tree.TreeSelector;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
@@ -48,44 +46,48 @@ import java.util.List;
  * Date: 06-Jan-2009
  * Time: 17:25:36
  */
-public class SeriesSelectionPanel extends JPanel implements SelectionManager {
+public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPanel implements SelectionManager<E> {
 
     private static final int WIDTH = 250;
-    private TimeSeriesContext rootContext;
-    private SeriesSelectionList selectionList;
+    private TimeSeriesContext context;
+    private Class<E> seriesClass;
+    private SeriesSelectionList<E> selectionList;
     private SeriesDescriptionPanel seriesDescriptionPanel = new SeriesDescriptionPanel();
     private JRadioButton useTreeRadio = new JRadioButton("Tree", true);
     private JRadioButton useTableRadio = new JRadioButton("Table");
     private JButton columnSelectorButton = new JButton("Columns");
-    private TreeSelector treeSelector;
-    private TableSelector tableSelector;
+    private TreeSelector<E> treeSelector;
+    private TableSelector<E> tableSelector;
     private JPanel selectorPanel;
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
-    private List<ChartingTimeSeries> timeSeries = new ArrayList<ChartingTimeSeries>();
-    private ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel = new ListSelectionActionModel<ChartingTimeSeries>();
+    private List<E> timeSeries = new ArrayList<E>();
+    private ListSelectionActionModel<E> seriesSelectionModel = new ListSelectionActionModel<E>();
     private RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
     private ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
     private PropertyChangeListener selectionPropertyListener = new SelectedSeriesPropertyChangeListener();
     private PropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
 
-    public SeriesSelectionPanel(TimeSeriesContext rootContext) {
-        this(rootContext, "Selected");
+    public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
+        this(context, "Selected", seriesClass);
     }
 
     /**
-     * @param rootContext
+     * Create a time series selector which allows the user to select time series in the supplied context using a tree or table view
+     * Selection listeners may be added, or the getSelectedTimeSeries() method invoked to get the current selections
+     *
      * @param selectionText, text name for boolean 'selected' column (e.g. if the selected series will be charted, this might be 'Chart')
      */
-    public SeriesSelectionPanel(TimeSeriesContext rootContext, String selectionText) {
-        this.rootContext = rootContext;
-        this.selectionList = new SeriesSelectionList();
-        setupTimeseries(rootContext.findAllTimeSeries().getAllMatches());
+    public SeriesSelectionPanel(TimeSeriesContext context, String selectionText, Class<E> seriesClass) {
+        this.context = context;
+        this.seriesClass = seriesClass;
+        this.selectionList = new SeriesSelectionList<E>();
+        setupTimeseries(context.findAll(seriesClass).getAllMatches());
 
         List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
-        treeSelector = new TreeSelector(seriesSelectionModel, rootContext, seriesActions);
-        tableSelector = new TableSelector(seriesSelectionModel, rootContext, seriesActions, selectionText);
+        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesActions);
+        tableSelector = new TableSelector<E>(seriesSelectionModel, context, seriesActions, selectionText, seriesClass);
         createSelectorPanel();
         createTitlePanel();
         addComponents();
@@ -152,27 +154,27 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         return selectionList;
     }
 
-    public List<ChartingTimeSeries> getSelectedTimeSeries() {
+    public List<E> getSelectedTimeSeries() {
         return selectionList.getSelectedTimeSeries();
     }
 
-    public void addSelectionListener(TimeSeriesSelectorListener l) {
+    public void addSelectionListener(TimeSeriesSelectorListener<E> l) {
         selectionList.addSelectionListener(l);
     }
 
-    public void removeSelectionListener(TimeSeriesSelectorListener l) {
+    public void removeSelectionListener(TimeSeriesSelectorListener<E> l) {
         selectionList.removeSelectionListener(l);
     }
 
-    public void addSelection(ChartingTimeSeries s) {
+    public void addSelection(E s) {
         selectionList.addSelection(s);
     }
 
-    public void removeSelection(ChartingTimeSeries s) {
+    public void removeSelection(E s) {
         selectionList.removeSelection(s);
     }
 
-    public void setSelectedTimeSeries(List<ChartingTimeSeries> selections) {
+    public void setSelectedTimeSeries(List<E> selections) {
         selectionList.setSelectedTimeSeries(selections);
     }
 
@@ -185,7 +187,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     }
 
     public void refresh() {
-        setupTimeseries(rootContext.findAllTimeSeries().getAllMatches());
+        setupTimeseries(context.findAll(seriesClass).getAllMatches());
         treeSelector.refreshSeries();
         tableSelector.refreshSeries();
     }
@@ -194,40 +196,38 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         tableSelector.addAllDynamicColumns();
     }
 
-    private void setupTimeseries(List<IdentifiableTimeSeries> l) {
+    private void setupTimeseries(List<E> l) {
         removePropertyListenerFromCurrentSeries();
         addPropertyListenerToNewSeries(l);
         updateSelections(l);
     }
 
-    private void updateSelections(List<IdentifiableTimeSeries> l) {
-        List<ChartingTimeSeries> selections = new ArrayList<ChartingTimeSeries>();
-        for ( IdentifiableTimeSeries s : l) {
-            ChartingTimeSeries r = (ChartingTimeSeries)s;
-            if ( r.isSelected() ) {
-                selections.add(r);
+    private void updateSelections(List<E> l) {
+        List<E> selections = new ArrayList<E>();
+        for ( E s : l) {
+            if ( s.isSelected() ) {
+                selections.add(s);
             }
         }
         selectionList.setSelectedTimeSeries(selections);
     }
 
-    private void addPropertyListenerToNewSeries(List<IdentifiableTimeSeries> l) {
-        for ( IdentifiableTimeSeries s : l) {
-            ChartingTimeSeries r = (ChartingTimeSeries)s;
-            r.addPropertyChangeListener(
-                    ChartingTimeSeries.SELECTED_PROPERTY,
+    private void addPropertyListenerToNewSeries(List<E> l) {
+        for ( E s : l) {
+            s.addPropertyChangeListener(
+                    UIPropertiesTimeSeries.SELECTED_PROPERTY,
                     selectionPropertyListener
             );
 
-            r.addPropertyChangeListener(
-                    RemoteHttpTimeSeries.SERIES_STALE_PROPERTY,
+            s.addPropertyChangeListener(
+                    UIPropertiesTimeSeries.STALE_PROPERTY,
                     seriesConnectionPropertyListener
             );
         }
     }
 
     private void removePropertyListenerFromCurrentSeries() {
-        for ( ChartingTimeSeries s : timeSeries ) {
+        for ( E s : timeSeries ) {
             s.removePropertyChangeListener(selectionPropertyListener);
             s.removePropertyChangeListener(seriesConnectionPropertyListener);
         }
@@ -267,9 +267,9 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         cardLayout.show(selectorPanel, "tree");
     }
 
-    private class DescriptionListener extends SelectorPanel.SelectorPanelListenerAdapter {
+    private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorPanel.SelectorPanelListenerAdapter<E> {
 
-        public void seriesSelectedForDescription(IdentifiableTimeSeries s) {
+        public void seriesSelectedForDescription(E s) {
             seriesDescriptionPanel.setSelectedSeries(s);
         }
     }
@@ -277,7 +277,7 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
     private class SelectedSeriesPropertyChangeListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            ChartingTimeSeries s = (ChartingTimeSeries)evt.getSource();
+            E s = (E)evt.getSource();
             if (s.isSelected()) {
                 selectionList.addSelection(s);
             } else {
@@ -293,15 +293,15 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         }
     }
 
-    public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<ChartingTimeSeries>> {
+    public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<E>> {
 
-        public RemoveSeriesAction(ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel) {
+        public RemoveSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
             super(seriesSelectionModel, "Remove Series", ImageUtils.REMOVE_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {
-            List<ChartingTimeSeries> series = getActionModel().getSelected();
-            for ( ChartingTimeSeries s : series) {
+            List<E> series = getActionModel().getSelected();
+            for ( E s : series) {
                 TimeSeriesContext c = (TimeSeriesContext)s.getParent();
                 s.setSelected(false);
                 c.removeChild(s);
@@ -311,25 +311,25 @@ public class SeriesSelectionPanel extends JPanel implements SelectionManager {
         }
     }
 
-    public class ReconnectSeriesAction extends ModelDrivenAction<ListSelectionActionModel<ChartingTimeSeries>> {
+    public class ReconnectSeriesAction extends ModelDrivenAction<ListSelectionActionModel<E>> {
 
-        public ReconnectSeriesAction(ListSelectionActionModel<ChartingTimeSeries> seriesSelectionModel) {
+        public ReconnectSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
             super(seriesSelectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {
-            List<ChartingTimeSeries> series = getActionModel().getSelected();
-            for ( ChartingTimeSeries s : series) {
-                if ( s.isSeriesStale()) {
-                    s.setSeriesStale(false);
-                }
+            List<E> series = getActionModel().getSelected();
+            for ( E s : series) {
+               if ( s.isStale()) {
+                   s.setStale(false);
+               }
             }
             repaint();
         }
 
         protected boolean isModelStateActionable() {
-            for ( ChartingTimeSeries s : getActionModel().getSelected()) {
-                if (s.isSeriesStale() ) {
+            for ( E s : getActionModel().getSelected()) {
+                if (s.isStale() ) {
                     return true;
                 }
             }

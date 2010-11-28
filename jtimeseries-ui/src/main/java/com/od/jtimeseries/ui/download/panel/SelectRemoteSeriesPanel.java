@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.FixedColumns;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -79,7 +80,7 @@ public class SelectRemoteSeriesPanel extends AbstractDownloadWizardPanel {
     }
 
     private JComponent createSeriesSelector(TimeSeriesContext timeSeriesContext) {
-        seriesSelectionPanel = new SeriesSelectionPanel(timeSeriesContext);
+        seriesSelectionPanel = new SeriesSelectionPanel(timeSeriesContext, ChartingTimeSeries.class);
         java.util.List<ColumnSettings> defaultColumnSettings = getDefaultColumnSettings();
         seriesSelectionPanel.setColumns(defaultColumnSettings);
         seriesSelectionPanel.addAllDynamicColumns();

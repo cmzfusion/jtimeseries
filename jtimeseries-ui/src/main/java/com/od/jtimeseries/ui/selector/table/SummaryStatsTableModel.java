@@ -18,10 +18,11 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,11 +30,11 @@ import java.util.*;
  * Date: 24-Feb-2010
  * Time: 17:30:29
  */
-public class SummaryStatsTableModel extends DynamicColumnsTableModel<ChartingTimeSeries> {
+public class SummaryStatsTableModel<E extends UIPropertiesTimeSeries> extends DynamicColumnsTableModel<E> {
 
     private List<String> propertyNamesList = new ArrayList<String>();
 
-    public SummaryStatsTableModel(BeanPerRowModel<ChartingTimeSeries> wrappedModel) {
+    public SummaryStatsTableModel(BeanPerRowModel<E> wrappedModel) {
         super(wrappedModel);
         initialize();
     }
@@ -55,7 +56,7 @@ public class SummaryStatsTableModel extends DynamicColumnsTableModel<ChartingTim
 
     private void addSummaryColumns(int firstRow, int lastRow) {
         for ( int row = firstRow; row <= lastRow; row++) {
-            ChartingTimeSeries s = getObject(row);
+            E s = getObject(row);
             for ( Object prop : s.getProperties().keySet()) {
                 String propertyName = (String) prop;
                 if (! propertyNamesList.contains(propertyName)) {

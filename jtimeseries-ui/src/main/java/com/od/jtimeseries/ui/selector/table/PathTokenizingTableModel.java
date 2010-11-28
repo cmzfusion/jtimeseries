@@ -18,7 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.util.PathParser;
 
 import java.util.List;
 
@@ -31,11 +32,11 @@ import java.util.List;
  *
  * A dynamic columns table model to show the elements of the context path as additional columns
  */
-public class PathTokenizingTableModel extends DynamicColumnsTableModel<ChartingTimeSeries> {
+public class PathTokenizingTableModel<E extends UIPropertiesTimeSeries> extends DynamicColumnsTableModel<E> {
 
     private int maxPathElements;
 
-    public PathTokenizingTableModel(BeanPerRowModel<ChartingTimeSeries> wrappedModel) {
+    public PathTokenizingTableModel(BeanPerRowModel<E> wrappedModel) {
         super(wrappedModel);
         initialize();
     }
@@ -43,8 +44,8 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<ChartingT
     protected boolean updateRequiresStructureChange(int firstRow, int lastRow) {
         int oldMax = maxPathElements;
         for ( int row = firstRow; row <= lastRow; row++) {
-            ChartingTimeSeries s = getObject(row);
-            maxPathElements = Math.max(maxPathElements, s.getPathElements().size());
+            E series = getObject(row);
+            maxPathElements = Math.max(maxPathElements, getParentPathElements(series).size());
         }
         return oldMax != maxPathElements;
     }
@@ -63,7 +64,7 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<ChartingT
     }
 
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
-        List<String> pathElements = (getObject(rowIndex)).getPathElements();
+        List<String> pathElements = getParentPathElements(getObject(rowIndex));
         return pathElements.size() > extraColsIndex ?  pathElements.get(extraColsIndex) : null;
     }
 
@@ -93,5 +94,10 @@ public class PathTokenizingTableModel extends DynamicColumnsTableModel<ChartingT
 
     protected Class<?> getDynamicColumnClass(int extraColsIndex) {
         return String.class;
+    }
+
+
+    private List<String> getParentPathElements(E timeSeries) {
+        return PathParser.splitPath(timeSeries.getParentPath());
     }
 }

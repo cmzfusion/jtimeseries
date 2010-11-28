@@ -19,8 +19,7 @@
 package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.swing.action.ListSelectionActionModel;
 
 import java.util.ArrayList;
@@ -33,50 +32,50 @@ import java.util.List;
  * Time: 11:43:35
  * To change this template use File | Settings | File Templates.
  */
-public abstract class SelectorPanel extends TitleLabelPanel {
+public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
 
-    protected java.util.List<SelectorPanelListener> seriesSelectionListeners = new ArrayList<SelectorPanelListener>();
-    private ListSelectionActionModel<ChartingTimeSeries> seriesActionModel;
+    protected java.util.List<SelectorPanelListener<E>> seriesSelectionListeners = new ArrayList<SelectorPanelListener<E>>();
+    private ListSelectionActionModel<E> seriesActionModel;
 
-    public SelectorPanel(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel) {
+    public SelectorPanel(ListSelectionActionModel<E> seriesActionModel) {
         this.seriesActionModel = seriesActionModel;
     }
 
-    public void addSelectorListener(SelectorPanelListener seriesSelectionListener) {
+    public void addSelectorListener(SelectorPanelListener<E> seriesSelectionListener) {
         seriesSelectionListeners.add(seriesSelectionListener);
     }
 
-    protected void fireSelectedForDescription(IdentifiableTimeSeries m) {
-        java.util.List<SelectorPanelListener> snapshot = new ArrayList<SelectorPanelListener>(seriesSelectionListeners);
-        for ( SelectorPanelListener l : snapshot) {
+    protected void fireSelectedForDescription(E m) {
+        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(seriesSelectionListeners);
+        for ( SelectorPanelListener<E> l : snapshot) {
             l.seriesSelectedForDescription(m);
         }
     }
 
     protected void fireSelectedForDescription(TimeSeriesContext m) {
-        java.util.List<SelectorPanelListener> snapshot = new ArrayList<SelectorPanelListener>(seriesSelectionListeners);
-        for ( SelectorPanelListener l : snapshot) {
+        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(seriesSelectionListeners);
+        for ( SelectorPanelListener<E> l : snapshot) {
             l.contextSelectedForDescription(m);
         }
     }
 
-    protected ListSelectionActionModel<ChartingTimeSeries> getSeriesActionModel() {
+    protected ListSelectionActionModel<E> getSeriesActionModel() {
         return seriesActionModel;
     }
 
     public abstract void refreshSeries();
 
-    public abstract void removeSeries(List<ChartingTimeSeries> series);
+    public abstract void removeSeries(List<E> series);
 
-    public static interface SelectorPanelListener {
-        void seriesSelectedForDescription(IdentifiableTimeSeries s);
+    public static interface SelectorPanelListener<E extends UIPropertiesTimeSeries> {
+        void seriesSelectedForDescription(E s);
 
         void contextSelectedForDescription(TimeSeriesContext m);
     }
 
-    public static class SelectorPanelListenerAdapter implements SelectorPanelListener {
+    public static class SelectorPanelListenerAdapter<E extends UIPropertiesTimeSeries> implements SelectorPanelListener<E> {
 
-        public void seriesSelectedForDescription(IdentifiableTimeSeries s) {}
+        public void seriesSelectedForDescription(E s) {}
 
         public void contextSelectedForDescription(TimeSeriesContext m) {}
     }

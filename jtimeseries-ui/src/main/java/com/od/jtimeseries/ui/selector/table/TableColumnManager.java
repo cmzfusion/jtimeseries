@@ -19,12 +19,12 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +35,13 @@ import java.util.List;
  * Time: 16:19:16
  * To change this template use File | Settings | File Templates.
  */
-public class TableColumnManager {
+public class TableColumnManager<E extends UIPropertiesTimeSeries> {
 
     private TableColumnModel columnModel = new DefaultTableColumnModel();
-    private BeanPerRowModel<ChartingTimeSeries> tableModel;
+    private BeanPerRowModel<E> tableModel;
     private String selectionColumnName;
 
-    public TableColumnManager(BeanPerRowModel<ChartingTimeSeries> tableModel, String selectionColumnName) {
+    public TableColumnManager(BeanPerRowModel<E> tableModel, String selectionColumnName) {
         this.tableModel = tableModel;
         this.selectionColumnName = selectionColumnName;
         setupDefaultColumns();

@@ -79,7 +79,7 @@ public class TimeSeriesVisualizer extends JPanel {
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
         JPanel chartPanel = createChartPanel();
-        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart");
+        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart", ChartingTimeSeries.class);
         createToolbar();
         createSplitPane(chartPanel);
         layoutVisualizer();
@@ -233,7 +233,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private void addSeriesSelectionListener() {
-        seriesSelectionPanel.addSelectionListener(new TimeSeriesSelectorListener() {
+        seriesSelectionPanel.addSelectionListener(new TimeSeriesSelectorListener<ChartingTimeSeries>() {
 
             public void selectionChanged(List<ChartingTimeSeries> newSelection) {
                 chart.setSeries(newSelection);

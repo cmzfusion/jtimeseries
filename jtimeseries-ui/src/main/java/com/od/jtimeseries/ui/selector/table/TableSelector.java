@@ -21,9 +21,8 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.action.ListSelectionActionModel;
 
@@ -31,7 +30,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,24 +40,27 @@ import java.util.List;
  * Time: 11:37:55
  * To change this template use File | Settings | File Templates.
  */
-public class TableSelector extends SelectorPanel {
+public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPanel<E> {
 
     private TimeSeriesContext rootContext;
     private java.util.List<Action> seriesActions;
     private String selectionText;
-    private BeanPerRowModel<ChartingTimeSeries> tableModel;
+    private Class<E> seriesClass;
+    private BeanPerRowModel<E> tableModel;
     private SortableTable timeSeriesTable;
     private JPopupMenu tablePopupMenu;
-    public TableColumnManager tableColumnManager;
+    public TableColumnManager<E> tableColumnManager;
 
-    public TableSelector(ListSelectionActionModel<ChartingTimeSeries> seriesActionModel,
+    public TableSelector(ListSelectionActionModel<E> seriesActionModel,
                          TimeSeriesContext rootContext,
                          java.util.List<Action> seriesActions,
-                         String selectionText) {
+                         String selectionText,
+                         Class<E> seriesClass) {
         super(seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
         this.selectionText = selectionText;
+        this.seriesClass = seriesClass;
         createTable();
         refreshSeries();
         createPopupMenu();
@@ -92,9 +94,9 @@ public class TableSelector extends SelectorPanel {
     }
 
     private void createTable() {
-        tableModel = new TableModelCreator().createTableModel();
-        tableColumnManager = new TableColumnManager(tableModel, selectionText);
-        timeSeriesTable = new TimeSeriesTable(tableModel, tableColumnManager);
+        tableModel = new TableModelCreator().createTableModel(seriesClass);
+        tableColumnManager = new TableColumnManager<E>(tableModel, selectionText);
+        timeSeriesTable = new TimeSeriesTable<E>(tableModel, tableColumnManager);
     }
 
     private void addSeriesSelectionListener() {
@@ -105,7 +107,7 @@ public class TableSelector extends SelectorPanel {
                 public void valueChanged(ListSelectionEvent e) {
                     if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
                         int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),timeSeriesTable.getSelectedRow());
-                        ChartingTimeSeries series = tableModel.getObject(modelRow);
+                        E series = tableModel.getObject(modelRow);
                         getSeriesActionModel().setSelected(series);
                         fireSelectedForDescription(series);
                     }
@@ -116,18 +118,16 @@ public class TableSelector extends SelectorPanel {
 
     public void refreshSeries() {
         tableModel.clear();
-        List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
-        List<ChartingTimeSeries> timeSeries = new ArrayList<ChartingTimeSeries>();
-        for ( IdentifiableTimeSeries i : l) {
-            if ( i instanceof ChartingTimeSeries) {
-                timeSeries.add((ChartingTimeSeries)i);
-            }
+        List<E> l = rootContext.findAll(seriesClass).getAllMatches();
+        List<E> timeSeries = new ArrayList<E>();
+        for ( E i : l) {
+            timeSeries.add(i);
         }
         tableModel.addObjects(timeSeries);
     }
 
-    public void removeSeries(java.util.List<ChartingTimeSeries> series) {
-        for (ChartingTimeSeries s : series ) {
+    public void removeSeries(java.util.List<E> series) {
+        for (E s : series ) {
             tableModel.removeObject(s);
         }
     }

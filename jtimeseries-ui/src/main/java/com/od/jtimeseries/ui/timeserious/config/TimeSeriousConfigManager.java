@@ -9,6 +9,7 @@ import od.configutil.PreferenceSettings;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,8 +42,10 @@ public class TimeSeriousConfigManager {
             createConfigManager();
             try {
                 result = configManager.loadConfig(MAIN_CONFIG_NAME);
+            } catch (NoConfigFoundException nfe) {
+                logMethods.logWarning("Could not find a config " + MAIN_CONFIG_NAME + " config, will use default config");
             } catch (ConfigManagerException n) {
-                logMethods.logWarning("Could not load config " + MAIN_CONFIG_NAME + ", will use default config", n);
+                logMethods.logWarning("Could not load " + MAIN_CONFIG_NAME + " config, will use default config", n);
             }
         }
         return result;
@@ -67,9 +70,7 @@ public class TimeSeriousConfigManager {
      */
     public void checkInitialized(JFrame mainFrame) {
         if ( ! isInitialized() ) {
-            ConfigDirectorySelector s = new ConfigDirectorySelector(mainFrame);
-            s.showSelectorDialog();
-            File f = s.getSelectedDirectory();
+            File f = getUserToSelectDirectory(mainFrame);
             if ( f != null ) {
                 preferenceSettings.setMainConfigDirectory(f);
                 preferenceSettings.store();
@@ -78,11 +79,31 @@ public class TimeSeriousConfigManager {
         }
     }
 
-    public void saveConfig(TimeSeriousConfig config) throws ConfigManagerException {
-        if ( isInitialized() ) {
-            configManager.saveConfig(MAIN_CONFIG_NAME, config);
-        } else {
-            throw new UnsupportedOperationException("Cannot save a config when ConfigManager not initialized");
+    private File getUserToSelectDirectory(JFrame mainFrame) {
+        ConfigDirectorySelector s = new ConfigDirectorySelector(mainFrame);
+        s.showSelectorDialog();
+        File f = s.getSelectedDirectory();
+        while(f != null && ! f.canWrite()) {
+            JOptionPane.showMessageDialog(mainFrame,
+                "Cannot write to this location. Please choose or create another directory to save the config",
+                "Cannot write config",
+                JOptionPane.WARNING_MESSAGE
+            );
+            f = getUserToSelectDirectory(mainFrame);
         }
+        return f;
+    }
+
+    public void saveConfig(JFrame mainFrame, TimeSeriousConfig config) throws ConfigManagerException {
+        checkInitialized(mainFrame);
+        if ( isInitialized()) {
+            doSave(config);
+        } else {
+            logMethods.logInfo("Not saving, config manager not initialized");
+        }
+    }
+
+    private void doSave(TimeSeriousConfig config) throws ConfigManagerException {
+        configManager.saveConfig(MAIN_CONFIG_NAME, config);
     }
 }

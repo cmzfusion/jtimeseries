@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileFilter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,6 +80,7 @@ public class ConfigDirectorySelector {
             f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             f.setApproveButtonText("Select");
             f.setApproveButtonMnemonic('s');
+
             f.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {

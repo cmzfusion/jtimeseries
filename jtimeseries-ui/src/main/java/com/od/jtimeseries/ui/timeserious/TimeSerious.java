@@ -40,7 +40,7 @@ public class TimeSerious {
             public void windowClosing(WindowEvent e) {
                 prepareConfigForSave(config);
                 try {
-                    configManager.saveConfig(config);
+                    configManager.saveConfig(mainFrame, config);
                 } catch (ConfigManagerException e1) {
                     //todo, add handling
                     e1.printStackTrace();

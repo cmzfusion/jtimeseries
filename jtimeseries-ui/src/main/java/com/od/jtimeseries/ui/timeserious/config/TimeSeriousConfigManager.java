@@ -60,7 +60,6 @@ public class TimeSeriousConfigManager {
      * @return true, if a config file directory has been determined and a ConfigManager created so that we can load and save configs
      */
     public boolean isInitialized() {
-        //if the user has not already configured the main config file directory, show the wizard to do get them to do it now
         return configManager != null;
     }
 

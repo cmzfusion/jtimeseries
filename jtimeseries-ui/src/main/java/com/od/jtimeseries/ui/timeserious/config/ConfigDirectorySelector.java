@@ -41,8 +41,8 @@ public class ConfigDirectorySelector {
     private class DirectorySelectionWizard extends WizardDialog {
 
         private ConfigFilePage welcomePage = new ConfigFilePage(
-            "Welcome to TimeSerious",
             "Choose a directory for config files",
+            "",
              this
         );
 

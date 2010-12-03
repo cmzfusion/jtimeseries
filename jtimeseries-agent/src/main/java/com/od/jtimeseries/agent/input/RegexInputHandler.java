@@ -5,6 +5,7 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,7 +20,7 @@ public class RegexInputHandler implements InputHandler {
 
     protected static LogMethods logMethods = LogUtils.getLogMethods(InputHandler.class);
 
-    private List<Pattern> patterns;
+    private List<Pattern> patterns = new LinkedList<Pattern>();
     private List<RegexValueHandler> valueHandlers = new ArrayList<RegexValueHandler>();
 
     public RegexInputHandler(String inputPattern) {

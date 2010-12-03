@@ -34,9 +34,6 @@ import java.awt.*;
  */
 public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
 
-    public static final String DISPLAY_NAME_PROPERTY = "displayName";
-    public static final String COLOUR_PROPERTY = "color";
-
     private static ColorRotator colorRotator = new ColorRotator();
 
     private boolean selected;
@@ -50,7 +47,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         addPropertyListeners();
     }
 
-    public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries, RemoteChartingTimeSeriesConfig c) {
+    public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries, UiTimeSeriesConfig c) {
         super(wrappedSeries);
         this.wrappedSeries = wrappedSeries;
         setDisplayName(c.getDisplayName());
@@ -60,9 +57,9 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
 
     private void addPropertyListeners() {
         //listen to and propagate the change events from wrapped series
-        addPropertyListener(RemoteHttpTimeSeries.URL_PROPERTY_NAME);
-        addPropertyListener(RemoteHttpTimeSeries.LAST_REFRESH_TIME_PROPERTY);
-        addPropertyListener(RemoteHttpTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
+        addPropertyListener(URL_PROPERTY_NAME);
+        addPropertyListener(LAST_REFRESH_TIME_PROPERTY);
+        addPropertyListener(REFRESH_TIME_SECONDS_PROPERTY);
         addPropertyListener(STALE_PROPERTY);
     }
 
@@ -80,7 +77,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     public void setDisplayName(String displayName) {
         String oldValue = this.displayName;
         this.displayName = displayName;
-        firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
+        firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
     }
 
 
@@ -108,14 +105,14 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     public void setColor(Color color) {
         Color oldValue = this.color;
         this.color = color;
-        firePropertyChange(COLOUR_PROPERTY, oldValue, color);
+        firePropertyChange(UIPropertiesTimeSeries.COLOUR_PROPERTY, oldValue, color);
     }
 
     public URL getTimeSeriesURL() {
         return wrappedSeries.getTimeSeriesURL();
     }
 
-    public void getTimeSeriesURL(URL url) {
+    public void setTimeSeriesURL(URL url) {
         wrappedSeries.setTimeSeriesURL(url);
     }
 
@@ -142,20 +139,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
     }
-
-    public RemoteChartingTimeSeriesConfig getConfig() {
-        return new RemoteChartingTimeSeriesConfig(
-            getParentPath(),
-            getId(),
-            getDescription(),
-            getTimeSeriesURL().toExternalForm(),
-            getRefreshTimeSeconds(),
-            isSelected(), 
-            getDisplayName(),
-            getColor()
-        );
-    }
-
+    
     private class WrappedSeriesPropertyChangeListener implements PropertyChangeListener {
 
         private String propertyName;

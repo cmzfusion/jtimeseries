@@ -26,7 +26,7 @@ import java.awt.*;
 * Date: 28-May-2009
 * Time: 17:20:00
 */
-public class RemoteChartingTimeSeriesConfig {
+public class UiTimeSeriesConfig {
     private String parentPath;
     private String id;
     private String description;
@@ -37,17 +37,17 @@ public class RemoteChartingTimeSeriesConfig {
     private Color color;
 
     //no params constructor required for bean xml persistence
-    public RemoteChartingTimeSeriesConfig() {}
+    public UiTimeSeriesConfig() {}
 
-    public RemoteChartingTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, boolean selected, String displayName, Color color) {
-        this.parentPath = parentPath;
-        this.id = id;
-        this.description = description;
-        this.timeSeriesUrl = timeSeriesUrl;
-        this.refreshTimeSeconds = refreshTimeSeconds;
-        this.selected = selected;
-        this.displayName = displayName;
-        this.color = color;
+    public UiTimeSeriesConfig(UIPropertiesTimeSeries s) {
+        this.parentPath = s.getParentPath();
+        this.id = s.getId();
+        this.description = s.getDescription();
+        this.timeSeriesUrl = s.getTimeSeriesURL().toExternalForm();
+        this.refreshTimeSeconds = s.getRefreshTimeSeconds();
+        this.selected = s.isSelected();
+        this.displayName = s.getDisplayName();
+        this.color = s.getColor();
     }
 
     public void setId(String id) {

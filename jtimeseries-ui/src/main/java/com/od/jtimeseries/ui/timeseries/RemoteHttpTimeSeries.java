@@ -48,110 +48,45 @@ import java.util.concurrent.TimeUnit;
  * to be called on the AWT only, and so there is no need for extra synchronization here. Furthermore property change
  * events should only be fired on the AWT
  */
-public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements ChartSeriesListener, UIPropertiesTimeSeries {
+public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSeriesListener {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
-
-    public static final String DISPLAY_NAME_PROPERTY = "displayName";
-    public static final String LAST_REFRESH_TIME_PROPERTY = "lastRefreshTime";
-    public static final String REFRESH_TIME_SECONDS_PROPERTY = "refreshTimeSeconds";
-    public static final String URL_PROPERTY_NAME = "timeSeriesURL";
 
     private static ScheduledExecutorService refreshExecutor = Executors.newSingleThreadScheduledExecutor();
     private static final int STATS_ONLY_REFRESH_TIME_SECONDS = 60 * 30;
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
-    private URL timeSeriesUrl;
     private volatile ScheduledFuture refreshTask;
-    private volatile int refreshTimeSeconds;
-    private String displayName;
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
-    private Date lastRefreshTime;
     private volatile int displayedChartCount;
-    private boolean selected;
+    private volatile int errorCount;
+
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
-    private volatile int errorCount;
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
-    private volatile boolean stale = false;
 
-    private RemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
+    private RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()));
         this.displayName = config.getDisplayName();
     }
 
     private RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
         super(id, description);
-        this.timeSeriesUrl = timeSeriesUrl;
-        this.refreshTimeSeconds = Math.max((int)(refreshTime.getLengthInMillis() / 1000), 10);
+        setTimeSeriesURL(timeSeriesUrl);
+        setRefreshTimeSeconds((int)refreshTime.getLengthInMillis() / 1000);
     }
 
-    public URL getTimeSeriesURL() {
-        return timeSeriesUrl;
-    }
-
-    public void setTimeSeriesURL(URL url) {
-        URL oldValue = this.timeSeriesUrl;
-        timeSeriesUrl = url;
-        firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
-    }
-
-    public String getDisplayName() {
-        if ( displayName == null ) {
-            setDisplayName(getPath());
-        }
-        return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        String oldValue = this.displayName;
-        this.displayName = displayName;
-        firePropertyChange(DISPLAY_NAME_PROPERTY, oldValue, displayName);
-    }
-
-    public boolean isStale() {
-        return stale;
+    public void setRefreshTimeSeconds(int seconds) {
+        super.setRefreshTimeSeconds(Math.max(seconds, MIN_REFRESH_TIME_SECONDS));
+        RemoteHttpTimeSeries.logMethods.logInfo("Changing refresh time for series " + getId() + " to " + getRefreshTimeSeconds() + " seconds");
+        scheduleRefresh();
     }
 
     public void setStale(boolean stale) {
-        boolean oldValue = this.stale;
-        this.stale = stale;
         if (!stale) {
             errorCount = 0;
         }
-        firePropertyChange(STALE_PROPERTY, oldValue, stale);
-    }
-
-    public int getRefreshTimeSeconds() {
-        return refreshTimeSeconds;
-    }
-
-    public void setRefreshTimeSeconds(int refreshTimeSeconds) {
-        long oldValue = this.refreshTimeSeconds;
-        this.refreshTimeSeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
-        logMethods.logInfo("Changing refresh time for series " + getId() + " to " + refreshTimeSeconds + " seconds");
-        scheduleRefresh();
-        firePropertyChange(REFRESH_TIME_SECONDS_PROPERTY, oldValue, refreshTimeSeconds);
-    }
-
-    public Date getLastRefreshTime() {
-        return lastRefreshTime;
-    }
-
-    public void setLastRefreshTime(Date time) {
-        Date oldValue = lastRefreshTime;
-        this.lastRefreshTime = time;
-        firePropertyChange(LAST_REFRESH_TIME_PROPERTY, oldValue, time);
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        boolean oldValue = this.selected;
-        this.selected = selected;
-        firePropertyChange(UIPropertiesTimeSeries.SELECTED_PROPERTY, oldValue, selected);
+        super.setStale(stale);
     }
 
     //Cancel any existing task and schedule a new one if series selected
@@ -245,7 +180,7 @@ public class RemoteHttpTimeSeries extends PropertyChangeTimeSeries implements Ch
         return r;
     }
 
-    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(RemoteChartingTimeSeriesConfig config) throws MalformedURLException {
+    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
         RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
         r.scheduleRefresh();
         return r;

@@ -19,10 +19,8 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 
 import java.net.URL;
 
@@ -54,8 +52,8 @@ public class AddRemoteSeriesQuery {
 
     private void createTimeSeries(FindRemoteTimeSeriesQuery.RemoteTimeSeries result) {
         TimeSeriesContext c = parent.createContext(result.getParentPath());
-        RemoteHttpTimeSeries r = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL(), Time.minutes(1));
-        ChartingTimeSeries series = new ChartingTimeSeries(r);
+
+        ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
         series.putAllProperties(result.getSummaryStatsProperties());
         c.addChild(series);
 

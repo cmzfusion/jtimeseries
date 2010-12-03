@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.net;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
@@ -50,6 +51,14 @@ public abstract class AbstractRemoteQuery {
         long time = System.nanoTime();
         doBeforeRun();
         XMLReader parser = XMLReaderFactory.createXMLReader();
+        String id    = "http://apache.org/xml/properties/input-buffer-size";
+        Object value = 20000000;
+        try {
+            parser.setProperty(id, value);
+        }
+        catch (SAXException e) {
+            System.err.println("could not set parser property");
+        }
         parser.setContentHandler(getContentHandler());
         parser.parse(url.toString());
         logMethods.logInfo(getClass().getName() + " query took " + ((System.nanoTime() - time) / 1000000) + " millis");

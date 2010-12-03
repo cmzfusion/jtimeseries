@@ -27,6 +27,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.SelectRemoteSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
@@ -48,7 +49,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private TimeSeriesContext contextToStoreRemoteSeries;
     private SelectRemoteSeriesPanel selectRemoteSeriesPanel;
     private DisplayNameCalculator displayNameCalculator;
-    private List<ChartingTimeSeries> selectedSeries = new LinkedList<ChartingTimeSeries>();
+    private List<? extends UIPropertiesTimeSeries> selectedSeries = new LinkedList<UIPropertiesTimeSeries>();
 
     public DownloadRemoteSeriesDialog(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, JComponent dialogPositionComponent) {
         this.displayNameCalculator = displayNameCalculator;
@@ -65,7 +66,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         setLocationRelativeTo(dialogPositionComponent);
     }
 
-    public List<ChartingTimeSeries> getSelectedSeries() {
+    public List<? extends UIPropertiesTimeSeries> getSelectedSeries() {
         return selectedSeries;
     }
 
@@ -84,7 +85,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
                 );
             }
 
-            public void seriesSelected(java.util.List<ChartingTimeSeries> series) {
+            public void seriesSelected(java.util.List<? extends UIPropertiesTimeSeries> series) {
                 DownloadRemoteSeriesDialog.this.selectedSeries = series;
                 dispose();
             }

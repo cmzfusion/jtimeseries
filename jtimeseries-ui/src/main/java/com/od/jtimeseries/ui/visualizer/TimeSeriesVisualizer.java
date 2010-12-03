@@ -21,8 +21,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
+import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
@@ -30,14 +29,13 @@ import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.time.Time;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +61,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private JToolBar toolbar;
     private TimeSeriesChart chart;
-    private SeriesSelectionPanel seriesSelectionPanel;
+    private SeriesSelectionPanel<ChartingTimeSeries> seriesSelectionPanel;
     private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private EditDisplayNamePatternsAction editDisplayNameAction;
@@ -79,7 +77,7 @@ public class TimeSeriesVisualizer extends JPanel {
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
         JPanel chartPanel = createChartPanel();
-        seriesSelectionPanel = new SeriesSelectionPanel(rootContext, "Chart", ChartingTimeSeries.class);
+        seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
         createToolbar();
         createSplitPane(chartPanel);
         layoutVisualizer();
@@ -206,22 +204,22 @@ public class TimeSeriesVisualizer extends JPanel {
         return seriesSelectionPanel;
     }
 
-    public List<RemoteChartingTimeSeriesConfig> getChartConfigs() {
-        List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
-        List<RemoteChartingTimeSeriesConfig> configs = new ArrayList<RemoteChartingTimeSeriesConfig>();
-        for ( IdentifiableTimeSeries i : l ) {
-            configs.add(((ChartingTimeSeries)i).getConfig());
+    public List<UiTimeSeriesConfig> getChartConfigs() {
+        List<UIPropertiesTimeSeries> l = rootContext.findAll(UIPropertiesTimeSeries.class).getAllMatches();
+        List<UiTimeSeriesConfig> configs = new ArrayList<UiTimeSeriesConfig>();
+        for ( UIPropertiesTimeSeries i : l ) {
+            configs.add(new UiTimeSeriesConfig(i));
         }
         return configs;
     }
 
-    public void addChartConfigs(List<RemoteChartingTimeSeriesConfig> chartConfigs) {
+    public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
         addChartsFromConfigs(chartConfigs);
         seriesSelectionPanel.refresh();
     }
 
-    private void addChartsFromConfigs(List<RemoteChartingTimeSeriesConfig> configs) {
-        for ( RemoteChartingTimeSeriesConfig c : configs) {
+    private void addChartsFromConfigs(List<UiTimeSeriesConfig> configs) {
+        for ( UiTimeSeriesConfig c : configs) {
             TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
                 RemoteHttpTimeSeries remoteHttpTimeSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(c);
@@ -243,13 +241,16 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private class AddToRootContextSelectionHandler implements ShowDownloadSeriesDialogAction.SeriesSelectionHandler {
 
-        public void seriesSelected(List<ChartingTimeSeries> selectedTimeSeries) {
-            for ( IdentifiableTimeSeries s : selectedTimeSeries) {
+        public void seriesSelected(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
+            for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
                 TimeSeriesContext c = rootContext.createContext(s.getParentPath());
+
+                RemoteHttpTimeSeries r = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(s.getId(), s.getDescription(), s.getTimeSeriesURL(), Time.minutes(1));
+                ChartingTimeSeries series = new ChartingTimeSeries(r);
 
                 //TODO we may want to flag the conflict up to the user
                 if ( ! c.containsChildWithId(s.getId())) {
-                    c.addChild(s);
+                    c.addChild(series);
                 }
             }
         }

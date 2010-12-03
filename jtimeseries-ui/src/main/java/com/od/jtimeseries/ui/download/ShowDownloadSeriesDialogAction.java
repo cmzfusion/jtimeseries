@@ -24,6 +24,7 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -74,6 +75,6 @@ public class ShowDownloadSeriesDialogAction extends AbstractAction {
 
     public static interface SeriesSelectionHandler {
 
-        public void seriesSelected(java.util.List<ChartingTimeSeries> selectedTimeSeries);
+        public void seriesSelected(java.util.List<? extends UIPropertiesTimeSeries> selectedTimeSeries);
     }
 }

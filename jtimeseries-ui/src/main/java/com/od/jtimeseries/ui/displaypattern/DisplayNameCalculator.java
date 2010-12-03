@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.displaypattern;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
         this.rootContext = rootContext;
     }
 
-    public void setDisplayName(ChartingTimeSeries s) {
+    public void setDisplayName(UIPropertiesTimeSeries s) {
         String path = s.getPath();
         String displayName = s.getId();
         for (DisplayNamePattern p : patternMap.keySet()) {

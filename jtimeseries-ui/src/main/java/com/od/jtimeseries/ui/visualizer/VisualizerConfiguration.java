@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
-import com.od.jtimeseries.ui.timeseries.RemoteChartingTimeSeriesConfig;
+import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 
@@ -40,7 +40,7 @@ public class VisualizerConfiguration {
     private String chartsTitle;
     private List<DisplayNamePattern> displayNamePatterns;
     private boolean tableSelectorVisible;
-    private List<RemoteChartingTimeSeriesConfig> chartConfigs;
+    private List<UiTimeSeriesConfig> chartConfigs;
     private int dividorLocation;
     private boolean showLegendOnChart = true;
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
@@ -51,7 +51,7 @@ public class VisualizerConfiguration {
     public VisualizerConfiguration() {
     }
 
-    public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<RemoteChartingTimeSeriesConfig> chartConfigs,
+    public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
                                    ChartRangeMode chartRangeMode, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
         this.chartsTitle = chartsTitle;
         this.displayNamePatterns = displayNamePatterns;
@@ -88,11 +88,11 @@ public class VisualizerConfiguration {
         this.tableSelectorVisible = tableSelectorVisible;
     }
 
-    public List<RemoteChartingTimeSeriesConfig> getChartConfigs() {
+    public List<UiTimeSeriesConfig> getChartConfigs() {
         return chartConfigs;
     }
 
-    public void setChartConfigs(List<RemoteChartingTimeSeriesConfig> chartConfigs) {
+    public void setChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
         this.chartConfigs = chartConfigs;
     }
 

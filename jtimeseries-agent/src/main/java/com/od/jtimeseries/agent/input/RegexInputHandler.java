@@ -4,6 +4,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,21 +19,29 @@ public class RegexInputHandler implements InputHandler {
 
     protected static LogMethods logMethods = LogUtils.getLogMethods(InputHandler.class);
 
-    private Pattern pattern;
+    private List<Pattern> patterns;
     private List<RegexValueHandler> valueHandlers = new ArrayList<RegexValueHandler>();
 
     public RegexInputHandler(String inputPattern) {
-        pattern = Pattern.compile(inputPattern);
+        this(Collections.singletonList(inputPattern));
+    }
+
+    public RegexInputHandler(List<String> inputPattern) {
+        for ( String p : inputPattern) {
+            patterns.add(Pattern.compile(p));
+        }
     }
 
     public void parseInput(String input) {
-        Matcher m = pattern.matcher(input);
-        if ( m.matches() ) {
-            for ( RegexValueHandler h : valueHandlers ) {
-                try {
-                    h.parseInputValue(m);
-                } catch ( Throwable t) {
-                    logMethods.logError("RegexValueHandler " + h + " failed to process value from input " + input, t);
+        for ( Pattern p : patterns) {
+            Matcher m = p.matcher(input);
+            if ( m.matches() ) {
+                for ( RegexValueHandler h : valueHandlers ) {
+                    try {
+                        h.parseInputValue(m);
+                    } catch ( Throwable t) {
+                        logMethods.logError("RegexValueHandler " + h + " failed to process value from input " + input, t);
+                    }
                 }
             }
         }

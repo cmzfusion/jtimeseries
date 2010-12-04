@@ -47,8 +47,6 @@ public class TimeSerious {
                 }
             }
         });
-
-        configManager.checkInitialized(mainFrame);
     }
 
     private void prepareConfigForSave(TimeSeriousConfig config) {

@@ -48,7 +48,7 @@ public class ConfigDirectorySelector {
 
         private DirectorySelectionWizard(Frame frame) throws HeadlessException {
             super(frame, "Select a Config Directory");
-            setSize(800, 600);
+            setSize(600, 600);
             setLocationRelativeTo(frame);
             setStepsPaneNavigable(false);
             setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

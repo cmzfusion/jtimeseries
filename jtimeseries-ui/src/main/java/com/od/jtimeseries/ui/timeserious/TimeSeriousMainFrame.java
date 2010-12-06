@@ -60,7 +60,7 @@ public class TimeSeriousMainFrame extends JFrame {
             setBounds(frameLocation);
             setExtendedState(config.getFrameExtendedState(MAIN_FRAME_NAME));
         } else {
-            setSize(1024, 768);
+            setSize(800, 600);
             setLocationRelativeTo(null);
         }
         desktopPanel.restoreConfig(config);

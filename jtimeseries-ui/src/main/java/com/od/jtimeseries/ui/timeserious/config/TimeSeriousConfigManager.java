@@ -50,61 +50,6 @@ public class TimeSeriousConfigManager {
         return result;
     }
 
-    private ConfigManager createConfigManager(File configDirectory) {
-        ConfigManager configManager = new ConfigManager();
-        configManager.setConfigDirectory(configDirectory);
-        return configManager;
-    }
-
-    /**
-     * @return true, if a config file directory has been determined and a ConfigManager created so that we can load and save configs
-     */
-    private boolean isInitializedAndWritable() {
-        return configManager != null && configManager.canWrite();
-    }
-
-    /**
-     * If not initialized already, prompt the user to choose a config directory, and use it to initialize the
-     * ConfigManager so that we can load and save configs
-     */
-    private boolean initializeConfigManager(JFrame mainFrame) {
-        if ( ! isInitializedAndWritable() ) {
-            configManager = createConfigManager(mainFrame);
-            if ( configManager != null ) {
-                saveConfigManagerPreferences(configManager);
-            }
-        }
-        return isInitializedAndWritable();
-    }
-
-    //the config directory is saved using Preferences mechanism
-    //this gives us the ability to find the main config file again on startup
-    private void saveConfigManagerPreferences(ConfigManager m) {
-        FileSourceAndSink fileSink = (FileSourceAndSink)m.getConfigSink();
-        preferenceSettings.setMainConfigDirectory(fileSink.getConfigDirectory());
-        preferenceSettings.store();
-    }
-
-    private ConfigManager createConfigManager(JFrame mainFrame) {
-        ConfigDirectorySelector s = new ConfigDirectorySelector(mainFrame);
-        s.showSelectorDialog();
-        File f = s.getSelectedDirectory();
-        ConfigManager result = null;
-        //if user selects a directory, proceed, or assume they don't want to save
-        if(f != null) {
-            result = createConfigManager(f);
-            if ( ! result.canWrite()) {
-                JOptionPane.showMessageDialog(mainFrame,
-                    "Cannot write to this location. Please choose another directory to save the config",
-                    "Cannot write config",
-                    JOptionPane.WARNING_MESSAGE
-                );
-                result = createConfigManager(mainFrame);
-            }
-        }
-        return result;
-    }
-
     /**
      * Check that a configManager has been initialized and is writable
      * If not, prompt the user for a config directory and create a new configManager
@@ -121,6 +66,86 @@ public class TimeSeriousConfigManager {
             logMethods.logInfo("Not saving, config manager not initialized");
         }
         return canSave;
+    }
+
+    /**
+     * @return true, if a config file directory has been determined and a ConfigManager created so that we can load and save configs
+     */
+    private boolean isInitializedAndWritable() {
+        return configManager != null && configManager.canWrite();
+    }
+
+    /**
+     * If not initialized already, prompt the user to choose a config directory, and use it to initialize the
+     * ConfigManager so that we can load and save configs
+     * @return true, if the configManager is initialized and we can save
+     */
+    private boolean initializeConfigManager(JFrame mainFrame) {
+        if ( ! isInitializedAndWritable() ) {
+            createConfigManagerAtDefaultDir();
+
+            //if creating the default config directory has failed, or
+            //the default directory is not writable, prompt the user to choose one
+            if ( configManager == null || ! configManager.canWrite()) {
+                configManager = showConfigDirectorySelector(mainFrame);
+            }
+
+            //if the user doesn't select a location, we may still not have a writable
+            //config dir, no point storing it
+            if ( configManager != null ) {
+                saveConfigManagerPreferences(configManager);
+            }
+        }
+        return isInitializedAndWritable();
+    }
+
+    private void createConfigManagerAtDefaultDir() {
+        File defaultConfigFolder = new File(System.getProperty("user.home"), ".timeSerious");
+        if ( ! defaultConfigFolder.exists()) {
+             boolean created = defaultConfigFolder.mkdir();
+             if ( created) {
+                 logMethods.logInfo("Created default config directory at " + defaultConfigFolder);
+                 configManager = createConfigManager(defaultConfigFolder);
+             } else {
+                 logMethods.logInfo("Could not create default config directory at " + defaultConfigFolder);
+             }
+        }
+    }
+
+    //the config directory is saved using Preferences mechanism
+    //this gives us the ability to find the main config file again on startup
+    private void saveConfigManagerPreferences(ConfigManager m) {
+        FileSourceAndSink fileSink = (FileSourceAndSink)m.getConfigSink();
+        preferenceSettings.setMainConfigDirectory(fileSink.getConfigDirectory());
+        preferenceSettings.store();
+    }
+
+    private ConfigManager showConfigDirectorySelector(JFrame mainFrame) {
+        logMethods.logInfo("Showing config directory selector");
+        ConfigDirectorySelector s = new ConfigDirectorySelector(mainFrame);
+        s.showSelectorDialog();
+        File f = s.getSelectedDirectory();
+        ConfigManager result = null;
+        //if user selects a directory, proceed, or assume they don't want to save
+        if(f != null) {
+            result = createConfigManager(f);
+            if ( ! result.canWrite()) {
+                JOptionPane.showMessageDialog(mainFrame,
+                    "Cannot write to this location. Please choose another directory to save the config",
+                    "Cannot write config",
+                    JOptionPane.WARNING_MESSAGE
+                );
+                result = showConfigDirectorySelector(mainFrame);
+            }
+        }
+        logMethods.logInfo("User selected directory " + f + " configManager initialized: " + isInitializedAndWritable());
+        return result;
+    }
+
+    private ConfigManager createConfigManager(File configDirectory) {
+        ConfigManager configManager = new ConfigManager();
+        configManager.setConfigDirectory(configDirectory);
+        return configManager;
     }
 
     private void doSave(TimeSeriousConfig config) throws ConfigManagerException {

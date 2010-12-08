@@ -4,6 +4,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.StringTokenizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,6 +67,11 @@ public class PathParser {
     }
 
     public static LinkedList<String> splitPath(String path) {
-        return new LinkedList<String>(Arrays.asList(path.split(IdentifiableBase.NAMESPACE_REGEX_PATH_SEPARATOR)));
+        LinkedList<String> l = new LinkedList<String>();
+        StringTokenizer st = new StringTokenizer(path, IdentifiableBase.NAMESPACE_REGEX_PATH_SEPARATOR);
+        while(st.hasMoreTokens()) {
+            l.add(st.nextToken());
+        }
+        return l;
     }
 }

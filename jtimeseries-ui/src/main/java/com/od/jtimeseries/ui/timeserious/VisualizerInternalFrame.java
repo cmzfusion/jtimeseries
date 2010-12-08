@@ -18,6 +18,7 @@ public class VisualizerInternalFrame extends JInternalFrame {
     public VisualizerInternalFrame(TimeSeriesVisualizer visualizer) {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
+        visualizer.setToolbarVisible(false);
         setFrameIcon(ImageUtils.SERIES_ICON_16x16);
         getContentPane().add(visualizer);
         setSize(800,600);

@@ -41,6 +41,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -67,6 +68,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     private final ChartControlPanel chartControlPanel;
+    private boolean toolbarVisible = true;
 
     public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary) {
         JideInitialization.applyLicense();
@@ -175,6 +177,17 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public void setColumns(List<ColumnSettings> columnSettings) {
         seriesSelectionPanel.setColumns(columnSettings);
+    }
+
+    public void setToolbarVisible(boolean visible) {
+        if ( visible != toolbarVisible ) {
+            if ( toolbarVisible ) {
+                remove(toolbar);
+            } else {
+                add(toolbar, BorderLayout.NORTH);
+            }
+            toolbarVisible = visible;
+        }
     }
 
     private void createToolbar() {

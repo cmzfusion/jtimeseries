@@ -80,6 +80,7 @@ public class ChartControlPanel extends JPanel {
     private void createColorCombo() {
         colorComboBox.setPreferredSize(new Dimension(65, colorComboBox.getPreferredSize().height));
         colorComboBox.setMaximumSize(colorComboBox.getPreferredSize());
+        colorComboBox.setColorValueVisible(false);
         colorComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 timeSeriesChart.setChartBackgroundColor(colorComboBox.getSelectedColor());
@@ -88,8 +89,6 @@ public class ChartControlPanel extends JPanel {
     }
 
     private void createRangeModeRadioButtons() {
-        radioButtonBox.setBorder(new EtchedBorder());
-
         radioButtonGroup = new ButtonGroup();
         for ( ChartRangeMode m : ChartRangeMode.values()) {
             JRadioButton b = new JRadioButton(m.toString());

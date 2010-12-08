@@ -20,19 +20,10 @@ public class DesktopPanel extends JPanel implements TimeSeriousDesktop {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary = new UdpPingHttpServerDictionary();
     private TimeSeriesDesktopPane desktopPane = new TimeSeriesDesktopPane(timeSeriesServerDictionary);
-    private JToolBar mainToolBar = new JToolBar();
 
     public DesktopPanel() {
         super(new BorderLayout());
-        createToolBar();
-        add(mainToolBar, BorderLayout.NORTH);
-
         add(desktopPane, BorderLayout.CENTER);
-    }
-
-    private void createToolBar() {
-        NewVisualizerAction newVisualizerAction = new NewVisualizerAction(this);
-        mainToolBar.add(newVisualizerAction);
     }
 
     public void createAndAddVisualizer() {

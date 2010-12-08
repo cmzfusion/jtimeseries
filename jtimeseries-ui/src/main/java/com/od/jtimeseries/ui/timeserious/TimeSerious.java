@@ -22,7 +22,8 @@ import java.awt.event.WindowEvent;
 public class TimeSerious {
 
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame();
+    private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
+    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(applicationActionModels);
     private TimeSeriousConfig config;
 
     public TimeSerious() {
@@ -58,15 +59,15 @@ public class TimeSerious {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
+                JideInitialization.applyLicense();                
+                JideInitialization.setupJide();
+                JideInitialization.setupJideLookAndFeel();
+
                 try {
                     UIManager.setLookAndFeel(WindowsLookAndFeel.class.getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                JideInitialization.applyLicense();                
-                JideInitialization.setupJide();
-                JideInitialization.setupJideLookAndFeel();
 
                 new TimeSerious();
             }

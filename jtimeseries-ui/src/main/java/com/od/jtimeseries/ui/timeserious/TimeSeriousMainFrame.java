@@ -2,15 +2,12 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.net.udp.UdpPingHttpServerDictionary;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.*;
-import java.util.List;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,16 +22,34 @@ public class TimeSeriousMainFrame extends JFrame {
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel = new DesktopPanel();
     private MainSeriesTreePanel seriesTreePanel = new MainSeriesTreePanel();
+    private JToolBar mainToolBar = new JToolBar();
+    private DesktopSelectionActionModel desktopSelectionActionModel;
 
-    public TimeSeriousMainFrame() {
+    public TimeSeriousMainFrame(ApplicationActionModels actionModels) {
+        desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         initializeFrame();
         createMenuBar();
+        createToolBar();
+        layoutFrame();
+        addListeners();
+    }
 
+    private void addListeners() {
+        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
+    }
+
+    private void layoutFrame() {
         setJMenuBar(mainMenuBar);
         JSplitPane splitPane = new JSplitPane();
         splitPane.setLeftComponent(seriesTreePanel);
         splitPane.setRightComponent(desktopPanel);
         getContentPane().add(splitPane, BorderLayout.CENTER);
+        add(mainToolBar, BorderLayout.NORTH);
+    }
+
+    private void createToolBar() {
+        NewVisualizerAction newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
+        mainToolBar.add(newVisualizerAction);
     }
 
     private void initializeFrame() {
@@ -72,6 +87,10 @@ public class TimeSeriousMainFrame extends JFrame {
         desktopPanel.prepareConfigForSave(config);
     }
 
+    public DesktopPanel getSelectedDesktop() {
+        return desktopPanel;
+    }
+
     private class ExitAction extends AbstractAction {
 
         private ExitAction() {
@@ -80,6 +99,17 @@ public class TimeSeriousMainFrame extends JFrame {
 
         public void actionPerformed(ActionEvent e) {
             System.exit(0);
+        }
+    }
+
+    //set the selected desktop in the desktopSelectionActionModel when this window is focused
+    private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
+
+        public void windowGainedFocus(WindowEvent e) {
+            desktopSelectionActionModel.setDesktop(desktopPanel);
+        }
+
+        public void windowLostFocus(WindowEvent e) {
         }
     }
 }

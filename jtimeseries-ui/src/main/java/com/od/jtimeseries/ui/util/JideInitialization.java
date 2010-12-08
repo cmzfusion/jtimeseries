@@ -57,6 +57,7 @@ public class JideInitialization {
 
     public static void setupJideLookAndFeel() {
         LookAndFeelFactory.installJideExtension(LookAndFeelFactory.OFFICE2007_STYLE);
+        LookAndFeelFactory.setDefaultStyle(LookAndFeelFactory.OFFICE2007_STYLE);
     }
 
     private static void setupCellEditorManager() {

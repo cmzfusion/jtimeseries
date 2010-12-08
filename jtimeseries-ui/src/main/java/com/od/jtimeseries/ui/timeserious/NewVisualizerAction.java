@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,16 +13,15 @@ import java.awt.event.ActionEvent;
  * Date: 26-Mar-2010
  * Time: 16:32:43
  */
-public class NewVisualizerAction extends AbstractAction {
+public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActionModel> {
 
-    private TimeSeriousDesktop desktopPane;
-
-    public NewVisualizerAction(TimeSeriousDesktop desktopPane) {
-        super("New Visualizer", ImageUtils.SERIES_ICON_16x16);
-        this.desktopPane = desktopPane;
+    public NewVisualizerAction(DesktopSelectionActionModel m) {
+        super(m, "New Visualizer", ImageUtils.SERIES_ICON_16x16);
     }
 
     public void actionPerformed(ActionEvent e) {
-        desktopPane.createAndAddVisualizer();
+        if ( getActionModel().isDesktopSelected()) {
+            getActionModel().getDesktop().createAndAddVisualizer();
+        }
     }
 }

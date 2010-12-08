@@ -26,6 +26,7 @@ import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.util.WeakReferenceListener;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
@@ -62,12 +63,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
-    private List<E> timeSeries = new ArrayList<E>();
-    private ListSelectionActionModel<E> seriesSelectionModel = new ListSelectionActionModel<E>();
-    private RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
-    private ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
     private PropertyChangeListener selectionPropertyListener = new SelectedSeriesPropertyChangeListener();
     private PropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
+    public WeakReferenceListener weakRefSeriesConnectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.STALE_PROPERTY, seriesConnectionPropertyListener);
+    public WeakReferenceListener weakRefSelectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.SELECTED_PROPERTY, selectionPropertyListener);
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
@@ -83,8 +82,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         this.context = context;
         this.seriesClass = seriesClass;
         this.selectionList = new SeriesSelectionList<E>();
-        setupTimeseries(context.findAll(seriesClass).getAllMatches());
-
+        setupTimeseries();
+        ListSelectionActionModel<E> seriesSelectionModel = new ListSelectionActionModel<E>();
+        ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
+        RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
         List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
         treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesActions);
         tableSelector = new TableSelector<E>(seriesSelectionModel, context, seriesActions, selectionText, seriesClass);
@@ -187,19 +188,23 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     }
 
     public void refresh() {
-        setupTimeseries(context.findAll(seriesClass).getAllMatches());
+        setupTimeseries();
         treeSelector.refreshSeries();
         tableSelector.refreshSeries();
+    }
+
+    private List<E> getAllTimeSeriesFromContext() {
+        return context.findAll(seriesClass).getAllMatches();
     }
 
     public void addAllDynamicColumns() {
         tableSelector.addAllDynamicColumns();
     }
 
-    private void setupTimeseries(List<E> l) {
-        removePropertyListenerFromCurrentSeries();
-        addPropertyListenerToNewSeries(l);
-        updateSelections(l);
+    private void setupTimeseries() {
+        List<E> series = getAllTimeSeriesFromContext();
+        addPropertyListenerToNewSeries(series);
+        updateSelections(series);
     }
 
     private void updateSelections(List<E> l) {
@@ -214,22 +219,8 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
 
     private void addPropertyListenerToNewSeries(List<E> l) {
         for ( E s : l) {
-            s.addPropertyChangeListener(
-                    UIPropertiesTimeSeries.SELECTED_PROPERTY,
-                    selectionPropertyListener
-            );
-
-            s.addPropertyChangeListener(
-                    UIPropertiesTimeSeries.STALE_PROPERTY,
-                    seriesConnectionPropertyListener
-            );
-        }
-    }
-
-    private void removePropertyListenerFromCurrentSeries() {
-        for ( E s : timeSeries ) {
-            s.removePropertyChangeListener(selectionPropertyListener);
-            s.removePropertyChangeListener(seriesConnectionPropertyListener);
+            weakRefSelectionListener.addListenerTo(s);
+            weakRefSeriesConnectionListener.addListenerTo(s);
         }
     }
 

@@ -49,7 +49,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPan
     private BeanPerRowModel<E> tableModel;
     private SortableTable timeSeriesTable;
     private JPopupMenu tablePopupMenu;
-    public TableColumnManager<E> tableColumnManager;
+    private TableColumnManager<E> tableColumnManager;
 
     public TableSelector(ListSelectionActionModel<E> seriesActionModel,
                          TimeSeriesContext rootContext,

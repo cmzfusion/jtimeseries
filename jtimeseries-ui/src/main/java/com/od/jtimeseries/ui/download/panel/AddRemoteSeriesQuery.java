@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.udp.RemoteHttpServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 
@@ -32,14 +33,24 @@ import java.net.URL;
  */
 public class AddRemoteSeriesQuery {
 
-    private TimeSeriesContext parent;
+    private TimeSeriesContext serverContext;
     private URL remoteContextUrl;
     private DisplayNameCalculator displayNameCalculator;
 
-    public AddRemoteSeriesQuery(TimeSeriesContext destinationContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
-        this.parent = destinationContext;
+    public AddRemoteSeriesQuery(RemoteHttpServer server, TimeSeriesContext destinationContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
+        this.serverContext = createServerContext(destinationContext, server);
         this.remoteContextUrl = remoteContextUrl;
         this.displayNameCalculator = displayNameCalculator;
+    }
+
+    private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, RemoteHttpServer server) {
+        String serverId = server.getDescription();
+        RemoteHttpServerContext serverContext = (RemoteHttpServerContext)destinationContext.get(serverId);
+        if ( serverContext == null) {
+            serverContext = new RemoteHttpServerContext(server, destinationContext, serverId, serverId);
+            destinationContext.addChild(serverContext);
+        }
+        return serverContext;
     }
 
     public void runQuery() throws Exception {
@@ -51,7 +62,7 @@ public class AddRemoteSeriesQuery {
     }
 
     private void createTimeSeries(FindRemoteTimeSeriesQuery.RemoteTimeSeries result) {
-        TimeSeriesContext c = parent.createContext(result.getParentPath());
+        TimeSeriesContext c = serverContext.createContext(result.getParentPath());
 
         ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
         series.putAllProperties(result.getSummaryStatsProperties());

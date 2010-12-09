@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.download.panel.RemoteHttpServerContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -270,7 +271,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         }
 
         protected Icon getIcon() {
-            return ImageUtils.CONTEXT_ICON_16x16;
+            return context instanceof RemoteHttpServerContext ? ImageUtils.REMOTE_SERVER_ICON : ImageUtils.CONTEXT_ICON_16x16;
         }
     }
 

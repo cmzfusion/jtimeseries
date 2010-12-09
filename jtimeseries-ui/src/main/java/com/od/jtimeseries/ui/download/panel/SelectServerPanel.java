@@ -44,8 +44,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -203,7 +205,21 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         try {
             if ( serverTextField.getText().trim() != null) {
                 URL url = new URL(serverTextField.getText().trim() + "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
-                loadSelectedSeriesCommand.execute(url);
+                RemoteHttpServer server = null;
+                try {
+                    server = new RemoteHttpServer(
+                        InetAddress.getByName(url.getHost()),
+                        url.getPort(),
+                        "Server at " + url.getHost() + ":" + url.getPort(),
+                        0
+                    );
+                } catch (UnknownHostException e) {
+                    JOptionPane.showMessageDialog(this, "Cannot find address for host " + url.getHost(), "Server not found", JOptionPane.WARNING_MESSAGE);
+                }
+                if (server != null) {
+                    loadSelectedSeriesCommand.setServer(server);
+                    loadSelectedSeriesCommand.execute(url);
+                }
             }
         } catch (MalformedURLException e1) {
             logMethods.logError("Bad URL specified", e1);
@@ -215,6 +231,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         if ( server != null) {
             try {
                 URL url = new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
+                loadSelectedSeriesCommand.setServer(server);
                 loadSelectedSeriesCommand.execute(url);
             } catch (MalformedURLException e1) {
                 logMethods.logError("Failed to download series, bad URL", e1);
@@ -224,12 +241,19 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
     private class LoadSelectedSeriesCommand extends SwingCommand<URL, String> {
 
+        private RemoteHttpServer server;
+
+        public void setServer(RemoteHttpServer server) {
+            this.server = server;
+        }
+
         protected Task<URL, String> createTask() {
             return new BackgroundTask<URL, String>() {
 
                 protected void doInBackground() throws Exception {
                     URL url = getParameters();
                     AddRemoteSeriesQuery q = new AddRemoteSeriesQuery(
+                        server,
                         remoteSeriesContext,
                         url,
                         displayNameCalculator

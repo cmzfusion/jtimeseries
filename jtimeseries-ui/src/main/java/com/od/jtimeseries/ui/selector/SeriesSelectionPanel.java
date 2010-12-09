@@ -63,10 +63,13 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
-    private PropertyChangeListener selectionPropertyListener = new SelectedSeriesPropertyChangeListener();
-    private PropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
-    public WeakReferenceListener weakRefSeriesConnectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.STALE_PROPERTY, seriesConnectionPropertyListener);
-    public WeakReferenceListener weakRefSelectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.SELECTED_PROPERTY, selectionPropertyListener);
+
+    private SeriesConnectionPropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
+    private SelectedSeriesPropertyChangeListener selectedSeriesPropertyListener = new SelectedSeriesPropertyChangeListener();
+
+    //add the property listeners using weak reference listener to allow the selection panel to be garbage collected
+    private final WeakReferenceListener weakRefSeriesConnectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.STALE_PROPERTY, seriesConnectionPropertyListener);
+    private final WeakReferenceListener weakRefSelectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.SELECTED_PROPERTY, selectedSeriesPropertyListener);
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);

@@ -5,10 +5,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,39 +13,81 @@ import java.util.concurrent.TimeUnit;
 /**
  * Nick Ebbutt (Object Definitions Ltd.)
  * <p/>
- * Create a dynamic proxy for a listener class, which delegates to a listener instance
- * wrapped in a weak reference
+ * Create a dynamic proxy for a listener, and add the dynamic proxy to one or more observables in place of the real listener instance
+ * The proxy delegates all events to the real listener, but only retains a WeakReference to the real listener instance.
+ * This allows the real listener (and any associated resources) to be garbage collected without explicitly removing
+ * its listeners from any observables.
+ *
+ * In this implementation, a background thread is used to keep track of all WeakReferenceListener instances currently in use.
+ * Once each real listener wrapped by a WeakReferenceListener has been garbage collected, a background task will perform cleanup -
+ * this will removing the dynamic proxy listener instance from any targetObservables to which it was added, and allow the
+ * WeakReferenceListener itself to be garbage collected.
+ *
+ * This implementation of WeakReferenceListener is intended for use in Swing UIs
+ * Only the Swing event thread should create WeakReferenceListeners and call addListenerTo() and removeListenerFrom()
+ * An alternative synchronization strategy would be required to make this class thread safe for other usages.
+ *
+ * This implementation uses reflection to find and to call the methods on target observables which allow listeners to be
+ * added and removed. This allows WeakReferenceListener to work for a wide range of swing listener interfaces 
+ *
+ * Usage:
+ * <pre>
+ * private PropertyChangeListener realListener = new PropertyChangeListener() {
+ *      public void propertyChange(PropertyChangeEvent evt) {
+ *          doSomeWork(evt);
+ *      }
+ * };
+ *
+ * public MyClass(List<MyBean> beans) {
+ *      for ( MyBean b : beans ) {
+ *          new WeakReferenceListener(realListener).addListenerTo(b);
+ *
+ *          //alternatively you can pass a parameter when the listener is added and removed:
+ *          //new WeakReferenceListener("myPropertyName", realListener).addListenerTo(b);
+ *      }
+ * }
+ * </pre>
+ *
  */
 public class WeakReferenceListener {
 
+    private static final boolean DEBUG_LOGGING = true;
+    
     private static final Object cleanupLock = new Object();
     private static final ScheduledExecutorService s = Executors.newSingleThreadScheduledExecutor();
     private static boolean cleanupRunning;
 
-    //really we need a WeakHashSet
-    private static final WeakHashMap<WeakReferenceListener, WeakReferenceListener> listeners = new WeakHashMap<WeakReferenceListener, WeakReferenceListener>();
+    //all the weak reference listeners, we check these periodically to see if we can
+    //the real listener is collected, and we can remove and garbage collect the weak listener
+    private static final Set<WeakReferenceListener> listeners = new HashSet<WeakReferenceListener>();
 
-    private volatile WeakReference listenerDelegate;
+    private volatile WeakReference delegateListener;
     private List<Class> listenerClassInterfaces;
     private Class listenerClass;
-    private Class[] addAndRemoveArguments;
 
+    //proxy listener added in place of delegateListener
     private Object proxyListener;
 
-    private List<WeakReference<Object>> targetObservables = new LinkedList<WeakReference<Object>>();
+    //list of observables to which the proxy listener has been added
+    //these need to be weak reference otherwise the WeakReferenceListener itself may hold on to them
+    private Set<WeakReference<Object>> targetObservables = new HashSet<WeakReference<Object>>();
+
+    //if set, the first argument to use for methods which add or remove the listener on target observables
     private Object firstAddAndRemoveArgument;
 
-    public WeakReferenceListener(Object firstAddAndRemoveArgument, Object delegateListener) {
-        this(delegateListener);
-        this.firstAddAndRemoveArgument = firstAddAndRemoveArgument;
-        addAndRemoveArguments = new Class[] { firstAddAndRemoveArgument.getClass(), listenerClass};
+    public WeakReferenceListener(Object delegateListener) {
+        this(null, delegateListener);
     }
 
-    public WeakReferenceListener(Object delegateListener) {
-        listenerClass = delegateListener.getClass();
-        listenerDelegate = new WeakReference(delegateListener);
-        addAndRemoveArguments = new Class[] { listenerClass };
-        listenerClassInterfaces = getAllInterfaces(delegateListener.getClass());
+    /**
+     * @param firstAddAndRemoveArgument - not null only if the add and remove listener methods on target observables take an additional first argument (e.g. we want to add a PropertyChangeListener for a specific named property)
+     * @param delegateListener, the listener we are proxying for
+     */
+    public WeakReferenceListener(Object firstAddAndRemoveArgument, Object delegateListener) {
+        this.firstAddAndRemoveArgument = firstAddAndRemoveArgument;
+        this.listenerClass = delegateListener.getClass();
+        this.delegateListener = new WeakReference(delegateListener);
+        this.listenerClassInterfaces = getAllInterfaces(delegateListener.getClass());
     }
 
     private LinkedList<Class> getAllInterfaces(Class c) {
@@ -57,8 +96,8 @@ public class WeakReferenceListener {
         return new LinkedList<Class>(interfaces);
     }
 
-    private int getListenerMethodArgumentCount() {
-        return addAndRemoveArguments.length;
+    private boolean isUseExtraParameterForListenerMethods() {
+        return firstAddAndRemoveArgument != null;
     }
 
     private void addAllInterfaces(Class startClass, HashSet<Class> interfaces) {
@@ -74,7 +113,7 @@ public class WeakReferenceListener {
     }
 
     private boolean isDelegateCollected() {
-        return listenerDelegate.get() == null;
+        return delegateListener.get() == null;
     }
 
     public boolean addListenerTo(Object targetObservable) {
@@ -85,13 +124,11 @@ public class WeakReferenceListener {
         boolean success = false;
         Method[] methods = targetObservable.getClass().getMethods();
         for ( Method m : methods ) {
-            if ( m.getName().startsWith("add") && m.getParameterTypes().length == getListenerMethodArgumentCount() && listenerClassInterfaces.contains(m.getParameterTypes()[getListenerMethodArgumentCount() -1])) {
+            if (m.getName().startsWith("add") && hasRequiredParameters(m)) {
                 try {
-                    if ( firstAddAndRemoveArgument == null) {
-                        m.invoke(targetObservable, proxyListener);
-                    } else {
-                        m.invoke(targetObservable, firstAddAndRemoveArgument, proxyListener);
-                    }
+                    Object[] args = getParameters(proxyListener);
+                    if (DEBUG_LOGGING) logDebug("Will use add method " + m);
+                    m.invoke(targetObservable, args);
                     success = true;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -115,7 +152,7 @@ public class WeakReferenceListener {
              //we are going to add the proxy listener to target observables,
             //so add this weak reference listener to the queue so that we can remove
             //proxyListener from target observables if the delegateListener is collected
-            listeners.put(this, this);
+            listeners.add(this);
         }
 
         checkCleanupThreadStarted();
@@ -129,13 +166,11 @@ public class WeakReferenceListener {
         if ( proxyListener != null ) {
             Method[] methods = targetObservable.getClass().getMethods();
             for ( Method m : methods ) {
-                if ( m.getName().startsWith("remove") && m.getParameterTypes().length == getListenerMethodArgumentCount() &&  listenerClassInterfaces.contains(m.getParameterTypes()[getListenerMethodArgumentCount() -1])) {
+                if ( m.getName().startsWith("remove") && hasRequiredParameters(m)) {
                     try {
-                        if ( firstAddAndRemoveArgument == null) {
-                            m.invoke(targetObservable, proxyListener);
-                        } else {
-                            m.invoke(targetObservable, firstAddAndRemoveArgument, proxyListener);
-                        }
+                        Object[] args = getParameters(proxyListener);
+                        if (DEBUG_LOGGING) logDebug("Will use remove method " + m);
+                        m.invoke(targetObservable, args);
                         success = true;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -154,20 +189,54 @@ public class WeakReferenceListener {
 
     private void removeFromCleanup(Object targetObservable) {
         synchronized (cleanupLock) {
-            WeakReference<Object> ref = null;
-            for ( WeakReference<Object> o : targetObservables) {
+            Iterator<WeakReference<Object>> i = targetObservables.iterator();
+            while( i.hasNext() ) {
+                WeakReference<Object> o = i.next();
                 if (o.get() == targetObservable) {
-                    ref = o;
+                    i.remove();
+                    break;
                 }
             }
 
-            if ( ref != null) {
-                targetObservables.remove(ref);
-            }
+            removeFromCleanupIfNoTargetObservables();
+        }
+    }
 
-            if ( targetObservables.size() == 0 ) {
-                listeners.remove(this);
-            }
+    private void removeFromCleanupIfNoTargetObservables() {
+        if ( targetObservables.size() == 0 ) {
+            if (DEBUG_LOGGING) logDebug("No more targetObservables, remove weak reference listener " + this);
+            listeners.remove(this);
+        }
+    }
+
+    //check an add or remove listener method has the right parameters
+    //if we are not using an extra argument, this means the only argument is a listener interface which is implemented by proxylistener
+    //if we are using an extra first argument, check the class for that is also valid
+    private boolean hasRequiredParameters(Method m) {
+        boolean result = false;
+        int expectedParameterCount = isUseExtraParameterForListenerMethods() ? 2 : 1;
+        Class[] parameterClasses = m.getParameterTypes();
+        if ( parameterClasses.length == expectedParameterCount ) {
+            result = checkParameters(parameterClasses[expectedParameterCount - 1], parameterClasses);
+        }
+        return result;
+    }
+
+    private boolean checkParameters(Class parameterClass, Class[] parameterClasses) {
+        boolean result = true;
+        if ( isUseExtraParameterForListenerMethods() ) {
+            result = parameterClasses[0].isAssignableFrom(firstAddAndRemoveArgument.getClass());
+        }
+        result &= listenerClassInterfaces.contains(parameterClass);
+        return result;
+    }
+
+    //if we are supporting an extra parameter to listener add and remove, return this in parameter array
+    private Object[] getParameters(Object proxyListener) {
+        if ( firstAddAndRemoveArgument == null) {
+            return new Object[] { proxyListener };
+        } else {
+            return new Object[] { firstAddAndRemoveArgument, proxyListener };
         }
     }
 
@@ -178,13 +247,15 @@ public class WeakReferenceListener {
                 public void run() {
                     List<WeakReferenceListener> currentListeners;
                     synchronized (cleanupLock) {
-                        currentListeners = new LinkedList<WeakReferenceListener>(listeners.keySet());
+                        currentListeners = new LinkedList<WeakReferenceListener>(listeners);
                     }
 
                     List<WeakReferenceListener> toDispose = new LinkedList<WeakReferenceListener>();
 
                     for ( WeakReferenceListener l : currentListeners) {
+                        if (DEBUG_LOGGING) logDebug("Checking weak ref listener " + l);
                         if ( l.isDelegateCollected() ) {
+                            if (DEBUG_LOGGING) logDebug("Delegate listener collected, adding for disposal " + l);
                             toDispose.add(l);
                         }
                     }
@@ -197,31 +268,45 @@ public class WeakReferenceListener {
                         });
                     }
                 }
-            }, 60, 60, TimeUnit.SECONDS);
+            }, 1, 1, TimeUnit.SECONDS);
             cleanupRunning = true;
         }
     }
 
     private void dispose() {
+        //targetObservables will change as we remove the listeners from it so take a snapshot to iterate
+        List<WeakReference> snapshotObservables;
+        synchronized (cleanupLock) {
+            snapshotObservables = new LinkedList<WeakReference>(targetObservables);
+        }
+
         //the delegate listener has been collected, good news! this is why we created a weak reference listener in the first place!
         //now we can remove this WeakReferenceListner from each of the observables it was added to and allow weak ref to be garbage collected
-        for ( WeakReference<Object> observable : targetObservables) {
+        for ( WeakReference<Object> observable : snapshotObservables) {
             Object o = observable.get();
             if ( o != null) {
+                if (DEBUG_LOGGING) logDebug("removing  " + this + " from target disposable " + o);
                 removeListenerFrom(o);
+            } else {
+                targetObservables.remove(observable);
             }
         }
+
+        //perhaps all the target observables were collected
+        //in that case, we don't need to keep this weak ref listener
+        removeFromCleanupIfNoTargetObservables();       
     }
 
     private Object getOrCreateProxyListener() {
         if ( proxyListener == null ) {
             InvocationHandler handler = new InvocationHandler() {
+
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    if (listenerDelegate.get() == null) {
+                    Object listener = delegateListener.get();
+                    if (listener == null) {
                         return null;
                     } else {
-                        Object delegate = listenerDelegate.get();
-                        return method.invoke(delegate, args);
+                        return method.invoke(listener, args);
                     }
                 }
             };
@@ -231,6 +316,10 @@ public class WeakReferenceListener {
                     handler);
             }
         return proxyListener;
+    }
+
+    private void logDebug(String s) {
+        System.out.println("WeakReferenceListener: " + s);
     }
 
 }

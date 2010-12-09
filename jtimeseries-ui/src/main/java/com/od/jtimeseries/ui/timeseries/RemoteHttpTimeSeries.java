@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.net.httpd.HttpParameterName;
+import com.od.jtimeseries.ui.util.ExecuteWeakReferencedCommandTask;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.Time;
@@ -95,17 +96,16 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             refreshTask.cancel(false);
         }
 
-        Runnable runCommandTask = new Runnable() {
-            public void run() {
-                refreshDataCommand.execute();
-            }
-        };
+        ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
         //if the user has not selected to chart the series, we only refresh the stats, and much less frequently
         int refreshTime = (displayedChartCount > 0) ? this.refreshTimeSeconds : STATS_ONLY_REFRESH_TIME_SECONDS;
         refreshTask = refreshExecutor.scheduleAtFixedRate(
             runCommandTask, 0, refreshTime, TimeUnit.SECONDS
         );
+
+        //cancel refresh task if this series is gc'd
+        runCommandTask.setFutureToCancel(refreshTask);
     }
 
     public void chartSeriesChanged(ChartSeriesEvent e) {
@@ -113,11 +113,12 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             case SERIES_CHART_DISPLAYED:
                 displayedChartCount++;
                 if ( displayedChartCount == 1) {
-                    scheduleRefresh(); //may want to increase refresh rate
+                    scheduleRefresh(); //may want to change refresh rate
                 }
                 break;
             case SERIES_CHART_HIDDEN:
                 displayedChartCount = Math.max(0, displayedChartCount - 1);
+                scheduleRefresh(); //may want to change refresh rate
                 break;
             default:
         }
@@ -159,18 +160,20 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                 }
             };
         }
-    }
 
-    //perform disconnection if task failed too many times
-    private class SetStaleOnErrorListener extends TaskListenerAdapter {
+        //perform disconnection if task failed too many times
+        private class SetStaleOnErrorListener extends TaskListenerAdapter {
 
-        public void error(Task task, Throwable error) {
-            errorCount++;
-            if ( errorCount >= MAX_ERRORS_BEFORE_DISCONNECT) {
-                setStale(true);
+            public void error(Task task, Throwable error) {
+                errorCount++;
+                if ( errorCount >= MAX_ERRORS_BEFORE_DISCONNECT) {
+                    setStale(true);
+                }
             }
         }
     }
+
+
 
     //Factory methods to construct, ensuring refresh is also scheduled after construction
 

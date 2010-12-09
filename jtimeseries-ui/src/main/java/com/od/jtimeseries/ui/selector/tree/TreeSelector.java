@@ -150,7 +150,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
 
     public void removeSeries(java.util.List<E> series) {
         for ( E s : series) {
-            SeriesTreeNode n = seriesToNodeMap.get(s);
+            SeriesTreeNode n = seriesToNodeMap.remove(s);
             treeModel.removeNodeFromParent(n);
         }
     }

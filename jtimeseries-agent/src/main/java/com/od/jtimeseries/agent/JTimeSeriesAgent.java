@@ -1,6 +1,7 @@
 package com.od.jtimeseries.agent;
 
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
+import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -60,7 +61,7 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     }
 
     private void doStartup() throws IOException {
-        startJmxManagementServer();
+        new JmxManagementService().startJmxManagementService(jmxManagementPort);
         setupManagedMetrics();
         startJmx();
         startTimeSeriesHttpServer();
@@ -75,18 +76,6 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
         inputProcessor.start();
     }
 
-    private void startJmxManagementServer() {
-        try {
-            logMethods.logInfo("Starting JMX Management Service");
-            LocateRegistry.createRegistry(jmxManagementPort);
-            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:" + jmxManagementPort + "/jmxrmi");
-            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
-            cs.start();
-        } catch (IOException e) {
-            logMethods.logError("Error creating jmx server", e);
-        }
-    }
 
     private void setupManagedMetrics() {
         logMethods.logInfo("Setting up server metrics series");

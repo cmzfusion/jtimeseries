@@ -24,14 +24,20 @@ public class TimeSeriousMainFrame extends JFrame {
     private MainSeriesTreePanel seriesTreePanel = new MainSeriesTreePanel();
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
+    private NewVisualizerAction newVisualizerAction;
 
     public TimeSeriousMainFrame(ApplicationActionModels actionModels) {
-        desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
+        createActions(actionModels);
         initializeFrame();
         createMenuBar();
         createToolBar();
         layoutFrame();
         addListeners();
+    }
+
+    private void createActions(ApplicationActionModels actionModels) {
+        desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
+        newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
     }
 
     private void addListeners() {
@@ -48,7 +54,6 @@ public class TimeSeriousMainFrame extends JFrame {
     }
 
     private void createToolBar() {
-        NewVisualizerAction newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
         mainToolBar.add(newVisualizerAction);
     }
 
@@ -66,6 +71,9 @@ public class TimeSeriousMainFrame extends JFrame {
         fileMenu.add(exitItem);
 
         JMenu windowMenu = new JMenu("Window");
+        JMenuItem newVisualizerItem = new JMenuItem(newVisualizerAction);
+        windowMenu.add(newVisualizerItem);
+
         mainMenuBar.add(windowMenu);
     }
 

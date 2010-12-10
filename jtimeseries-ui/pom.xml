@@ -42,8 +42,13 @@
         </dependency>
         <dependency>
             <groupId>od</groupId>
+            <artifactId>jtimeseries-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>od</groupId>
             <artifactId>od-swing</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jidesoft</groupId>

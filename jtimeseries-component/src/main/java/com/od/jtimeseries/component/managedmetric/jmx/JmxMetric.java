@@ -54,6 +54,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This is used by the server itself to capture its own memory usage.
  * It may also be configured to capture performance stats from third party processes.
  * See the serverMetricsContext.xml where the jmx metrics are defined.
+ *
+ * One JmxMetric may collect a number of jmx values - this enables us to make the most efficient use of 
+ * the connection
  */
 public class JmxMetric implements ManagedMetric {
 

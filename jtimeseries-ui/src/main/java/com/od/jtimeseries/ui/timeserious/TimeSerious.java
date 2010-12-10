@@ -1,15 +1,18 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +23,8 @@ import java.awt.event.WindowEvent;
  * Standalone UI for time series exploration
  */
 public class TimeSerious {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(TimeSerious.class);
 
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
@@ -72,8 +77,22 @@ public class TimeSerious {
                 new TimeSerious();
             }
         });
+
+        startJmxAndLocalHttpd();
     }
 
+    private static void startJmxAndLocalHttpd() {
+        LocalJmxMetrics localJmxMetrics = new LocalJmxMetrics();
+        localJmxMetrics.startJmxManagementService(17001);
+        localJmxMetrics.startLocalMetricCollection();
+
+        try {
+            JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(17002, localJmxMetrics.getRootContext());
+            httpd.start();
+        } catch (IOException e) {
+            logMethods.logError("Could not start timeserious httpd for local metrics", e);
+        }
+    }
 
 
 }

@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.server;
 
+import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
+import com.od.jtimeseries.component.jmx.JmxManagementService;
+import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
@@ -27,21 +30,14 @@ import com.od.jtimeseries.server.jmx.ServerConfigJmx;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-import javax.management.remote.JMXServiceURL;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
 import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.lang.management.ManagementFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -85,7 +81,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     private void doStartup() throws IOException {
         startSeriesDirectoryManager();
-        startJmxManagementServer();
+        new JmxManagementService().startJmxManagementService(jmxManagementPort);
         setupServerMetrics();
         startSummaryStats();
         addUdpMessageListeners();
@@ -97,19 +93,6 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         rootContext.startScheduling().startDataCapture();
 
         serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
-    }
-
-    private void startJmxManagementServer() {
-        try {
-            logMethods.logInfo("Starting JMX Management Service");
-            LocateRegistry.createRegistry(jmxManagementPort);
-            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            JMXServiceURL url = new JMXServiceURL("service:jmx:rmi:///jndi/rmi://:" + jmxManagementPort + "/jmxrmi");
-            JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
-            cs.start();
-        } catch (IOException e) {
-            logMethods.logError("Error creating jmx server", e);
-        }
     }
 
     private void startServerAnnouncementPings() {

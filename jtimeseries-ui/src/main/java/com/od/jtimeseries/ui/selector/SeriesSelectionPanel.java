@@ -26,7 +26,7 @@ import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.util.WeakReferenceListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 

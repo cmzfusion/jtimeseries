@@ -286,6 +286,7 @@ public class WeakReferenceListener {
             snapshotObservables = new LinkedList<WeakReference>(targetObservables);
         }
 
+        List<WeakReference<Object>> toRemove = new LinkedList<WeakReference<Object>>();
         //the delegate listener has been collected, good news! this is why we created a weak reference listener in the first place!
         //now we can remove this WeakReferenceListner from each of the observables it was added to and allow weak ref to be garbage collected
         for ( WeakReference<Object> observable : snapshotObservables) {
@@ -294,13 +295,18 @@ public class WeakReferenceListener {
                 if (DEBUG_LOGGING) logDebug("removing  " + this + " from target disposable " + o);
                 removeListenerFrom(o);
             } else {
-                targetObservables.remove(observable);
+                synchronized (cleanupLock) {
+                    targetObservables.remove(observable);
+                }
             }
         }
 
-        //perhaps all the target observables were collected
-        //in that case, we don't need to keep this weak ref listener
-        removeFromCleanupIfNoTargetObservables();       
+        synchronized (cleanupLock) {
+            for ( WeakReference<Object> o : toRemove ) {
+                targetObservables.remove(o);
+            }
+            listeners.remove(this);
+        }
     }
 
     private Object getOrCreateProxyListener() {

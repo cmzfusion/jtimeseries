@@ -51,7 +51,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class WeakReferenceListener {
 
-    private static final boolean DEBUG_LOGGING = true;
+    private static final boolean DEBUG_LOGGING = false;
+    private static volatile int CLEANUP_PERIOD_SECONDS = 30;
     
     private static final Object cleanupLock = new Object();
     private static final ScheduledExecutorService s = Executors.newSingleThreadScheduledExecutor();
@@ -88,6 +89,11 @@ public class WeakReferenceListener {
         this.listenerClass = delegateListener.getClass();
         this.delegateListener = new WeakReference(delegateListener);
         this.listenerClassInterfaces = getAllInterfaces(delegateListener.getClass());
+    }
+
+    //set how often the background thread will attempt to deregister and cleanup old WeakReferenceListener
+    public static void setCleanupPeriod(int seconds) {
+        CLEANUP_PERIOD_SECONDS = seconds;
     }
 
     private LinkedList<Class> getAllInterfaces(Class c) {
@@ -268,7 +274,7 @@ public class WeakReferenceListener {
                         });
                     }
                 }
-            }, 30, 30, TimeUnit.SECONDS);
+            }, CLEANUP_PERIOD_SECONDS, CLEANUP_PERIOD_SECONDS, TimeUnit.SECONDS);
             cleanupRunning = true;
         }
     }
@@ -305,7 +311,7 @@ public class WeakReferenceListener {
                     Class<?>[] paramTypes = method.getParameterTypes();
                     if (method.getName().equals("equals") && paramTypes.length == 1 && paramTypes[0] == Object.class) {
                         //this is the equals method being called on the proxy, we need to handle it locally
-                        return args[0] == this;
+                        return args[0] == proxy;
                     } else {
                         Object listener = delegateListener.get();
                         if (listener == null) {

@@ -20,12 +20,15 @@ public class TestWeakReferenceListener extends TestCase {
 
     public void testListener() throws InvocationTargetException, InterruptedException {
 
-        for ( int loop=0; loop < 10000000; loop ++ ) {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    new MyCollectable(listeners, button);
+        for ( int loop=0; loop < 100; loop ++) {
+            SwingUtilities.invokeAndWait(
+                new Runnable() {
+                    public void run() {
+                        createCollectables();
+                    }
                 }
-            });
+            );
+            Thread.sleep(1000);
         }
 
         int collectCount = 0;
@@ -37,6 +40,12 @@ public class TestWeakReferenceListener extends TestCase {
 
         System.out.println("Collected: " + collectCount);
         assertTrue(collectCount > 0);
+    }
+
+    private void createCollectables() {
+        for ( int loop=0; loop < 1000; loop ++ ) {
+            new MyCollectable(listeners, button);
+        }
     }
 
     public static class MyCollectable {

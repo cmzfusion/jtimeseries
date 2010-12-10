@@ -268,7 +268,7 @@ public class WeakReferenceListener {
                         });
                     }
                 }
-            }, 1, 1, TimeUnit.SECONDS);
+            }, 30, 30, TimeUnit.SECONDS);
             cleanupRunning = true;
         }
     }
@@ -302,11 +302,17 @@ public class WeakReferenceListener {
             InvocationHandler handler = new InvocationHandler() {
 
                 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    Object listener = delegateListener.get();
-                    if (listener == null) {
-                        return null;
+                    Class<?>[] paramTypes = method.getParameterTypes();
+                    if (method.getName().equals("equals") && paramTypes.length == 1 && paramTypes[0] == Object.class) {
+                        //this is the equals method being called on the proxy, we need to handle it locally
+                        return args[0] == this;
                     } else {
-                        return method.invoke(listener, args);
+                        Object listener = delegateListener.get();
+                        if (listener == null) {
+                            return null;
+                        } else {
+                            return method.invoke(listener, args);
+                        }
                     }
                 }
             };

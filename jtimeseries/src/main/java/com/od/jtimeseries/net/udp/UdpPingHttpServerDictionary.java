@@ -45,17 +45,41 @@ public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, 
     }
 
     public void udpMessageReceived(UdpMessage udpMessage) {
-        if ( udpMessage instanceof AnnouncementMessage) {
+        if ( udpMessage instanceof HttpServerAnnouncementMessage) {
             RemoteHttpServer remoteTimeSeriesServer = null;
             try {
-                remoteTimeSeriesServer = RemoteHttpServer.createRemoteTimeSeriesServer((AnnouncementMessage)udpMessage);
-                if ( ! serverSet.remove(remoteTimeSeriesServer) ) {
-                    logMethods.logDebug("New RemoteHttpServer " + remoteTimeSeriesServer);
-                }
-                serverSet.add(remoteTimeSeriesServer);
+                remoteTimeSeriesServer = RemoteHttpServer.create((HttpServerAnnouncementMessage)udpMessage);
+                addServer(remoteTimeSeriesServer);
             } catch (UnknownHostException e) {
                 logMethods.logError("Failed to add RemoteHttpServer ", e);
             }
         }
+    }
+
+    public boolean removeServer(RemoteHttpServer server) {
+        boolean removed = serverSet.remove(server);
+        if ( removed ) {
+            serverRemoved(server);
+        }
+        return removed;
+    }
+
+    //hook for subclasses to take action on server removal
+    protected void serverRemoved(RemoteHttpServer server) {
+    }
+
+    public boolean addServer(RemoteHttpServer remoteTimeSeriesServer) {
+        if ( ! serverSet.remove(remoteTimeSeriesServer) ) {
+            logMethods.logDebug("New RemoteHttpServer " + remoteTimeSeriesServer);
+        }
+        boolean added = serverSet.add(remoteTimeSeriesServer);
+        if ( added ) {
+            serverAdded(remoteTimeSeriesServer);
+        }
+        return added;
+    }
+
+    //hook for subclasses to take action on server addition
+    protected void serverAdded(RemoteHttpServer server) {
     }
 }

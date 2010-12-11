@@ -108,7 +108,7 @@ public class RemoteHttpServer implements Comparable {
                 '}';
     }
 
-    public static RemoteHttpServer createRemoteTimeSeriesServer(AnnouncementMessage p) throws UnknownHostException {
+    public static RemoteHttpServer create(AnnouncementMessage p) throws UnknownHostException {
         InetAddress i = InetAddress.getByName(p.getInetAddress());
         int port = p.getPort();
         String description = p.getDescription();

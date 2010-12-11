@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
+import com.od.jtimeseries.net.udp.UdpServer;
+import com.od.jtimeseries.ui.net.udp.UiRemoteHttpServerDictionary;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -29,9 +31,14 @@ public class TimeSerious {
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(applicationActionModels);
+    private UiRemoteHttpServerDictionary udpPingHttpServerDictionary = new UiRemoteHttpServerDictionary();
     private TimeSeriousConfig config;
 
     public TimeSerious() {
+
+        startJmxAndLocalHttpd();
+        setupServerDictionary();
+
         try {
             config = configManager.loadConfig();
         } catch (ConfigManagerException e) {
@@ -78,10 +85,15 @@ public class TimeSerious {
             }
         });
 
-        startJmxAndLocalHttpd();
     }
 
-    private static void startJmxAndLocalHttpd() {
+    private void setupServerDictionary() {
+        UdpServer server = new UdpServer(17000);
+        server.addUdpMessageListener(udpPingHttpServerDictionary);
+        server.startReceive();
+    }
+
+    private void startJmxAndLocalHttpd() {
         LocalJmxMetrics localJmxMetrics = new LocalJmxMetrics();
         localJmxMetrics.startJmxManagementService(17001);
         localJmxMetrics.startLocalMetricCollection();

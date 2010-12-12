@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,9 +48,18 @@ public class TimeSeriousMainFrame extends JFrame {
 
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
-        JSplitPane splitPane = new JSplitPane();
+        final JSplitPane splitPane = new JSplitPane();
         splitPane.setLeftComponent(seriesTreePanel);
         splitPane.setRightComponent(desktopPanel);
+        splitPane.addPropertyChangeListener(
+            JSplitPane.DIVIDER_LOCATION_PROPERTY,
+            new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    seriesTreePanel.revalidate();
+                    seriesTreePanel.repaint();
+                }
+            }
+        );
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
     }

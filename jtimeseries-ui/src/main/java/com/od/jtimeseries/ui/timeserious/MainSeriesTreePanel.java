@@ -1,5 +1,9 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.JTimeSeries;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+
 import javax.swing.*;
 
 /**
@@ -11,9 +15,13 @@ import javax.swing.*;
  */
 public class MainSeriesTreePanel extends JPanel {
 
-    public MainSeriesTreePanel() {
-        add(new JLabel("Main series tree"));
-    }
+    private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
+       JTimeSeries.createRootContext(),
+       UIPropertiesTimeSeries.class
+    );
 
+    public MainSeriesTreePanel() {
+        add(selectionPanel);
+    }
 
 }

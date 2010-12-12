@@ -1,8 +1,9 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
+import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpServer;
-import com.od.jtimeseries.ui.net.udp.UiRemoteHttpServerDictionary;
+import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -15,6 +16,8 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +34,7 @@ public class TimeSerious {
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(applicationActionModels);
-    private UiRemoteHttpServerDictionary udpPingHttpServerDictionary = new UiRemoteHttpServerDictionary();
+    private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private TimeSeriousConfig config;
 
     public TimeSerious() {
@@ -98,12 +101,28 @@ public class TimeSerious {
         localJmxMetrics.startJmxManagementService(17001);
         localJmxMetrics.startLocalMetricCollection();
 
+        int httpdPort = 17002;
         try {
-            JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(17002, localJmxMetrics.getRootContext());
+            JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(httpdPort, localJmxMetrics.getRootContext());
             httpd.start();
         } catch (IOException e) {
             logMethods.logError("Could not start timeserious httpd for local metrics", e);
         }
+
+        try {
+            udpPingHttpServerDictionary.addServer(
+                new TimeSeriesServer(
+                    InetAddress.getLocalHost(),
+                    httpdPort,
+                    "Timeserious",
+                    System.currentTimeMillis()
+                )
+            );
+        } catch (UnknownHostException e) {
+            logMethods.logError("Could not add local timeseries server", e);
+        }
+
+
     }
 
 

@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
-import com.od.jtimeseries.net.udp.RemoteHttpServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -63,7 +63,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private static final long HIDE_SERVERS_WITH_LAST_PING_OLDER_THAN_MILLIS = 1000 * 60 * 10;
     private JList knownServersList;
     private JTextField serverTextField = new JTextField();
-    private ListSelectionActionModel<RemoteHttpServer> listSelectionActionModel = new ListSelectionActionModel<RemoteHttpServer>();
+    private ListSelectionActionModel<TimeSeriesServer> listSelectionActionModel = new ListSelectionActionModel<TimeSeriesServer>();
     private JButton downloadButton = new JButton(new DownloadAction());
     private LoadSelectedSeriesCommand loadSelectedSeriesCommand = new LoadSelectedSeriesCommand();
     private TimeSeriesContext remoteSeriesContext;
@@ -119,7 +119,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         knownServersList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if ( knownServersList.getSelectedIndex() != -1 ) {
-                    listSelectionActionModel.setSelected((RemoteHttpServer)knownServersList.getSelectedValue());
+                    listSelectionActionModel.setSelected((TimeSeriesServer)knownServersList.getSelectedValue());
                 } else {
                     listSelectionActionModel.clearActionModelState();
                 }
@@ -179,8 +179,8 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
     private void buildList(TimeSeriesServerDictionary serverDictionary) {
         DefaultListModel defaultListModel = new DefaultListModel();
-        List<RemoteHttpServer> servers = serverDictionary.getKnownTimeSeriesServer();
-        for ( RemoteHttpServer s : servers) {
+        List<TimeSeriesServer> servers = serverDictionary.getKnownTimeSeriesServer();
+        for ( TimeSeriesServer s : servers) {
             if ( System.currentTimeMillis() - s.getLastAnnounceTimestamp() < HIDE_SERVERS_WITH_LAST_PING_OLDER_THAN_MILLIS) {
                 defaultListModel.addElement(s);
             }
@@ -190,7 +190,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         knownServersList.setCellRenderer(new RemoteTimeSeriesServerListCellRenderer());
     }
 
-    private class DownloadAction extends ModelDrivenAction<ListSelectionActionModel<RemoteHttpServer>> {
+    private class DownloadAction extends ModelDrivenAction<ListSelectionActionModel<TimeSeriesServer>> {
 
         public DownloadAction() {
             super(listSelectionActionModel, "Download Series from Server", ImageUtils.DOWNLOAD_16x16);
@@ -205,9 +205,9 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         try {
             if ( serverTextField.getText().trim() != null) {
                 URL url = new URL(serverTextField.getText().trim() + "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
-                RemoteHttpServer server = null;
+                TimeSeriesServer server = null;
                 try {
-                    server = new RemoteHttpServer(
+                    server = new TimeSeriesServer(
                         InetAddress.getByName(url.getHost()),
                         url.getPort(),
                         "Server at " + url.getHost() + ":" + url.getPort(),
@@ -227,7 +227,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     }
 
     private void downloadListSelections() {
-        final RemoteHttpServer server = (RemoteHttpServer)knownServersList.getSelectedValue();
+        final TimeSeriesServer server = (TimeSeriesServer)knownServersList.getSelectedValue();
         if ( server != null) {
             try {
                 URL url = new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
@@ -241,9 +241,9 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
     private class LoadSelectedSeriesCommand extends SwingCommand<URL, String> {
 
-        private RemoteHttpServer server;
+        private TimeSeriesServer server;
 
-        public void setServer(RemoteHttpServer server) {
+        public void setServer(TimeSeriesServer server) {
             this.server = server;
         }
 
@@ -272,7 +272,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            RemoteHttpServer server = (RemoteHttpServer)value;
+            TimeSeriesServer server = (TimeSeriesServer)value;
             setText(server.getDescription());
             setIcon(ImageUtils.REMOTE_SERVER_ICON);
             return this;

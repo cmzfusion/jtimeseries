@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.net.udp.RemoteHttpServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,18 +13,18 @@ import com.od.jtimeseries.net.udp.RemoteHttpServer;
  */
 public class RemoteHttpServerContext extends DefaultTimeSeriesContext {
 
-    private RemoteHttpServer server;
+    private TimeSeriesServer server;
 
-    public RemoteHttpServerContext(RemoteHttpServer server, TimeSeriesContext parentContext, String id, String description) {
+    public RemoteHttpServerContext(TimeSeriesServer server, TimeSeriesContext parentContext, String id, String description) {
         super(parentContext, id, description);
         this.server = server;
     }
 
-    public RemoteHttpServer getServer() {
+    public TimeSeriesServer getServer() {
         return server;
     }
 
-    public void setServer(RemoteHttpServer server) {
+    public void setServer(TimeSeriesServer server) {
         this.server = server;
     }
 }

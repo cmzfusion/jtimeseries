@@ -104,7 +104,7 @@ public class JTimeSeriesDemo {
         httpd.start();
 
         //A server dictionary which stores the list of known http servers from which we can download data in the ui
-        UdpPingHttpServerDictionary serverDictionary = new UdpPingHttpServerDictionary();
+        UdpPingTimeSeriesServerDictionary serverDictionary = new UdpPingTimeSeriesServerDictionary();
         UdpServer udpServer = new UdpServer(UDP_SERVER_PORT);
         udpServer.addUdpMessageListener(serverDictionary);
 
@@ -148,7 +148,7 @@ public class JTimeSeriesDemo {
         }).start();
     }
 
-    private void createVisualizer(UdpPingHttpServerDictionary serverDictionary) throws FileNotFoundException {
+    private void createVisualizer(UdpPingTimeSeriesServerDictionary serverDictionary) throws FileNotFoundException {
         visualizer = new TimeSeriesVisualizer("Test Chart", serverDictionary);
         VisualizerConfiguration config = loadVisualizerConfig();
         if ( config != null) {

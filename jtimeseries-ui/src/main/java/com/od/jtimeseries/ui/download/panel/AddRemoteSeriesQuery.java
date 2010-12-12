@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.net.udp.RemoteHttpServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 
@@ -37,13 +37,13 @@ public class AddRemoteSeriesQuery {
     private URL remoteContextUrl;
     private DisplayNameCalculator displayNameCalculator;
 
-    public AddRemoteSeriesQuery(RemoteHttpServer server, TimeSeriesContext destinationContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
+    public AddRemoteSeriesQuery(TimeSeriesServer server, TimeSeriesContext destinationContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
         this.serverContext = createServerContext(destinationContext, server);
         this.remoteContextUrl = remoteContextUrl;
         this.displayNameCalculator = displayNameCalculator;
     }
 
-    private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, RemoteHttpServer server) {
+    private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, TimeSeriesServer server) {
         String serverId = server.getDescription();
         RemoteHttpServerContext serverContext = (RemoteHttpServerContext)destinationContext.get(serverId);
         if ( serverContext == null) {

@@ -30,14 +30,14 @@ import java.util.*;
  * Date: 13-Jan-2009
  * Time: 12:37:59
  */
-public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, UdpServer.UdpMessageListener {
+public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictionary, UdpServer.UdpMessageListener {
     
-    private static LogMethods logMethods = LogUtils.getLogMethods(UdpPingHttpServerDictionary.class);
+    private static LogMethods logMethods = LogUtils.getLogMethods(UdpPingTimeSeriesServerDictionary.class);
 
-    private final Set<RemoteHttpServer> serverSet = Collections.synchronizedSet(new TreeSet<RemoteHttpServer>());
+    private final Set<TimeSeriesServer> serverSet = Collections.synchronizedSet(new TreeSet<TimeSeriesServer>());
 
-    public List<RemoteHttpServer> getKnownTimeSeriesServer() {
-        ArrayList<RemoteHttpServer> servers = new ArrayList<RemoteHttpServer>();
+    public List<TimeSeriesServer> getKnownTimeSeriesServer() {
+        ArrayList<TimeSeriesServer> servers = new ArrayList<TimeSeriesServer>();
         synchronized (serverSet) {
             servers.addAll(serverSet);
         }
@@ -46,17 +46,17 @@ public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, 
 
     public void udpMessageReceived(UdpMessage udpMessage) {
         if ( udpMessage instanceof HttpServerAnnouncementMessage) {
-            RemoteHttpServer remoteTimeSeriesServer = null;
+            TimeSeriesServer remoteTimeSeriesServer = null;
             try {
-                remoteTimeSeriesServer = RemoteHttpServer.create((HttpServerAnnouncementMessage)udpMessage);
+                remoteTimeSeriesServer = TimeSeriesServer.create((HttpServerAnnouncementMessage)udpMessage);
                 addServer(remoteTimeSeriesServer);
             } catch (UnknownHostException e) {
-                logMethods.logError("Failed to add RemoteHttpServer ", e);
+                logMethods.logError("Failed to add TimeSeriesServer ", e);
             }
         }
     }
 
-    public boolean removeServer(RemoteHttpServer server) {
+    public boolean removeServer(TimeSeriesServer server) {
         boolean removed = serverSet.remove(server);
         if ( removed ) {
             serverRemoved(server);
@@ -65,12 +65,12 @@ public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, 
     }
 
     //hook for subclasses to take action on server removal
-    protected void serverRemoved(RemoteHttpServer server) {
+    protected void serverRemoved(TimeSeriesServer server) {
     }
 
-    public boolean addServer(RemoteHttpServer remoteTimeSeriesServer) {
+    public boolean addServer(TimeSeriesServer remoteTimeSeriesServer) {
         if ( ! serverSet.remove(remoteTimeSeriesServer) ) {
-            logMethods.logDebug("New RemoteHttpServer " + remoteTimeSeriesServer);
+            logMethods.logDebug("New TimeSeriesServer " + remoteTimeSeriesServer);
         }
         boolean added = serverSet.add(remoteTimeSeriesServer);
         if ( added ) {
@@ -80,6 +80,6 @@ public class UdpPingHttpServerDictionary implements TimeSeriesServerDictionary, 
     }
 
     //hook for subclasses to take action on server addition
-    protected void serverAdded(RemoteHttpServer server) {
+    protected void serverAdded(TimeSeriesServer server) {
     }
 }

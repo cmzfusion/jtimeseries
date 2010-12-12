@@ -28,7 +28,7 @@ import java.util.Date;
  * Date: 13-Jan-2009
  * Time: 12:38:49
  */
-public class RemoteHttpServer implements Comparable {
+public class TimeSeriesServer implements Comparable {
 
     private final InetAddress serverAddress;
     private final int port;
@@ -36,7 +36,7 @@ public class RemoteHttpServer implements Comparable {
     private String description;
     private long lastAnnounceTimestamp;
 
-    public RemoteHttpServer(InetAddress serverAddress, int port, String description, long lastAnnounceTimestamp) {
+    public TimeSeriesServer(InetAddress serverAddress, int port, String description, long lastAnnounceTimestamp) {
         this.serverAddress = serverAddress;
         this.port = port;
         this.description = description;
@@ -82,15 +82,15 @@ public class RemoteHttpServer implements Comparable {
         boolean result = false;
         if ( o == this ) {
             result = true;
-        } else if ( o instanceof RemoteHttpServer) {
-            RemoteHttpServer r = (RemoteHttpServer)o;
+        } else if ( o instanceof TimeSeriesServer) {
+            TimeSeriesServer r = (TimeSeriesServer)o;
             result = serverAddress.equals(r.getServerAddress()) && port == r.getPort();
         }
         return result;
     }
 
     public int compareTo(Object o) {
-        RemoteHttpServer r = (RemoteHttpServer)o;
+        TimeSeriesServer r = (TimeSeriesServer)o;
         if ( this.equals(o)) {
             return 0;
         }  else {
@@ -100,7 +100,7 @@ public class RemoteHttpServer implements Comparable {
 
     @Override
     public String toString() {
-        return "RemoteHttpServer{" +
+        return "TimeSeriesServer{" +
                 "serverAddress=" + serverAddress +
                 ", port=" + port +
                 ", description='" + description + '\'' +
@@ -108,10 +108,10 @@ public class RemoteHttpServer implements Comparable {
                 '}';
     }
 
-    public static RemoteHttpServer create(AnnouncementMessage p) throws UnknownHostException {
+    public static TimeSeriesServer create(AnnouncementMessage p) throws UnknownHostException {
         InetAddress i = InetAddress.getByName(p.getInetAddress());
         int port = p.getPort();
         String description = p.getDescription();
-        return new RemoteHttpServer(i, port, description, System.currentTimeMillis());
+        return new TimeSeriesServer(i, port, description, System.currentTimeMillis());
     }
 }

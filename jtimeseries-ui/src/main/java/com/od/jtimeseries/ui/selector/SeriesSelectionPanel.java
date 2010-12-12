@@ -96,6 +96,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         createTitlePanel();
         addComponents();
         addListeners();
+        showTree();
     }
 
     private void createTitlePanel() {
@@ -231,10 +232,8 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         public void actionPerformed(ActionEvent e) {
             if ( useTreeRadio.isSelected()) {
                 SeriesSelectionPanel.this.showTree();
-                columnSelectorButton.setEnabled(false);
             } else {
                 SeriesSelectionPanel.this.showTable();
-                columnSelectorButton.setEnabled(true);
             }
         }
     }
@@ -254,11 +253,13 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     public void showTable() {
         useTableRadio.setSelected(true);
         cardLayout.show(selectorPanel, "table");
+        columnSelectorButton.setEnabled(true);
     }
 
     public void showTree() {
         useTreeRadio.setSelected(true);
         cardLayout.show(selectorPanel, "tree");
+        columnSelectorButton.setEnabled(false);
     }
 
     private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorPanel.SelectorPanelListenerAdapter<E> {

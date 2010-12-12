@@ -28,6 +28,6 @@ import java.util.List;
  */
 public interface TimeSeriesServerDictionary {
 
-    List<RemoteHttpServer> getKnownTimeSeriesServer();
+    List<TimeSeriesServer> getKnownTimeSeriesServer();
 
 }

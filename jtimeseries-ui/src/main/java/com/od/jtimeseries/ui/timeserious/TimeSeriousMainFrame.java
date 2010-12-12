@@ -8,8 +8,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +21,7 @@ public class TimeSeriousMainFrame extends JFrame {
 
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel = new DesktopPanel();
-    private MainSeriesTreePanel seriesTreePanel = new MainSeriesTreePanel();
+    private MainSeriesSelector seriesSelector = new MainSeriesSelector();
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
@@ -49,17 +47,17 @@ public class TimeSeriousMainFrame extends JFrame {
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
         final JSplitPane splitPane = new JSplitPane();
-        splitPane.setLeftComponent(seriesTreePanel);
+        splitPane.setLeftComponent(seriesSelector);
         splitPane.setRightComponent(desktopPanel);
-        splitPane.addPropertyChangeListener(
-            JSplitPane.DIVIDER_LOCATION_PROPERTY,
-            new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    seriesTreePanel.revalidate();
-                    seriesTreePanel.repaint();
-                }
-            }
-        );
+//        splitPane.addPropertyChangeListener(
+//            JSplitPane.DIVIDER_LOCATION_PROPERTY,
+//            new PropertyChangeListener() {
+//                public void propertyChange(PropertyChangeEvent evt) {
+//                    seriesSelector.revalidate();
+//                    seriesSelector.repaint();
+//                }
+//            }
+//        );
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
     }

@@ -274,7 +274,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             TimeSeriesServer server = (TimeSeriesServer)value;
             setText(server.getDescription());
-            setIcon(ImageUtils.REMOTE_SERVER_ICON);
+            setIcon(ImageUtils.TIMESERIES_SERVER_ICON_24x24);
             return this;
         }
     }

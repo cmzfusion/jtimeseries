@@ -33,13 +33,14 @@ public class ImageUtils {
     public static ImageIcon ADD_ICON_16x16 = getImageIcon("/images/add16x16.png");
     public static ImageIcon REMOVE_ICON_16x16 = getImageIcon("/images/selection_delete16x16.png");
     public static ImageIcon CONNECT_ICON_16x16 = getImageIcon("/images/connect16x16.png");
-    public static ImageIcon REMOTE_SERVER_ICON = getImageIcon("/images/server_client.png");
+    public static ImageIcon TIMESERIES_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_16x16.png");
+    public static ImageIcon TIMESERIES_SERVER_ICON_24x24 = getImageIcon("/images/server_client2_24x24.png");
+    public static ImageIcon ADD_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_add_16x16.png");
     public static ImageIcon REMOTE_CHART_16x16 = getImageIcon("/images/remoteChart.gif");
     public static ImageIcon DOWNLOAD_16x16 = getImageIcon("/images/download16x16.png");
     public static ImageIcon CANCEL_16x16 = getImageIcon("/images/cancel16x16.png");
     public static ImageIcon DISPLAY_NAME_16x16 = getImageIcon("/images/displayName16x16.png");
     public static ImageIcon OK_16x16 = getImageIcon("/images/ok16x16.png");
-
 
 
     public static ImageIcon getImageIcon(String name) {

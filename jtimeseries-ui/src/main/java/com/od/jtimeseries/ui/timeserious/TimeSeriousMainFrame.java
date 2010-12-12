@@ -25,6 +25,7 @@ public class TimeSeriousMainFrame extends JFrame {
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
+    private NewServerAction newServerAction;
 
     public TimeSeriousMainFrame(ApplicationActionModels actionModels) {
         createActions(actionModels);
@@ -38,6 +39,7 @@ public class TimeSeriousMainFrame extends JFrame {
     private void createActions(ApplicationActionModels actionModels) {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
+        newServerAction = new NewServerAction();
     }
 
     private void addListeners() {
@@ -49,21 +51,13 @@ public class TimeSeriousMainFrame extends JFrame {
         final JSplitPane splitPane = new JSplitPane();
         splitPane.setLeftComponent(seriesSelector);
         splitPane.setRightComponent(desktopPanel);
-//        splitPane.addPropertyChangeListener(
-//            JSplitPane.DIVIDER_LOCATION_PROPERTY,
-//            new PropertyChangeListener() {
-//                public void propertyChange(PropertyChangeEvent evt) {
-//                    seriesSelector.revalidate();
-//                    seriesSelector.repaint();
-//                }
-//            }
-//        );
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
     }
 
     private void createToolBar() {
         mainToolBar.add(newVisualizerAction);
+        mainToolBar.add(newServerAction);
     }
 
     private void initializeFrame() {

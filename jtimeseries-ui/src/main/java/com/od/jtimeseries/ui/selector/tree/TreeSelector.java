@@ -271,7 +271,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         }
 
         protected Icon getIcon() {
-            return context instanceof RemoteHttpServerContext ? ImageUtils.REMOTE_SERVER_ICON : ImageUtils.CONTEXT_ICON_16x16;
+            return context instanceof RemoteHttpServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
         }
     }
 

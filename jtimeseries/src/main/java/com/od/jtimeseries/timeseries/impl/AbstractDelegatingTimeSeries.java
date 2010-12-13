@@ -164,20 +164,11 @@ public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AbstractDelegatingTimeSeries that = (AbstractDelegatingTimeSeries) o;
-
-        if (wrappedTimeSeries != null ? !wrappedTimeSeries.equals(that.wrappedTimeSeries) : that.wrappedTimeSeries != null)
-            return false;
-
-        return true;
+        return wrappedTimeSeries.equals(o);
     }
 
     @Override
     public int hashCode() {
-        int result = wrappedTimeSeries != null ? wrappedTimeSeries.hashCode() : 0;
-        return result;
+        return wrappedTimeSeries.hashCode();
     }
 }

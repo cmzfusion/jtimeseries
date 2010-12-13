@@ -18,7 +18,15 @@
  */
 package com.od.jtimeseries.util.identifiable;
 
+import com.od.jtimeseries.capture.Capture;
+import com.od.jtimeseries.capture.CaptureFactory;
+import com.od.jtimeseries.context.*;
+import com.od.jtimeseries.scheduling.Scheduler;
+import com.od.jtimeseries.scheduling.Triggerable;
+import com.od.jtimeseries.source.ValueSourceFactory;
+import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.PathParser;
 
 import java.util.*;
 
@@ -38,8 +46,8 @@ public class IdentifiableBase extends LockingIdentifiable {
     private volatile String description;
     private volatile Identifiable parent;
     private Properties properties = new Properties();
-
-    private static List<Identifiable> EMPTY_CHILD_LIST = Collections.unmodifiableList(new ArrayList<Identifiable>());
+    private final Map<String, Identifiable> childrenById = new TreeMap<String, Identifiable>();
+    private List<IdentifiableTreeListener> treeListeners = new LinkedList<IdentifiableTreeListener>();
 
     public IdentifiableBase(Identifiable parent, String id, String description) {
         this(id, description);
@@ -53,6 +61,24 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     public String getId() {
         return id;
+    }
+
+    protected Identifiable addChild_Locked(Identifiable... identifiables) {
+        checkIdCharacters(identifiables);
+        for ( Identifiable i : identifiables) {
+            checkUniqueIdAndAdd(i);
+        }
+        return this;
+    }
+
+
+    protected <E extends Identifiable> void checkUniqueIdAndAdd(E identifiable) {
+        if (childrenById.containsKey(identifiable.getId())) {
+            throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
+        } else {
+            childrenById.put(identifiable.getId(), identifiable);
+        }
+        identifiable.setParent(this);
     }
 
     protected String getParentPath_Locked() {
@@ -89,20 +115,26 @@ public class IdentifiableBase extends LockingIdentifiable {
         return oldParent;
     }
 
-    protected boolean removeChild_Locked(Identifiable c) {
-        return false;
-    }
-
-    protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {
-        return null;
+    protected boolean removeChild_Locked(Identifiable e) {
+        boolean removed = false;
+        if ( containsChild_Locked(e) ) {
+            childrenById.remove(e.getId());
+            e.setParent(null);
+            removed = true;
+        }
+        return removed;
     }
 
     protected boolean containsChildWithId_Locked(String id) {
-        return false;
+        return childrenById.containsKey(id);
     }
 
-    protected boolean containsChild_Locked(Identifiable i) {
-        return false;
+    protected boolean containsChild_Locked(Identifiable child) {
+        boolean result = false;
+        if ( child != null) {
+            result = childrenById.get(child.getId()) == child;
+        }
+        return result;
     }
 
     protected String getProperty_Locked(String propertyName) {
@@ -132,11 +164,19 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected List<Identifiable> getChildren_Locked() {
-        return EMPTY_CHILD_LIST;
+        List<Identifiable> children = new ArrayList<Identifiable>();
+        children.addAll(this. childrenById.values());
+        return children;
     }
 
     protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
-        return (List<E>)EMPTY_CHILD_LIST;
+        List<E> list = new ArrayList<E>();
+        for ( Identifiable i : childrenById.values()) {
+            if ( classType.isAssignableFrom(i.getClass())) {
+                list.add((E)i);
+            }
+        }
+        return list;
     }
 
     public void setDescription(String description) {
@@ -163,20 +203,87 @@ public class IdentifiableBase extends LockingIdentifiable {
         return getId();
     }
 
-    public Identifiable getRoot() {
-        try {
-            getContextLock().readLock().lock();
-            return isRoot() ? this : getParent().getRoot();
-        } finally {
-            getContextLock().readLock().unlock();
+    protected Identifiable getRoot_Locked() {
+        return isRoot() ? this : getParent().getRoot();
+    }
+
+    protected boolean addTreeListener_Locked(IdentifiableTreeListener l) {
+        boolean result = false;
+        if ( ! treeListeners.contains(l)) {
+            treeListeners.add(l);
+            result = true;
         }
+        return result;
+    }
+
+    protected boolean removeTreeListener_Locked(IdentifiableTreeListener l) {
+        return treeListeners.remove(l);
     }
 
     protected boolean isRoot_Locked() {
         return getParent() == null;
     }
 
-    protected <E extends Identifiable> E get_Locked(String id, Class<E> classType) {
+    protected <E extends Identifiable> E get_Locked(String path, Class<E> classType) {
+        PathParser p = new PathParser(path);
+        Identifiable result;
+        if (p.isEmpty()) {
+            result = this;
+        } else if (p.isSingleNode()) {
+            result = childrenById.get(path);
+        } else {
+            String childContext = p.removeFirstNode();
+            Identifiable c = get(childContext);
+            result = c == null ? null : c.get(p.getRemainingPath(), classType);
+        }
+        if ( result != null && ! classType.isAssignableFrom(result.getClass())) {
+            throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from " + result.getClass() + " to " + classType);
+        }
+        return (E)result;
+    }
+
+    protected <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType) {
+        E result = get(id, classType);
+        if (result == null && ! isRoot()) {
+            result = getParent().getFromAncestors(id, classType);
+        }
+        return result;
+    }
+
+    protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters) {
+        PathParser p = new PathParser(path);
+        if ( p.isSingleNode() || p.isEmpty() ) {
+            E s = get(path, clazz);
+            if ( s == null) {
+                s = doCreate(path, description, clazz, parameters);
+                addChild(s);
+            }
+            return s;
+        } else {
+            //create the next context in the path, and recusively call create
+            String nextNode = p.removeFirstNode();
+            Identifiable c = create(nextNode, nextNode, Identifiable.class);
+            return c.create(p.getRemainingPath(), description, clazz, parameters);
+        }
+    }
+
+    protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {
+        PathParser p = new PathParser(path);
+        E result;
+        if (p.isSingleNode()) {
+            result = get(path, classType);
+            if ( result != null ) {
+                removeChild(result);
+            }
+        } else {
+            String childContext = p.removeFirstNode();
+            Identifiable c = get(childContext);
+            result = c == null ? null : c.remove(p.getRemainingPath(), classType);
+        }
+        return result;
+    }
+
+    protected <E extends Identifiable> E doCreate(String path, String description, Class<E> clazz, Object[] parameters) {
         return null;
     }
 

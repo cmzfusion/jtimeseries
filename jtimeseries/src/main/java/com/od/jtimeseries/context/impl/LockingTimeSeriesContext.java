@@ -53,36 +53,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return (TimeSeriesContext) super.getParent();
     }
 
-    public <E extends Identifiable> E getFromAncestors(String id, Class<E> classType) {
-        try {
-            getContextLock().readLock().lock();
-            return getFromAncestors_Locked(id, classType);
-        } finally {
-            getContextLock().readLock().unlock();
-        }
-    }
-    protected abstract <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType);
-
-    public final TimeSeriesContext addChild(Identifiable... identifiables) {
-        try {
-            getContextLock().writeLock().lock();
-            return addChild_Locked(identifiables);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-    protected abstract TimeSeriesContext addChild_Locked(Identifiable... identifiables);
-
-    public <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters) {
-        try {
-            getContextLock().writeLock().lock();
-            return create_Locked(path, description, clazz, parameters);
-        } finally {
-            getContextLock().writeLock().unlock();
-        }
-    }
-    protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters);
-
     public final List<ValueSource> getSources() {
         return getChildren(ValueSource.class);
     }
@@ -94,7 +64,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     public final List<TimeSeriesContext> getChildContexts() {
         return getChildren(TimeSeriesContext.class);
     }
-
 
     public final List<IdentifiableTimeSeries> getTimeSeries() {
        return getChildren(IdentifiableTimeSeries.class);

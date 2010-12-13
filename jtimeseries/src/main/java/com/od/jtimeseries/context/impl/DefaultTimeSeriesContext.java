@@ -46,7 +46,6 @@ import java.util.*;
  */
 public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
-    private final Map<String, Identifiable> childrenById = new TreeMap<String, Identifiable>();
     private ContextQueries contextQueries = new DefaultContextQueries(this);
     private DefaultMetricCreator defaultMetricCreator = new DefaultMetricCreator(this);
 
@@ -89,32 +88,8 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         setDefaultContextProperties();
     }
 
-    protected <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType) {
-        E result = get(id, classType);
-        if (result == null && ! isRoot()) {
-            result = getParent().getFromAncestors(id, classType);
-        }
-        return result;
-    }
-
     private void setDefaultContextProperties() {
         setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "true");
-    }
-
-    protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
-        List<E> list = new ArrayList<E>();
-        for ( Identifiable i : childrenById.values()) {
-            if ( classType.isAssignableFrom(i.getClass())) {
-                list.add((E)i);
-            }
-        }
-        return list;
-    }
-
-    protected List<Identifiable> getChildren_Locked() {
-        List<Identifiable> children = new ArrayList<Identifiable>();
-        children.addAll(this. childrenById.values());
-        return children;
     }
 
     protected TimeSeriesContext addChild_Locked(Identifiable... identifiables) {
@@ -148,32 +123,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return this;
     }
 
-    protected boolean removeChild_Locked(Identifiable e) {
-        boolean removed = false;
-        if ( containsChild_Locked(e) ) {
-            childrenById.remove(e.getId());
-            e.setParent(null);
-            removed = true;
-        }
-        return removed;
-    }
-
-    protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {
-        PathParser p = new PathParser(path);
-        E result;
-        if (p.isSingleNode()) {
-            result = get(path, classType);
-            if ( result != null ) {
-                removeChild(result);
-            }
-        } else {
-            String childContext = p.removeFirstNode();
-            TimeSeriesContext c = getContext(childContext);
-            result = c == null ? null : c.remove(p.getRemainingPath(), classType);
-        }
-        return result;
-    }
-
     private void doSetScheduler(Scheduler scheduler) {
         if ( isSchedulerStarted() ) {
             throw new UnsupportedOperationException("Cannot setScheduler while the existing scheduler is running");
@@ -195,36 +144,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
                 newScheduler.addTriggerable(t);
             }
         }
-    }
-
-    protected <E extends Identifiable> E get_Locked(String path, Class<E> classType) {
-        PathParser p = new PathParser(path);
-        Identifiable result;
-        if (p.isEmpty()) {
-            result = this;
-        } else if (p.isSingleNode()) {
-            result = childrenById.get(path);
-        } else {
-            String childContext = p.removeFirstNode();
-            TimeSeriesContext c = getContext(childContext);
-            result = c == null ? null : c.get(p.getRemainingPath(), classType);
-        }
-        if ( result != null && ! classType.isAssignableFrom(result.getClass())) {
-            throw new WrongClassTypeException("Cannot convert identifiable " + result.getPath() + " from " + result.getClass() + " to " + classType);
-        }
-        return (E)result;
-    }
-
-    protected boolean containsChildWithId_Locked(String id) {
-        return childrenById.containsKey(id);
-    }
-
-    protected boolean containsChild_Locked(Identifiable child) {
-        boolean result = false;
-        if ( child != null) {
-            result = childrenById.get(child.getId()) == child;
-        }
-        return result;
     }
 
     protected boolean isSchedulerStarted_Locked() {
@@ -262,24 +181,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         return this;
     }
 
-    protected <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters) {
-        PathParser p = new PathParser(path);
-        if ( p.isSingleNode() || p.isEmpty() ) {
-            E s = get(path, clazz);
-            if ( s == null) {
-                s = doCreate(path, description, clazz, parameters);
-                addChild(s);
-            }
-            return s;
-        } else {
-            //create the next context in the path, and recusively call create
-            String nextContext = p.removeFirstNode();
-            TimeSeriesContext c = create(nextContext, nextContext, TimeSeriesContext.class);
-            return c.create(p.getRemainingPath(), description, clazz, parameters);
-        }
-    }
-
-    private <E extends Identifiable> E doCreate(String id, String description, Class<E> classType, Object... parameters) {
+    protected <E extends Identifiable> E doCreate(String id, String description, Class<E> classType, Object... parameters) {
         E result;
         if ( TimeSeriesContext.class.isAssignableFrom(classType)) {
             result = getContextFactory().createContext(this, id, description, classType, parameters);
@@ -292,6 +194,9 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         }
         else if ( Capture.class.isAssignableFrom(classType)) {
             result = getCaptureFactory().createCapture(this, getPathForChild(id), id, (ValueSource)parameters[0], (IdentifiableTimeSeries)parameters[1], (CaptureFunction)parameters[2], classType, parameters);
+        }
+        else if ( Identifiable.class.isAssignableFrom(classType)) { //default to creating a child context so recursive creation works
+            result = getContextFactory().createContext(this, id, description, classType, parameters);
         }
         else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + classType);
@@ -394,15 +299,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     public String toString() {
         return "Context " + getId();
-    }
-
-    private <E extends Identifiable> void checkUniqueIdAndAdd(E identifiable) {
-        if (childrenById.containsKey(identifiable.getId())) {
-            throw new DuplicateIdException("id " + identifiable.getId() + " already exists in this context");
-        } else {
-            childrenById.put(identifiable.getId(), identifiable);
-        }
-        identifiable.setParent(this);
     }
 
 }

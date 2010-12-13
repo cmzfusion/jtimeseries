@@ -106,6 +106,10 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.get(id, classType);
     }
 
+    public <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters) {
+        return timingSource.create(id, description, clazz, parameters);
+    }
+
     public boolean containsChildWithId(String id) {
         return timingSource.containsChildWithId(id);
     }
@@ -144,6 +148,14 @@ public class DefaultQueueTimer implements QueueTimer {
 
     public String setProperty(String propertyName, String value) {
         return timingSource.setProperty(propertyName, value);
+    }
+
+    public Identifiable addChild(Identifiable... identifiables) {
+        return timingSource.addChild(identifiables);
+    }
+
+    public <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz) {
+        return timingSource.getFromAncestors(id, clazz);
     }
 
     public Properties getProperties() {

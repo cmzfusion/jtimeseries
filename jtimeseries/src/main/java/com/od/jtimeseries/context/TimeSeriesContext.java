@@ -37,12 +37,26 @@ import java.util.List;
  * Date: 17-Dec-2008
  * Time: 17:25:10
  *
- * A context for storing and creating timeseries
+ * A TimeSeriesContext is an Identifiable which supports special methods for the creation of several specialized types
+ * of child identifiable - e.g. TimeSeries, Captures and ValueSource
  *
- * TimeSeriesContext has several convenience methods such as createValueRecorder() which allow the user to create
- * a value source, a capture and a time series within the context in one method call.
+ * The creation of each special type is handled by a Factory class, e.g. TimeSeriesFactory
+ * At most one instance of each factory type can be associated with a context.
+ * If the context does not itself have a factory instance, it will use the factory defined by the first ancestor
+ * in the identifiable tree which can supply one.
  *
- * An example is the easiest way to illustrate this:
+ * In a similar manner to the factory classes, a single instance of a scheduler can be associated with the context
+ * This scheduler is responsible for triggering the timed capture of information into time series
+ * (in fact it it will periodically trigger any Triggerable instance which is added as a child of the context)
+ * e.g. If we are capturing the mean value from a ValueSource every five minutes, the scheduler will trigger this capture
+ *
+ * TimeSeriesContext has several convenience methods in the form createXXSeries, such as createValueRecorderSeries()
+ * which allow the user to create in one method call:
+ * - a value source (to submit values),
+ * - a capture (to record the raw values into a series or apply a function to record a value periodically) and
+ * - a time series within the context in one method call.
+ *
+ * An example is the easiest way to illustrate this
  *
  * <pre>
  * e.g.
@@ -59,10 +73,6 @@ import java.util.List;
  */
 public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
-    <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);
-
-    <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);
-
     TimeSeriesContext getParent();
 
     TimeSeriesContext getRoot();
@@ -74,8 +84,6 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
     List<TimeSeriesContext> getChildContexts();
 
     List<IdentifiableTimeSeries> getTimeSeries();
-
-    TimeSeriesContext addChild(Identifiable... identifiables);
 
     IdentifiableTimeSeries getTimeSeries(String path);
 

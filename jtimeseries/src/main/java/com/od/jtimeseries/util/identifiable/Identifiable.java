@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.util.identifiable;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -63,6 +65,8 @@ public interface Identifiable {
     Identifiable get(String path);
 
     <E extends Identifiable> E get(String path, Class<E> classType);
+
+    <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);
 
     Identifiable remove(String path);
 
@@ -113,4 +117,20 @@ public interface Identifiable {
      * @return the previous value for propertyName, or null if property was not set
      */
     String setProperty(String propertyName, String value);
+
+    Identifiable addChild(Identifiable... identifiables);
+
+
+    <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);
+
+
+    /**
+     * @return true, if the listener was not already in the listener list and was added
+     */
+    boolean addTreeListener(IdentifiableTreeListener l);
+
+    /**
+     * @return true, if the listener was currently in the listener list and was removed
+     */
+    boolean removeTreeListener(IdentifiableTreeListener l);
 }

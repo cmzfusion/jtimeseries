@@ -1,8 +1,14 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -14,108 +20,145 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Time: 17:07:26
  *
  */
-public class DelegatingIdentifiableTimeSeries extends AbstractDelegatingTimeSeries implements IdentifiableTimeSeries {
+public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
 
     private IdentifiableTimeSeries wrappedSeries;
 
+    private WrappedTimeSeriesEventHandler eventHandler = new WrappedTimeSeriesEventHandler(this);
+
     public DelegatingIdentifiableTimeSeries(IdentifiableTimeSeries wrappedSeries) {
-        super(wrappedSeries);
+        super(wrappedSeries.getId(), wrappedSeries.getDescription());
         this.wrappedSeries = wrappedSeries;
+        wrappedSeries.addTimeSeriesListener(eventHandler);
     }
 
-    public String getId() {
-        return wrappedSeries.getId();
+    public boolean prepend(TimeSeriesItem item) {
+        return wrappedSeries.prepend(item);
     }
 
-    public String getParentPath() {
-        return wrappedSeries.getParentPath();
+    public boolean append(TimeSeriesItem value) {
+        return wrappedSeries.append(value);
     }
 
-    public String getPath() {
-        return wrappedSeries.getPath();
+    public TimeSeries getSubSeries(long timestamp) {
+        return wrappedSeries.getSubSeries(timestamp);
     }
 
-    public void setDescription(String description) {
-        wrappedSeries.setDescription(description);
+    public TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+        return wrappedSeries.getSubSeries(startTimestamp, endTimestamp);
     }
 
-    public String getDescription() {
-        return wrappedSeries.getDescription();
+    public TimeSeriesItem getEarliestItem() {
+        return wrappedSeries.getEarliestItem();
     }
 
-    public Identifiable getParent() {
-        return wrappedSeries.getParent();
+    public TimeSeriesItem getLatestItem() {
+        return wrappedSeries.getLatestItem();
     }
 
-    public Identifiable setParent(Identifiable parent) {
-        return wrappedSeries.setParent(parent);
+    public TimeSeriesItem removeEarliestItem() {
+        return wrappedSeries.removeEarliestItem();
     }
 
-    public List<Identifiable> getChildren() {
-        return wrappedSeries.getChildren();
+    public TimeSeriesItem removeLatestItem() {
+        return wrappedSeries.removeLatestItem();
     }
 
-    public <E extends Identifiable> List<E> getChildren(Class<E> classType) {
-        return wrappedSeries.getChildren(classType);
+    public long getEarliestTimestamp() {
+        return wrappedSeries.getEarliestTimestamp();
     }
 
-    public Identifiable get(String path) {
-        return wrappedSeries.get(path);
+    public long getLatestTimestamp() {
+        return wrappedSeries.getLatestTimestamp();
     }
 
-    public <E extends Identifiable> E get(String path, Class<E> classType) {
-        return wrappedSeries.get(path, classType);
+    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+        return wrappedSeries.getFirstItemAtOrBefore(timestamp);
     }
 
-    public Identifiable remove(String path) {
-        return wrappedSeries.remove(path);
+    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+        return wrappedSeries.getFirstItemAtOrAfter(timestamp);
     }
 
-    public <E extends Identifiable> E remove(String path, Class<E> classType) {
-        return wrappedSeries.remove(path, classType);
+    public long getTimestampAfter(long timestamp) {
+        return wrappedSeries.getTimestampAfter(timestamp);
     }
 
-    public boolean removeChild(Identifiable c) {
-        return wrappedSeries.removeChild(c);
+    public long getTimestampBefore(long timestamp) {
+        return wrappedSeries.getTimestampBefore(timestamp);
     }
 
-    public ReentrantReadWriteLock getContextLock() {
-        return wrappedSeries.getContextLock();
+    public Collection<TimeSeriesItem> getSnapshot() {
+        return wrappedSeries.getSnapshot();
     }
 
-    public Identifiable getRoot() {
-        return wrappedSeries.getRoot();
+    public int size() {
+        return wrappedSeries.size();
     }
 
-    public boolean isRoot() {
-        return wrappedSeries.isRoot();
+    public boolean isEmpty() {
+        return wrappedSeries.isEmpty();
     }
 
-    public boolean containsChildWithId(String id) {
-        return wrappedSeries.containsChildWithId(id);
+    public boolean contains(Object o) {
+        return wrappedSeries.contains(o);
     }
 
-    public boolean containsChild(Identifiable i) {
-        return wrappedSeries.containsChild(i);
+    public Iterator<TimeSeriesItem> iterator() {
+        return wrappedSeries.iterator();
     }
 
-    public String getProperty(String propertyName) {
-        return wrappedSeries.getProperty(propertyName);
+    public Object[] toArray() {
+        return wrappedSeries.toArray();
     }
 
-    public Properties getProperties() {
-        return wrappedSeries.getProperties();
+    public <T> T[] toArray(T[] a) {
+        return wrappedSeries.toArray(a);
     }
 
-    public void putAllProperties(Properties p) {
-        wrappedSeries.putAllProperties(p);
+    public boolean add(TimeSeriesItem o) {
+        return wrappedSeries.add(o);
     }
 
-    public String findProperty(String propertyName) {
-        return wrappedSeries.findProperty(propertyName);
+    public boolean remove(Object o) {
+        return wrappedSeries.remove(o);
     }
 
-    public String setProperty(String propertyName, String value) {
-        return wrappedSeries.setProperty(propertyName, value);
+    public boolean containsAll(Collection<?> c) {
+        return wrappedSeries.containsAll(c);
+    }
+
+    public boolean addAll(Collection<? extends TimeSeriesItem> c) {
+        return wrappedSeries.addAll(c);
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        return wrappedSeries.removeAll(c);
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        return wrappedSeries.retainAll(c);
+    }
+
+    public void clear() {
+        wrappedSeries.clear();
+    }
+
+    public void addTimeSeriesListener(TimeSeriesListener l) {
+        eventHandler.addTimeSeriesListener(l);
+    }
+
+    public void removeTimeSeriesListener(TimeSeriesListener l) {
+        eventHandler.removeTimeSeriesListener(l);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return wrappedSeries.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return wrappedSeries.hashCode();
     }
 }

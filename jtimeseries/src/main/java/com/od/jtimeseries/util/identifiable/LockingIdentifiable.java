@@ -1,5 +1,7 @@
 package com.od.jtimeseries.util.identifiable;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -77,6 +79,16 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType);
 
+    public <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters) {
+        try {
+            getContextLock().writeLock().lock();
+            return create_Locked(path, description, clazz, parameters);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters);
+
     public final boolean removeChild(Identifiable c) {
         try {
             getContextLock().writeLock().lock();
@@ -127,6 +139,18 @@ public abstract class LockingIdentifiable implements Identifiable {
     }
     protected abstract <E extends Identifiable> E get_Locked(String path, Class<E> classType);
 
+
+    public <E extends Identifiable> E getFromAncestors(String id, Class<E> classType) {
+        try {
+            getContextLock().readLock().lock();
+            return getFromAncestors_Locked(id, classType);
+        } finally {
+            getContextLock().readLock().unlock();
+        }
+    }
+    protected abstract <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType);
+
+
     public final boolean containsChildWithId(String id) {
         try {
             getContextLock().readLock().lock();
@@ -135,7 +159,6 @@ public abstract class LockingIdentifiable implements Identifiable {
             getContextLock().readLock().unlock();
         }
     }
-
     protected abstract boolean containsChildWithId_Locked(String id);
 
     public final boolean containsChild(Identifiable i) {
@@ -204,4 +227,47 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract String setProperty_Locked(String propertyName, String value);
 
+    public final Identifiable addChild(Identifiable... identifiables) {
+        try {
+            getContextLock().writeLock().lock();
+            return addChild_Locked(identifiables);
+        } finally {
+            getContextLock().writeLock().unlock();
+        }
+    }
+
+    protected abstract Identifiable addChild_Locked(Identifiable... identifiables);
+
+    public boolean addTreeListener(IdentifiableTreeListener l) {
+        try {
+            getContextLock().readLock().lock();
+            return addTreeListener_Locked(l);
+        } finally {
+            getContextLock().readLock().unlock();
+        }
+    }
+
+    protected abstract boolean addTreeListener_Locked(IdentifiableTreeListener l);
+
+    public boolean removeTreeListener(IdentifiableTreeListener l) {
+        try {
+            getContextLock().readLock().lock();
+            return removeTreeListener_Locked(l);
+        } finally {
+            getContextLock().readLock().unlock();
+        }
+    }
+
+    protected abstract boolean removeTreeListener_Locked(IdentifiableTreeListener l);
+
+    public Identifiable getRoot() {
+        try {
+            getContextLock().readLock().lock();
+            return getRoot_Locked();
+        } finally {
+            getContextLock().readLock().unlock();
+        }
+    }
+
+    protected abstract Identifiable getRoot_Locked();
 }

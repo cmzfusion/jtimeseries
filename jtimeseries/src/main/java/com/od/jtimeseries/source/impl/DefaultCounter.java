@@ -122,6 +122,10 @@ public class DefaultCounter implements Counter {
         return simpleSource.get(id, classType);
     }
 
+    public <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters) {
+        return simpleSource.create(id, description, clazz, parameters);
+    }
+
     public boolean containsChildWithId(String id) {
         return simpleSource.containsChildWithId(id);
     }
@@ -132,6 +136,14 @@ public class DefaultCounter implements Counter {
 
     public String setProperty(String propertyName, String value) {
         return simpleSource.setProperty(propertyName, value);
+    }
+
+    public Identifiable addChild(Identifiable... identifiables) {
+        return simpleSource.addChild(identifiables);
+    }
+
+    public <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz) {
+        return simpleSource.getFromAncestors(id, clazz);
     }
 
     public String findProperty(String propertyName) {
@@ -161,4 +173,6 @@ public class DefaultCounter implements Counter {
     public <E extends Identifiable> E remove(String path, Class<E> classType) {
         return simpleSource.remove(path, classType);
     }
+
+
 }

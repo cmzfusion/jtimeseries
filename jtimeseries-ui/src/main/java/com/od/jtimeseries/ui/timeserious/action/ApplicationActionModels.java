@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
 /**
  * Created by IntelliJ IDEA.

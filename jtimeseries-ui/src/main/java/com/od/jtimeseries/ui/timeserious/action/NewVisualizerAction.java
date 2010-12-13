@@ -1,10 +1,9 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
+import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**

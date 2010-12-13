@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -33,8 +34,8 @@ public class TimeSerious {
 
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(applicationActionModels);
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
+    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary, applicationActionModels);
     private TimeSeriousConfig config;
 
     public TimeSerious() {

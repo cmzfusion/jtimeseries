@@ -1,5 +1,10 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
+import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
+import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
@@ -19,15 +24,18 @@ public class TimeSeriousMainFrame extends JFrame {
 
     public static final String MAIN_FRAME_NAME = "mainFrame";
 
+    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext();
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel = new DesktopPanel();
-    private MainSeriesSelector seriesSelector = new MainSeriesSelector();
+    private MainSeriesSelector seriesSelector = new MainSeriesSelector(rootContext);
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
     private NewServerAction newServerAction;
+    private UiTimeSeriesServerDictionary serverDictionary;
 
-    public TimeSeriousMainFrame(ApplicationActionModels actionModels) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
+        this.serverDictionary = serverDictionary;
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -39,7 +47,7 @@ public class TimeSeriousMainFrame extends JFrame {
     private void createActions(ApplicationActionModels actionModels) {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
-        newServerAction = new NewServerAction();
+        newServerAction = new NewServerAction(this, serverDictionary, rootContext);
     }
 
     private void addListeners() {

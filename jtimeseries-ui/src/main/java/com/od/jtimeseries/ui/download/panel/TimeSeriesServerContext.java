@@ -11,11 +11,11 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
  * Time: 14:13:37
  * To change this template use File | Settings | File Templates.
  */
-public class RemoteHttpServerContext extends DefaultTimeSeriesContext {
+public class TimeSeriesServerContext extends DefaultTimeSeriesContext {
 
     private TimeSeriesServer server;
 
-    public RemoteHttpServerContext(TimeSeriesServer server, TimeSeriesContext parentContext, String id, String description) {
+    public TimeSeriesServerContext(TimeSeriesServer server, TimeSeriesContext parentContext, String id, String description) {
         super(parentContext, id, description);
         this.server = server;
     }

@@ -22,7 +22,7 @@ import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.download.panel.RemoteHttpServerContext;
+import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
@@ -280,11 +280,11 @@ public class TimeSeriesVisualizer extends JPanel {
         private void createServerContexts(UIPropertiesTimeSeries s) {
             Identifiable i = s.getRoot();
             if ( i instanceof ContextQueries ) {
-                List<RemoteHttpServerContext> serverContexts =
-                        ((ContextQueries)i).findAll(RemoteHttpServerContext.class).getAllMatches();
-                for (RemoteHttpServerContext c : serverContexts) {
+                List<TimeSeriesServerContext> serverContexts =
+                        ((ContextQueries)i).findAll(TimeSeriesServerContext.class).getAllMatches();
+                for (TimeSeriesServerContext c : serverContexts) {
                     if ( ! rootContext.containsChildWithId(c.getId())) {
-                        rootContext.addChild(new RemoteHttpServerContext(
+                        rootContext.addChild(new TimeSeriesServerContext(
                                 c.getServer(),
                                 rootContext,
                                 c.getId(),

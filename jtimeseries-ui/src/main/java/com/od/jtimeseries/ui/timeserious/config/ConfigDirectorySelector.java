@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious.config;
 import com.jidesoft.dialog.ButtonEvent;
 import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageList;
+import com.jidesoft.wizard.DefaultWizardPage;
 import com.jidesoft.wizard.WelcomeWizardPage;
 import com.jidesoft.wizard.WizardDialog;
 import com.jidesoft.wizard.WizardStyle;
@@ -64,7 +65,7 @@ public class ConfigDirectorySelector {
         }
     }
 
-    private class ConfigFilePage extends WelcomeWizardPage {
+    private class ConfigFilePage extends DefaultWizardPage {
 
         private File selectedDirectory;
         private WizardDialog wizardDialog;

@@ -16,14 +16,17 @@ import java.awt.*;
  */
 public class MainSeriesSelector extends JPanel {
 
-    private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
+    private TimeSeriesContext rootContext;
+    private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
 
-    private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
+    public MainSeriesSelector(TimeSeriesContext rootContext) {
+        this.rootContext = rootContext;
+
+        selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
             UIPropertiesTimeSeries.class
-    );
+        );
 
-    public MainSeriesSelector() {
         setLayout(new BorderLayout());
         add(selectionPanel, BorderLayout.CENTER);
     }

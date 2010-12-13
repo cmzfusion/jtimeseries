@@ -1,5 +1,6 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
+import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktop;
 import com.od.swing.action.AbstractActionModel;
 
 /**

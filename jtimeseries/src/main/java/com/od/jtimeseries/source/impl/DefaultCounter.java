@@ -21,6 +21,7 @@ package com.od.jtimeseries.source.impl;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 
 import java.util.List;
 import java.util.Properties;
@@ -174,5 +175,11 @@ public class DefaultCounter implements Counter {
         return simpleSource.remove(path, classType);
     }
 
+    public boolean addTreeListener(IdentifiableTreeListener l) {
+        return simpleSource.addTreeListener(l);
+    }
 
+    public boolean removeTreeListener(IdentifiableTreeListener l) {
+        return simpleSource.removeTreeListener(l);
+    }
 }

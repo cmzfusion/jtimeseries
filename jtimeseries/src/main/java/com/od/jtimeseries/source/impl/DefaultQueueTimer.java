@@ -22,6 +22,7 @@ import com.od.jtimeseries.source.EventTimer;
 import com.od.jtimeseries.source.QueueTimer;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 
 import java.util.List;
 import java.util.Properties;
@@ -172,5 +173,13 @@ public class DefaultQueueTimer implements QueueTimer {
 
     public <E extends Identifiable> E remove(String path, Class<E> classType) {
         return timingSource.remove(path, classType);
+    }
+
+    public boolean addTreeListener(IdentifiableTreeListener l) {
+        return timingSource.addTreeListener(l);
+    }
+
+    public boolean removeTreeListener(IdentifiableTreeListener l) {
+        return timingSource.removeTreeListener(l);
     }
 }

@@ -15,8 +15,8 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext {
 
     private TimeSeriesServer server;
 
-    public TimeSeriesServerContext(TimeSeriesServer server, TimeSeriesContext parentContext, String id, String description) {
-        super(parentContext, id, description);
+    public TimeSeriesServerContext(TimeSeriesServer server, String id, String description) {
+        super(id, description);
         this.server = server;
     }
 

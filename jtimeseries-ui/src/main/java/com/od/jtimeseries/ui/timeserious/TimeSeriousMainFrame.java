@@ -47,7 +47,7 @@ public class TimeSeriousMainFrame extends JFrame {
     private void createActions(ApplicationActionModels actionModels) {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
-        newServerAction = new NewServerAction(this, serverDictionary, rootContext);
+        newServerAction = new NewServerAction(this, rootContext);
     }
 
     private void addListeners() {

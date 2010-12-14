@@ -21,20 +21,24 @@ package com.od.jtimeseries.server.timeseries;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
-import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.timeseries.impl.TimeSeriesOrderingException;
 import com.od.jtimeseries.timeseries.impl.WrappedTimeSeriesEventHandler;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.lang.ref.SoftReference;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,7 +60,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
 
-    private static ScheduledExecutorService clearCacheExecutor = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService clearCacheExecutor = NamedExecutors.newSingleThreadScheduledExecutor("FilesystemTimeSeriesClearCache");
     private Executor eventExecutor = TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     private SoftReference<RoundRobinTimeSeries> softSeriesReference = new SoftReference<RoundRobinTimeSeries>(null);
     private RoundRobinSerializer roundRobinSerializer;

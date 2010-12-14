@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.util;
 
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
@@ -46,7 +47,7 @@ public class FileReaper {
     private static final LogMethods log = LogUtils.getLogMethods(FileReaper.class);
     private static AtomicInteger id = new AtomicInteger();
 
-    private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService timer = NamedExecutors.newSingleThreadScheduledExecutor("FileReaper");
     private String name;
     private File parentDirectory;
     private int maxFileCount;
@@ -72,17 +73,6 @@ public class FileReaper {
         log.logInfo("Created FileReaper " + name + " for timeseries dir " + parentDirectory.getPath() +
                 ", pattern [" + fileSearchRegExp + "], max file count " + maxFileCount +
                 ", maxCumulativeSize " + maxCumulativeSize + ", maxAge " + maxAgeInMillis);
-
-        setNameOnTimerThread();
-    }
-
-    private void setNameOnTimerThread() {
-        //only way to access the timer thread is to run a task to do it?
-        timer.execute(new Runnable() {
-            public void run() {
-                Thread.currentThread().setName("FileReaperTimer " + id.getAndIncrement());
-            }
-        });
     }
 
     public void startReaper(int reapFrequencyMillis) {

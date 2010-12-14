@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -44,7 +45,7 @@ public class UdpClient {
     private static final LogMethods logMethods = LogUtils.getLogMethods(UdpClient.class);
     
     private final LimitedErrorLogger limitedLogger = new LimitedErrorLogger(logMethods, 5, 100);
-    private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduledExecutor = NamedExecutors.newSingleThreadScheduledExecutor("UdpClient");
 
     //using the set to check whether already in the list without iterating
     //want to preserve the order in which clients are sent messages so keeping the list

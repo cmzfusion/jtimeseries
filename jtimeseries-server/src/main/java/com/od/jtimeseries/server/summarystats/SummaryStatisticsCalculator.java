@@ -56,7 +56,7 @@ public class SummaryStatisticsCalculator {
             logMethods.logInfo("Starting summary statistics calculation every " + refreshPeriod);
             Thread t = new Thread(new SummaryStatisticsRecalculator());
             t.setDaemon(true);
-            t.setName("SummaryStats");
+            t.setName("SummaryStatsRecalculation");
             t.start();
         }
     }

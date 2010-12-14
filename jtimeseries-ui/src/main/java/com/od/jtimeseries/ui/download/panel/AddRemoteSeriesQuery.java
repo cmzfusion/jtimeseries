@@ -47,7 +47,7 @@ public class AddRemoteSeriesQuery {
         String serverId = server.getDescription();
         TimeSeriesServerContext serverContext = (TimeSeriesServerContext)destinationContext.get(serverId);
         if ( serverContext == null) {
-            serverContext = new TimeSeriesServerContext(server, destinationContext, serverId, serverId);
+            serverContext = new TimeSeriesServerContext(server, serverId, serverId);
             destinationContext.addChild(serverContext);
         }
         return serverContext;

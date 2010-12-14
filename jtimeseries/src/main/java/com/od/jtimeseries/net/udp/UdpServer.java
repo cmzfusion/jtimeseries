@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -52,7 +53,7 @@ public class UdpServer {
     private final List<UdpMessageListener> udpMessageListeners = Collections.synchronizedList(new ArrayList<UdpMessageListener>());
     private MessageFactory udpMessageFactory = new MessageFactory();
 
-    private Executor udpMessageExecutor = Executors.newSingleThreadExecutor();
+    private Executor udpMessageExecutor = NamedExecutors.newSingleThreadExecutor("UdpServer");
     private volatile boolean stopping;
     private Thread receiveThread;
 

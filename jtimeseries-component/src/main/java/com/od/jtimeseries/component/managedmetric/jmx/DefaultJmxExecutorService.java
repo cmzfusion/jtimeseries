@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.component.managedmetric.jmx;
 
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -75,14 +76,7 @@ public class DefaultJmxExecutorService implements JmxExecutorService {
 
     private void startConnectionPruningThread() {
 
-        ScheduledExecutorService pruningExecutor = Executors.newSingleThreadScheduledExecutor();
-
-        //set the name of the executor thread
-        pruningExecutor.execute(new Runnable() {
-            public void run() {
-                Thread.currentThread().setName("DefaultJmxExecutorService Connection Pruning");
-            }
-        });
+        ScheduledExecutorService pruningExecutor = NamedExecutors.newSingleThreadScheduledExecutor("JmxConnectionPruning");
 
         pruningExecutor.scheduleAtFixedRate(new Runnable() {
             public void run() {

@@ -32,22 +32,20 @@ public class TimeSeriesExecutorFactory {
 
     private static volatile ExecutorSource executorSource = new ExecutorSource() {
 
-        private ExecutorService defaultEventExecutor = Executors.newSingleThreadExecutor();
-
-        {
-            defaultEventExecutor.execute(new Runnable() {
-                public void run() {
-                    Thread.currentThread().setName("JTimeseries Event Executor");
-                }
-            });
-        }
+        private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
+        private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
+        private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");        
 
         public Executor getExecutorForTimeSeriesEvents(Object timeSeries) {
-            return defaultEventExecutor;
+            return timeSeriesEventExecutor;
         }
 
         public Executor getExecutorForCaptureEvents(Object capture) {
-            return defaultEventExecutor;
+            return captureEventExecutor;
+        }
+
+        public Executor getExecutorForIdentifiableTreeEvents(Object identifiable) {
+            return identifiableEventExecutor;
         }
     };
 
@@ -57,6 +55,10 @@ public class TimeSeriesExecutorFactory {
 
     public static Executor getExecutorForCaptureEvents(Object capture) {
         return executorSource.getExecutorForCaptureEvents(capture);
+    }
+
+    public static Executor getExecutorForIdentifiableTreeEvents(Object identifiable) {
+        return executorSource.getExecutorForIdentifiableTreeEvents(identifiable);
     }
 
     public static ExecutorSource getExecutorSource() {
@@ -69,8 +71,22 @@ public class TimeSeriesExecutorFactory {
 
     public static interface ExecutorSource {
 
+        /**
+         * Should return a single threaded executor if the guaranteed ordering of events
+         * is to be preserved
+         */
         Executor getExecutorForTimeSeriesEvents(Object timeSeries);
 
+        /**
+         * Should return a single threaded executor if the guaranteed ordering of events
+         * is to be preserved
+         */
         Executor getExecutorForCaptureEvents(Object capture);
+
+        /**
+         * Should return a single threaded executor if the guaranteed ordering of events
+         * is to be preserved
+         */
+        Executor getExecutorForIdentifiableTreeEvents(Object identifiable);
     }
 }

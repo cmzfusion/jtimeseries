@@ -286,7 +286,6 @@ public class TimeSeriesVisualizer extends JPanel {
                     if ( ! rootContext.containsChildWithId(c.getId())) {
                         rootContext.addChild(new TimeSeriesServerContext(
                                 c.getServer(),
-                                rootContext,
                                 c.getId(),
                                 c.getId()
                         ));

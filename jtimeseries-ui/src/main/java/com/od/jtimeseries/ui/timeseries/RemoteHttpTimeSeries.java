@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.net.httpd.HttpParameterName;
 import com.od.jtimeseries.ui.util.ExecuteWeakReferencedCommandTask;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.time.Time;
@@ -53,7 +54,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
-    private static ScheduledExecutorService refreshExecutor = Executors.newSingleThreadScheduledExecutor();
+    private static ScheduledExecutorService refreshExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeriesRefresh");
     private static final int STATS_ONLY_REFRESH_TIME_SECONDS = 60 * 30;
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
 

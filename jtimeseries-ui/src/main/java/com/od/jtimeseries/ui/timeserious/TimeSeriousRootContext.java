@@ -33,7 +33,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext {
         //add a time series server context when a new server is created
         public void serverAdded(TimeSeriesServer s) {
             TimeSeriesServerContext context = new TimeSeriesServerContext(
-                s, TimeSeriousRootContext.this, s.getDescription(), s.getDescription()
+                s, s.getDescription(), s.getDescription()
             );
             TimeSeriousRootContext.this.addChild(context);
         }

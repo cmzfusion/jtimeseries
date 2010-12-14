@@ -21,9 +21,11 @@ package com.od.jtimeseries.util.identifiable;
 import com.od.jtimeseries.context.*;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.PathParser;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,9 +44,10 @@ public class IdentifiableBase extends LockingIdentifiable {
     private volatile Identifiable parent;
     private Properties properties = new Properties();
     private final Map<String, Identifiable> childrenById = new TreeMap<String, Identifiable>();
-    private CopyOnWriteArrayList<IdentifiableTreeListener> treeListeners = new CopyOnWriteArrayList<IdentifiableTreeListener>();
-    private ChildTreeListener childTreeListener = new ChildTreeListener();
-    
+
+    private List<IdentifiableTreeListener> treeListeners = new CopyOnWriteArrayList<IdentifiableTreeListener>();
+    private ChildTreeEventPropagator childEventPropagator = new ChildTreeEventPropagator();
+
     public IdentifiableBase(Identifiable parent, String id, String description) {
         this(id, description);
         this.parent = parent;
@@ -75,8 +78,8 @@ public class IdentifiableBase extends LockingIdentifiable {
             childrenById.put(identifiable.getId(), identifiable);
         }
         identifiable.setParent(this);
-        identifiable.addTreeListener(childTreeListener);
-        fireNodesAdded(new IdentifiableTreeEvent(getPath(), identifiable));
+        identifiable.addTreeListener(childEventPropagator);
+        fireNodesAdded(new IdentifiableTreeEvent(this, "", identifiable));
     }
 
     protected String getParentPath_Locked() {
@@ -118,9 +121,9 @@ public class IdentifiableBase extends LockingIdentifiable {
         if ( containsChild(i) ) {
             childrenById.remove(i.getId());
             i.setParent(null);
-            i.removeTreeListener(childTreeListener);
+            i.removeTreeListener(childEventPropagator);
             removed = true;
-            fireNodesRemoved(new IdentifiableTreeEvent(getPath(), i));
+            fireNodesRemoved(new IdentifiableTreeEvent(this, "", i));
         }
         return removed;
     }
@@ -220,22 +223,42 @@ public class IdentifiableBase extends LockingIdentifiable {
         return treeListeners.remove(l);
     }
     
-    protected void fireNodesChanged(IdentifiableTreeEvent e) {
-        for ( IdentifiableTreeListener l : treeListeners) {
-            l.nodesChanged(e);
-        }
+    protected void fireNodesChanged(final IdentifiableTreeEvent e) {
+        fireEvent(new Runnable() {
+            public void run() {
+                for ( IdentifiableTreeListener l : treeListeners) {
+                    l.nodesChanged(e);
+                }
+            }
+        });
     }
     
-    protected void fireNodesAdded(IdentifiableTreeEvent e) {
-        for ( IdentifiableTreeListener l : treeListeners) {
-            l.nodesAdded(e);
-        }
+    protected void fireNodesAdded(final IdentifiableTreeEvent e) {
+        fireEvent(new Runnable() {
+            public void run() {
+                for ( IdentifiableTreeListener l : treeListeners) {
+                    l.nodesAdded(e);
+                }
+            }
+        });
     }
-    
-    protected void fireNodesRemoved(IdentifiableTreeEvent e) {
-        for ( IdentifiableTreeListener l : treeListeners) {
-            l.nodesRemoved(e);
-        }
+
+    protected void fireNodesRemoved(final IdentifiableTreeEvent e) {
+        fireEvent(new Runnable() {
+            public void run() {
+                for ( IdentifiableTreeListener l : treeListeners) {
+                    l.nodesRemoved(e);
+                }
+            }
+        });
+    }
+
+    //events are fired on a dedicated single thread executor
+    //the executor queue guarantees correct ordering of events published without requiring
+    //the thread which caused the change to hold any locks while events are fired
+    private void fireEvent(Runnable r) {
+        Executor e = TimeSeriesExecutorFactory.getExecutorForIdentifiableTreeEvents(this);
+        e.execute(r);
     }
 
     protected boolean isRoot_Locked() {
@@ -310,18 +333,24 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
     
     //receive events from children, propogate them with updated path
-    private class ChildTreeListener implements IdentifiableTreeListener {
+    private class ChildTreeEventPropagator implements IdentifiableTreeListener {
         
         public void nodesChanged(IdentifiableTreeEvent contextTreeEvent) {
-            fireNodesChanged(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+            fireNodesChanged(new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes()));
         }
 
         public void nodesAdded(IdentifiableTreeEvent contextTreeEvent) {
-            fireNodesAdded(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+            fireNodesAdded(new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes()));
         }
 
         public void nodesRemoved(IdentifiableTreeEvent contextTreeEvent) {
-            fireNodesRemoved(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+            fireNodesRemoved(new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes()));
+        }
+
+        //add the path to the child node from which we received the event
+        private String getNewPathForEvent(IdentifiableTreeEvent contextTreeEvent) {
+            return contextTreeEvent.getSource().getId() +
+                (contextTreeEvent.getPath().length() > 0 ? JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
         }
     }
 }

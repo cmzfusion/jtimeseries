@@ -20,6 +20,7 @@ package com.od.jtimeseries.scheduling;
 
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.*;
@@ -79,7 +80,7 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     }
 
     protected ScheduledExecutorService createExecutor() {
-        return Executors.newScheduledThreadPool(threadCount);
+        return NamedExecutors.newScheduledThreadPool("AbstractScheduler", threadCount);
     }
 
     protected abstract void doStart();

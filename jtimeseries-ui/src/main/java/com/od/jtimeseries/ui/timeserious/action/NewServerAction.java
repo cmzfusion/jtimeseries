@@ -1,7 +1,8 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.dialog.ButtonEvent;
-import com.jidesoft.dialog.ButtonListener;
 import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
@@ -15,8 +16,6 @@ import com.od.jtimeseries.ui.util.ImageUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -30,12 +29,12 @@ import java.net.UnknownHostException;
 public class NewServerAction extends AbstractAction {
 
     private JFrame frame;
-    private UiTimeSeriesServerDictionary serverDictionary;
+    private TimeSeriesContext rootContext;
 
-    public NewServerAction(JFrame frame, UiTimeSeriesServerDictionary serverDictionary, TimeSeriesContext rootContext) {
+    public NewServerAction(JFrame frame, TimeSeriesContext rootContext) {
         super("New Server", ImageUtils.ADD_SERVER_ICON_16x16);
         this.frame = frame;
-        this.serverDictionary = serverDictionary;
+        this.rootContext = rootContext;
         super.putValue(SHORT_DESCRIPTION, "Add a new server to connect and download series data");
     }
 
@@ -63,44 +62,47 @@ public class NewServerAction extends AbstractAction {
 
             setPageList(p);
 
-            setFinishAction(new AbstractAction() {
-                public void actionPerformed(ActionEvent e) {
-
-                    //TODO
-                    InetAddress i = null;
-                    try {
-                        i = InetAddress.getByName(serverDetailsPage.getHostName());
-                    } catch (UnknownHostException e1) {
-                        e1.printStackTrace();
-                    }
-
-                    TimeSeriesServer s = new TimeSeriesServer(
-                        i,
-                        serverDetailsPage.getPort(),
-                        serverDetailsPage.getServerDescription(),
-                        0
-                    );
-
-                    boolean added = serverDictionary.addServer(s);
-//                    if (added) {
-//                        TimeSeriesServerContext context = new TimeSeriesServerContext(
-//                            s, rootContext, s.getDescription(), s.getDescription()
-//                        );
-//                    }
-
-                    closeCurrentPage();
-                }
-            });
+            setFinishAction(new FinishAction());
         }
 
 
+        private class FinishAction extends AbstractAction {
+
+            public FinishAction() {
+                super("Add Server", ImageUtils.ADD_SERVER_ICON_16x16);
+            }
+
+            public void actionPerformed(ActionEvent e) {
+
+                //TODO
+                InetAddress i = null;
+                try {
+                    i = InetAddress.getByName(serverDetailsPage.getHostName());
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                }
+
+                TimeSeriesServer s = new TimeSeriesServer(
+                    i,
+                    serverDetailsPage.getPort(),
+                    serverDetailsPage.getHostName(),
+                    0
+                );
+
+                TimeSeriesServerContext context = new TimeSeriesServerContext(
+                    s, s.getDescription(), s.getDescription()
+                );
+                rootContext.addChild(context);
+
+                closeCurrentPage();
+            }
+        }
     }
 
     private class ServerDetailsPage extends DefaultWizardPage {
 
-        JTextField hostField  = new JTextField();
-        JTextField portField = new JTextField();
-        JTextField serverDescriptionField = new JTextField();
+        JTextField hostField  = new JTextField(20);
+        JTextField portField = new JTextField(20);
 
         public ServerDetailsPage(String title, String description) {
             super(title, description);
@@ -110,10 +112,6 @@ public class NewServerAction extends AbstractAction {
             return hostField.getText();
         }
 
-        public String getServerDescription() {
-            return serverDescriptionField.getText();
-        }
-
         public int getPort() {
             //TODO
             return Integer.parseInt(portField.getText());
@@ -121,8 +119,22 @@ public class NewServerAction extends AbstractAction {
 
         @Override
         public void initContentPane() {
-            addComponent(hostField);
-            addComponent(portField);
+            FormLayout layout = new FormLayout(
+                "10dlu:grow, pref:none:right, 3dlu:none, pref:none, 10dlu:grow",
+                "2dlu:grow, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 10dlu:grow"
+            );
+            JPanel p = new JPanel();
+
+            //layout.setRowGroups(new int[][]{{2,4,6}});
+            p.setLayout(layout);
+
+            CellConstraints cc = new CellConstraints();
+            p.add(new JLabel("Host"), cc.xy(2, 4));
+            p.add(hostField, cc.xy(4, 4));
+            p.add(new JLabel("Port"), cc.xy(2, 6));
+            p.add(portField, cc.xy(4, 6));
+
+            addComponent(p);
         }
 
         @Override

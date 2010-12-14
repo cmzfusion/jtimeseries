@@ -25,6 +25,7 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
@@ -65,7 +66,7 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
     public AppendToSeriesMessageListener(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
 
-        scheduleReportingAndCleanup(Executors.newSingleThreadScheduledExecutor());
+        scheduleReportingAndCleanup(NamedExecutors.newSingleThreadScheduledExecutor("AppendToSeriesMessageListener"));
     }
 
     private void scheduleReportingAndCleanup(ScheduledExecutorService staleSeriesExecutor) {

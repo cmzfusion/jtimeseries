@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpClientConfig;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 import java.net.InetAddress;
@@ -32,7 +33,7 @@ public class AppendToSeriesPerformanceHarness {
 
     public AppendToSeriesPerformanceHarness() throws UnknownHostException {
         generateSeriesPaths();
-        ScheduledExecutorService s = Executors.newSingleThreadScheduledExecutor();
+        ScheduledExecutorService s = NamedExecutors.newSingleThreadScheduledExecutor("AppendToSeriesPerformanceHarness");
         s.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 fireMessage();

@@ -13,7 +13,7 @@ public interface IdentifiableTreeListener {
      *
      * @param contextTreeEvent
      */
-    public void nodeChanged(IdentifiableTreeEvent contextTreeEvent);
+    public void nodesChanged(IdentifiableTreeEvent contextTreeEvent);
 
     public void nodesAdded(IdentifiableTreeEvent contextTreeEvent);
 

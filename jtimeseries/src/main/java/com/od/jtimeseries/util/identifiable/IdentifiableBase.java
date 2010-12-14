@@ -18,17 +18,12 @@
  */
 package com.od.jtimeseries.util.identifiable;
 
-import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.context.*;
-import com.od.jtimeseries.scheduling.Scheduler;
-import com.od.jtimeseries.scheduling.Triggerable;
-import com.od.jtimeseries.source.ValueSourceFactory;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.PathParser;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,8 +42,9 @@ public class IdentifiableBase extends LockingIdentifiable {
     private volatile Identifiable parent;
     private Properties properties = new Properties();
     private final Map<String, Identifiable> childrenById = new TreeMap<String, Identifiable>();
-    private List<IdentifiableTreeListener> treeListeners = new LinkedList<IdentifiableTreeListener>();
-
+    private CopyOnWriteArrayList<IdentifiableTreeListener> treeListeners = new CopyOnWriteArrayList<IdentifiableTreeListener>();
+    private ChildTreeListener childTreeListener = new ChildTreeListener();
+    
     public IdentifiableBase(Identifiable parent, String id, String description) {
         this(id, description);
         this.parent = parent;
@@ -79,6 +75,8 @@ public class IdentifiableBase extends LockingIdentifiable {
             childrenById.put(identifiable.getId(), identifiable);
         }
         identifiable.setParent(this);
+        identifiable.addTreeListener(childTreeListener);
+        fireNodesAdded(new IdentifiableTreeEvent(getPath(), identifiable));
     }
 
     protected String getParentPath_Locked() {
@@ -115,12 +113,14 @@ public class IdentifiableBase extends LockingIdentifiable {
         return oldParent;
     }
 
-    protected boolean removeChild_Locked(Identifiable e) {
+    protected boolean removeChild_Locked(Identifiable i) {
         boolean removed = false;
-        if ( containsChild_Locked(e) ) {
-            childrenById.remove(e.getId());
-            e.setParent(null);
+        if ( containsChild(i) ) {
+            childrenById.remove(i.getId());
+            i.setParent(null);
+            i.removeTreeListener(childTreeListener);
             removed = true;
+            fireNodesRemoved(new IdentifiableTreeEvent(getPath(), i));
         }
         return removed;
     }
@@ -219,6 +219,24 @@ public class IdentifiableBase extends LockingIdentifiable {
     protected boolean removeTreeListener_Locked(IdentifiableTreeListener l) {
         return treeListeners.remove(l);
     }
+    
+    protected void fireNodesChanged(IdentifiableTreeEvent e) {
+        for ( IdentifiableTreeListener l : treeListeners) {
+            l.nodesChanged(e);
+        }
+    }
+    
+    protected void fireNodesAdded(IdentifiableTreeEvent e) {
+        for ( IdentifiableTreeListener l : treeListeners) {
+            l.nodesAdded(e);
+        }
+    }
+    
+    protected void fireNodesRemoved(IdentifiableTreeEvent e) {
+        for ( IdentifiableTreeListener l : treeListeners) {
+            l.nodesRemoved(e);
+        }
+    }
 
     protected boolean isRoot_Locked() {
         return getParent() == null;
@@ -289,5 +307,21 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     protected String getPathForChild(String id) {
         return getPath() + NAMESPACE_SEPARATOR + id;
+    }
+    
+    //receive events from children, propogate them with updated path
+    private class ChildTreeListener implements IdentifiableTreeListener {
+        
+        public void nodesChanged(IdentifiableTreeEvent contextTreeEvent) {
+            fireNodesChanged(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+        }
+
+        public void nodesAdded(IdentifiableTreeEvent contextTreeEvent) {
+            fireNodesAdded(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+        }
+
+        public void nodesRemoved(IdentifiableTreeEvent contextTreeEvent) {
+            fireNodesRemoved(new IdentifiableTreeEvent(getId() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath(), contextTreeEvent.getNodes()));
+        }
     }
 }

@@ -6,17 +6,14 @@ import com.jidesoft.dialog.ButtonEvent;
 import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
-import com.jidesoft.wizard.WizardDialog;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
-import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.util.ProgressIndicatorWizard;
 import com.od.swing.progress.ProgressIndicatorTaskListener;
-import com.od.swing.progress.ProgressLayeredPane;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
@@ -30,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,7 +52,7 @@ public class NewServerAction extends AbstractAction {
         w.setVisible(true);
     }
 
-    private class NewServerWizard extends WizardDialog {
+    private class NewServerWizard extends ProgressIndicatorWizard {
         private ServerDetailsPage serverDetailsPage = new ServerDetailsPage(
                 "Add a new Timeseries Server",
                 ""
@@ -78,6 +74,53 @@ public class NewServerAction extends AbstractAction {
         }
 
 
+        private class ServerDetailsPage extends DefaultWizardPage {
+
+            private JTextField hostField = new JTextField(20);
+            private JTextField portField = new JTextField(20);
+            JPanel serverFormPanel = new JPanel();
+
+            public ServerDetailsPage(String title, String description) {
+                super(title, description);
+            }
+
+            public String getHostName() {
+                return hostField.getText();
+            }
+
+            public int getPort() {
+                //TODO
+                return Integer.parseInt(portField.getText());
+            }
+
+            @Override
+            public void initContentPane() {
+                FormLayout layout = new FormLayout(
+                        "10dlu:grow, pref:none:right, 3dlu:none, pref:none, 10dlu:grow",
+                        "2dlu:grow, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 10dlu:grow"
+                );
+
+                //layout.setRowGroups(new int[][]{{2,4,6}});
+                serverFormPanel.setLayout(layout);
+
+                CellConstraints cc = new CellConstraints();
+                serverFormPanel.add(new JLabel("Host"), cc.xy(2, 4));
+                serverFormPanel.add(hostField, cc.xy(4, 4));
+                serverFormPanel.add(new JLabel("Port"), cc.xy(2, 6));
+                serverFormPanel.add(portField, cc.xy(4, 6));
+
+                addComponent(serverFormPanel);
+            }
+
+            @Override
+            public void setupWizardButtons() {
+                fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
+                fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.NEXT);
+            }
+
+        }
+
+
         private class FinishAction extends AbstractAction {
 
             public FinishAction() {
@@ -85,9 +128,11 @@ public class NewServerAction extends AbstractAction {
             }
 
             public void actionPerformed(ActionEvent e) {
+                addProgressPane(0.8f, 24, 15);
+
                 SwingCommand checkServerCommand = new CheckAndCreateServerCommand();
                 checkServerCommand.execute(
-                    new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel )
+                        new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel)
                 );
             }
 
@@ -102,7 +147,7 @@ public class NewServerAction extends AbstractAction {
                         @Override
                         protected void doInBackground() throws Exception {
                             Thread.sleep(1000);
-                            
+
                             InetAddress i = InetAddress.getByName(serverDetailsPage.getHostName());
                             server = new TimeSeriesServer(
                                     i,
@@ -138,21 +183,21 @@ public class NewServerAction extends AbstractAction {
                             CheckServerQuery q = new CheckServerQuery(server);
                             q.runQuery();
 
-                            if ( ! q.success ) {
+                            if (!q.success) {
                                 throw new Exception("Failed to connect to timeseries server at " + q.getQueryUrl());
                             }
                         }
 
                         @Override
                         protected void doInEventThread() throws Exception {
-                          TimeSeriesServerContext context = new TimeSeriesServerContext(
-                                server,
-                                server.getDescription(),
-                                server.getDescription()
-                          );
-                          rootContext.addChild(context);
-                          closeCurrentPage();
-                          setVisible(false);
+                            TimeSeriesServerContext context = new TimeSeriesServerContext(
+                                    server,
+                                    server.getDescription(),
+                                    server.getDescription()
+                            );
+                            rootContext.addChild(context);
+                            closeCurrentPage();
+                            setVisible(false);
                         }
                     };
                 }
@@ -160,50 +205,4 @@ public class NewServerAction extends AbstractAction {
         }
     }
 
-    private class ServerDetailsPage extends DefaultWizardPage {
-
-        private JTextField hostField = new JTextField(20);
-        private JTextField portField = new JTextField(20);
-        JPanel serverFormPanel = new JPanel();
-
-        public ServerDetailsPage(String title, String description) {
-            super(title, description);
-        }
-
-        public String getHostName() {
-            return hostField.getText();
-        }
-
-        public int getPort() {
-            //TODO
-            return Integer.parseInt(portField.getText());
-        }
-
-        @Override
-        public void initContentPane() {
-            FormLayout layout = new FormLayout(
-                    "10dlu:grow, pref:none:right, 3dlu:none, pref:none, 10dlu:grow",
-                    "2dlu:grow, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 10dlu:grow"
-            );
-
-            //layout.setRowGroups(new int[][]{{2,4,6}});
-            serverFormPanel.setLayout(layout);
-
-            CellConstraints cc = new CellConstraints();
-            serverFormPanel.add(new JLabel("Host"), cc.xy(2, 4));
-            serverFormPanel.add(hostField, cc.xy(4, 4));
-            serverFormPanel.add(new JLabel("Port"), cc.xy(2, 6));
-            serverFormPanel.add(portField, cc.xy(4, 6));
-
-            ProgressLayeredPane progressPane = new ProgressLayeredPane(serverFormPanel);
-            addComponent(progressPane);
-        }
-
-        @Override
-        public void setupWizardButtons() {
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.BACK);
-            fireButtonEvent(ButtonEvent.HIDE_BUTTON, ButtonNames.NEXT);
-        }
-
-    }
 }

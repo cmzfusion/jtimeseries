@@ -28,12 +28,10 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
-import com.od.swing.progress.ProgressIndicator;
-import com.od.swing.progress.ProgressUtilities;
+import com.od.swing.progress.ProgressIndicatorTaskListener;
 import swingcommand.BackgroundTask;
 import swingcommand.SwingCommand;
 import swingcommand.Task;
-import swingcommand.TaskListenerAdapter;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -145,25 +143,13 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     }
 
     private void addProgressTaskListener() {
-        loadSelectedSeriesCommand.addTaskListener(new TaskListenerAdapter<String>() {
-            ProgressIndicator i;
+        loadSelectedSeriesCommand.addTaskListener(new ProgressIndicatorTaskListener(
+                "Loading Time Series",
+                SelectServerPanel.this) {
 
-            public void pending(Task task) {
-                i = ProgressUtilities.findProgressIndicator(SelectServerPanel.this);
-                if ( i != null) {
-                    i.startProgressAnimation("Loading Time Series");
-                }
-            }
-            
             public void error(Task task, Throwable t) {
-                logMethods.logError("Failed to load remote series", t);
+                logMethods.logError("Failed to load remote series", t);                
                 JOptionPane.showMessageDialog(SelectServerPanel.this, "Failed to load remote series", "Failed to load timeseries", JOptionPane.ERROR_MESSAGE);
-            }
-
-            public void finished(Task task) {
-                if ( i != null) {
-                    i.stopProgressAnimation();
-                }
             }
         });
     }

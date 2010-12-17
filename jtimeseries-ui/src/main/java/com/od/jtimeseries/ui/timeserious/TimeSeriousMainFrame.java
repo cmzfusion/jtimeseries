@@ -78,6 +78,9 @@ public class TimeSeriousMainFrame extends JFrame {
         JMenu fileMenu = new JMenu("File");
         mainMenuBar.add(fileMenu);
 
+        JMenuItem newServerItem = new JMenuItem(newServerAction);
+        fileMenu.add(newServerItem);
+
         JMenuItem exitItem = new JMenuItem(new ExitAction());
         fileMenu.add(exitItem);
 

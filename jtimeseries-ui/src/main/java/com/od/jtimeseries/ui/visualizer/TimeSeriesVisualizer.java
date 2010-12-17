@@ -196,8 +196,7 @@ public class TimeSeriesVisualizer extends JPanel {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
             new ShowDownloadSeriesDialogAction(
-                seriesSelectionPanel,
-                new AddToRootContextSelectionHandler(),
+                new NewSeriesHandler(),
                 timeSeriesServerDictionary,
                 editDisplayNameAction.getDisplayNameCalculator(),
                 this
@@ -230,7 +229,6 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
         addChartsFromConfigs(chartConfigs);
-        seriesSelectionPanel.refresh();
     }
 
     private void addChartsFromConfigs(List<UiTimeSeriesConfig> configs) {
@@ -254,9 +252,9 @@ public class TimeSeriesVisualizer extends JPanel {
         });
     }
 
-    private class AddToRootContextSelectionHandler implements ShowDownloadSeriesDialogAction.SeriesSelectionHandler {
+    private class NewSeriesHandler implements ShowDownloadSeriesDialogAction.NewSeriesHandler {
 
-        public void seriesSelected(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
+        public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
             boolean serverContextsCreated = false;
             for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
                 if ( ! serverContextsCreated ) {

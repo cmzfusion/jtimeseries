@@ -26,17 +26,18 @@ import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
-import com.od.swing.weakreferencelistener.WeakReferenceListener;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,13 +65,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
 
-    private SeriesConnectionPropertyChangeListener seriesConnectionPropertyListener = new SeriesConnectionPropertyChangeListener();
-    private SelectedSeriesPropertyChangeListener selectedSeriesPropertyListener = new SelectedSeriesPropertyChangeListener();
-
-    //add the property listeners using weak reference listener to allow the selection panel to be garbage collected
-    private final WeakReferenceListener weakRefSeriesConnectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.STALE_PROPERTY, seriesConnectionPropertyListener);
-    private final WeakReferenceListener weakRefSelectionListener = new WeakReferenceListener(UIPropertiesTimeSeries.SELECTED_PROPERTY, selectedSeriesPropertyListener);
-
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
     }
@@ -90,7 +84,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
         RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
         List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
-        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesActions);
+        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesActions, seriesClass);
         tableSelector = new TableSelector<E>(seriesSelectionModel, context, seriesActions, selectionText, seriesClass);
         createSelectorPanel();
         createTitlePanel();
@@ -144,6 +138,32 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private void addListeners() {
         treeSelector.addSelectorListener(descriptionSettingSelectorListener);
         tableSelector.addSelectorListener(descriptionSettingSelectorListener);
+
+        context.addTreeListener(
+            AwtSafeListener.getAwtSafeListener(
+                new IdentifiableTreeListener() {
+
+                    public void nodeChanged(Identifiable node, Object changeDescription) {
+                    }
+
+                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                        List<E> seriesAffected = SelectorPanel.getAffectedSeries(seriesClass, contextTreeEvent);
+                        for ( E series : seriesAffected) {
+                            if ( series.isSelected() ) {
+                                selectionList.addSelection(series);
+                            } else {
+                                selectionList.removeSelection(series);
+                            }
+                        }
+                    }
+
+                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {}
+
+                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {}
+                },
+                IdentifiableTreeListener.class
+            )
+        );
     }
 
     private void addComponents() {
@@ -152,7 +172,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         add(titleBox,BorderLayout.NORTH);
         add(selectorPanel, BorderLayout.CENTER);
         add(seriesDescriptionPanel, BorderLayout.SOUTH);
-        setBorder(new EmptyBorder(5,5,5,5));
+        setBorder(new EmptyBorder(5, 5, 5, 5));
     }
 
     public SeriesSelectionList getSelectionList() {
@@ -191,12 +211,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         return tableSelector.getColumnSettings();
     }
 
-    public void refresh() {
-        setupTimeseries();
-        treeSelector.refreshSeries();
-        tableSelector.refreshSeries();
-    }
-
     private List<E> getAllTimeSeriesFromContext() {
         return context.findAll(seriesClass).getAllMatches();
     }
@@ -207,7 +221,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
 
     private void setupTimeseries() {
         List<E> series = getAllTimeSeriesFromContext();
-        addPropertyListenerToNewSeries(series);
         updateSelections(series);
     }
 
@@ -219,13 +232,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
             }
         }
         selectionList.setSelectedTimeSeries(selections);
-    }
-
-    private void addPropertyListenerToNewSeries(List<E> l) {
-        for ( E s : l) {
-            weakRefSelectionListener.addListenerTo(s);
-            weakRefSeriesConnectionListener.addListenerTo(s);
-        }
     }
 
     private class RadioButtonSelectionListener implements ActionListener {
@@ -269,25 +275,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
     }
 
-    private class SelectedSeriesPropertyChangeListener implements PropertyChangeListener {
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            E s = (E)evt.getSource();
-            if (s.isSelected()) {
-                selectionList.addSelection(s);
-            } else {
-                selectionList.removeSelection(s);
-            }
-        }
-    }
-
-    private class SeriesConnectionPropertyChangeListener implements PropertyChangeListener {
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            tableSelector.repaint();
-        }
-    }
-
     public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<E>> {
 
         public RemoveSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
@@ -301,8 +288,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
                 s.setSelected(false);
                 c.removeChild(s);
             }
-            treeSelector.removeSeries(series);
-            tableSelector.removeSeries(series);
         }
     }
 

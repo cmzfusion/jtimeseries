@@ -26,7 +26,10 @@ import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -49,13 +52,15 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
     private List<Action> seriesActions;
+    private Class seriesClass;
     private JTree tree;
     private Map<UIPropertiesTimeSeries, SeriesTreeNode> seriesToNodeMap = new HashMap<UIPropertiesTimeSeries, SeriesTreeNode>();
 
-    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions) {
+    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
+        this.seriesClass = seriesClass;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
         tree = new JTree();
@@ -66,11 +71,38 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         tree.addTreeSelectionListener(new SeriesTreeSelectionListener());
 
         refreshSeries();
+        addContextListener();
 
         setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(tree);
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
+    }
+
+    private void addContextListener() {
+        rootContext.addTreeListener(
+            AwtSafeListener.getAwtSafeListener(
+                    new IdentifiableTreeListener() {
+                        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                            repaint();
+                        }
+
+                        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+                            //List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
+                            refreshSeries();
+                        }
+
+                        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+                            List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
+                            removeSeries(timeSeries);
+                        }
+
+                        public void nodeChanged(Identifiable node, Object changeDescription) {
+                        }
+                    },
+                    IdentifiableTreeListener.class
+            )
+        );
     }
 
     private void addMouseListeners() {
@@ -148,7 +180,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         }
     }
 
-    public void removeSeries(java.util.List<E> series) {
+    private void removeSeries(java.util.List<E> series) {
         for ( E s : series) {
             SeriesTreeNode n = seriesToNodeMap.remove(s);
             treeModel.removeNodeFromParent(n);

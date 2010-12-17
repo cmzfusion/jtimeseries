@@ -24,7 +24,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -68,6 +72,35 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPan
         setLayout(new BorderLayout());
         add(new JScrollPane(timeSeriesTable), BorderLayout.CENTER);
         addSeriesSelectionListener();
+        addContextListener();
+    }
+
+    private void addContextListener() {
+        rootContext.addTreeListener(
+            AwtSafeListener.getAwtSafeListener(
+                new IdentifiableTreeListener() {
+                    public void nodeChanged(Identifiable node, Object changeDescription) {
+                    }
+
+                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                        repaint();
+                    }
+
+                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+                        List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
+                        tableModel.addObjects(timeSeries);
+                    }
+
+                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+                        List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
+                        for ( E series : timeSeries) {
+                            tableModel.removeObject(series);
+                        }
+                    }
+                },
+                IdentifiableTreeListener.class
+            )
+        );
     }
 
     public TableColumnManager getTableColumnManager() {
@@ -124,12 +157,6 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPan
             timeSeries.add(i);
         }
         tableModel.addObjects(timeSeries);
-    }
-
-    public void removeSeries(java.util.List<E> series) {
-        for (E s : series ) {
-            tableModel.removeObject(s);
-        }
     }
 
     public void addAllDynamicColumns() {

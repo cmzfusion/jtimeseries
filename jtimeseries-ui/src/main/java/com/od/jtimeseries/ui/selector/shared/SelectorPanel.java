@@ -20,9 +20,12 @@ package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.swing.action.ListSelectionActionModel;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -63,11 +66,8 @@ public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends Ti
         return seriesActionModel;
     }
 
-    public abstract void refreshSeries();
-
-    public abstract void removeSeries(List<E> series);
-
     public static interface SelectorPanelListener<E extends UIPropertiesTimeSeries> {
+
         void seriesSelectedForDescription(E s);
 
         void contextSelectedForDescription(TimeSeriesContext m);
@@ -78,5 +78,15 @@ public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends Ti
         public void seriesSelectedForDescription(E s) {}
 
         public void contextSelectedForDescription(TimeSeriesContext m) {}
+    }
+
+    public static <E> List<E> getAffectedSeries(Class seriesClass, IdentifiableTreeEvent contextTreeEvent) {
+        LinkedList<E> l = new LinkedList<E>();
+        for ( Identifiable i : contextTreeEvent.getNodes()) {
+            if ( seriesClass.isAssignableFrom(i.getClass())) {
+                l.add((E)i);
+            }
+        }
+        return l;
     }
 }

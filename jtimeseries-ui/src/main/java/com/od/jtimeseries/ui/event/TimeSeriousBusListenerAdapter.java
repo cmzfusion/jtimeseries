@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious.event;
+package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 
@@ -16,4 +16,5 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
 
     public void serverRemoved(TimeSeriesServer s) {
     }
+
 }

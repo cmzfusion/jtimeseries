@@ -3,8 +3,8 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.timeserious.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.timeserious.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.swing.eventbus.UIEventBus;
 
 /**

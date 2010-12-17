@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.net.udp;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.timeserious.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 

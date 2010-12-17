@@ -238,27 +238,27 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract Identifiable addChild_Locked(Identifiable... identifiables);
 
-    public boolean addTreeListener(IdentifiableTreeListener l) {
+    public void addTreeListener(IdentifiableTreeListener l) {
         try {
             getContextLock().readLock().lock();
-            return addTreeListener_Locked(l);
+            addTreeListener_Locked(l);
         } finally {
             getContextLock().readLock().unlock();
         }
     }
 
-    protected abstract boolean addTreeListener_Locked(IdentifiableTreeListener l);
+    protected abstract void addTreeListener_Locked(IdentifiableTreeListener l);
 
-    public boolean removeTreeListener(IdentifiableTreeListener l) {
+    public void removeTreeListener(IdentifiableTreeListener l) {
         try {
             getContextLock().readLock().lock();
-            return removeTreeListener_Locked(l);
+            removeTreeListener_Locked(l);
         } finally {
             getContextLock().readLock().unlock();
         }
     }
 
-    protected abstract boolean removeTreeListener_Locked(IdentifiableTreeListener l);
+    protected abstract void removeTreeListener_Locked(IdentifiableTreeListener l);
 
     public Identifiable getRoot() {
         try {

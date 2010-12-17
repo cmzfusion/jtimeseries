@@ -175,11 +175,15 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.remove(path, classType);
     }
 
-    public boolean addTreeListener(IdentifiableTreeListener l) {
-        return timingSource.addTreeListener(l);
+    public void addTreeListener(IdentifiableTreeListener l) {
+        timingSource.addTreeListener(l);
     }
 
-    public boolean removeTreeListener(IdentifiableTreeListener l) {
-        return timingSource.removeTreeListener(l);
+    public void removeTreeListener(IdentifiableTreeListener l) {
+        timingSource.removeTreeListener(l);
+    }
+
+    public void fireNodeChanged(Object changeDescription) {
+        timingSource.fireNodeChanged("change");
     }
 }

@@ -120,17 +120,14 @@ public interface Identifiable {
 
     Identifiable addChild(Identifiable... identifiables);
 
-
     <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);
 
+    void addTreeListener(IdentifiableTreeListener l);
+
+    void removeTreeListener(IdentifiableTreeListener l);
 
     /**
-     * @return true, if the listener was not already in the listener list and was added
+     * fire an event to IdentifiableTreeListener to indicate this node has changed
      */
-    boolean addTreeListener(IdentifiableTreeListener l);
-
-    /**
-     * @return true, if the listener was currently in the listener list and was removed
-     */
-    boolean removeTreeListener(IdentifiableTreeListener l);
+    void fireNodeChanged(Object changeDescription);
 }

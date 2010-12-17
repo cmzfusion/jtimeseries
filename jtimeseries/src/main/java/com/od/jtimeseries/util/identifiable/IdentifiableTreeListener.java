@@ -9,14 +9,23 @@ package com.od.jtimeseries.util.identifiable;
 public interface IdentifiableTreeListener {
 
     /**
-     * nodes changed in a way which did not affect tree structure (e.g. node description changed)
-     *
-     * @param contextTreeEvent
+     * called when the node to which the listener was added changes
      */
-    public void nodesChanged(IdentifiableTreeEvent contextTreeEvent);
+    public void nodeChanged(Identifiable node, Object changeDescription);
+    
+    /**
+     * descendant nodes changed in a way which did not affect tree structure (e.g. node description changed)
+     */
+    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent);
 
-    public void nodesAdded(IdentifiableTreeEvent contextTreeEvent);
+    /**
+     * descendant nodes were added
+     */
+    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent);
 
-    public void nodesRemoved(IdentifiableTreeEvent contextTreeEvent);
+    /**
+     * descendant nodes were removed
+     */
+    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent);
 
 }

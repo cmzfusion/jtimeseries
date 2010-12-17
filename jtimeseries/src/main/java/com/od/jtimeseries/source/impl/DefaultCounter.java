@@ -175,11 +175,15 @@ public class DefaultCounter implements Counter {
         return simpleSource.remove(path, classType);
     }
 
-    public boolean addTreeListener(IdentifiableTreeListener l) {
-        return simpleSource.addTreeListener(l);
+    public void addTreeListener(IdentifiableTreeListener l) {
+        simpleSource.addTreeListener(l);
     }
 
-    public boolean removeTreeListener(IdentifiableTreeListener l) {
-        return simpleSource.removeTreeListener(l);
+    public void removeTreeListener(IdentifiableTreeListener l) {
+        simpleSource.removeTreeListener(l);
+    }
+
+    public void fireNodeChanged(Object changeDescription) {
+        simpleSource.fireNodeChanged("change");
     }
 }

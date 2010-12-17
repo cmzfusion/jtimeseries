@@ -152,13 +152,4 @@ public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implement
         eventHandler.removeTimeSeriesListener(l);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return wrappedSeries.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return wrappedSeries.hashCode();
-    }
 }

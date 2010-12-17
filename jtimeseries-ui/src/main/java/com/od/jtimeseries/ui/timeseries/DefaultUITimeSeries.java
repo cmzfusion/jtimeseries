@@ -32,6 +32,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         boolean oldValue = this.stale;
         this.stale = stale;
         firePropertyChange(STALE_PROPERTY, oldValue, stale);
+        fireNodeChanged(UIPropertiesTimeSeries.STALE_PROPERTY);
     }
 
     public boolean isSelected() {
@@ -42,6 +43,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         boolean oldValue = this.selected;
         this.selected = selected;
         firePropertyChange(UIPropertiesTimeSeries.SELECTED_PROPERTY, oldValue, selected);
+        fireNodeChanged(UIPropertiesTimeSeries.SELECTED_PROPERTY);
     }
 
     public String getDisplayName() {

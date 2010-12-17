@@ -96,6 +96,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
             )
         );
         firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
+        fireNodeChanged(SELECTED_PROPERTY);
     }
 
     public Color getColor() {

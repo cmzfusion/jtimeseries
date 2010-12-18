@@ -437,6 +437,12 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private class IdentifiableTreeComparator implements Comparator<Identifiable> {
         public int compare(Identifiable o1, Identifiable o2) {
+            //sort context folders before series, then by display name
+            boolean o1IsContext = o1 instanceof TimeSeriesContext;
+            boolean o2IsContext = o2 instanceof TimeSeriesContext;
+            if ( o1IsContext != o2IsContext) {
+                return o1IsContext ? 1 : -1;
+            }
             return getDisplayName(o1).compareTo(getDisplayName(o2));
         }
     }

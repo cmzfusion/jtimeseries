@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.*;
@@ -17,14 +18,14 @@ import java.awt.*;
 public class MainSeriesSelector extends JPanel {
 
     private TimeSeriesContext rootContext;
-    private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
+    private SeriesSelectionPanel<RemoteHttpTimeSeries> selectionPanel;
 
     public MainSeriesSelector(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
 
-        selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
+        selectionPanel = new SeriesSelectionPanel<RemoteHttpTimeSeries>(
             rootContext,
-            UIPropertiesTimeSeries.class
+            RemoteHttpTimeSeries.class
         );
 
         setLayout(new BorderLayout());

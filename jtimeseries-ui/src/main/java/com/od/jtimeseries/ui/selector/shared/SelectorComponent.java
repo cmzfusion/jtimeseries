@@ -35,13 +35,13 @@ import java.util.List;
  * Time: 11:43:35
  * To change this template use File | Settings | File Templates.
  */
-public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
+public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
 
     protected java.util.List<SelectorPanelListener<E>> seriesSelectionListeners = new ArrayList<SelectorPanelListener<E>>();
     private TimeSeriesContext rootContext;
     private ListSelectionActionModel<E> seriesActionModel;
 
-    public SelectorPanel(TimeSeriesContext rootContext, ListSelectionActionModel<E> seriesActionModel) {
+    public SelectorComponent(TimeSeriesContext rootContext, ListSelectionActionModel<E> seriesActionModel) {
         this.rootContext = rootContext;
         this.seriesActionModel = seriesActionModel;
     }

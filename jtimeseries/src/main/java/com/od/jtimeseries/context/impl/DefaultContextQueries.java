@@ -229,12 +229,12 @@ public class DefaultContextQueries implements ContextQueries {
         return result;
     }
 
-    private <E extends Identifiable> void addAllIdentifiableMatchingClassRecursive(List<E> valueSources, Identifiable identifiable, Class<E> clazz) {
+    private <E extends Identifiable> void addAllIdentifiableMatchingClassRecursive(List<E> l, Identifiable identifiable, Class<E> clazz) {
         for ( Identifiable i : identifiable.getChildren()) {
             if ( clazz.isAssignableFrom(i.getClass())) {
-                valueSources.add((E)i);
+                l.add((E)i);
             }
-            addAllIdentifiableMatchingClassRecursive(valueSources, i, clazz);
+            addAllIdentifiableMatchingClassRecursive(l, i, clazz);
         }
     }
 

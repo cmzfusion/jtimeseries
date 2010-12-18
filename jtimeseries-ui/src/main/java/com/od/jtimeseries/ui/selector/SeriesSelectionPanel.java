@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.selector;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
+import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.table.ColumnSelectionDialog;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
@@ -147,7 +147,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
                     }
 
                     public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> seriesAffected = SelectorPanel.getAffectedSeries(seriesClass, contextTreeEvent);
+                        List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent);
                         for ( E series : seriesAffected) {
                             if ( series.isSelected() ) {
                                 selectionList.addSelection(series);
@@ -268,7 +268,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         columnSelectorButton.setEnabled(false);
     }
 
-    private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorPanel.SelectorPanelListenerAdapter<E> {
+    private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorComponent.SelectorPanelListenerAdapter<E> {
 
         public void seriesSelectedForDescription(E s) {
             seriesDescriptionPanel.setSelectedSeries(s);

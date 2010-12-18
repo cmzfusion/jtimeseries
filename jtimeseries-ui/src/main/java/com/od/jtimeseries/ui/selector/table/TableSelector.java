@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
+import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -34,7 +34,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +43,7 @@ import java.util.List;
  * Time: 11:37:55
  * To change this template use File | Settings | File Templates.
  */
-public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPanel<E> {
+public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
     private TimeSeriesContext rootContext;
     private java.util.List<Action> seriesActions;

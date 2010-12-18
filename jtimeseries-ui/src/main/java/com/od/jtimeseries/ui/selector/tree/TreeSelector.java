@@ -20,8 +20,7 @@ package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -46,7 +45,13 @@ import java.util.List;
 * Date: 07-Jan-2009
 * Time: 10:56:35
 */
-public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPanel<E> {
+public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
+
+    private static ExpansionRule EXPAND_ALL_NODES_RULE = new ExpansionRule() {
+        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+            return true;
+        }
+    };
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
@@ -68,6 +73,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
+        expandNodes((AbstractSeriesSelectionTreeNode)treeModel.getRoot(), EXPAND_ALL_NODES_RULE);
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new SeriesTreeCellRenderer());
@@ -81,41 +87,63 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
 
     protected void addContextTreeListener() {
         rootContext.addTreeListener(
-                AwtSafeListener.getAwtSafeListener(
-                        new IdentifiableTreeListener() {
-                            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                                repaint();
-                            }
+            AwtSafeListener.getAwtSafeListener(
+                new IdentifiableTreeListener() {
+                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                        repaint();
+                    }
 
-                            public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                                for (Identifiable series : contextTreeEvent.getNodes()) {
-                                    Identifiable parent = series.getParent();
-                                    AbstractSeriesSelectionTreeNode parentNode = identifiableToNodeMap.get(parent);
-                                    AbstractSeriesSelectionTreeNode newNode = buildNode(series);
-                                    if ( parentNode != null && newNode != null) {
-                                        int index = addChild(parentNode, newNode);
-                                        treeModel.nodesWereInserted(parentNode, new int[]{index});
-                                    }
+                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+                        for (Identifiable i : contextTreeEvent.getNodes()) {
+                            addNodeAndAllDescendants(i);
+                        }
+                    }
 
-                                    //the below seems to be required or we end up not showing new nodes at the server level
-                                    if ( parentNode.isRoot()) {
-                                        tree.expandPath(new TreePath(new Object[] {treeModel.getRoot(), parentNode }));
-                                    }
-                                }
+                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+                        for ( Identifiable i : contextTreeEvent.getNodes()) {
+                            removeNodeAndAllDescendants(i);
+                        }
+                    }
 
-                            }
-
-                            public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                                List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
-                                removeSeries(timeSeries);
-                            }
-
-                            public void nodeChanged(Identifiable node, Object changeDescription) {
-                            }
-                        },
-                        IdentifiableTreeListener.class
-                )
+                    public void nodeChanged(Identifiable node, Object changeDescription) {
+                    }
+                },
+                IdentifiableTreeListener.class
+            )
         );
+    }
+
+    private void addNodeAndAllDescendants(Identifiable i) {
+        if ( ! identifiableToNodeMap.containsKey(i)) {
+            Identifiable parent = i.getParent();
+            AbstractSeriesSelectionTreeNode parentNode = identifiableToNodeMap.get(parent);
+
+            //build and add the node tree for each added item and any descendant nodes
+            AbstractSeriesSelectionTreeNode newNode = buildTree(i);
+            if ( parentNode != null && newNode != null) {
+                int index = addChild(parentNode, newNode);
+                treeModel.nodesWereInserted(parentNode, new int[]{index});
+                expandNodes(newNode, EXPAND_ALL_NODES_RULE);
+            }
+        }
+    }
+
+    private void removeNodeAndAllDescendants(Identifiable node) {
+        AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(node);
+        treeModel.removeNodeFromParent(n);
+
+        List<Identifiable> allDescendants = new LinkedList<Identifiable>();
+        addAllDescendants(allDescendants, node);
+        for ( Identifiable i : allDescendants) {
+            identifiableToNodeMap.remove(i);
+        }
+    }
+
+    private void addAllDescendants(List<Identifiable> allDescendants, Identifiable node) {
+        for ( Identifiable i : node.getChildren()) {
+            addAllDescendants(allDescendants, i);
+        }
+        allDescendants.add(node);
     }
 
     private void addMouseListeners() {
@@ -168,31 +196,34 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
     }
 
     protected void buildView() {
-        TreeNode rootNode = buildTreeNode(rootContext);
+        AbstractSeriesSelectionTreeNode rootNode = buildTree(rootContext);
         treeModel.setRoot(rootNode);
-        ensureSelectedNodesVisible();
     }
 
-    private void ensureSelectedNodesVisible() {
-        for ( AbstractSeriesSelectionTreeNode n : identifiableToNodeMap.values()) {
-            if ( n.isSelected()) {
-                tree.expandPath(new TreePath(n.getPath()).getParentPath());
-            }
+    private static interface ExpansionRule {
+        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n);
+    }
+
+    /**
+     * expand the tree to show any child nodes of startNode which satisfy the ExpansionRule
+     */
+    private void expandNodes(AbstractSeriesSelectionTreeNode startNode, ExpansionRule r) {
+        Enumeration<AbstractSeriesSelectionTreeNode> e = startNode.children();
+        while(e.hasMoreElements()) {
+            expandNodes(e.nextElement(), r);
+        }
+
+        TreePath pathToExpand = new TreePath(startNode.getPath()).getParentPath();
+        if ( ! tree.isExpanded(pathToExpand) && r.shouldExpand(startNode) ) {
+            tree.expandPath(pathToExpand);
         }
     }
 
-    private void removeSeries(java.util.List<E> series) {
-        for ( E s : series) {
-            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(s);
-            treeModel.removeNodeFromParent(n);
-        }
-    }
-
-    private AbstractSeriesSelectionTreeNode buildTreeNode(Identifiable identifiable) {
+    private AbstractSeriesSelectionTreeNode buildTree(Identifiable identifiable) {
 
         List<AbstractSeriesSelectionTreeNode> childNodes = new LinkedList<AbstractSeriesSelectionTreeNode>();
         for ( Identifiable c : identifiable.getChildren()) {
-            AbstractSeriesSelectionTreeNode childNode = buildTreeNode(c);
+            AbstractSeriesSelectionTreeNode childNode = buildTree(c);
             if ( childNode != null) {
                 childNodes.add(childNode);
             }
@@ -215,7 +246,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         while(e.hasMoreElements()) {
             AbstractSeriesSelectionTreeNode node = (AbstractSeriesSelectionTreeNode)e.nextElement();
             int comparison = c.compare(node.getIdentifiable(), child.getIdentifiable());
-            if ( comparison == -1) {
+            if ( comparison < 0) {
                 parent.insert(child, index);
                 inserted = true;
                 break;

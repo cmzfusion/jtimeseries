@@ -31,29 +31,20 @@ import java.net.URL;
  * Date: 12-Jan-2009
  * Time: 16:18:37
  */
-public class AddRemoteSeriesQuery {
+public class AddRemoteSeriesTask {
 
     private TimeSeriesContext serverContext;
     private URL remoteContextUrl;
     private DisplayNameCalculator displayNameCalculator;
 
-    public AddRemoteSeriesQuery(TimeSeriesServer server, TimeSeriesContext destinationContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
-        this.serverContext = createServerContext(destinationContext, server);
+    public AddRemoteSeriesTask(TimeSeriesContext serverContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
+        this.serverContext = serverContext;
         this.remoteContextUrl = remoteContextUrl;
         this.displayNameCalculator = displayNameCalculator;
     }
 
-    private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, TimeSeriesServer server) {
-        String serverId = server.getDescription();
-        TimeSeriesServerContext serverContext = (TimeSeriesServerContext)destinationContext.get(serverId);
-        if ( serverContext == null) {
-            serverContext = new TimeSeriesServerContext(server, serverId, serverId);
-            destinationContext.addChild(serverContext);
-        }
-        return serverContext;
-    }
 
-    public void runQuery() throws Exception {
+    public void run() throws Exception {
         FindRemoteTimeSeriesQuery findAllTimeSeries = new FindRemoteTimeSeriesQuery(remoteContextUrl);
         findAllTimeSeries.runQuery();
         for ( FindRemoteTimeSeriesQuery.RemoteTimeSeries timeSeriesResult : findAllTimeSeries.getResult()) {
@@ -70,7 +61,9 @@ public class AddRemoteSeriesQuery {
 
         //must do this after adding the series to the context because the contextPath will not
         //be complete until this is done, and the name calculation is based on the path
-        displayNameCalculator.setDisplayName(series);
+        if ( displayNameCalculator != null) {
+            displayNameCalculator.setDisplayName(series);
+        }
     }
 
 }

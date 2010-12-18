@@ -18,14 +18,14 @@ import java.awt.*;
 public class MainSeriesSelector extends JPanel {
 
     private TimeSeriesContext rootContext;
-    private SeriesSelectionPanel<RemoteHttpTimeSeries> selectionPanel;
+    private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
 
     public MainSeriesSelector(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
 
-        selectionPanel = new SeriesSelectionPanel<RemoteHttpTimeSeries>(
+        selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
-            RemoteHttpTimeSeries.class
+            UIPropertiesTimeSeries.class
         );
 
         setLayout(new BorderLayout());

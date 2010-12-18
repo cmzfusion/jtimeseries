@@ -9,7 +9,9 @@ import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.ui.download.panel.AddRemoteSeriesTask;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -137,7 +139,7 @@ public class NewServerAction extends AbstractAction {
             public void actionPerformed(ActionEvent e) {
                 addProgressPane(0.8f, 24, 15);
 
-                SwingCommand checkServerCommand = new CheckAndCreateServerCommand();
+                final CheckAndCreateServerCommand checkServerCommand = new CheckAndCreateServerCommand();
                 checkServerCommand.execute(
                     new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel) {
                         public void error(Task task, Throwable error) {
@@ -148,6 +150,18 @@ public class NewServerAction extends AbstractAction {
                                 JideOptionPane.ERROR_MESSAGE
                             );
                         }
+
+                        public void success(Task task) {
+                            try {
+                                new AddRemoteSeriesTask(
+                                        checkServerCommand.context,
+                                        new URL("http", serverDetailsPage.getHostName(), serverDetailsPage.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX),
+                                        null
+                                        ).run();
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                        }
                     }
                 );
             }
@@ -155,6 +169,7 @@ public class NewServerAction extends AbstractAction {
             private class CheckAndCreateServerCommand extends SwingCommand {
 
                 TimeSeriesServer server;
+                private TimeSeriesServerContext context;
 
                 @Override
                 protected Task createTask() {
@@ -206,7 +221,7 @@ public class NewServerAction extends AbstractAction {
 
                         @Override
                         protected void doInEventThread() throws Exception {
-                            TimeSeriesServerContext context = new TimeSeriesServerContext(
+                            context = new TimeSeriesServerContext(
                                     server,
                                     server.getDescription(),
                                     server.getDescription()

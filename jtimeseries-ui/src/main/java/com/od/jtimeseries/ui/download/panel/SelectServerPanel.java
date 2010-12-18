@@ -238,14 +238,27 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
 
                 protected void doInBackground() throws Exception {
                     URL url = getParameters();
-                    AddRemoteSeriesQuery q = new AddRemoteSeriesQuery(
-                        server,
-                        remoteSeriesContext,
+
+                    TimeSeriesContext context = createServerContext(remoteSeriesContext, server);
+                    AddRemoteSeriesTask t = new AddRemoteSeriesTask(
+                        context,
                         url,
                         displayNameCalculator
                     );
-                    q.runQuery();
+                    t.run();
                 }
+
+
+                private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, TimeSeriesServer server) {
+                    String serverId = server.getDescription();
+                    TimeSeriesServerContext serverContext = (TimeSeriesServerContext)destinationContext.get(serverId);
+                    if ( serverContext == null) {
+                        serverContext = new TimeSeriesServerContext(server, serverId, serverId);
+                        destinationContext.addChild(serverContext);
+                    }
+                    return serverContext;
+                }
+
 
                 protected void doInEventThread() {
                     getPanelListener().seriesLoaded();

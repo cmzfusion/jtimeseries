@@ -103,8 +103,8 @@ public class DefaultCounter implements Counter {
         return simpleSource.removeChild(c);
     }
 
-    public ReentrantReadWriteLock getContextLock() {
-        return simpleSource.getContextLock();
+    public ReentrantReadWriteLock getTreeLock() {
+        return simpleSource.getTreeLock();
     }
 
     public Identifiable getRoot() {

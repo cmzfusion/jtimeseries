@@ -15,7 +15,6 @@ import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.PathParser;
 
 import java.util.List;
 
@@ -42,10 +41,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public TimeSeriesContext getRoot() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return isRoot() ? this : getParent().getRoot();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -87,50 +86,50 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final boolean isSchedulerStarted() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return isSchedulerStarted_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract boolean isSchedulerStarted_Locked();
 
     public final TimeSeriesContext startScheduling() {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return startScheduling_Locked();
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract TimeSeriesContext startScheduling_Locked();
 
     public final TimeSeriesContext stopScheduling() {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return stopScheduling_Locked();
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract TimeSeriesContext stopScheduling_Locked();
 
     public final TimeSeriesContext startDataCapture() {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return startDataCapture_Locked();
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract TimeSeriesContext startDataCapture_Locked();
 
     public final TimeSeriesContext stopDataCapture() {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return stopDataCapture_Locked();
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract TimeSeriesContext stopDataCapture_Locked();
@@ -247,10 +246,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findTimeSeries_Locked(criteria);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -258,10 +257,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<IdentifiableTimeSeries> findTimeSeries(ValueSource source) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findTimeSeries_Locked(source);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -269,10 +268,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<IdentifiableTimeSeries> findTimeSeries(String searchPattern) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findTimeSeries_Locked(searchPattern);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -280,10 +279,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<IdentifiableTimeSeries> findAllTimeSeries() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllTimeSeries_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -291,10 +290,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Capture> findCaptures(String searchPattern) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findCaptures_Locked(searchPattern);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -302,10 +301,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Capture> findCaptures(CaptureCriteria criteria) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findCaptures_Locked(criteria);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -313,10 +312,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Capture> findCaptures(ValueSource valueSource) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findCaptures_Locked(valueSource);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -324,10 +323,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Capture> findCaptures(IdentifiableTimeSeries timeSeries) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findCaptures_Locked(timeSeries);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -335,10 +334,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Capture> findAllCaptures() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllCaptures_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -346,10 +345,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<ValueSource> findValueSources(CaptureCriteria criteria) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findValueSources_Locked(criteria);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -357,10 +356,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<ValueSource> findValueSources(IdentifiableTimeSeries timeSeries) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findValueSources_Locked(timeSeries);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -368,10 +367,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<ValueSource> findValueSources(String searchPattern) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findValueSources_Locked(searchPattern);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -379,10 +378,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<ValueSource> findAllValueSources() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllValueSources_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -390,10 +389,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Scheduler> findAllSchedulers() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllSchedulers_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -401,10 +400,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Scheduler> findSchedulers(String searchPattern) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findSchedulers_Locked(searchPattern);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -412,10 +411,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final QueryResult<Scheduler> findSchedulers(Triggerable triggerable) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findSchedulers_Locked(triggerable);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -423,10 +422,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllChildren_Locked(assignableToClass);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -434,10 +433,10 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findAllChildren_Locked(searchPattern, assignableToClass);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 

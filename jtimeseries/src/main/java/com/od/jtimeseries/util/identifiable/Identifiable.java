@@ -78,7 +78,7 @@ public interface Identifiable {
      * Structural changes made to the context tree structure should be made
      * while holding the write lock on this Object
      */
-    ReentrantReadWriteLock getContextLock();
+    ReentrantReadWriteLock getTreeLock();
 
     Identifiable getRoot();
 

@@ -38,9 +38,11 @@ import java.util.List;
 public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
 
     protected java.util.List<SelectorPanelListener<E>> seriesSelectionListeners = new ArrayList<SelectorPanelListener<E>>();
+    private TimeSeriesContext rootContext;
     private ListSelectionActionModel<E> seriesActionModel;
 
-    public SelectorPanel(ListSelectionActionModel<E> seriesActionModel) {
+    public SelectorPanel(TimeSeriesContext rootContext, ListSelectionActionModel<E> seriesActionModel) {
+        this.rootContext = rootContext;
         this.seriesActionModel = seriesActionModel;
     }
 
@@ -64,6 +66,22 @@ public abstract class SelectorPanel<E extends UIPropertiesTimeSeries> extends Ti
 
     protected ListSelectionActionModel<E> getSeriesActionModel() {
         return seriesActionModel;
+    }
+
+    protected abstract void addContextTreeListener();
+
+    protected abstract void buildView();
+
+    protected void setupSeries() {
+        //hold the context tree lock so that the context tree doesn't change while we are constructing the nodes or populating the table
+        //add the context listener while we hold the lock to guarantee we receive all subsequent events
+        try {
+            rootContext.getTreeLock().readLock().lock();
+            buildView();
+            addContextTreeListener();
+        } finally {
+            rootContext.getTreeLock().readLock().unlock();
+        }
     }
 
     public static interface SelectorPanelListener<E extends UIPropertiesTimeSeries> {

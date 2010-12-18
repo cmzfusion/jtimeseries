@@ -60,22 +60,22 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPan
                          java.util.List<Action> seriesActions,
                          String selectionText,
                          Class<E> seriesClass) {
-        super(seriesActionModel);
+        super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
         this.selectionText = selectionText;
         this.seriesClass = seriesClass;
         createTable();
-        refreshSeries();
+        setupSeries();
         createPopupMenu();
 
         setLayout(new BorderLayout());
         add(new JScrollPane(timeSeriesTable), BorderLayout.CENTER);
         addSeriesSelectionListener();
-        addContextListener();
     }
 
-    private void addContextListener() {
+    @Override
+    protected void addContextTreeListener() {
         rootContext.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
                 new IdentifiableTreeListener() {
@@ -149,14 +149,10 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorPan
         );
     }
 
-    public void refreshSeries() {
-        tableModel.clear();
+    @Override
+    protected void buildView() {
         List<E> l = rootContext.findAll(seriesClass).getAllMatches();
-        List<E> timeSeries = new ArrayList<E>();
-        for ( E i : l) {
-            timeSeries.add(i);
-        }
-        tableModel.addObjects(timeSeries);
+        tableModel.addObjects(l);
     }
 
     public void addAllDynamicColumns() {

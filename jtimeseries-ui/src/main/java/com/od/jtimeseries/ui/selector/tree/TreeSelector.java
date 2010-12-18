@@ -19,7 +19,6 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorPanel;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
@@ -54,24 +53,25 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
     private List<Action> seriesActions;
     private Class seriesClass;
     private JTree tree;
-    private Map<UIPropertiesTimeSeries, SeriesTreeNode> seriesToNodeMap = new HashMap<UIPropertiesTimeSeries, SeriesTreeNode>();
+    private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
 
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
-        super(seriesActionModel);
+        super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
         this.seriesClass = seriesClass;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+        setupSeries();
+
         tree = new JTree();
         tree.setModel(treeModel);
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new SeriesTreeCellRenderer());
         tree.addTreeSelectionListener(new SeriesTreeSelectionListener());
-
-        refreshSeries();
-        addContextListener();
 
         setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(tree);
@@ -79,29 +79,42 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         addMouseListeners();
     }
 
-    private void addContextListener() {
+    protected void addContextTreeListener() {
         rootContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
-                    new IdentifiableTreeListener() {
-                        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                            repaint();
-                        }
+                AwtSafeListener.getAwtSafeListener(
+                        new IdentifiableTreeListener() {
+                            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                                repaint();
+                            }
 
-                        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                            //List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
-                            refreshSeries();
-                        }
+                            public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+                                for (Identifiable series : contextTreeEvent.getNodes()) {
+                                    Identifiable parent = series.getParent();
+                                    AbstractSeriesSelectionTreeNode parentNode = identifiableToNodeMap.get(parent);
+                                    AbstractSeriesSelectionTreeNode newNode = buildNode(series);
+                                    if ( parentNode != null && newNode != null) {
+                                        int index = addChild(parentNode, newNode);
+                                        treeModel.nodesWereInserted(parentNode, new int[]{index});
+                                    }
 
-                        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                            List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
-                            removeSeries(timeSeries);
-                        }
+                                    //the below seems to be required or we end up not showing new nodes at the server level
+                                    if ( parentNode.isRoot()) {
+                                        tree.expandPath(new TreePath(new Object[] {treeModel.getRoot(), parentNode }));
+                                    }
+                                }
 
-                        public void nodeChanged(Identifiable node, Object changeDescription) {
-                        }
-                    },
-                    IdentifiableTreeListener.class
-            )
+                            }
+
+                            public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+                                List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
+                                removeSeries(timeSeries);
+                            }
+
+                            public void nodeChanged(Identifiable node, Object changeDescription) {
+                            }
+                        },
+                        IdentifiableTreeListener.class
+                )
         );
     }
 
@@ -154,27 +167,15 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         return menuItems;
     }
 
-    public void refreshSeries() {
-        TreeNode rootNode;
-        seriesToNodeMap.clear();
-
-        //hold the context tree lock so that the context tree doesn't change while we are constructing the nodes
-        try {
-            rootContext.getContextLock().readLock().lock();
-            rootNode = buildTreeNode(rootContext);
-        } finally {
-            rootContext.getContextLock().readLock().unlock();
-        }
+    protected void buildView() {
+        TreeNode rootNode = buildTreeNode(rootContext);
         treeModel.setRoot(rootNode);
-
         ensureSelectedNodesVisible();
-        validate();
-        repaint();
     }
 
     private void ensureSelectedNodesVisible() {
-        for ( SeriesTreeNode n : seriesToNodeMap.values()) {
-            if ( ((UIPropertiesTimeSeries)n.getTimeSeries()).isSelected()) {
+        for ( AbstractSeriesSelectionTreeNode n : identifiableToNodeMap.values()) {
+            if ( n.isSelected()) {
                 tree.expandPath(new TreePath(n.getPath()).getParentPath());
             }
         }
@@ -182,36 +183,72 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
 
     private void removeSeries(java.util.List<E> series) {
         for ( E s : series) {
-            SeriesTreeNode n = seriesToNodeMap.remove(s);
+            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(s);
             treeModel.removeNodeFromParent(n);
         }
     }
 
-    private DefaultMutableTreeNode buildTreeNode(TimeSeriesContext context) {
-        DefaultMutableTreeNode n = new ContextTreeNode(context);
+    private AbstractSeriesSelectionTreeNode buildTreeNode(Identifiable identifiable) {
 
-        List<TimeSeriesContext> childContexts = sort(context.getChildContexts());
-        for ( TimeSeriesContext c : childContexts) {
-            n.add(buildTreeNode(c));
+        List<AbstractSeriesSelectionTreeNode> childNodes = new LinkedList<AbstractSeriesSelectionTreeNode>();
+        for ( Identifiable c : identifiable.getChildren()) {
+            AbstractSeriesSelectionTreeNode childNode = buildTreeNode(c);
+            if ( childNode != null) {
+                childNodes.add(childNode);
+            }
         }
 
-        List<IdentifiableTimeSeries> timeSeries = sort(context.getTimeSeries());
-        for ( IdentifiableTimeSeries s : timeSeries) {
-            SeriesTreeNode node = new SeriesTreeNode<E>((E)s);
-            seriesToNodeMap.put((E)s, node);
-            n.add(node);
+        AbstractSeriesSelectionTreeNode n = buildNode(identifiable);
+        if ( n != null ) {
+            for ( AbstractSeriesSelectionTreeNode child : childNodes) {
+                addChild(n, child);
+            }
         }
         return n;
     }
 
-    //sort child series by display name
-    private <E extends Identifiable> List<E> sort(List<E> identifiables) {
-        Collections.sort(identifiables, new Comparator<Identifiable>() {
-            public int compare(Identifiable o1, Identifiable o2) {
-                return getDisplayName(o1).compareTo(getDisplayName(o2));
+    private int addChild(AbstractSeriesSelectionTreeNode parent, AbstractSeriesSelectionTreeNode child) {
+        Enumeration<DefaultMutableTreeNode> e = parent.children();
+        int index = 0;
+        IdentifiableTreeComparator c = new IdentifiableTreeComparator();
+        boolean inserted = false;
+        while(e.hasMoreElements()) {
+            AbstractSeriesSelectionTreeNode node = (AbstractSeriesSelectionTreeNode)e.nextElement();
+            int comparison = c.compare(node.getIdentifiable(), child.getIdentifiable());
+            if ( comparison == -1) {
+                parent.insert(child, index);
+                inserted = true;
+                break;
             }
-        });
-        return identifiables;
+            index++;
+        }
+        if ( ! inserted) {
+            parent.add(child);
+        }
+        return index;
+    }
+
+    private AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
+        AbstractSeriesSelectionTreeNode result;
+        if ( identifiable instanceof TimeSeriesContext) {
+            result = buildContextNode((TimeSeriesContext)identifiable);
+        } else if ( seriesClass.isAssignableFrom(identifiable.getClass())) {
+            result = buildSeriesNode((E)identifiable);
+        } else {
+            result = null;
+        }
+        if ( result != null ) {
+            identifiableToNodeMap.put(identifiable, result);
+        }
+        return result;
+    }
+
+    private ContextTreeNode buildContextNode(TimeSeriesContext context) {
+        return new ContextTreeNode(context);
+    }
+
+    private SeriesTreeNode buildSeriesNode(E s) {
+        return new SeriesTreeNode<E>(s);
     }
 
     public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
@@ -253,19 +290,22 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
 
     //get the display name for an identifiable in the context tree
     private String getDisplayName(Identifiable i) {
-        if ( i instanceof ChartingTimeSeries) {
-            return ((ChartingTimeSeries)i).getDisplayName();
+        if ( i instanceof UIPropertiesTimeSeries) {
+            return ((UIPropertiesTimeSeries)i).getDisplayName();
         } else {
             return i.getId();
         }
     }
 
     private abstract static class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode {
+        protected abstract Identifiable getIdentifiable();
 
         protected abstract Icon getIcon();
+
+        public abstract boolean isSelected();
     }
 
-    private static class SeriesTreeNode<E> extends AbstractSeriesSelectionTreeNode {
+    private static class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSelectionTreeNode {
 
         private E series;
 
@@ -281,8 +321,18 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
             return series;
         }
 
+        @Override
+        protected Identifiable getIdentifiable() {
+            return series;
+        }
+
         protected Icon getIcon() {
             return ImageUtils.REMOTE_CHART_16x16;
+        }
+
+        @Override
+        public boolean isSelected() {
+            return series.isSelected();
         }
     }
 
@@ -302,13 +352,23 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
             return context.toString();
         }
 
+        @Override
+        protected Identifiable getIdentifiable() {
+            return context;
+        }
+
         protected Icon getIcon() {
             return context instanceof TimeSeriesServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
+        }
+
+        @Override
+        public boolean isSelected() {
+            return false;
         }
     }
 
 
-    private class SeriesSelectionMouseListener<E> extends MouseAdapter {
+    private class SeriesSelectionMouseListener<E extends UIPropertiesTimeSeries> extends MouseAdapter {
 
         private  int hotspot = new JCheckBox().getPreferredSize().width;
 
@@ -344,4 +404,9 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorPane
         }
     }
 
+    private class IdentifiableTreeComparator implements Comparator<Identifiable> {
+        public int compare(Identifiable o1, Identifiable o2) {
+            return getDisplayName(o1).compareTo(getDisplayName(o2));
+        }
+    }
 }

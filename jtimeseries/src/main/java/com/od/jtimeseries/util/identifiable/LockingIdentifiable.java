@@ -1,7 +1,5 @@
 package com.od.jtimeseries.util.identifiable;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
-
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -22,36 +20,36 @@ public abstract class LockingIdentifiable implements Identifiable {
      */
     private static final ReentrantReadWriteLock CONTEXT_LOCK = new ReentrantReadWriteLock();
 
-    public ReentrantReadWriteLock getContextLock() {
+    public ReentrantReadWriteLock getTreeLock() {
         return CONTEXT_LOCK;
     }
 
     public final String getParentPath() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getParentPath_Locked();
         } finally {
-            getContextLock().readLock().unlock();                
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract String getParentPath_Locked();
     
     public final String getPath() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getPath_Locked();
         } finally {
-            getContextLock().readLock().unlock();                
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract String getPath_Locked();
 
     public final Identifiable setParent(Identifiable parent) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return setParent_Locked(parent);
         } finally {
-            getContextLock().writeLock().unlock();                
+            getTreeLock().writeLock().unlock();
         }
     }
 
@@ -59,10 +57,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final List<Identifiable> getChildren() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getChildren_Locked();
         } finally {
-            getContextLock().readLock().unlock();                
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -70,10 +68,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final <E extends Identifiable> List<E> getChildren(Class<E> classType) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getChildren_Locked(classType);
         } finally {
-            getContextLock().readLock().unlock();                
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -81,20 +79,20 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return create_Locked(path, description, clazz, parameters);
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters);
 
     public final boolean removeChild(Identifiable c) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return removeChild_Locked(c);
         } finally {
-            getContextLock().writeLock().unlock();                
+            getTreeLock().writeLock().unlock();
         }
     }
 
@@ -106,20 +104,20 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public <E extends Identifiable> E remove(String path, Class<E> classType) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return remove_Locked(path, classType);
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
     protected abstract <E extends Identifiable> E remove_Locked(String path, Class<E> classType);
 
     public final boolean isRoot() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return isRoot_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -131,10 +129,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final <E extends Identifiable> E get(String path, Class<E> classType) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return get_Locked(path, classType);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract <E extends Identifiable> E get_Locked(String path, Class<E> classType);
@@ -142,10 +140,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public <E extends Identifiable> E getFromAncestors(String id, Class<E> classType) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getFromAncestors_Locked(id, classType);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract <E extends Identifiable> E getFromAncestors_Locked(String id, Class<E> classType);
@@ -153,20 +151,20 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final boolean containsChildWithId(String id) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return containsChildWithId_Locked(id);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
     protected abstract boolean containsChildWithId_Locked(String id);
 
     public final boolean containsChild(Identifiable i) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return containsChild_Locked(i);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -174,10 +172,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final String getProperty(String propertyName) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getProperty_Locked(propertyName);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -185,10 +183,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final Properties getProperties() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getProperties_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -196,10 +194,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final void putAllProperties(Properties p) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             putAllProperties_Locked(p);
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
 
@@ -207,10 +205,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final String findProperty(String propertyName) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return findProperty_Locked(propertyName);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -218,10 +216,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final String setProperty(String propertyName, String value) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return setProperty_Locked(propertyName, value);
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
 
@@ -229,10 +227,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public final Identifiable addChild(Identifiable... identifiables) {
         try {
-            getContextLock().writeLock().lock();
+            getTreeLock().writeLock().lock();
             return addChild_Locked(identifiables);
         } finally {
-            getContextLock().writeLock().unlock();
+            getTreeLock().writeLock().unlock();
         }
     }
 
@@ -240,10 +238,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public void addTreeListener(IdentifiableTreeListener l) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             addTreeListener_Locked(l);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -251,10 +249,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public void removeTreeListener(IdentifiableTreeListener l) {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             removeTreeListener_Locked(l);
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 
@@ -262,10 +260,10 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     public Identifiable getRoot() {
         try {
-            getContextLock().readLock().lock();
+            getTreeLock().readLock().lock();
             return getRoot_Locked();
         } finally {
-            getContextLock().readLock().unlock();
+            getTreeLock().readLock().unlock();
         }
     }
 

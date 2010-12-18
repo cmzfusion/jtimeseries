@@ -87,8 +87,8 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.setParent(parent);
     }
 
-    public ReentrantReadWriteLock getContextLock() {
-        return timingSource.getContextLock();
+    public ReentrantReadWriteLock getTreeLock() {
+        return timingSource.getTreeLock();
     }
 
     public Identifiable getRoot() {

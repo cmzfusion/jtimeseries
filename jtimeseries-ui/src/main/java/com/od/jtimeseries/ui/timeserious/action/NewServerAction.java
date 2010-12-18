@@ -4,6 +4,7 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.dialog.ButtonEvent;
 import com.jidesoft.dialog.ButtonNames;
+import com.jidesoft.dialog.JideOptionPane;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -73,6 +74,9 @@ public class NewServerAction extends AbstractAction {
             setFinishAction(new FinishAction());
         }
 
+        private String getServerConnectionUrl() {
+            return "http://" + serverDetailsPage.getHostName() + ":" + serverDetailsPage.getPort() + "/";
+        }
 
         private class ServerDetailsPage extends DefaultWizardPage {
 
@@ -89,8 +93,11 @@ public class NewServerAction extends AbstractAction {
             }
 
             public int getPort() {
-                //TODO
-                return Integer.parseInt(portField.getText());
+                try {
+                    return Integer.parseInt(portField.getText());
+                } catch ( NumberFormatException nfe) {
+                    return 0;
+                }
             }
 
             @Override
@@ -132,7 +139,16 @@ public class NewServerAction extends AbstractAction {
 
                 SwingCommand checkServerCommand = new CheckAndCreateServerCommand();
                 checkServerCommand.execute(
-                        new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel)
+                    new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel) {
+                        public void error(Task task, Throwable error) {
+                            JOptionPane.showMessageDialog(
+                                NewServerWizard.this,
+                                "Cannot connect to server at " + getServerConnectionUrl(),
+                                "Cannot connect to server",
+                                JideOptionPane.ERROR_MESSAGE
+                            );
+                        }
+                    }
                 );
             }
 
@@ -161,7 +177,7 @@ public class NewServerAction extends AbstractAction {
                                 private boolean success;
 
                                 public CheckServerQuery(TimeSeriesServer s) throws MalformedURLException {
-                                    super(new URL("http://" + serverDetailsPage.getHostName() + ":" + serverDetailsPage.getPort() + "/"));
+                                    super(new URL(getServerConnectionUrl()));
                                 }
 
                                 public ContentHandler getContentHandler() {

@@ -24,16 +24,13 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
-import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -76,29 +73,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     @Override
     protected void addContextTreeListener() {
         rootContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
-                new IdentifiableTreeListener() {
-                    public void nodeChanged(Identifiable node, Object changeDescription) {
-                    }
-
-                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                        repaint();
-                    }
-
-                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
-                        tableModel.addObjects(timeSeries);
-                    }
-
-                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> timeSeries = getAffectedSeries(seriesClass, contextTreeEvent);
-                        for ( E series : timeSeries) {
-                            tableModel.removeObject(series);
-                        }
-                    }
-                },
-                IdentifiableTreeListener.class
-            )
+            new CoalescingTreeListener<E>(seriesClass, tableModel, this)
         );
     }
 
@@ -157,4 +132,5 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     public void addAllDynamicColumns() {
         tableColumnManager.addAllDynamicColumns();    
     }
+
 }

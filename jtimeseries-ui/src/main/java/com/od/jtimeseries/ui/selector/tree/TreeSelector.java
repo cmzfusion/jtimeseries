@@ -53,6 +53,9 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     };
 
+    //auto expand to this depth when nodes are inserted
+    private static final int TREE_AUTO_EXPAND_LEVEL = 4;
+
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
     private List<Action> seriesActions;
@@ -73,7 +76,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        expandNodes((AbstractSeriesSelectionTreeNode)treeModel.getRoot(), EXPAND_ALL_NODES_RULE);
+        expandNodesFrom((AbstractSeriesSelectionTreeNode) treeModel.getRoot(), EXPAND_ALL_NODES_RULE);
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new SeriesTreeCellRenderer());
@@ -123,7 +126,12 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             if ( parentNode != null && newNode != null) {
                 int index = addChild(parentNode, newNode);
                 treeModel.nodesWereInserted(parentNode, new int[]{index});
-                expandNodes(newNode, EXPAND_ALL_NODES_RULE);
+                TreePath path = new TreePath(newNode.getPath());
+
+
+                if ( path.getPathCount() <= TREE_AUTO_EXPAND_LEVEL) {
+                    tree.expandPath(path);
+                }
             }
         }
     }
@@ -207,14 +215,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     /**
      * expand the tree to show any child nodes of startNode which satisfy the ExpansionRule
      */
-    private void expandNodes(AbstractSeriesSelectionTreeNode startNode, ExpansionRule r) {
-        Enumeration<AbstractSeriesSelectionTreeNode> e = startNode.children();
+    private void expandNodesFrom(AbstractSeriesSelectionTreeNode node, ExpansionRule r) {
+        Enumeration<AbstractSeriesSelectionTreeNode> e = node.children();
         while(e.hasMoreElements()) {
-            expandNodes(e.nextElement(), r);
+            expandNodesFrom(e.nextElement(), r);
         }
 
-        TreePath pathToExpand = new TreePath(startNode.getPath()).getParentPath();
-        if ( ! tree.isExpanded(pathToExpand) && r.shouldExpand(startNode) ) {
+        TreePath pathToExpand = new TreePath(node.getPath());
+        if ( ! tree.isExpanded(pathToExpand) && r.shouldExpand(node) ) {
             tree.expandPath(pathToExpand);
         }
     }

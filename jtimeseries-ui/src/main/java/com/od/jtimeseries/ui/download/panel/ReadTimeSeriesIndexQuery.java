@@ -38,11 +38,11 @@ import java.util.Properties;
  * Date: 12-Jan-2009
  * Time: 12:03:26
  */
-public class FindRemoteTimeSeriesQuery extends AbstractRemoteQuery {
+public class ReadTimeSeriesIndexQuery extends AbstractRemoteQuery {
 
     private List<RemoteTimeSeries> result;
 
-    public FindRemoteTimeSeriesQuery(URL url) {
+    public ReadTimeSeriesIndexQuery(URL url) {
         super(url);
     }
 

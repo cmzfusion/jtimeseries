@@ -9,9 +9,8 @@ import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.ElementName;
-import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.download.panel.AddRemoteSeriesTask;
+import com.od.jtimeseries.ui.download.panel.AddSeriesFromServerTask;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -153,11 +152,11 @@ public class NewServerAction extends AbstractAction {
 
                         public void success(Task task) {
                             try {
-                                new AddRemoteSeriesTask(
-                                        checkServerCommand.context,
-                                        new URL("http", serverDetailsPage.getHostName(), serverDetailsPage.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX),
-                                        null
-                                        ).run();
+                                new AddSeriesFromServerTask(
+                                    rootContext,
+                                    checkServerCommand.server,
+                                    null
+                                ).run();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
                             }

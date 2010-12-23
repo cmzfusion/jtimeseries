@@ -40,11 +40,11 @@ import java.util.List;
  * Time: 22:33:56
  * To change this template use File | Settings | File Templates.
  */
-public class SelectRemoteSeriesPanel extends AbstractDownloadWizardPanel {
+public class ChooseSeriesPanel extends AbstractDownloadWizardPanel {
 
     private SeriesSelectionPanel<ServerTimeSeries> seriesSelectionPanel;
 
-    public SelectRemoteSeriesPanel(WizardPanelListener panelListener, TimeSeriesContext timeSeriesContext) {
+    public ChooseSeriesPanel(WizardPanelListener panelListener, TimeSeriesContext timeSeriesContext) {
         super(panelListener);
         Box titlePanel = createTitlePanel("Select series to import (" + timeSeriesContext.findAllTimeSeries().getNumberOfMatches() + " series found)");
         JComponent seriesSelector = createSeriesSelector(timeSeriesContext);

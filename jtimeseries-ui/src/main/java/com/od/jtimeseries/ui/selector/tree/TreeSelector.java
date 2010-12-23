@@ -19,10 +19,8 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -34,8 +32,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -54,7 +50,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     };
 
     //auto expand to this depth when nodes are inserted
-    private static final int TREE_AUTO_EXPAND_LEVEL = 4;
+    private static final int TREE_AUTO_EXPAND_LEVEL = 3;
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
@@ -91,29 +87,32 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     protected void addContextTreeListener() {
         rootContext.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
-                new IdentifiableTreeListener() {
-                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                        repaint();
-                    }
-
-                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                        for (Identifiable i : contextTreeEvent.getNodes()) {
-                            addNodeAndAllDescendants(i);
-                        }
-                    }
-
-                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                        for ( Identifiable i : contextTreeEvent.getNodes()) {
-                            removeNodeAndAllDescendants(i);
-                        }
-                    }
-
-                    public void nodeChanged(Identifiable node, Object changeDescription) {
-                    }
-                },
+                new ContextTreeUpdaterListener(),
                 IdentifiableTreeListener.class
             )
         );
+    }
+
+    private class ContextTreeUpdaterListener implements IdentifiableTreeListener {
+
+        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+            repaint();
+        }
+
+        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+            for (Identifiable i : contextTreeEvent.getNodes()) {
+                addNodeAndAllDescendants(i);
+            }
+        }
+
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+            for ( Identifiable i : contextTreeEvent.getNodes()) {
+                removeNodeAndAllDescendants(i);
+            }
+        }
+
+        public void nodeChanged(Identifiable node, Object changeDescription) {
+        }
     }
 
     private void addNodeAndAllDescendants(Identifiable i) {
@@ -155,52 +154,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private void addMouseListeners() {
-
-        tree.addMouseListener(new SeriesSelectionMouseListener());
+        tree.addMouseListener(new SeriesSelectionMouseListener(tree));
 
         //add a listener for mouse clicks on the tree, to populate the fileSelectionModel
         //this is done as a mouse listener rather than a tree selection listener so that we still get an event even if the selection is not changed
-        tree.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
-                showMenuIfPopupTrigger(e);
-            }
-
-            public void mouseClicked(MouseEvent e) {
-                showMenuIfPopupTrigger(e);
-
-            }
-
-            public void mouseReleased(MouseEvent e) {
-                showMenuIfPopupTrigger(e);
-            }
-
-            private void showMenuIfPopupTrigger(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    java.util.List<JMenuItem> menuItems = getMenuItems(e);
-                    if ( menuItems != null) {
-                        JPopupMenu menu = new JPopupMenu();
-                        for ( JMenuItem i : menuItems) {
-                            menu.add(i);
-                        }
-                        menu.show(tree, e.getX() + 3, e.getY() + 3);
-                    }
-                }
-            }
-        });
-    }
-
-    private java.util.List<JMenuItem> getMenuItems(MouseEvent e) {
-        TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-        java.util.List<JMenuItem> menuItems = new ArrayList<JMenuItem>();
-        if (selPath != null ) {
-            Object selectedNode = selPath.getLastPathComponent();
-            if ( selectedNode instanceof SeriesTreeNode) {
-                for ( Action a : seriesActions) {
-                    menuItems.add(new JMenuItem(a));
-                }
-            }
-        }
-        return menuItems;
+        tree.addMouseListener(new PopupMenuMouseListener(tree, seriesActions));
     }
 
     protected void buildView() {
@@ -290,146 +248,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         return new SeriesTreeNode<E>(s);
     }
 
-    public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
-
-        DefaultTreeCellRenderer delegateRenderer = new DefaultTreeCellRenderer();
-        private JCheckBox seriesSelectionCheckbox = new JCheckBox();
-
-        public SeriesTreeCellRenderer() {
-            setLayout(new BorderLayout());
-            add(delegateRenderer, BorderLayout.CENTER);
-            seriesSelectionCheckbox.setOpaque(false);
-            setOpaque(false);
-        }
-
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            delegateRenderer.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            if ( value instanceof AbstractSeriesSelectionTreeNode) {
-                delegateRenderer.setIcon(((AbstractSeriesSelectionTreeNode) value).getIcon());
-                removeAll();
-                if ( value instanceof SeriesTreeNode ) {
-                    SeriesTreeNode seriesNode = (SeriesTreeNode)value;
-                    Object timeSeries = seriesNode.getTimeSeries();
-                    if ( timeSeries instanceof UIPropertiesTimeSeries) {
-                        seriesSelectionCheckbox.setSelected(((UIPropertiesTimeSeries)timeSeries).isSelected());
-                    }
-                    delegateRenderer.setText(getDisplayName(((SeriesTreeNode<E>)value).getTimeSeries()));
-                    add(seriesSelectionCheckbox, BorderLayout.WEST);
-                    add(delegateRenderer, BorderLayout.CENTER);
-                } else {
-                    delegateRenderer.setText(getDisplayName(((ContextTreeNode)value).getContext()));
-                    add(delegateRenderer, BorderLayout.CENTER);
-                }
-                return this;
-            } else {
-                return delegateRenderer;
-            }
-        }
-    }
-
-    //get the display name for an identifiable in the context tree
-    private String getDisplayName(Identifiable i) {
-        if ( i instanceof UIPropertiesTimeSeries) {
-            return ((UIPropertiesTimeSeries)i).getDisplayName();
-        } else {
-            return i.getId();
-        }
-    }
-
-    private abstract static class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode {
-        protected abstract Identifiable getIdentifiable();
-
-        protected abstract Icon getIcon();
-
-        public abstract boolean isSelected();
-    }
-
-    private static class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSelectionTreeNode {
-
-        private E series;
-
-        public SeriesTreeNode(E series) {
-            this.series = series;
-        }
-
-        public String toString() {
-            return series.toString();
-        }
-
-        public E getTimeSeries() {
-            return series;
-        }
-
-        @Override
-        protected Identifiable getIdentifiable() {
-            return series;
-        }
-
-        protected Icon getIcon() {
-            return ImageUtils.REMOTE_CHART_16x16;
-        }
-
-        @Override
-        public boolean isSelected() {
-            return series.isSelected();
-        }
-    }
-
-    private static class ContextTreeNode extends AbstractSeriesSelectionTreeNode {
-
-        private TimeSeriesContext context;
-
-        public ContextTreeNode(TimeSeriesContext context) {
-            this.context = context;
-        }
-
-        public TimeSeriesContext getContext() {
-            return context;
-        }
-
-        public String toString() {
-            return context.toString();
-        }
-
-        @Override
-        protected Identifiable getIdentifiable() {
-            return context;
-        }
-
-        protected Icon getIcon() {
-            return context instanceof TimeSeriesServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
-        }
-
-        @Override
-        public boolean isSelected() {
-            return false;
-        }
-    }
-
-
-    private class SeriesSelectionMouseListener<E extends UIPropertiesTimeSeries> extends MouseAdapter {
-
-        private  int hotspot = new JCheckBox().getPreferredSize().width;
-
-        public void mouseClicked(MouseEvent me){
-            TreePath path = tree.getPathForLocation(me.getX(), me.getY());
-            if(path==null)
-                return;
-            if(me.getX()>tree.getPathBounds(path).x+hotspot)
-                return;
-
-            Object o = path.getLastPathComponent();
-            if ( o instanceof SeriesTreeNode) {
-                E m = ((SeriesTreeNode<E>)o).getTimeSeries();
-                if ( m instanceof UIPropertiesTimeSeries) {
-                    UIPropertiesTimeSeries s = (UIPropertiesTimeSeries)m;
-                    s.setSelected(!s.isSelected());
-                }
-                tree.repaint();
-            }
-        }
-    }
-
     private class SeriesTreeSelectionListener implements TreeSelectionListener {
 
         public void valueChanged(TreeSelectionEvent e) {
@@ -443,15 +261,4 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     }
 
-    private class IdentifiableTreeComparator implements Comparator<Identifiable> {
-        public int compare(Identifiable o1, Identifiable o2) {
-            //sort context folders before series, then by display name
-            boolean o1IsContext = o1 instanceof TimeSeriesContext;
-            boolean o2IsContext = o2 instanceof TimeSeriesContext;
-            if ( o1IsContext != o2IsContext) {
-                return o1IsContext ? 1 : -1;
-            }
-            return getDisplayName(o1).compareTo(getDisplayName(o2));
-        }
-    }
 }

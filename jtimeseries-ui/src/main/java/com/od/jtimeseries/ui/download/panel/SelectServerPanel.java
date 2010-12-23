@@ -63,13 +63,13 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private JTextField serverTextField = new JTextField();
     private ListSelectionActionModel<TimeSeriesServer> listSelectionActionModel = new ListSelectionActionModel<TimeSeriesServer>();
     private JButton downloadButton = new JButton(new DownloadAction());
-    private LoadSelectedSeriesCommand loadSelectedSeriesCommand = new LoadSelectedSeriesCommand();
-    private TimeSeriesContext remoteSeriesContext;
+    private LoadSeriesFromServerCommand loadSeriesFromServerCommand = new LoadSeriesFromServerCommand();
+    private TimeSeriesContext destinationContext;
     private DisplayNameCalculator displayNameCalculator;
 
-    public SelectServerPanel(WizardPanelListener panelListener, TimeSeriesServerDictionary serverDictionary, TimeSeriesContext remoteSeriesContext, DisplayNameCalculator displayNameCalculator) {
+    public SelectServerPanel(WizardPanelListener panelListener, TimeSeriesServerDictionary serverDictionary, TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
         super(panelListener);
-        this.remoteSeriesContext = remoteSeriesContext;
+        this.destinationContext = destinationContext;
         this.displayNameCalculator = displayNameCalculator;
         buildList(serverDictionary);
         doAddComponents();
@@ -143,7 +143,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     }
 
     private void addProgressTaskListener() {
-        loadSelectedSeriesCommand.addTaskListener(new ProgressIndicatorTaskListener(
+        loadSeriesFromServerCommand.addTaskListener(new ProgressIndicatorTaskListener(
                 "Loading Time Series",
                 SelectServerPanel.this) {
 
@@ -203,8 +203,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
                     JOptionPane.showMessageDialog(this, "Cannot find address for host " + url.getHost(), "Server not found", JOptionPane.WARNING_MESSAGE);
                 }
                 if (server != null) {
-                    loadSelectedSeriesCommand.setServer(server);
-                    loadSelectedSeriesCommand.execute(url);
+                    loadSeriesFromServerCommand.execute(server);
                 }
             }
         } catch (MalformedURLException e1) {
@@ -215,50 +214,25 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private void downloadListSelections() {
         final TimeSeriesServer server = (TimeSeriesServer)knownServersList.getSelectedValue();
         if ( server != null) {
-            try {
-                URL url = new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
-                loadSelectedSeriesCommand.setServer(server);
-                loadSelectedSeriesCommand.execute(url);
-            } catch (MalformedURLException e1) {
-                logMethods.logError("Failed to download series, bad URL", e1);
-            }
+            loadSeriesFromServerCommand.execute(server);
         }
     }
 
-    private class LoadSelectedSeriesCommand extends SwingCommand<URL, String> {
+    private class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, String> {
 
-        private TimeSeriesServer server;
-
-        public void setServer(TimeSeriesServer server) {
-            this.server = server;
-        }
-
-        protected Task<URL, String> createTask() {
-            return new BackgroundTask<URL, String>() {
+        protected Task<TimeSeriesServer, String> createTask() {
+            return new BackgroundTask<TimeSeriesServer, String>() {
 
                 protected void doInBackground() throws Exception {
-                    URL url = getParameters();
+                    TimeSeriesServer server = getParameters();
 
-                    TimeSeriesContext context = createServerContext(remoteSeriesContext, server);
-                    AddRemoteSeriesTask t = new AddRemoteSeriesTask(
-                        context,
-                        url,
+                    AddSeriesFromServerTask t = new AddSeriesFromServerTask(
+                        destinationContext,
+                        server,
                         displayNameCalculator
                     );
                     t.run();
                 }
-
-
-                private TimeSeriesContext createServerContext(TimeSeriesContext destinationContext, TimeSeriesServer server) {
-                    String serverId = server.getDescription();
-                    TimeSeriesServerContext serverContext = (TimeSeriesServerContext)destinationContext.get(serverId);
-                    if ( serverContext == null) {
-                        serverContext = new TimeSeriesServerContext(server, serverId, serverId);
-                        destinationContext.addChild(serverContext);
-                    }
-                    return serverContext;
-                }
-
 
                 protected void doInEventThread() {
                     getPanelListener().seriesLoaded();

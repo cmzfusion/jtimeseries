@@ -21,11 +21,9 @@ package com.od.jtimeseries.ui.download;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
-import com.od.jtimeseries.ui.download.panel.SelectRemoteSeriesPanel;
+import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.swing.progress.ProgressLayeredPane;
@@ -47,7 +45,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private AbstractDownloadWizardPanel.WizardPanelListener panelListener;
     private SelectServerPanel selectServerPanel;
     private TimeSeriesContext contextToStoreRemoteSeries;
-    private SelectRemoteSeriesPanel selectRemoteSeriesPanel;
+    private ChooseSeriesPanel chooseSeriesPanel;
     private DisplayNameCalculator displayNameCalculator;
     private List<? extends UIPropertiesTimeSeries> selectedSeries = new LinkedList<UIPropertiesTimeSeries>();
 
@@ -79,9 +77,9 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         panelListener = new AbstractDownloadWizardPanel.WizardPanelListener() {
 
             public void seriesLoaded() {
-                selectRemoteSeriesPanel = new SelectRemoteSeriesPanel(panelListener, contextToStoreRemoteSeries);
+                chooseSeriesPanel = new ChooseSeriesPanel(panelListener, contextToStoreRemoteSeries);
                 progressLayeredPane.setViewComponent(
-                        selectRemoteSeriesPanel
+                        chooseSeriesPanel
                 );
             }
 

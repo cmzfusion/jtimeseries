@@ -19,10 +19,14 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -31,28 +35,45 @@ import java.net.URL;
  * Date: 12-Jan-2009
  * Time: 16:18:37
  */
-public class AddRemoteSeriesTask {
+public class AddSeriesFromServerTask {
 
     private TimeSeriesContext serverContext;
     private URL remoteContextUrl;
+    private TimeSeriesContext rootContext;
+    private TimeSeriesServer server;
     private DisplayNameCalculator displayNameCalculator;
 
-    public AddRemoteSeriesTask(TimeSeriesContext serverContext, URL remoteContextUrl, DisplayNameCalculator displayNameCalculator) {
-        this.serverContext = serverContext;
-        this.remoteContextUrl = remoteContextUrl;
+    public AddSeriesFromServerTask(TimeSeriesContext rootContext, TimeSeriesServer server, DisplayNameCalculator displayNameCalculator) throws MalformedURLException {
+        this.rootContext = rootContext;
+        this.server = server;
         this.displayNameCalculator = displayNameCalculator;
+        this.serverContext = findOrCreateServerContext();
+        this.remoteContextUrl = createUrl();
     }
 
+    private URL createUrl() throws MalformedURLException {
+        return new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
+    }
+
+    private TimeSeriesContext findOrCreateServerContext() {
+        String serverId = server.getDescription();
+        TimeSeriesServerContext serverContext = (TimeSeriesServerContext)rootContext.get(serverId);
+        if ( serverContext == null) {
+            serverContext = new TimeSeriesServerContext(server, serverId, serverId);
+            rootContext.addChild(serverContext);
+        }
+        return serverContext;
+    }
 
     public void run() throws Exception {
-        FindRemoteTimeSeriesQuery findAllTimeSeries = new FindRemoteTimeSeriesQuery(remoteContextUrl);
-        findAllTimeSeries.runQuery();
-        for ( FindRemoteTimeSeriesQuery.RemoteTimeSeries timeSeriesResult : findAllTimeSeries.getResult()) {
-            createTimeSeries(timeSeriesResult);
+        ReadTimeSeriesIndexQuery readIndexQuery = new ReadTimeSeriesIndexQuery(remoteContextUrl);
+        readIndexQuery.runQuery();
+        for ( ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
+            createAndAddToContext(timeSeriesResult);
         }
     }
 
-    private void createTimeSeries(FindRemoteTimeSeriesQuery.RemoteTimeSeries result) {
+    private void createAndAddToContext(ReadTimeSeriesIndexQuery.RemoteTimeSeries result) {
         TimeSeriesContext c = serverContext.createContext(result.getParentPath());
 
         ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());

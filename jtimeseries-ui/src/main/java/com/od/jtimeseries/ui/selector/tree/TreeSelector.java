@@ -25,6 +25,8 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
+import com.od.swing.progress.AnimatedIconTree;
+import com.od.swing.progress.IconComponentAnimator;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
@@ -59,6 +61,18 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
 
+    private IconComponentAnimator animator = new IconComponentAnimator(
+       "/progressAnimation/loading",
+       ".gif",
+       18, 1, 200, 0, false,
+       16,
+       16
+    );
+    {
+       animator.setBackgroundImage("/images/server_client2_16x16.png", 0.9f);
+    }
+
+
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
@@ -68,7 +82,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
         setupSeries();
 
-        tree = new JTree();
+        tree = new AnimatedIconTree();
         tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
@@ -241,7 +255,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private ContextTreeNode buildContextNode(TimeSeriesContext context) {
-        return new ContextTreeNode(context);
+        return new ContextTreeNode(tree, context, animator);
     }
 
     private SeriesTreeNode buildSeriesNode(E s) {

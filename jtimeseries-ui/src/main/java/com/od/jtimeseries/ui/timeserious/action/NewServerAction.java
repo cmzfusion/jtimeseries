@@ -4,13 +4,12 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.dialog.ButtonEvent;
 import com.jidesoft.dialog.ButtonNames;
-import com.jidesoft.dialog.JideOptionPane;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.download.panel.AddSeriesFromServerTask;
+import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -146,25 +145,13 @@ public class NewServerAction extends AbstractAction {
                                 NewServerWizard.this,
                                 "Cannot connect to server at " + getServerConnectionUrl(),
                                 "Cannot connect to server",
-                                JideOptionPane.ERROR_MESSAGE
+                                JOptionPane.ERROR_MESSAGE
                             );
                         }
 
                         public void success(Task task) {
-                            new Thread(new Runnable() {
-                                public void run() {
-                                    try {
-                                        new AddSeriesFromServerTask(
-                                                rootContext,
-                                                checkServerCommand.server,
-                                                null
-                                        ).run();
-                                    } catch (Exception e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                            }).start();
-
+                            LoadSeriesFromServerCommand loadSeriesCommand = new LoadSeriesFromServerCommand(frame, rootContext);
+                            loadSeriesCommand.execute(checkServerCommand.server);
                         }
                     }
                 );

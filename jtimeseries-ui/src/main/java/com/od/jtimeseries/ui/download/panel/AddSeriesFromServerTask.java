@@ -28,6 +28,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +37,7 @@ import java.net.URL;
  * Date: 12-Jan-2009
  * Time: 16:18:37
  */
-public class AddSeriesFromServerTask {
+class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.RemoteTimeSeries>> {
 
     private TimeSeriesServerContext serverContext;
     private URL remoteContextUrl;
@@ -65,15 +67,19 @@ public class AddSeriesFromServerTask {
         return serverContext;
     }
 
-    public void run() throws Exception {
-        serverContext.setLoading(true);
-        Thread.sleep(5000);
-        ReadTimeSeriesIndexQuery readIndexQuery = new ReadTimeSeriesIndexQuery(remoteContextUrl);
-        readIndexQuery.runQuery();
-        for ( ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
-            createAndAddToContext(timeSeriesResult);
+    public List<ReadTimeSeriesIndexQuery.RemoteTimeSeries> call() throws Exception {
+        try {
+            serverContext.setLoading(true); //this will cause loading animations to be shown for the node representing this server in the context tree
+            ReadTimeSeriesIndexQuery readIndexQuery = new ReadTimeSeriesIndexQuery(remoteContextUrl);
+            readIndexQuery.runQuery();
+            for ( ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
+                createAndAddToContext(timeSeriesResult);
+            }
+            return readIndexQuery.getResult();
+
+        } finally {
+            serverContext.setLoading(false);
         }
-        serverContext.setLoading(false);
     }
 
     private void createAndAddToContext(ReadTimeSeriesIndexQuery.RemoteTimeSeries result) {

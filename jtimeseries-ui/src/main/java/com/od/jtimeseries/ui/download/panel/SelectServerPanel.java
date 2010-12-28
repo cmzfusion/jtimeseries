@@ -29,9 +29,8 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 import com.od.swing.progress.ProgressIndicatorTaskListener;
-import swingcommand.BackgroundTask;
-import swingcommand.SwingCommand;
 import swingcommand.Task;
+import swingcommand.TaskListenerAdapter;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -63,14 +62,16 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private JTextField serverTextField = new JTextField();
     private ListSelectionActionModel<TimeSeriesServer> listSelectionActionModel = new ListSelectionActionModel<TimeSeriesServer>();
     private JButton downloadButton = new JButton(new DownloadAction());
-    private LoadSeriesFromServerCommand loadSeriesFromServerCommand = new LoadSeriesFromServerCommand();
-    private TimeSeriesContext destinationContext;
-    private DisplayNameCalculator displayNameCalculator;
+    private LoadSeriesFromServerCommand loadSeriesFromServerCommand;
 
     public SelectServerPanel(WizardPanelListener panelListener, TimeSeriesServerDictionary serverDictionary, TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
         super(panelListener);
-        this.destinationContext = destinationContext;
-        this.displayNameCalculator = displayNameCalculator;
+        loadSeriesFromServerCommand = new LoadSeriesFromServerCommand(this, destinationContext, displayNameCalculator);
+        loadSeriesFromServerCommand.addTaskListener(new TaskListenerAdapter<String>() {
+            public void success(Task task) {
+                getPanelListener().seriesLoaded();
+            }
+        });
         buildList(serverDictionary);
         doAddComponents();
     }
@@ -143,15 +144,12 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     }
 
     private void addProgressTaskListener() {
-        loadSeriesFromServerCommand.addTaskListener(new ProgressIndicatorTaskListener(
+        loadSeriesFromServerCommand.addTaskListener(
+            new ProgressIndicatorTaskListener(
                 "Loading Time Series",
-                SelectServerPanel.this) {
-
-            public void error(Task task, Throwable t) {
-                logMethods.logError("Failed to load remote series", t);                
-                JOptionPane.showMessageDialog(SelectServerPanel.this, "Failed to load remote series", "Failed to load timeseries", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+                SelectServerPanel.this
+            )
+        );
     }
 
     private JComponent horizontalBox(JComponent... components) {
@@ -215,29 +213,6 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
         final TimeSeriesServer server = (TimeSeriesServer)knownServersList.getSelectedValue();
         if ( server != null) {
             loadSeriesFromServerCommand.execute(server);
-        }
-    }
-
-    private class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, String> {
-
-        protected Task<TimeSeriesServer, String> createTask() {
-            return new BackgroundTask<TimeSeriesServer, String>() {
-
-                protected void doInBackground() throws Exception {
-                    TimeSeriesServer server = getParameters();
-
-                    AddSeriesFromServerTask t = new AddSeriesFromServerTask(
-                        destinationContext,
-                        server,
-                        displayNameCalculator
-                    );
-                    t.run();
-                }
-
-                protected void doInEventThread() {
-                    getPanelListener().seriesLoaded();
-                }
-            };
         }
     }
 

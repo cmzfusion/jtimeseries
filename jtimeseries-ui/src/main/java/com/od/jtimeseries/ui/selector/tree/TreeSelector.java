@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.selector.tree;
 
+import com.jidesoft.swing.Animator;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -57,32 +58,22 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
     private List<Action> seriesActions;
-    private Class seriesClass;
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
-
-    private IconComponentAnimator animator = new IconComponentAnimator(
-       "/progressAnimation/loading",
-       ".gif",
-       18, 1, 200, 0, false,
-       16,
-       16
-    );
-    {
-       animator.setBackgroundImage("/images/server_client2_16x16.png", 0.9f);
-    }
-
+    private ContextNodeFactory<E> nodeFactory;
 
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
-        this.seriesClass = seriesClass;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
-        setupSeries();
 
         tree = new AnimatedIconTree();
+        nodeFactory = new ContextNodeFactory<E>(tree, seriesClass);
+
+        setupSeries();
+
         tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
@@ -111,6 +102,9 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
             repaint();
+            for (Identifiable i : contextTreeEvent.getNodes()) {
+                fireChangeEvents(i);
+            }
         }
 
         public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
@@ -126,6 +120,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
+            fireChangeEvents(node);
+        }
+    }
+
+    private void fireChangeEvents(Identifiable i) {
+        AbstractSeriesSelectionTreeNode changedNode = identifiableToNodeMap.get(i);
+        if ( i != null ) {
+            treeModel.nodeChanged(changedNode);
         }
     }
 
@@ -139,7 +141,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             if ( parentNode != null && newNode != null) {
                 int index = addChild(parentNode, newNode);
                 treeModel.nodesWereInserted(parentNode, new int[]{index});
-                TreePath path = new TreePath(newNode.getPath());
+                TreePath path = new TreePath(parentNode.getPath());
 
 
                 if ( path.getPathCount() <= TREE_AUTO_EXPAND_LEVEL) {
@@ -240,26 +242,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
-        AbstractSeriesSelectionTreeNode result;
-        if ( identifiable instanceof TimeSeriesContext) {
-            result = buildContextNode((TimeSeriesContext)identifiable);
-        } else if ( seriesClass.isAssignableFrom(identifiable.getClass())) {
-            result = buildSeriesNode((E)identifiable);
-        } else {
-            result = null;
-        }
+        AbstractSeriesSelectionTreeNode result = nodeFactory.buildNode(identifiable);
         if ( result != null ) {
             identifiableToNodeMap.put(identifiable, result);
         }
         return result;
-    }
-
-    private ContextTreeNode buildContextNode(TimeSeriesContext context) {
-        return new ContextTreeNode(tree, context, animator);
-    }
-
-    private SeriesTreeNode buildSeriesNode(E s) {
-        return new SeriesTreeNode<E>(s);
     }
 
     private class SeriesTreeSelectionListener implements TreeSelectionListener {

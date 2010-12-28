@@ -151,15 +151,20 @@ public class NewServerAction extends AbstractAction {
                         }
 
                         public void success(Task task) {
-                            try {
-                                new AddSeriesFromServerTask(
-                                    rootContext,
-                                    checkServerCommand.server,
-                                    null
-                                ).run();
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
+                            new Thread(new Runnable() {
+                                public void run() {
+                                    try {
+                                        new AddSeriesFromServerTask(
+                                                rootContext,
+                                                checkServerCommand.server,
+                                                null
+                                        ).run();
+                                    } catch (Exception e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                            }).start();
+
                         }
                     }
                 );

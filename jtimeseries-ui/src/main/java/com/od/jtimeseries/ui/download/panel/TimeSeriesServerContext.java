@@ -14,6 +14,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 public class TimeSeriesServerContext extends DefaultTimeSeriesContext {
 
     private TimeSeriesServer server;
+    private boolean loading;
 
     public TimeSeriesServerContext(TimeSeriesServer server, String id, String description) {
         super(id, description);
@@ -26,5 +27,14 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext {
 
     public void setServer(TimeSeriesServer server) {
         this.server = server;
+    }
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading = loading;
+        fireNodeChanged("loadingState");
     }
 }

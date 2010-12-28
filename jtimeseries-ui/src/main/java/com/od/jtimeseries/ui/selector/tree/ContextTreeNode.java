@@ -4,12 +4,8 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.swing.progress.AnimatedIconTree;
-import com.od.swing.progress.IconComponentAnimator;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
-import java.awt.*;
 
 /**
 * Created by IntelliJ IDEA.
@@ -18,19 +14,12 @@ import java.awt.*;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-class ContextTreeNode extends AbstractSeriesSelectionTreeNode implements AnimatedIconTree.ProgressTreeNode {
+class ContextTreeNode extends AbstractSeriesSelectionTreeNode {
 
-    private JTree tree;
     private TimeSeriesContext context;
-    private Icon icon;
 
-    private IconComponentAnimator animator;
-
-    public ContextTreeNode(JTree tree, TimeSeriesContext context, IconComponentAnimator animator) {
-        this.tree = tree;
+    public ContextTreeNode(TimeSeriesContext context) {
         this.context = context;
-        this.animator = animator;
-        icon = context instanceof TimeSeriesServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
     }
 
     public TimeSeriesContext getContext() {
@@ -47,29 +36,11 @@ class ContextTreeNode extends AbstractSeriesSelectionTreeNode implements Animate
     }
 
     protected Icon getIcon() {
-        return icon;
+        return context instanceof TimeSeriesServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
     }
 
     @Override
     public boolean isSelected() {
         return false;
-    }
-
-    public IconComponentAnimator getIconComponentAnimator() {
-        return animator;
-    }
-
-    public Rectangle getBounds() {
-        return tree.getPathBounds(
-            new TreePath(getPath())
-        );
-    }
-
-    public boolean isAnimationEnabled() {
-        return context instanceof TimeSeriesServerContext;
-    }
-
-    public void setAnimatedIcon(Icon i) {
-        icon = i;
     }
 }

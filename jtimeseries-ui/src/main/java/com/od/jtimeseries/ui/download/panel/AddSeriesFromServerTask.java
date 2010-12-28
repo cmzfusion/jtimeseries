@@ -37,7 +37,7 @@ import java.net.URL;
  */
 public class AddSeriesFromServerTask {
 
-    private TimeSeriesContext serverContext;
+    private TimeSeriesServerContext serverContext;
     private URL remoteContextUrl;
     private TimeSeriesContext rootContext;
     private TimeSeriesServer server;
@@ -55,7 +55,7 @@ public class AddSeriesFromServerTask {
         return new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
     }
 
-    private TimeSeriesContext findOrCreateServerContext() {
+    private TimeSeriesServerContext findOrCreateServerContext() {
         String serverId = server.getDescription();
         TimeSeriesServerContext serverContext = (TimeSeriesServerContext)rootContext.get(serverId);
         if ( serverContext == null) {
@@ -66,11 +66,14 @@ public class AddSeriesFromServerTask {
     }
 
     public void run() throws Exception {
+        serverContext.setLoading(true);
+        Thread.sleep(5000);
         ReadTimeSeriesIndexQuery readIndexQuery = new ReadTimeSeriesIndexQuery(remoteContextUrl);
         readIndexQuery.runQuery();
         for ( ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
             createAndAddToContext(timeSeriesResult);
         }
+        serverContext.setLoading(false);
     }
 
     private void createAndAddToContext(ReadTimeSeriesIndexQuery.RemoteTimeSeries result) {

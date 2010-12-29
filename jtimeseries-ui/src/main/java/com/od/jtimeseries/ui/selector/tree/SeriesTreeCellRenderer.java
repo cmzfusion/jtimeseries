@@ -19,6 +19,7 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
 
     DefaultTreeCellRenderer delegateRenderer = new DefaultTreeCellRenderer();
     private JCheckBox seriesSelectionCheckbox = new JCheckBox();
+    private boolean seriesSelectionEnabled;
 
     public SeriesTreeCellRenderer() {
         setLayout(new BorderLayout());
@@ -39,7 +40,9 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
                     seriesSelectionCheckbox.setSelected(((UIPropertiesTimeSeries)timeSeries).isSelected());
                 }
                 delegateRenderer.setText(getDisplayName(((SeriesTreeNode) value).getTimeSeries()));
-                add(seriesSelectionCheckbox, BorderLayout.WEST);
+                if ( seriesSelectionEnabled ) {
+                    add(seriesSelectionCheckbox, BorderLayout.WEST);
+                }
                 add(delegateRenderer, BorderLayout.CENTER);
             } else {
                 delegateRenderer.setText(getDisplayName(((ContextTreeNode) value).getContext()));
@@ -58,5 +61,9 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
         } else {
             return i.getId();
         }
+    }
+
+    public void setSeriesSelectionEnabled(boolean enabled) {
+        seriesSelectionEnabled = enabled;
     }
 }

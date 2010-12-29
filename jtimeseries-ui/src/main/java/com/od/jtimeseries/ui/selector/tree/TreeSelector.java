@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.selector.tree;
 
-import com.jidesoft.swing.Animator;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -27,7 +26,6 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.progress.AnimatedIconTree;
-import com.od.swing.progress.IconComponentAnimator;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
@@ -35,6 +33,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
@@ -52,8 +51,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     };
 
-    //auto expand to this depth when nodes are inserted
-    private static final int TREE_AUTO_EXPAND_LEVEL = 3;
+    //auto expand to this depth
+    private int treeAutoExpandLevel = 3;
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
@@ -61,6 +60,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private ContextNodeFactory<E> nodeFactory;
+    private SeriesTreeCellRenderer cellRenderer;
+    private JToolBar toolbar = new JToolBar();
 
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(rootContext, seriesActionModel);
@@ -77,16 +78,68 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        expandNodesFrom((AbstractSeriesSelectionTreeNode) treeModel.getRoot(), EXPAND_ALL_NODES_RULE);
+        autoExpandTree();
+
+        createToolbar();
 
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(new SeriesTreeCellRenderer());
+        cellRenderer = new SeriesTreeCellRenderer();
+        tree.setCellRenderer(cellRenderer);
         tree.addTreeSelectionListener(new SeriesTreeSelectionListener());
 
         setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(tree);
+        add(toolbar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
+    }
+
+    private void createToolbar() {
+
+        class ChangeTreeAutoExpandAction extends AbstractAction {
+            private int increment;
+
+            public ChangeTreeAutoExpandAction(int increment) {
+                this.increment = increment;
+            }
+
+            public void actionPerformed(ActionEvent e) {
+                treeAutoExpandLevel += increment;
+                autoExpandTree();
+            }
+        }
+
+        class ExpandTreeAction extends ChangeTreeAutoExpandAction {
+            public ExpandTreeAction() {
+                super(1);
+                putValue(Action.NAME, "+");
+            }
+        }
+
+        class ContractTreeAction extends ChangeTreeAutoExpandAction {
+            public ContractTreeAction() {
+                super(-1);
+                putValue(Action.NAME, "-");
+            }
+        }
+        toolbar.add(new ContractTreeAction());
+        toolbar.add(new ExpandTreeAction());
+    }
+
+    public void setSeriesSelectionEnabled(boolean enabled) {
+        cellRenderer.setSeriesSelectionEnabled(enabled);
+    }
+
+    private void autoExpandTree() {
+        expandNodesFrom(
+            (AbstractSeriesSelectionTreeNode)treeModel.getRoot(),
+             new ExpansionRule() {
+                 public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+                     return n.getLevel() <= treeAutoExpandLevel;
+                 }
+             },
+             true
+        );
     }
 
     protected void addContextTreeListener() {
@@ -144,7 +197,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
                 TreePath path = new TreePath(parentNode.getPath());
 
 
-                if ( path.getPathCount() <= TREE_AUTO_EXPAND_LEVEL) {
+                if ( path.getPathCount() <= treeAutoExpandLevel) {
                     tree.expandPath(path);
                 }
             }
@@ -189,15 +242,19 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     /**
      * expand the tree to show any child nodes of startNode which satisfy the ExpansionRule
      */
-    private void expandNodesFrom(AbstractSeriesSelectionTreeNode node, ExpansionRule r) {
+    private void expandNodesFrom(AbstractSeriesSelectionTreeNode node, ExpansionRule r, boolean collapse) {
         Enumeration<AbstractSeriesSelectionTreeNode> e = node.children();
         while(e.hasMoreElements()) {
-            expandNodesFrom(e.nextElement(), r);
+            expandNodesFrom(e.nextElement(), r, collapse);
         }
 
         TreePath pathToExpand = new TreePath(node.getPath());
-        if ( ! tree.isExpanded(pathToExpand) && r.shouldExpand(node) ) {
+        boolean expanded = tree.isExpanded(pathToExpand);
+        boolean shouldBeExpanded = r.shouldExpand(node);
+        if ( ! expanded && shouldBeExpanded) {
             tree.expandPath(pathToExpand);
+        } else if ( expanded && ! shouldBeExpanded && collapse ) {
+            tree.collapsePath(pathToExpand);
         }
     }
 

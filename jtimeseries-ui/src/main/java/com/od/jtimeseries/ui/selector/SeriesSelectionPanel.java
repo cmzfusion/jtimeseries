@@ -33,6 +33,7 @@ import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 import com.od.swing.util.AwtSafeListener;
 
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -57,7 +58,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private SeriesDescriptionPanel seriesDescriptionPanel = new SeriesDescriptionPanel();
     private JRadioButton useTreeRadio = new JRadioButton("Tree", true);
     private JRadioButton useTableRadio = new JRadioButton("Table");
-    private JButton columnSelectorButton = new JButton("Columns");
     private TreeSelector<E> treeSelector;
     private TableSelector<E> tableSelector;
     private JPanel selectorPanel;
@@ -93,6 +93,11 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         showTree();
     }
 
+    public void setSeriesSelectionEnabled(boolean selectable) {
+        treeSelector.setSeriesSelectionEnabled(selectable);
+        tableSelector.setSeriesSelectionEnabled(selectable);
+    }
+
     private void createTitlePanel() {
         titleBox = Box.createHorizontalBox();
         titleBox.add(new JLabel("Series Selector"));
@@ -102,30 +107,12 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         useTreeRadio.addActionListener(radioListener);
         useTableRadio.addActionListener(radioListener);
 
-        columnSelectorButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showColumnSelectionDialog();
-            }
-        });
-
         ButtonGroup group = new ButtonGroup();
         group.add(useTreeRadio);
         group.add(useTableRadio);
         titleBox.add(useTreeRadio);
         titleBox.add(useTableRadio);
         titleBox.add(Box.createHorizontalStrut(10));
-        titleBox.add(columnSelectorButton);
-    }
-
-    private void showColumnSelectionDialog() {
-        ColumnSelectionDialog d = new ColumnSelectionDialog(getFrameForComponent(this), this, tableSelector.getTableColumnManager());
-        d.setVisible(true);
-        d.dispose();
-    }
-
-    private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {
-        if (parentComponent instanceof Frame)  return (Frame)parentComponent;
-        return getFrameForComponent(parentComponent.getParent());
     }
 
     private void createSelectorPanel() {
@@ -259,13 +246,11 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     public void showTable() {
         useTableRadio.setSelected(true);
         cardLayout.show(selectorPanel, "table");
-        columnSelectorButton.setEnabled(true);
     }
 
     public void showTree() {
         useTreeRadio.setSelected(true);
         cardLayout.show(selectorPanel, "tree");
-        columnSelectorButton.setEnabled(false);
     }
 
     private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorComponent.SelectorPanelListenerAdapter<E> {

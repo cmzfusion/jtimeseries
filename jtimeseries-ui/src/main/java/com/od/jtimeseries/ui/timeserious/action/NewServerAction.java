@@ -86,6 +86,7 @@ public class NewServerAction extends AbstractAction {
 
             public ServerDetailsPage(String title, String description) {
                 super(title, description);
+                portField.addActionListener(new FinishAction());
             }
 
             public String getHostName() {

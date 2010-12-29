@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private SortableTable timeSeriesTable;
     private JPopupMenu tablePopupMenu;
     private TableColumnManager<E> tableColumnManager;
+    private JToolBar toolbar = new JToolBar();
 
     public TableSelector(ListSelectionActionModel<E> seriesActionModel,
                          TimeSeriesContext rootContext,
@@ -62,12 +64,40 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         this.selectionText = selectionText;
         this.seriesClass = seriesClass;
         createTable();
+        createToolbar();
         setupSeries();
         createPopupMenu();
 
         setLayout(new BorderLayout());
+        add(toolbar, BorderLayout.NORTH);
         add(new JScrollPane(timeSeriesTable), BorderLayout.CENTER);
         addSeriesSelectionListener();
+    }
+
+    private void createToolbar() {
+        class ShowColumnSelectionDialogAction extends AbstractAction {
+
+            public ShowColumnSelectionDialogAction() {
+                putValue(NAME, "Select Columns");
+            }
+
+            public void actionPerformed(ActionEvent e) {
+                showColumnSelectionDialog();
+            }
+        }
+
+        toolbar.add(new ShowColumnSelectionDialogAction());
+    }
+
+    private void showColumnSelectionDialog() {
+        ColumnSelectionDialog d = new ColumnSelectionDialog(getFrameForComponent(this), this, getTableColumnManager());
+        d.setVisible(true);
+        d.dispose();
+    }
+
+    private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {
+        if (parentComponent instanceof Frame)  return (Frame)parentComponent;
+        return getFrameForComponent(parentComponent.getParent());
     }
 
     @Override
@@ -77,7 +107,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         );
     }
 
-    public TableColumnManager getTableColumnManager() {
+    private TableColumnManager getTableColumnManager() {
         return tableColumnManager;
     }
 
@@ -133,4 +163,11 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         tableColumnManager.addAllDynamicColumns();    
     }
 
+    public void setSeriesSelectionEnabled(boolean selectable) {
+        if (selectable) {
+            tableColumnManager.addColumn(FixedColumns.Selected.getColumnName());
+        } else {
+            tableColumnManager.removeColumn(FixedColumns.Selected.getColumnName());
+        }
+    }
 }

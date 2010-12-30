@@ -95,14 +95,7 @@ public class TreeAutoExpandAction extends ModelDrivenAction<ExpandLevelActionMod
         }
     }
 
-    /**
-* Created by IntelliJ IDEA.
-* User: nick
-* Date: 30/12/10
-* <p/>
-* To change this template use File | Settings | File Templates.
-*/
     static interface ExpansionRule {
-    public boolean shouldExpand(DefaultMutableTreeNode n);
-}
+        public boolean shouldExpand(DefaultMutableTreeNode n);
+    }
 }

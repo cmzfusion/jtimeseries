@@ -33,6 +33,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
 
@@ -44,31 +45,40 @@ import java.util.List;
 */
 public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
-    //auto expand to this depth
+    private static ExpansionRule EXPAND_ALL_NODES_RULE = new ExpansionRule() {
+        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+            return true;
+        }
+    };
 
-    private DefaultTreeModel treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+    //auto expand to this depth
+    private int treeAutoExpandLevel = 3;
+
+    private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
     private List<Action> seriesActions;
-    private JTree tree = new AnimatedIconTree(treeModel);
+    private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private ContextNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
     private JToolBar toolbar = new JToolBar();
-    private ExpandLevelActionModel expandLevelModel = new ExpandLevelActionModel(treeModel, 2);
-    private TreeAutoExpandAction.ContractTreeAction contractTreeAction = new TreeAutoExpandAction.ContractTreeAction(tree, expandLevelModel);
-    private TreeAutoExpandAction.ExpandTreeAction expandTreeAction = new TreeAutoExpandAction.ExpandTreeAction(tree, expandLevelModel);
 
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
         this.seriesActions = seriesActions;
 
+        treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
+
+        tree = new AnimatedIconTree();
         nodeFactory = new ContextNodeFactory<E>(tree, seriesClass);
 
         setupSeries();
 
+        tree.setModel(treeModel);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
+        autoExpandTree();
 
         createToolbar();
 
@@ -84,21 +94,59 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         addMouseListeners();
     }
 
-
     private void createToolbar() {
-        toolbar.add(contractTreeAction);
-        toolbar.add(expandTreeAction);
+
+        class ChangeTreeAutoExpandAction extends AbstractAction {
+            private int increment;
+
+            public ChangeTreeAutoExpandAction(int increment) {
+                this.increment = increment;
+            }
+
+            public void actionPerformed(ActionEvent e) {
+                treeAutoExpandLevel += increment;
+                autoExpandTree();
+            }
+        }
+
+        class ExpandTreeAction extends ChangeTreeAutoExpandAction {
+            public ExpandTreeAction() {
+                super(1);
+                putValue(Action.NAME, "+");
+            }
+        }
+
+        class ContractTreeAction extends ChangeTreeAutoExpandAction {
+            public ContractTreeAction() {
+                super(-1);
+                putValue(Action.NAME, "-");
+            }
+        }
+        toolbar.add(new ContractTreeAction());
+        toolbar.add(new ExpandTreeAction());
     }
 
     public void setSeriesSelectionEnabled(boolean enabled) {
         cellRenderer.setSeriesSelectionEnabled(enabled);
     }
 
+    private void autoExpandTree() {
+        expandNodesFrom(
+            (AbstractSeriesSelectionTreeNode)treeModel.getRoot(),
+             new ExpansionRule() {
+                 public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+                     return n.getLevel() <= treeAutoExpandLevel;
+                 }
+             },
+             true
+        );
+    }
+
     protected void addContextTreeListener() {
         rootContext.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
-                    new ContextTreeUpdaterListener(),
-                    IdentifiableTreeListener.class
+                new ContextTreeUpdaterListener(),
+                IdentifiableTreeListener.class
             )
         );
     }
@@ -146,9 +194,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             if ( parentNode != null && newNode != null) {
                 int index = addChild(parentNode, newNode);
                 treeModel.nodesWereInserted(parentNode, new int[]{index});
+                TreePath path = new TreePath(parentNode.getPath());
 
-                if ( parentNode.getLevel() <= expandLevelModel.getAutoExpandLevel()) {
-                    expandTreeAction.autoExpandNodesFrom(parentNode, true, false);
+
+                if ( path.getPathCount() <= treeAutoExpandLevel) {
+                    tree.expandPath(path);
                 }
             }
         }
@@ -185,6 +235,28 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         treeModel.setRoot(rootNode);
     }
 
+    private static interface ExpansionRule {
+        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n);
+    }
+
+    /**
+     * expand the tree to show any child nodes of startNode which satisfy the ExpansionRule
+     */
+    private void expandNodesFrom(AbstractSeriesSelectionTreeNode node, ExpansionRule r, boolean collapse) {
+        Enumeration<AbstractSeriesSelectionTreeNode> e = node.children();
+        while(e.hasMoreElements()) {
+            expandNodesFrom(e.nextElement(), r, collapse);
+        }
+
+        TreePath pathToExpand = new TreePath(node.getPath());
+        boolean expanded = tree.isExpanded(pathToExpand);
+        boolean shouldBeExpanded = r.shouldExpand(node);
+        if ( ! expanded && shouldBeExpanded) {
+            tree.expandPath(pathToExpand);
+        } else if ( expanded && ! shouldBeExpanded && collapse ) {
+            tree.collapsePath(pathToExpand);
+        }
+    }
 
     private AbstractSeriesSelectionTreeNode buildTree(Identifiable identifiable) {
 

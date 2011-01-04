@@ -169,13 +169,12 @@ public class NewServerAction extends AbstractAction {
 
                         @Override
                         protected void doInBackground() throws Exception {
-                            Thread.sleep(1000);
 
                             InetAddress i = InetAddress.getByName(serverDetailsPage.getHostName());
                             server = new TimeSeriesServer(
                                     i,
                                     serverDetailsPage.getPort(),
-                                    serverDetailsPage.getHostName(),
+                                    getDefaultServerName(i),
                                     0
                             );
 
@@ -223,6 +222,12 @@ public class NewServerAction extends AbstractAction {
                             setVisible(false);
                         }
                     };
+                }
+
+                private String getDefaultServerName(InetAddress i) {
+                    String name = i.getHostName();
+                    name = name.replaceAll("\\.", "_");   //can't use the . which is the context tree path separator
+                    return name;
                 }
             }
         }

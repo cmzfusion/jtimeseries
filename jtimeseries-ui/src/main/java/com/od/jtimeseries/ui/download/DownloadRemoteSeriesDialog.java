@@ -44,7 +44,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private ProgressLayeredPane progressLayeredPane;
     private AbstractDownloadWizardPanel.WizardPanelListener panelListener;
     private SelectServerPanel selectServerPanel;
-    private TimeSeriesContext contextToStoreRemoteSeries;
+    private TimeSeriesContext contextToStoreRemoteSeries = JTimeSeries.createRootContext();
     private ChooseSeriesPanel chooseSeriesPanel;
     private DisplayNameCalculator displayNameCalculator;
     private List<? extends UIPropertiesTimeSeries> selectedSeries = new LinkedList<UIPropertiesTimeSeries>();
@@ -69,7 +69,6 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     }
 
     private void createPanels(TimeSeriesServerDictionary serverDictionary) {
-        contextToStoreRemoteSeries = JTimeSeries.createRootContext();
         selectServerPanel = new SelectServerPanel(panelListener, serverDictionary, contextToStoreRemoteSeries, displayNameCalculator);
     }
 

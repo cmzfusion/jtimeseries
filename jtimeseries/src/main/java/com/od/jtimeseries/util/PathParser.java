@@ -68,7 +68,7 @@ public class PathParser {
 
     public static LinkedList<String> splitPath(String path) {
         LinkedList<String> l = new LinkedList<String>();
-        StringTokenizer st = new StringTokenizer(path, IdentifiableBase.NAMESPACE_REGEX_PATH_SEPARATOR);
+        StringTokenizer st = new StringTokenizer(path, JTimeSeriesConstants.NAMESPACE_SEPARATOR);
         while(st.hasMoreTokens()) {
             l.add(st.nextToken());
         }

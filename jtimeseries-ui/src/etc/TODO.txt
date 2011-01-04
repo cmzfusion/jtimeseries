@@ -1,0 +1,13 @@
+
+Icon for table columns toolbar button
+Save server information and refresh servers on restart
+
+Handle fail to connect to server, server state stale
+Add reconnect to server action
+
+send to visualizer action in main series tree
+drag and drop series to visualizer
+
+
+
+

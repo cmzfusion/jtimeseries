@@ -46,7 +46,14 @@ import java.util.List;
 public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
     //auto expand to this depth
-    private int treeAutoExpandLevel = 3;
+    private static final int treeAutoExpandLevel = 1;
+
+    private static final ExpansionRule AUTO_EXPAND_RULE = new ExpansionRule() {
+
+        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+            return n.getLevel() <= treeAutoExpandLevel;
+        }
+    };
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
@@ -92,11 +99,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private void autoExpandTree() {
         expandNodesFrom(
             (AbstractSeriesSelectionTreeNode)treeModel.getRoot(),
-             new ExpansionRule() {
-                 public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
-                     return n.getLevel() <= treeAutoExpandLevel;
-                 }
-             },
+             AUTO_EXPAND_RULE,
              true
         );
     }
@@ -153,11 +156,9 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             if ( parentNode != null && newNode != null) {
                 int index = addChild(parentNode, newNode);
                 treeModel.nodesWereInserted(parentNode, new int[]{index});
-                TreePath path = new TreePath(parentNode.getPath());
 
-
-                if ( path.getPathCount() <= treeAutoExpandLevel) {
-                    tree.expandPath(path);
+                if ( newNode.getLevel() <= (treeAutoExpandLevel + 1)) {  //+1 because parent would have been a leaf before and so would not have expanded
+                    expandNodesFrom(parentNode, AUTO_EXPAND_RULE, false);
                 }
             }
         }

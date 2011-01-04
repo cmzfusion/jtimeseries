@@ -37,8 +37,6 @@ import java.util.concurrent.Executor;
  */
 public class IdentifiableBase extends LockingIdentifiable {
 
-    public static final String NAMESPACE_SEPARATOR = JTimeSeriesConstants.NAMESPACE_SEPARATOR;
-    public static final String NAMESPACE_REGEX_PATH_SEPARATOR = "\\.";
     private volatile String id;
     private volatile String description;
     private volatile Identifiable parent;
@@ -195,8 +193,8 @@ public class IdentifiableBase extends LockingIdentifiable {
     protected void checkId(String id) {
         if ( id == null ) {
             throw new IdentifierException("id cannot be null");
-        }else if ( id.contains(NAMESPACE_REGEX_PATH_SEPARATOR)) {
-            throw new IdentifierException("id cannot contain a '" + NAMESPACE_REGEX_PATH_SEPARATOR + "', this is the path separator symbol");
+        }else if ( id.contains(JTimeSeriesConstants.NAMESPACE_SEPARATOR)) {
+            throw new IdentifierException("id cannot contain a '" + JTimeSeriesConstants.NAMESPACE_SEPARATOR + "', this is the path separator symbol");
         } else if ( id.equals("")) {
             throw new IdentifierException("id cannot be an empty string");
         }
@@ -345,7 +343,7 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected String getPathForChild(String id) {
-        return getPath() + NAMESPACE_SEPARATOR + id;
+        return getPath() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + id;
     }
     
     //receive events from children, propogate them with updated path

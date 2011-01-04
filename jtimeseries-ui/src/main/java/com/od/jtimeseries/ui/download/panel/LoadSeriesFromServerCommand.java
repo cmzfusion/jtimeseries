@@ -5,7 +5,6 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.Loader;
 import swingcommand.BackgroundTask;
 import swingcommand.SwingCommand;
 import swingcommand.Task;

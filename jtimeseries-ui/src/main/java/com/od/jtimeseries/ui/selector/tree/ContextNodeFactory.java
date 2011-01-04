@@ -31,7 +31,7 @@ public class ContextNodeFactory<E extends UIPropertiesTimeSeries> {
     public ContextNodeFactory(JTree tree, Class seriesClass) {
         this.tree = tree;
         this.seriesClass = seriesClass;
-        serverNodeAnimator.setBackgroundImage("/images/server_client2_16x16.png", 0.65f);
+        serverNodeAnimator.setBackgroundImage("/images/server_client2_16x16.png", 0.70f);
     }
 
     public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {

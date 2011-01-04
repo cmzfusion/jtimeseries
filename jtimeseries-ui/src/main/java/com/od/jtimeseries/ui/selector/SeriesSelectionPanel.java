@@ -81,11 +81,11 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         this.selectionList = new SeriesSelectionList<E>();
         setupTimeseries();
         ListSelectionActionModel<E> seriesSelectionModel = new ListSelectionActionModel<E>();
-        ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
-        RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
-        List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
-        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesActions, seriesClass);
-        tableSelector = new TableSelector<E>(seriesSelectionModel, context, seriesActions, selectionText, seriesClass);
+        //ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
+        //RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
+        //List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
+        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesClass);
+        tableSelector = new TableSelector<E>(seriesSelectionModel, context, selectionText, seriesClass);
         createSelectorPanel();
         createTitlePanel();
         addComponents();

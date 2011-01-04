@@ -57,16 +57,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private DefaultTreeModel treeModel;
     private TimeSeriesContext rootContext;
-    private List<Action> seriesActions;
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private ContextNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
 
-    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
+    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, Class seriesClass) {
         super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
-        this.seriesActions = seriesActions;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
 
@@ -187,7 +185,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         //add a listener for mouse clicks on the tree, to populate the fileSelectionModel
         //this is done as a mouse listener rather than a tree selection listener so that we still get an event even if the selection is not changed
-        tree.addMouseListener(new PopupMenuMouseListener(tree, seriesActions));
+//        tree.addMouseListener(new PopupMenuMouseListener(tree, seriesActions));
     }
 
     protected void buildView() {

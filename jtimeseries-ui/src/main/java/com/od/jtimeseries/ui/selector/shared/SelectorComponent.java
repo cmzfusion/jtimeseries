@@ -24,7 +24,9 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.swing.action.ListSelectionActionModel;
 
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +42,11 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
     protected java.util.List<SelectorPanelListener<E>> seriesSelectionListeners = new ArrayList<SelectorPanelListener<E>>();
     private TimeSeriesContext rootContext;
     private ListSelectionActionModel<E> seriesActionModel;
+    private SelectorActionFactory selectorActionFactory = new SelectorActionFactory() {
+        public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
+            return Collections.emptyList();
+        }
+    };
 
     public SelectorComponent(TimeSeriesContext rootContext, ListSelectionActionModel<E> seriesActionModel) {
         this.rootContext = rootContext;
@@ -48,6 +55,14 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
 
     public void addSelectorListener(SelectorPanelListener<E> seriesSelectionListener) {
         seriesSelectionListeners.add(seriesSelectionListener);
+    }
+
+    public SelectorActionFactory getSelectorActionFactory() {
+        return selectorActionFactory;
+    }
+
+    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
+        this.selectorActionFactory = selectorActionFactory;
     }
 
     protected void fireSelectedForDescription(E m) {

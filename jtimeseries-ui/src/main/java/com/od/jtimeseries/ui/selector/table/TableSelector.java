@@ -44,7 +44,6 @@ import java.util.List;
 public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
     private TimeSeriesContext rootContext;
-    private java.util.List<Action> seriesActions;
     private String selectionText;
     private Class<E> seriesClass;
     private BeanPerRowModel<E> tableModel;
@@ -55,12 +54,10 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     public TableSelector(ListSelectionActionModel<E> seriesActionModel,
                          TimeSeriesContext rootContext,
-                         java.util.List<Action> seriesActions,
                          String selectionText,
                          Class<E> seriesClass) {
         super(rootContext, seriesActionModel);
         this.rootContext = rootContext;
-        this.seriesActions = seriesActions;
         this.selectionText = selectionText;
         this.seriesClass = seriesClass;
         createTable();
@@ -121,9 +118,9 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     private void createPopupMenu() {
         tablePopupMenu = new JPopupMenu("Series Actions");
-        for ( Action a : seriesActions) {
-            tablePopupMenu.add(a);
-        }
+//        for ( Action a : seriesActions) {
+//            tablePopupMenu.add(a);
+//        }
 
         timeSeriesTable.addMouseListener(
             new PopupTriggerMouseAdapter(tablePopupMenu, timeSeriesTable)

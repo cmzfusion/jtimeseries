@@ -10,6 +10,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 public class ApplicationActionModels {
 
     private DesktopSelectionActionModel desktopSelectionActionModel = new DesktopSelectionActionModel();
+    private VisualizerSelectionActionModel visualizerSelectionActionModel = new VisualizerSelectionActionModel();
 
     public DesktopSelectionActionModel getDesktopSelectionActionModel() {
         return desktopSelectionActionModel;
@@ -18,4 +19,6 @@ public class ApplicationActionModels {
     public void setDesktopSelectionActionModel(DesktopSelectionActionModel desktopSelectionActionModel) {
         this.desktopSelectionActionModel = desktopSelectionActionModel;
     }
+
+
 }

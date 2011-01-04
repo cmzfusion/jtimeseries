@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.ui.timeserious.DesktopPanel;
+import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,6 +17,12 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     }
 
     public void serverRemoved(TimeSeriesServer s) {
+    }
+
+    public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {
+    }
+
+    public void desktopSelected(DesktopPanel desktopPane) {
     }
 
 }

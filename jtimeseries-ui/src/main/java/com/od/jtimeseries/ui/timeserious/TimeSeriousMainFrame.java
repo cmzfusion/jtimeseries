@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
@@ -7,6 +8,8 @@ import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.swing.eventbus.EventSender;
+import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.*;
@@ -128,7 +131,13 @@ public class TimeSeriousMainFrame extends JFrame {
     private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
 
         public void windowGainedFocus(WindowEvent e) {
-            desktopSelectionActionModel.setDesktop(desktopPanel);
+            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
+                new EventSender<TimeSeriousBusListener>() {
+                    public void sendEvent(TimeSeriousBusListener listener) {
+                        listener.desktopSelected(desktopPanel);
+                    }
+                }
+            );
         }
 
         public void windowLostFocus(WindowEvent e) {

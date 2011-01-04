@@ -45,12 +45,6 @@ import java.util.List;
 */
 public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
-    private static ExpansionRule EXPAND_ALL_NODES_RULE = new ExpansionRule() {
-        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
-            return true;
-        }
-    };
-
     //auto expand to this depth
     private int treeAutoExpandLevel = 3;
 
@@ -61,7 +55,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private ContextNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
-    private JToolBar toolbar = new JToolBar();
 
     public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, java.util.List<Action> seriesActions, Class seriesClass) {
         super(rootContext, seriesActionModel);
@@ -80,8 +73,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         tree.setShowsRootHandles(true);
         autoExpandTree();
 
-        createToolbar();
-
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         cellRenderer = new SeriesTreeCellRenderer();
         tree.setCellRenderer(cellRenderer);
@@ -89,41 +80,9 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(tree);
-        add(toolbar, BorderLayout.NORTH);
+        //add(toolbar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
-    }
-
-    private void createToolbar() {
-
-        class ChangeTreeAutoExpandAction extends AbstractAction {
-            private int increment;
-
-            public ChangeTreeAutoExpandAction(int increment) {
-                this.increment = increment;
-            }
-
-            public void actionPerformed(ActionEvent e) {
-                treeAutoExpandLevel += increment;
-                autoExpandTree();
-            }
-        }
-
-        class ExpandTreeAction extends ChangeTreeAutoExpandAction {
-            public ExpandTreeAction() {
-                super(1);
-                putValue(Action.NAME, "+");
-            }
-        }
-
-        class ContractTreeAction extends ChangeTreeAutoExpandAction {
-            public ContractTreeAction() {
-                super(-1);
-                putValue(Action.NAME, "-");
-            }
-        }
-        toolbar.add(new ContractTreeAction());
-        toolbar.add(new ExpandTreeAction());
     }
 
     public void setSeriesSelectionEnabled(boolean enabled) {

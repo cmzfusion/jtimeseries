@@ -3,11 +3,12 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
-import com.od.jtimeseries.ui.util.ConfigAware;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,5 +42,9 @@ public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAw
 
     public void restoreConfig(TimeSeriousConfig config) {
         desktopPane.addVisualizers(config.getVisualizerConfigurations());
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
     }
 }

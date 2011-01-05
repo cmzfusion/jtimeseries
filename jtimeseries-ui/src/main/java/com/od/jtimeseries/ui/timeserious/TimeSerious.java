@@ -5,6 +5,8 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAwareTree;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -37,6 +39,7 @@ public class TimeSerious {
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary, applicationActionModels);
     private TimeSeriousConfig config;
+    private ConfigAwareTree configTree = new ConfigAwareTree(mainFrame);
 
     public TimeSerious() {
 
@@ -50,12 +53,12 @@ public class TimeSerious {
             e.printStackTrace();
         }
 
-        mainFrame.restoreConfig(config);      
+        configTree.restoreConfig(config);
         mainFrame.setVisible(true);
 
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                prepareConfigForSave(config);
+                configTree.prepareConfigForSave(config);
                 try {
                     configManager.saveConfig(mainFrame, config);
                 } catch (ConfigManagerException e1) {
@@ -64,10 +67,6 @@ public class TimeSerious {
                 }
             }
         });
-    }
-
-    private void prepareConfigForSave(TimeSeriousConfig config) {
-        mainFrame.prepareConfigForSave(config);
     }
 
     public static void main(String[] args) {
@@ -110,18 +109,18 @@ public class TimeSerious {
             logMethods.logError("Could not start timeserious httpd for local metrics", e);
         }
 
-        try {
-            udpPingHttpServerDictionary.addServer(
-                new TimeSeriesServer(
-                    InetAddress.getLocalHost(),
-                    httpdPort,
-                    "Timeserious",
-                    System.currentTimeMillis()
-                )
-            );
-        } catch (UnknownHostException e) {
-            logMethods.logError("Could not add local timeseries server", e);
-        }
+//        try {
+//            udpPingHttpServerDictionary.addServer(
+//                new TimeSeriesServer(
+//                    InetAddress.getLocalHost(),
+//                    httpdPort,
+//                    "Timeserious",
+//                    System.currentTimeMillis()
+//                )
+//            );
+//        } catch (UnknownHostException e) {
+//            logMethods.logError("Could not add local timeseries server", e);
+//        }
 
 
     }

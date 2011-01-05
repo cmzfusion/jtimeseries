@@ -2,16 +2,16 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.download.panel.AddSeriesFromServerTask;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
-import com.od.jtimeseries.ui.util.ConfigAware;
 import com.od.swing.eventbus.UIEventBus;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -55,6 +55,10 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
                 this
             ).execute(s);
         }
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
     }
 
     private class RootContextBusListener extends TimeSeriousBusListenerAdapter {

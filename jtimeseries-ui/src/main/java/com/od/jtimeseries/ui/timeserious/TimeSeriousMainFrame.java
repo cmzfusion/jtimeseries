@@ -6,6 +6,7 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
 import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.eventbus.EventSender;
@@ -16,6 +17,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +25,7 @@ import java.awt.event.WindowFocusListener;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends JFrame {
+public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public static final String MAIN_FRAME_NAME = "mainFrame";
 
@@ -103,14 +105,15 @@ public class TimeSeriousMainFrame extends JFrame {
             setSize(800, 600);
             setLocationRelativeTo(null);
         }
-        desktopPanel.restoreConfig(config);
+    }
+
+    public java.util.List<ConfigAware> getConfigAwareChildren() {
+        return Arrays.asList(desktopPanel, rootContext);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
         config.setFrameLocation(MAIN_FRAME_NAME, getBounds());
         config.setFrameExtendedState(MAIN_FRAME_NAME, getExtendedState());
-        desktopPanel.prepareConfigForSave(config);
-        rootContext.prepareConfigForSave(config);
     }
 
     public DesktopPanel getSelectedDesktop() {

@@ -1,6 +1,6 @@
-package com.od.jtimeseries.ui.util;
+package com.od.jtimeseries.ui.timeserious.config;
 
-import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +10,11 @@ import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
  * To change this template use File | Settings | File Templates.
  */
 public interface ConfigAware {
+
     void prepareConfigForSave(TimeSeriousConfig config);
 
     void restoreConfig(TimeSeriousConfig config);
+
+    List<ConfigAware> getConfigAwareChildren();
+
 }

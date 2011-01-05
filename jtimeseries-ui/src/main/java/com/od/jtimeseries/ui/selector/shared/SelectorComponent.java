@@ -39,7 +39,7 @@ import java.util.List;
  */
 public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
 
-    protected java.util.List<SelectorPanelListener<E>> seriesSelectionListeners = new ArrayList<SelectorPanelListener<E>>();
+    protected java.util.List<SelectorPanelListener<E>> selectedSeries = new ArrayList<SelectorPanelListener<E>>();
     private TimeSeriesContext rootContext;
     private ListSelectionActionModel<E> seriesActionModel;
     private SelectorActionFactory selectorActionFactory = new SelectorActionFactory() {
@@ -54,7 +54,7 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
     }
 
     public void addSelectorListener(SelectorPanelListener<E> seriesSelectionListener) {
-        seriesSelectionListeners.add(seriesSelectionListener);
+        selectedSeries.add(seriesSelectionListener);
     }
 
     public SelectorActionFactory getSelectorActionFactory() {
@@ -66,14 +66,14 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
     }
 
     protected void fireSelectedForDescription(E m) {
-        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(seriesSelectionListeners);
+        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(selectedSeries);
         for ( SelectorPanelListener<E> l : snapshot) {
             l.seriesSelectedForDescription(m);
         }
     }
 
     protected void fireSelectedForDescription(TimeSeriesContext m) {
-        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(seriesSelectionListeners);
+        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(selectedSeries);
         for ( SelectorPanelListener<E> l : snapshot) {
             l.contextSelectedForDescription(m);
         }

@@ -1,7 +1,8 @@
-package com.od.jtimeseries.ui.selector.tree;
+package com.od.jtimeseries.ui.selector.shared;
+
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -14,14 +15,14 @@ import java.util.List;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-class PopupMenuMouseListener extends MouseAdapter {
+public abstract class SelectorPopupMouseListener extends MouseAdapter {
 
-    private JTree tree;
-    private List<Action> seriesActions;
+    private JComponent component;
+    private SelectorActionFactory actionFactory;
 
-    public PopupMenuMouseListener(JTree tree, List<Action> seriesActions) {
-        this.tree = tree;
-        this.seriesActions = seriesActions;
+    public SelectorPopupMouseListener(JComponent component, SelectorActionFactory actionFactory) {
+        this.component = component;
+        this.actionFactory = actionFactory;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -45,22 +46,22 @@ class PopupMenuMouseListener extends MouseAdapter {
                 for ( JMenuItem i : menuItems) {
                     menu.add(i);
                 }
-                menu.show(tree, e.getX() + 3, e.getY() + 3);
+                menu.show(component, e.getX() + 3, e.getY() + 3);
             }
         }
     }
 
     private List<JMenuItem> getMenuItems(MouseEvent e) {
-        TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
         List<JMenuItem> menuItems = new ArrayList<JMenuItem>();
-        if (selPath != null ) {
-            Object selectedNode = selPath.getLastPathComponent();
-            if ( selectedNode instanceof SeriesTreeNode) {
-                for ( Action a : seriesActions) {
-                    menuItems.add(new JMenuItem(a));
-                }
-            }
+        List<Identifiable> selectedIdentifiable = getSelectedIdentifiable(e);
+        List<Action> actions = actionFactory.getActions(getSelectorComponent(), selectedIdentifiable);
+        for ( Action a : actions) {
+            menuItems.add(new JMenuItem(a));
         }
         return menuItems;
     }
+
+    protected abstract List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent);
+
+    protected abstract SelectorComponent getSelectorComponent();
 }

@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -33,7 +34,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
@@ -185,7 +186,24 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         //add a listener for mouse clicks on the tree, to populate the fileSelectionModel
         //this is done as a mouse listener rather than a tree selection listener so that we still get an event even if the selection is not changed
-//        tree.addMouseListener(new PopupMenuMouseListener(tree, seriesActions));
+        tree.addMouseListener(new SelectorPopupMouseListener(tree, getSelectorActionFactory()) {
+            protected List<Identifiable> getSelectedIdentifiable(MouseEvent e) {
+                //only support single selection at present
+                List<Identifiable> result = Collections.emptyList();
+                TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+                if (selPath != null) {
+                    Object selectedNode = selPath.getLastPathComponent();
+                    if (selectedNode instanceof Identifiable) {
+                        result = Collections.singletonList((Identifiable) selectedNode);
+                    }
+                }
+                return result;
+            }
+
+            protected SelectorComponent getSelectorComponent() {
+                return TreeSelector.this;
+            }
+        });
     }
 
     protected void buildView() {

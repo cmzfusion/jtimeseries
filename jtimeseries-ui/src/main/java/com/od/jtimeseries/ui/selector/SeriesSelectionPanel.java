@@ -19,8 +19,8 @@
 package com.od.jtimeseries.ui.selector;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.table.ColumnSelectionDialog;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
@@ -40,7 +40,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -64,6 +63,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
+    ListSelectionActionModel<E> seriesSelectionActionModel;
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
@@ -80,12 +80,9 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         this.seriesClass = seriesClass;
         this.selectionList = new SeriesSelectionList<E>();
         setupTimeseries();
-        ListSelectionActionModel<E> seriesSelectionModel = new ListSelectionActionModel<E>();
-        //ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionModel);
-        //RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionModel);
-        //List<Action> seriesActions = Arrays.asList(new Action[]{removeSeriesAction, reconnectSeriesAction});
-        treeSelector = new TreeSelector<E>(seriesSelectionModel, context, seriesClass);
-        tableSelector = new TableSelector<E>(seriesSelectionModel, context, selectionText, seriesClass);
+        seriesSelectionActionModel = new ListSelectionActionModel<E>();
+        treeSelector = new TreeSelector<E>(seriesSelectionActionModel, context, seriesClass);
+        tableSelector = new TableSelector<E>(seriesSelectionActionModel, context, selectionText, seriesClass);
         createSelectorPanel();
         createTitlePanel();
         addComponents();
@@ -96,6 +93,15 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     public void setSeriesSelectionEnabled(boolean selectable) {
         treeSelector.setSeriesSelectionEnabled(selectable);
         tableSelector.setSeriesSelectionEnabled(selectable);
+    }
+
+    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
+        treeSelector.setSelectorActionFactory(selectorActionFactory);
+        tableSelector.setSelectorActionFactory(selectorActionFactory);
+    }
+
+    public ListSelectionActionModel<E> getSeriesSelectionActionModel() {
+        return seriesSelectionActionModel;
     }
 
     private void createTitlePanel() {
@@ -260,7 +266,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
     }
 
-    public class RemoveSeriesAction extends ModelDrivenAction<ListSelectionActionModel<E>> {
+    public static class RemoveSeriesAction<E extends UIPropertiesTimeSeries> extends ModelDrivenAction<ListSelectionActionModel<E>> {
 
         public RemoveSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
             super(seriesSelectionModel, "Remove Series", ImageUtils.REMOVE_ICON_16x16);
@@ -276,10 +282,13 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
     }
 
-    public class ReconnectSeriesAction extends ModelDrivenAction<ListSelectionActionModel<E>> {
+    public static class ReconnectSeriesAction<E extends UIPropertiesTimeSeries> extends ModelDrivenAction<ListSelectionActionModel<E>> {
 
-        public ReconnectSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
+        private JComponent componentToRepaint;
+
+        public ReconnectSeriesAction(JComponent componentToRepaint, ListSelectionActionModel<E> seriesSelectionModel) {
             super(seriesSelectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
+            this.componentToRepaint = componentToRepaint;
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -289,7 +298,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
                    s.setStale(false);
                }
             }
-            repaint();
+            componentToRepaint.repaint();
         }
 
         protected boolean isModelStateActionable() {

@@ -22,8 +22,9 @@ import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
@@ -31,6 +32,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -117,13 +119,17 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     }
 
     private void createPopupMenu() {
-        tablePopupMenu = new JPopupMenu("Series Actions");
-//        for ( Action a : seriesActions) {
-//            tablePopupMenu.add(a);
-//        }
-
         timeSeriesTable.addMouseListener(
-            new PopupTriggerMouseAdapter(tablePopupMenu, timeSeriesTable)
+            new SelectorPopupMouseListener(timeSeriesTable, getSelectorActionFactory()) {
+
+                protected List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent) {
+                    return new LinkedList<Identifiable>(getSeriesActionModel().getSelected());
+                }
+
+                protected SelectorComponent getSelectorComponent() {
+                    return TableSelector.this;
+                }
+            }
         );
     }
 

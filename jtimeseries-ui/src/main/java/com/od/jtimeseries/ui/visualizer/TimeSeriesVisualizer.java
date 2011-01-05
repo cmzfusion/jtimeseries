@@ -23,6 +23,8 @@ import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
+import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
@@ -44,6 +46,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -81,11 +84,23 @@ public class TimeSeriesVisualizer extends JPanel {
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
         JPanel chartPanel = createChartPanel();
-        seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
+        createSeriesSelectionPanel();
         createToolbar();
         createSplitPane(chartPanel);
         layoutVisualizer();
         addSeriesSelectionListener();
+    }
+
+    private void createSeriesSelectionPanel() {
+        seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
+        final SeriesSelectionPanel.ReconnectSeriesAction reconnectSeriesAction = new SeriesSelectionPanel.ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSeriesSelectionActionModel());
+        final SeriesSelectionPanel.RemoveSeriesAction removeSeriesAction = new SeriesSelectionPanel.RemoveSeriesAction(seriesSelectionPanel.getSeriesSelectionActionModel());
+        SelectorActionFactory actionFactory = new SelectorActionFactory() {
+            public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
+                return Arrays.asList((Action)reconnectSeriesAction, removeSeriesAction);
+            }
+        };
+        seriesSelectionPanel.setSelectorActionFactory(actionFactory);
     }
 
     private void layoutVisualizer() {

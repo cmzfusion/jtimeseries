@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.util.Displayable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -33,13 +34,13 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
         if ( value instanceof AbstractSeriesSelectionTreeNode) {
             delegateRenderer.setIcon(((AbstractSeriesSelectionTreeNode) value).getIcon());
             removeAll();
+            delegateRenderer.setText(getDisplayName(((AbstractSeriesSelectionTreeNode) value).getIdentifiable()));
             if ( value instanceof SeriesTreeNode ) {
                 SeriesTreeNode seriesNode = (SeriesTreeNode)value;
                 Object timeSeries = seriesNode.getTimeSeries();
                 if ( timeSeries instanceof UIPropertiesTimeSeries) {
                     seriesSelectionCheckbox.setSelected(((UIPropertiesTimeSeries)timeSeries).isSelected());
                 }
-                delegateRenderer.setText(getDisplayName(((SeriesTreeNode) value).getTimeSeries()));
                 if ( seriesSelectionEnabled ) {
                     add(seriesSelectionCheckbox, BorderLayout.WEST);
                 }
@@ -56,8 +57,8 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
 
     //get the display name for an identifiable in the context tree
     static String getDisplayName(Identifiable i) {
-        if ( i instanceof UIPropertiesTimeSeries) {
-            return ((UIPropertiesTimeSeries)i).getDisplayName();
+        if ( i instanceof Displayable) {
+            return ((Displayable)i).getDisplayName();
         } else {
             return i.getId();
         }

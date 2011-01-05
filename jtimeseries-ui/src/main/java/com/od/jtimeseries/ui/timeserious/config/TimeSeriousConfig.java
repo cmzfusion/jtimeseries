@@ -18,6 +18,7 @@ public class TimeSeriousConfig {
 
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
+    private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
 
     public Rectangle getFrameLocation(String frameName) {
         return frameLocations.get(frameName);
@@ -41,5 +42,13 @@ public class TimeSeriousConfig {
 
     public Integer getFrameExtendedState(String frameName) {
         return frameExtendedStates.get(frameName);
+    }
+
+    public List<TimeSeriesServerConfig> getServerConfigs() {
+        return serverConfigs;
+    }
+
+    public void setTimeSeriesServerConfigs(List<TimeSeriesServerConfig> serverConfigs) {
+        this.serverConfigs = serverConfigs;
     }
 }

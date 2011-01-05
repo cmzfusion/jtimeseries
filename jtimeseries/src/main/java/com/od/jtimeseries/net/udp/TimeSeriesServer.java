@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -35,6 +37,9 @@ public class TimeSeriesServer implements Comparable {
 
     private String description;
     private long lastAnnounceTimestamp;
+    private boolean connectionFailed;
+
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public TimeSeriesServer(InetAddress serverAddress, int port, String description, long lastAnnounceTimestamp) {
         this.serverAddress = serverAddress;
@@ -108,10 +113,34 @@ public class TimeSeriesServer implements Comparable {
                 '}';
     }
 
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
     public static TimeSeriesServer create(AnnouncementMessage p) throws UnknownHostException {
         InetAddress i = InetAddress.getByName(p.getInetAddress());
         int port = p.getPort();
         String description = p.getDescription();
         return new TimeSeriesServer(i, port, description, System.currentTimeMillis());
+    }
+
+    public void setConnectionFailed(boolean connectionFailed) {
+        this.connectionFailed = connectionFailed;
+    }
+
+    public boolean isConnectionFailed() {
+        return this.connectionFailed;
     }
 }

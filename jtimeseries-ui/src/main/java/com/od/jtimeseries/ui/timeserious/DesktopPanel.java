@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.util.ConfigAware;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import javax.swing.*;
@@ -16,7 +17,7 @@ import java.util.List;
  * Time: 09:29:26
  * To change this template use File | Settings | File Templates.
  */
-public class DesktopPanel extends JPanel implements TimeSeriousDesktop {
+public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAware {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary = new UdpPingTimeSeriesServerDictionary();
     private TimeSeriesDesktopPane desktopPane = new TimeSeriesDesktopPane(timeSeriesServerDictionary);

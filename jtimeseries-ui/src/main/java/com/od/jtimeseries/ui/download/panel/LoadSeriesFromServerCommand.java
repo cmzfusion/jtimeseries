@@ -26,20 +26,18 @@ public class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, 
     private TimeSeriesContext destinationContext;
     private DisplayNameCalculator displayNameCalculator;
 
-    public LoadSeriesFromServerCommand(Component parent, TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
-        this(parent, destinationContext);
+    public LoadSeriesFromServerCommand(TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
+        this(destinationContext);
         this.displayNameCalculator = displayNameCalculator;
     }
 
-    public LoadSeriesFromServerCommand(final Component parent, TimeSeriesContext destinationContext) {
+    public LoadSeriesFromServerCommand(TimeSeriesContext destinationContext) {
         this.destinationContext = destinationContext;
         addTaskListener(
-            new TaskListenerAdapter<Object>() {
+            new TaskListenerAdapter<String>() {
                 public void error(Task task, Throwable error) {
-                    logMethods.logError("Failed to load series from server " + task.getParameters(), error);
-                    JOptionPane.showMessageDialog(parent,
-                    "Failed to load series from server",
-                    "Failed to load series", JOptionPane.WARNING_MESSAGE);
+                    TimeSeriesServer s = (TimeSeriesServer)task.getParameters();
+                    s.setConnectionFailed(true);
                 }
             }
         );

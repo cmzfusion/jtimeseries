@@ -110,6 +110,7 @@ public class TimeSeriousMainFrame extends JFrame {
         config.setFrameLocation(MAIN_FRAME_NAME, getBounds());
         config.setFrameExtendedState(MAIN_FRAME_NAME, getExtendedState());
         desktopPanel.prepareConfigForSave(config);
+        rootContext.prepareConfigForSave(config);
     }
 
     public DesktopPanel getSelectedDesktop() {

@@ -37,7 +37,7 @@ import java.util.concurrent.Callable;
  * Date: 12-Jan-2009
  * Time: 16:18:37
  */
-class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.RemoteTimeSeries>> {
+public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.RemoteTimeSeries>> {
 
     private TimeSeriesServerContext serverContext;
     private URL remoteContextUrl;
@@ -61,7 +61,7 @@ class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.
         String serverId = server.getDescription();
         TimeSeriesServerContext serverContext = (TimeSeriesServerContext)rootContext.get(serverId);
         if ( serverContext == null) {
-            serverContext = new TimeSeriesServerContext(server, serverId, serverId);
+            serverContext = new TimeSeriesServerContext(server);
             rootContext.addChild(serverContext);
         }
         return serverContext;

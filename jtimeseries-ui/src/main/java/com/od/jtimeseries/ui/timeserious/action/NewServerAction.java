@@ -151,7 +151,7 @@ public class NewServerAction extends AbstractAction {
                         }
 
                         public void success(Task task) {
-                            LoadSeriesFromServerCommand loadSeriesCommand = new LoadSeriesFromServerCommand(frame, rootContext);
+                            LoadSeriesFromServerCommand loadSeriesCommand = new LoadSeriesFromServerCommand(rootContext);
                             loadSeriesCommand.execute(checkServerCommand.server);
                         }
                     }
@@ -172,10 +172,10 @@ public class NewServerAction extends AbstractAction {
 
                             InetAddress i = InetAddress.getByName(serverDetailsPage.getHostName());
                             server = new TimeSeriesServer(
-                                    i,
-                                    serverDetailsPage.getPort(),
-                                    getDefaultServerName(i),
-                                    0
+                                i,
+                                serverDetailsPage.getPort(),
+                                getDefaultServerName(i),
+                                0
                             );
 
                             class CheckServerQuery extends AbstractRemoteQuery {
@@ -213,9 +213,7 @@ public class NewServerAction extends AbstractAction {
                         @Override
                         protected void doInEventThread() throws Exception {
                             context = new TimeSeriesServerContext(
-                                    server,
-                                    server.getDescription(),
-                                    server.getDescription()
+                                server
                             );
                             rootContext.addChild(context);
                             closeCurrentPage();

@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.util.Displayable;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
@@ -14,7 +15,7 @@ import java.util.Date;
  * Time: 23:57:31
  * To change this template use File | Settings | File Templates.
  */
-public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries {
+public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displayable {
 
     public static final String SELECTED_PROPERTY = "selected";
     public static final String STALE_PROPERTY = "stale";

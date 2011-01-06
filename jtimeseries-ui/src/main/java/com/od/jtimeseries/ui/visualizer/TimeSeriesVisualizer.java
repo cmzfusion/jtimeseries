@@ -23,6 +23,8 @@ import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
+import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.*;
@@ -56,10 +58,12 @@ import java.util.List;
  * Time: 15:58:18
  *
  * The TimeSeriesVisualizer is designed to be a standalone component that can be integrated
- * into third party applications. It allows time series to be selected and downloaded/synchronized
- * from time series server(s), and charts plotted of selected series. The time series server(s)
- * provide access to time series data via http, and  may be remote or local  applications,
- * or even a time series service provided by the client application itself.
+ * into third party applications, as well as used in TimeSerious standalone application.
+ * It has a feature which allows time series to be selected and downloaded/synchronized
+ * from time series server(s), and charts plotted of selected series. (This feature is diabled
+ * in TimeSerious, which has alternative way of adding servers/timeseries).
+ * The time series server(s) provide access to time series data via http, and may be remote or
+ * local applications, or even a time series service provided by the client application itself.
  */
 public class TimeSeriesVisualizer extends JPanel {
 
@@ -93,11 +97,11 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
-        final SeriesSelectionPanel.ReconnectSeriesAction reconnectSeriesAction = new SeriesSelectionPanel.ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSeriesSelectionActionModel());
-        final SeriesSelectionPanel.RemoveSeriesAction removeSeriesAction = new SeriesSelectionPanel.RemoveSeriesAction(seriesSelectionPanel.getSeriesSelectionActionModel());
+        final ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSeriesSelectionActionModel());
+        final RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionPanel.getSeriesSelectionActionModel());
         SelectorActionFactory actionFactory = new SelectorActionFactory() {
             public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-                return Arrays.asList((Action)reconnectSeriesAction, removeSeriesAction);
+                return Arrays.asList((Action)removeSeriesAction, reconnectSeriesAction);
             }
         };
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
@@ -298,9 +302,7 @@ public class TimeSeriesVisualizer extends JPanel {
                 for (TimeSeriesServerContext c : serverContexts) {
                     if ( ! rootContext.containsChildWithId(c.getId())) {
                         rootContext.addChild(new TimeSeriesServerContext(
-                                c.getServer(),
-                                c.getId(),
-                                c.getId()
+                                c.getServer()
                         ));
                     }
                 }

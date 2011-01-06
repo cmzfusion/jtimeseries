@@ -46,7 +46,10 @@ class ServerTreeNode extends ContextTreeNode implements AnimatedIconTree.Progres
     }
 
     protected Icon getIcon() {
-        return isAnimationEnabled() ? animatedIcon :  ImageUtils.TIMESERIES_SERVER_ICON_16x16;
+        return isAnimationEnabled() ? animatedIcon :
+            context.isConnectionFailed() ?
+                ImageUtils.TIMESERIES_SERVER_OFFLINE_ICON_16x16 :
+                ImageUtils.TIMESERIES_SERVER_ICON_16x16;
     }
 
     public boolean isSelected() {

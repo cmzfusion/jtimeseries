@@ -48,9 +48,6 @@ public class TimeSeriesServer implements Comparable {
         this.lastAnnounceTimestamp = lastAnnounceTimestamp;
     }
 
-    public void setLastAnnounceTimestamp(long lastAnnounceTimestamp) {
-        this.lastAnnounceTimestamp = lastAnnounceTimestamp;
-    }
 
     public InetAddress getServerAddress() {
         return serverAddress;
@@ -60,20 +57,38 @@ public class TimeSeriesServer implements Comparable {
         return port;
     }
 
+    public long getLastAnnounceTimestamp() {
+        return lastAnnounceTimestamp;
+    }
+
+    public void setLastAnnounceTimestamp(long lastAnnounceTimestamp) {
+        long oldValue = this.lastAnnounceTimestamp;
+        this.lastAnnounceTimestamp = lastAnnounceTimestamp;
+        firePropertyChange("lastAnnounceTimestamp", oldValue, this.lastAnnounceTimestamp);
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
+        String oldValue = this.description;
         this.description = description;
+        firePropertyChange("description", oldValue, this.description);
+    }
+
+    public boolean isConnectionFailed() {
+        return connectionFailed;
+    }
+
+    public void setConnectionFailed(boolean connectionFailed) {
+        boolean oldValue = this.connectionFailed;
+        this.connectionFailed = connectionFailed;
+        firePropertyChange("connectionFailed", oldValue, this.connectionFailed);
     }
 
     public String getAddressAndPort() {
         return serverAddress + ":" + port;
-    }
-
-    public long getLastAnnounceTimestamp() {
-        return lastAnnounceTimestamp;
     }
 
     public int hashCode() {
@@ -129,18 +144,14 @@ public class TimeSeriesServer implements Comparable {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
+    private void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+
     public static TimeSeriesServer create(AnnouncementMessage p) throws UnknownHostException {
         InetAddress i = InetAddress.getByName(p.getInetAddress());
         int port = p.getPort();
         String description = p.getDescription();
         return new TimeSeriesServer(i, port, description, System.currentTimeMillis());
-    }
-
-    public void setConnectionFailed(boolean connectionFailed) {
-        this.connectionFailed = connectionFailed;
-    }
-
-    public boolean isConnectionFailed() {
-        return this.connectionFailed;
     }
 }

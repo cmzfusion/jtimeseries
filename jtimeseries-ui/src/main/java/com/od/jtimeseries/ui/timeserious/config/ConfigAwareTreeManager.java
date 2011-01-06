@@ -8,13 +8,15 @@ import java.util.List;
  * User: nick
  * Date: 05/01/11
  * Time: 22:22
- * To change this template use File | Settings | File Templates.
+ *
+ * Flatten a tree structure of ConfigAware classes, and iterate the nodes
+ * when saving or loading config
  */
-public class ConfigAwareTree {
+public class ConfigAwareTreeManager {
 
     private ConfigAware rootNode;
 
-    public ConfigAwareTree(ConfigAware rootNode) {
+    public ConfigAwareTreeManager(ConfigAware rootNode) {
         this.rootNode = rootNode;
     }
 

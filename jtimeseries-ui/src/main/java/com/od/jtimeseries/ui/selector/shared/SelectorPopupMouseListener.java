@@ -17,12 +17,10 @@ import java.util.List;
 */
 public abstract class SelectorPopupMouseListener extends MouseAdapter {
 
-    private JComponent component;
-    private SelectorActionFactory actionFactory;
+    private SelectorComponent selectorComponent;
 
-    public SelectorPopupMouseListener(JComponent component, SelectorActionFactory actionFactory) {
-        this.component = component;
-        this.actionFactory = actionFactory;
+    public SelectorPopupMouseListener(SelectorComponent selectorComponent) {
+        this.selectorComponent = selectorComponent;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -46,7 +44,7 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
                 for ( JMenuItem i : menuItems) {
                     menu.add(i);
                 }
-                menu.show(component, e.getX() + 3, e.getY() + 3);
+                menu.show(selectorComponent, e.getX() + 3, e.getY() + 3);
             }
         }
     }
@@ -54,7 +52,7 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
     private List<JMenuItem> getMenuItems(MouseEvent e) {
         List<JMenuItem> menuItems = new ArrayList<JMenuItem>();
         List<Identifiable> selectedIdentifiable = getSelectedIdentifiable(e);
-        List<Action> actions = actionFactory.getActions(getSelectorComponent(), selectedIdentifiable);
+        List<Action> actions = selectorComponent.getSelectorActionFactory().getActions(getSelectorComponent(), selectedIdentifiable);
         for ( Action a : actions) {
             menuItems.add(new JMenuItem(a));
         }

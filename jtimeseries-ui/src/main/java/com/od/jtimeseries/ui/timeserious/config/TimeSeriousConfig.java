@@ -51,4 +51,13 @@ public class TimeSeriousConfig {
     public void setTimeSeriesServerConfigs(List<TimeSeriesServerConfig> serverConfigs) {
         this.serverConfigs = serverConfigs;
     }
+
+    /*
+    private Object readResolve() {
+        if ( serverConfigs == null) {
+            serverConfigs = new LinkedList<TimeSeriesServerConfig>();
+        }
+        return this;
+    }
+    */
 }

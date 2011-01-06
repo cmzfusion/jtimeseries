@@ -20,5 +20,11 @@ public class ApplicationActionModels {
         this.desktopSelectionActionModel = desktopSelectionActionModel;
     }
 
+    public VisualizerSelectionActionModel getVisualizerSelectionActionModel() {
+        return visualizerSelectionActionModel;
+    }
 
+    public void setVisualizerSelectionActionModel(VisualizerSelectionActionModel visualizerSelectionActionModel) {
+        this.visualizerSelectionActionModel = visualizerSelectionActionModel;
+    }
 }

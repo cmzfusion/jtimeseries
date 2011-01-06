@@ -39,6 +39,11 @@ public class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, 
                     TimeSeriesServer s = (TimeSeriesServer)task.getParameters();
                     s.setConnectionFailed(true);
                 }
+
+                public void success(Task task) {
+                    TimeSeriesServer s = (TimeSeriesServer)task.getParameters();
+                    s.setConnectionFailed(false);
+                }
             }
         );
     }

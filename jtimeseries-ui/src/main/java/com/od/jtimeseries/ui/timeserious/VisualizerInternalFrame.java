@@ -7,6 +7,8 @@ import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
@@ -28,18 +30,18 @@ public class VisualizerInternalFrame extends JInternalFrame {
         getContentPane().add(visualizer);
         setSize(800,600);
 
-        addFocusListener(new FocusAdapter() {
+        addInternalFrameListener(new InternalFrameAdapter() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void internalFrameActivated(InternalFrameEvent e) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
                         listener.visualizerSelected(VisualizerInternalFrame.this);
                     }
-                }
-            );
+                } );
             }
         });
+
     }
 
     public TimeSeriesVisualizer getVisualizer() {

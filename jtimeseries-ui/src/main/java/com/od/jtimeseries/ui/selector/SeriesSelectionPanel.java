@@ -63,7 +63,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
-    ListSelectionActionModel<E> seriesSelectionActionModel;
+    private ListSelectionActionModel<E> seriesSelectionActionModel;
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
@@ -266,49 +266,4 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
     }
 
-    public static class RemoveSeriesAction<E extends UIPropertiesTimeSeries> extends ModelDrivenAction<ListSelectionActionModel<E>> {
-
-        public RemoveSeriesAction(ListSelectionActionModel<E> seriesSelectionModel) {
-            super(seriesSelectionModel, "Remove Series", ImageUtils.REMOVE_ICON_16x16);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            List<E> series = getActionModel().getSelected();
-            for ( E s : series) {
-                TimeSeriesContext c = (TimeSeriesContext)s.getParent();
-                s.setSelected(false);
-                c.removeChild(s);
-            }
-        }
-    }
-
-    public static class ReconnectSeriesAction<E extends UIPropertiesTimeSeries> extends ModelDrivenAction<ListSelectionActionModel<E>> {
-
-        private JComponent componentToRepaint;
-
-        public ReconnectSeriesAction(JComponent componentToRepaint, ListSelectionActionModel<E> seriesSelectionModel) {
-            super(seriesSelectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
-            this.componentToRepaint = componentToRepaint;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            List<E> series = getActionModel().getSelected();
-            for ( E s : series) {
-               if ( s.isStale()) {
-                   s.setStale(false);
-               }
-            }
-            componentToRepaint.repaint();
-        }
-
-        protected boolean isModelStateActionable() {
-            for ( E s : getActionModel().getSelected()) {
-                if (s.isStale() ) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-    }
 }

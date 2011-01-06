@@ -1,12 +1,10 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
-import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
-import com.od.jtimeseries.ui.timeserious.config.ConfigAwareTree;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
 import com.od.jtimeseries.ui.util.JideInitialization;
@@ -19,8 +17,6 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +35,7 @@ public class TimeSerious {
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary, applicationActionModels);
     private TimeSeriousConfig config;
-    private ConfigAwareTree configTree = new ConfigAwareTree(mainFrame);
+    private ConfigAwareTreeManager configTree = new ConfigAwareTreeManager(mainFrame);
 
     public TimeSerious() {
 

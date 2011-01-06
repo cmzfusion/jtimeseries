@@ -33,6 +33,7 @@ public class ImageUtils {
     public static ImageIcon ADD_ICON_16x16 = getImageIcon("/images/add16x16.png");
     public static ImageIcon REMOVE_ICON_16x16 = getImageIcon("/images/selection_delete16x16.png");
     public static ImageIcon CONNECT_ICON_16x16 = getImageIcon("/images/connect16x16.png");
+    public static ImageIcon TIMESERIES_SERVER_OFFLINE_ICON_16x16 = getImageIcon("/images/server_client2_offline_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_24x24 = getImageIcon("/images/server_client2_24x24.png");
     public static ImageIcon ADD_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_add_16x16.png");

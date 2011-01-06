@@ -12,13 +12,15 @@ import java.util.Date;
  */
 public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIPropertiesTimeSeries {
 
+    private static ColorRotator colorRotator = new ColorRotator();
+
     private boolean selected;
     private volatile boolean stale = false;
     protected String displayName;
     private Date lastRefreshTime;
     protected URL timeSeriesUrl;
     protected volatile int refreshTimeSeconds;
-    private Color color;
+    private Color color = colorRotator.getNextColor();
 
     public DefaultUITimeSeries(String id, String description) {
         super(id, description);

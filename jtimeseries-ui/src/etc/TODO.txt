@@ -10,6 +10,30 @@ drag and drop series to visualizer
 
 visualizer should not require server dictionary if download is disabled
 
+restrict time range in visualizer
+
+display name calculator
+
+fix to show charts correctly on startup
+
+store split pane position for tree and table
+
+remove server action
+
+auto populate visualizer by path pattern
+
+select for charting by criteria
+
+multi select in selector
+
+default visualizer to table view
+
+named visualizers
+
+visualizer title on visualizer frame / iconified state
+
+colour schemes
+
 
 
 

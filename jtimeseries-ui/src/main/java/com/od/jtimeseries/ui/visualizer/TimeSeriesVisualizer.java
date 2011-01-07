@@ -97,8 +97,8 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
-        final ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSeriesSelectionActionModel());
-        final RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionPanel.getSeriesSelectionActionModel());
+        final ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSelectionActionModel());
+        final RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionPanel.getSelectionActionModel());
         SelectorActionFactory actionFactory = new SelectorActionFactory() {
             public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
                 return Arrays.asList((Action)removeSeriesAction, reconnectSeriesAction);
@@ -247,11 +247,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
-        addChartsFromConfigs(chartConfigs);
-    }
-
-    private void addChartsFromConfigs(List<UiTimeSeriesConfig> configs) {
-        for ( UiTimeSeriesConfig c : configs) {
+        for ( UiTimeSeriesConfig c : chartConfigs) {
             TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
                 RemoteHttpTimeSeries remoteHttpTimeSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(c);

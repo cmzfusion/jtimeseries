@@ -20,7 +20,7 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
 
     DefaultTreeCellRenderer delegateRenderer = new DefaultTreeCellRenderer();
     private JCheckBox seriesSelectionCheckbox = new JCheckBox();
-    private boolean seriesSelectionEnabled;
+    private boolean seriesSelectionEnabled = true;
 
     public SeriesTreeCellRenderer() {
         setLayout(new BorderLayout());

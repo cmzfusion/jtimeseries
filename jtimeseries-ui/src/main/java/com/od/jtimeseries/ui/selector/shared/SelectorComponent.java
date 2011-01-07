@@ -78,13 +78,22 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         }
     }
 
-    public static <E> List<E> getAffectedSeries(Class seriesClass, IdentifiableTreeEvent contextTreeEvent) {
+    public static <E> List<E> getAffectedSeries(Class seriesClass, IdentifiableTreeEvent contextTreeEvent, boolean recursive) {
         LinkedList<E> l = new LinkedList<E>();
         for ( Identifiable i : contextTreeEvent.getNodes()) {
-            if ( seriesClass.isAssignableFrom(i.getClass())) {
-                l.add((E)i);
-            }
+            addToList(seriesClass, l, i, recursive);
         }
         return l;
+    }
+
+    private static <E> void addToList(Class seriesClass, LinkedList<E> l, Identifiable i, boolean recursive) {
+        if ( recursive) {
+            for (Identifiable child : i.getChildren()) {
+                addToList(seriesClass, l, child, recursive);
+            }
+        }
+        if ( seriesClass.isAssignableFrom(i.getClass())) {
+            l.add((E)i);
+        }
     }
 }

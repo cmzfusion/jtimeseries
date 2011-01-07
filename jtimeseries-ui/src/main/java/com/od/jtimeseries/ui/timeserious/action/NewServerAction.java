@@ -11,9 +11,12 @@ import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.util.ProgressIndicatorWizard;
+import com.od.swing.eventbus.EventSender;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.progress.ProgressIndicatorTaskListener;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -149,11 +152,6 @@ public class NewServerAction extends AbstractAction {
                                 JOptionPane.ERROR_MESSAGE
                             );
                         }
-
-                        public void success(Task task) {
-                            LoadSeriesFromServerCommand loadSeriesCommand = new LoadSeriesFromServerCommand(rootContext);
-                            loadSeriesCommand.execute(checkServerCommand.server);
-                        }
                     }
                 );
             }
@@ -208,14 +206,16 @@ public class NewServerAction extends AbstractAction {
                             if (!q.success) {
                                 throw new Exception("Failed to connect to timeseries server at " + q.getQueryUrl());
                             }
+
+                            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
+                                public void sendEvent(TimeSeriousBusListener listener) {
+                                    listener.serverAdded(server);
+                                }
+                            });
                         }
 
                         @Override
                         protected void doInEventThread() throws Exception {
-                            context = new TimeSeriesServerContext(
-                                server
-                            );
-                            rootContext.addChild(context);
                             closeCurrentPage();
                             setVisible(false);
                         }

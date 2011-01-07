@@ -102,7 +102,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     @Override
     protected void addContextTreeListener() {
         rootContext.addTreeListener(
-            new CoalescingTreeListener<E>(seriesClass, tableModel, this)
+            new CoalescingTableUpdater<E>(seriesClass, tableModel, this)
         );
     }
 

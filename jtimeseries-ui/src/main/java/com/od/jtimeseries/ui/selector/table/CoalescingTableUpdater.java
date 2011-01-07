@@ -9,6 +9,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +20,12 @@ import java.util.concurrent.TimeUnit;
 * Date: 20/12/10
 *
 * Individual inserts into jide table are extremely inefficiently handled when we have a large number of separate inserts
-* This class coalesces events from the context tree so that the table is only update once
+* This class coalesces events from the context tree so that the table is only updated once
+*
+* It also ensures we don't insert duplicates into the table, since jide bean table model allows the same bean to appear twice at different rows
 *
 */
-class CoalescingTreeListener<E> implements IdentifiableTreeListener {
+class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
 
     private static ScheduledExecutorService coalescingEventExceutor = NamedExecutors.newSingleThreadScheduledExecutor("Selector-CoalescingEventExecutor");
 
@@ -31,8 +34,9 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
     private Class seriesClass;
     private BeanPerRowModel<E> tableModel;
     private Component tableComponent;
+    private HashSet tableContents = new HashSet();
 
-    CoalescingTreeListener(Class seriesClass, BeanPerRowModel<E> tableModel, Component tableComponent) {
+    CoalescingTableUpdater(Class seriesClass, BeanPerRowModel<E> tableModel, Component tableComponent) {
         this.seriesClass = seriesClass;
         this.tableModel = tableModel;
         this.tableComponent = tableComponent;
@@ -46,13 +50,13 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
     }
 
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent);
+        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
         if ( timeSeries.size() > 0 ) {
             synchronized (changeList) {
                 if ( changeList.size() > 0 && changeList.getLast().isAdd()) {
                     changeList.getLast().addBeans(timeSeries);
                 } else {
-                    changeList.add(new TableChange(true, timeSeries));
+                    changeList.add(new TableChange(true, new LinkedHashSet(timeSeries)));
                 }
                 scheduleUpdate();
             }
@@ -60,13 +64,13 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
     }
 
     public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent);
+        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
         if ( timeSeries.size() > 0 ) {
             synchronized (changeList) {
                 if ( changeList.size() > 0 && ! changeList.getLast().isAdd()) {
                     changeList.getLast().addBeans(timeSeries);
                 } else {
-                    changeList.add(new TableChange(false, timeSeries));
+                    changeList.add(new TableChange(false, new LinkedHashSet(timeSeries)));
                 }
                 scheduleUpdate();
             }
@@ -81,9 +85,9 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
 
     private static class TableChange {
         private boolean isAdd;
-        private java.util.List beans;
+        private LinkedHashSet beans;
 
-        private TableChange(boolean add, java.util.List beans) {
+        private TableChange(boolean add, LinkedHashSet beans) {
             isAdd = add;
             this.beans = beans;
         }
@@ -96,7 +100,7 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
             return isAdd;
         }
 
-        public java.util.List getBeans() {
+        public LinkedHashSet getBeans() {
             return beans;
         }
     }
@@ -120,13 +124,20 @@ class CoalescingTreeListener<E> implements IdentifiableTreeListener {
                 public void run() {
                     for ( TableChange c : changeListSnapshot ) {
                         if ( c.isAdd() ) {
-                            tableModel.addObjects(c.getBeans());
+                            //jide bean model allows the same object to appear twice! Not generally helpful
+                            //we have to eliminate duplicates here
+                            LinkedHashSet s = c.getBeans();
+                            s.removeAll(tableContents);
+                            List toAdd = new LinkedList(s);
+                            tableModel.addObjects(toAdd);
+                            tableContents.addAll(toAdd);
                         } else {
                             //TODO since there's no method to remove multiple beans the only way would be
                             //to clear and re-add everything, at present we don't coalesce removes
                             for ( Object o : c.getBeans()) {
                                 tableModel.removeObject((E)o);
                             }
+                            tableContents.removeAll(c.getBeans());
                         }
                     }
                 }

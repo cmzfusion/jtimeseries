@@ -23,7 +23,6 @@ public class RemoveSeriesAction<E extends UIPropertiesTimeSeries> extends ModelD
         List<E> series = getActionModel().getSelected();
         for ( E s : series) {
             TimeSeriesContext c = (TimeSeriesContext)s.getParent();
-            s.setSelected(false);
             c.removeChild(s);
         }
     }

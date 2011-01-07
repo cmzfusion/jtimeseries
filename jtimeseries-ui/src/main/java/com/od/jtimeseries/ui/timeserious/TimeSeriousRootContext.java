@@ -9,6 +9,7 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
     private void addBusListener() {
         UIEventBus.getInstance().addEventListener(
             TimeSeriousBusListener.class,
-                new RootContextBusListener()
+                new AddServerBusListener()
         );
     }
 
@@ -48,12 +49,12 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
 
     public void restoreConfig(TimeSeriousConfig config) {
         for (TimeSeriesServerConfig c : config.getServerConfigs()) {
-            TimeSeriesServer s = c.createServer();
-            TimeSeriesServerContext context = new TimeSeriesServerContext(s);
-            addChild(context);
-            new LoadSeriesFromServerCommand(
-                this
-            ).execute(s);
+            final TimeSeriesServer s = c.createServer();
+            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
+                public void sendEvent(TimeSeriousBusListener listener) {
+                    listener.serverAdded(s);
+                }
+            });
         }
     }
 
@@ -61,12 +62,16 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
         return Collections.emptyList();
     }
 
-    private class RootContextBusListener extends TimeSeriousBusListenerAdapter {
+    private class AddServerBusListener extends TimeSeriousBusListenerAdapter {
 
         //add a time series server context when a new server is created
         public void serverAdded(TimeSeriesServer s) {
             TimeSeriesServerContext context = new TimeSeriesServerContext(s);
             TimeSeriousRootContext.this.addChild(context);
+
+            new LoadSeriesFromServerCommand(
+                TimeSeriousRootContext.this
+            ).execute(s);
         }
     }
 }

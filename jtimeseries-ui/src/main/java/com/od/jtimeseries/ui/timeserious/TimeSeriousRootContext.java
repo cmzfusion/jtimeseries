@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
@@ -25,6 +26,8 @@ import java.util.List;
  */
 public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements ConfigAware {
 
+    private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator(this);
+
     public TimeSeriousRootContext() {
         super("TmeSeriousRootContext", "Root context for TimeSerious application");
         addBusListener();
@@ -37,6 +40,10 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
         );
     }
 
+    public DisplayNameCalculator getDisplayNameCalculator() {
+        return displayNameCalculator;
+    }
+
     public void prepareConfigForSave(TimeSeriousConfig config) {
         List<TimeSeriesServerContext> serverContexts = findAll(TimeSeriesServerContext.class).getAllMatches();
 
@@ -45,6 +52,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
             serverConfigs.add(new TimeSeriesServerConfig(c));
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
+        config.setDisplayNamePatterns(displayNameCalculator.getDisplayNamePatterns());
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
@@ -56,6 +64,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
                 }
             });
         }
+        displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -70,7 +79,8 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
             TimeSeriousRootContext.this.addChild(context);
 
             new LoadSeriesFromServerCommand(
-                TimeSeriousRootContext.this
+                TimeSeriousRootContext.this,
+                displayNameCalculator
             ).execute(s);
         }
     }

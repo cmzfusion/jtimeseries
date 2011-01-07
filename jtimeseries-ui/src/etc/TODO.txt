@@ -1,6 +1,4 @@
 
-Icon for table columns toolbar button
-
 send to visualizer action in main series tree
 drag and drop series to visualizer
 

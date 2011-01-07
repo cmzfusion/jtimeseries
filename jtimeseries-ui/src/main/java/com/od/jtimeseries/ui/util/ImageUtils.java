@@ -45,7 +45,7 @@ public class ImageUtils {
     public static ImageIcon CANCEL_16x16 = getImageIcon("/images/cancel16x16.png");
     public static ImageIcon DISPLAY_NAME_16x16 = getImageIcon("/images/displayName16x16.png");
     public static ImageIcon OK_16x16 = getImageIcon("/images/ok16x16.png");
-
+    public static ImageIcon TABLE_COLUMN_ADD_16x16 = getImageIcon("/images/table_column_add_16x16.png");
 
     public static ImageIcon getImageIcon(String name) {
         ImageIcon imageIcon = null;

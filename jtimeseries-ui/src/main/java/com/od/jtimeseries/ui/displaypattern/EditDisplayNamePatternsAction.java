@@ -40,11 +40,15 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
     private List<DisplayPatternDialog.DisplayPatternListener> displayPatternListeners = new ArrayList<DisplayPatternDialog.DisplayPatternListener>();
 
     public EditDisplayNamePatternsAction(TimeSeriesContext rootContext, Component componentToPositionDialog) {
+        this(rootContext, componentToPositionDialog, new DisplayNameCalculator(rootContext));
+    }
+
+    public EditDisplayNamePatternsAction(TimeSeriesContext rootContext, Component componentToPositionDialog, DisplayNameCalculator displayNameCalculator) {
         super("Display Name Patterns", ImageUtils.DISPLAY_NAME_16x16);
         this.componentToPositionDialog = componentToPositionDialog;
 
         //the calculator stores the list of patterns and is responsible for applying them to timeseries
-        this.displayNameCalculator = new DisplayNameCalculator(rootContext);
+        this.displayNameCalculator = displayNameCalculator;
     }
 
     public void addDisplayPatternListener(DisplayPatternDialog.DisplayPatternListener l) {

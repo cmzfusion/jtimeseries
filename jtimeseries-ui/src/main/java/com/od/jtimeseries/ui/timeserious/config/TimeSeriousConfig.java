@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious.config;
 
+import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import java.awt.*;
@@ -15,10 +16,10 @@ import java.util.List;
 public class TimeSeriousConfig {
 
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
-
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
+    private List<DisplayNamePattern> displayNamePatterns;
 
     public Rectangle getFrameLocation(String frameName) {
         return frameLocations.get(frameName);
@@ -52,12 +53,24 @@ public class TimeSeriousConfig {
         this.serverConfigs = serverConfigs;
     }
 
-    /*
+    public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
+        this.displayNamePatterns = displayNamePatterns;
+    }
+
+    public List<DisplayNamePattern> getDisplayNamePatterns() {
+        return displayNamePatterns;
+    }
+
+    //the readResolve method allows us to handle migrations where we add fields which need to
+    //be initialised - xstream sets the fields null even if a default is
+    //assigned when the field is defined
     private Object readResolve() {
-        if ( serverConfigs == null) {
+        if (serverConfigs == null) {
             serverConfigs = new LinkedList<TimeSeriesServerConfig>();
+        }
+        if (displayNamePatterns == null) {
+            displayNamePatterns = new LinkedList<DisplayNamePattern>();
         }
         return this;
     }
-    */
 }

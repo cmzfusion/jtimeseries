@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -45,6 +46,7 @@ public class ColumnSelectionDialog extends JDialog {
         this.tableColumnManager = tableColumnManager;
         buildDialog();
         setLocationRelativeTo(parentComponent);
+        setIconImage(ImageUtils.TABLE_COLUMN_ADD_16x16.getImage());
     }
 
     private void buildDialog() {

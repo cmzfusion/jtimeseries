@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
@@ -31,10 +32,12 @@ public class MainSeriesSelector extends JPanel {
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private TimeSeriesContext rootContext;
     private ApplicationActionModels applicationActionModels;
+    private DisplayNameCalculator displayNameCalculator;
 
-    public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels) {
+    public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator) {
         this.rootContext = rootContext;
         this.applicationActionModels = applicationActionModels;
+        this.displayNameCalculator = displayNameCalculator;
         selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
             UIPropertiesTimeSeries.class
@@ -90,7 +93,7 @@ public class MainSeriesSelector extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             java.util.List<TimeSeriesServerContext> serverContexts = getActionModel().getSelected(TimeSeriesServerContext.class);
-            LoadSeriesFromServerCommand l = new LoadSeriesFromServerCommand(rootContext, null );
+            LoadSeriesFromServerCommand l = new LoadSeriesFromServerCommand(rootContext, displayNameCalculator );
             for ( TimeSeriesServerContext c : serverContexts ) {
                 l.execute(c.getServer());
             }

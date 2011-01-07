@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
@@ -37,11 +38,16 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
     private NewServerAction newServerAction;
+    private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
     private UiTimeSeriesServerDictionary serverDictionary;
 
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
-        this.seriesSelector = new MainSeriesSelector(rootContext, actionModels);
+        this.seriesSelector = new MainSeriesSelector(
+            rootContext,
+            actionModels,
+            rootContext.getDisplayNameCalculator()
+        );
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -54,6 +60,11 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
         newServerAction = new NewServerAction(this, rootContext);
+        editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
+            rootContext,
+            TimeSeriousMainFrame.this,
+            rootContext.getDisplayNameCalculator()
+        );
     }
 
     private void addListeners() {
@@ -72,6 +83,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private void createToolBar() {
         mainToolBar.add(newVisualizerAction);
         mainToolBar.add(newServerAction);
+        mainToolBar.add(editDisplayNamePatternsAction);
     }
 
     private void initializeFrame() {

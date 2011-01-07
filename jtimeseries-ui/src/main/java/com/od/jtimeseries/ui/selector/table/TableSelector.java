@@ -25,6 +25,7 @@ import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -78,6 +79,8 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
             public ShowColumnSelectionDialogAction() {
                 putValue(NAME, "Select Columns");
+                putValue(SMALL_ICON, ImageUtils.TABLE_COLUMN_ADD_16x16);
+                putValue(SHORT_DESCRIPTION, "Select Columns");
             }
 
             public void actionPerformed(ActionEvent e) {

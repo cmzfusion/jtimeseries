@@ -22,10 +22,8 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
-import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,22 +37,17 @@ import java.util.List;
  */
 public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extends TitleLabelPanel {
 
-    protected java.util.List<SelectorPanelListener<E>> selectedSeries = new ArrayList<SelectorPanelListener<E>>();
     private TimeSeriesContext rootContext;
-    private ListSelectionActionModel<E> seriesActionModel;
+    private IdentifiableListActionModel selectionsActionModel;
     private SelectorActionFactory selectorActionFactory = new SelectorActionFactory() {
         public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
             return Collections.emptyList();
         }
     };
 
-    public SelectorComponent(TimeSeriesContext rootContext, ListSelectionActionModel<E> seriesActionModel) {
+    public SelectorComponent(TimeSeriesContext rootContext, IdentifiableListActionModel selectionsActionModel) {
         this.rootContext = rootContext;
-        this.seriesActionModel = seriesActionModel;
-    }
-
-    public void addSelectorListener(SelectorPanelListener<E> seriesSelectionListener) {
-        selectedSeries.add(seriesSelectionListener);
+        this.selectionsActionModel = selectionsActionModel;
     }
 
     public SelectorActionFactory getSelectorActionFactory() {
@@ -65,22 +58,8 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         this.selectorActionFactory = selectorActionFactory;
     }
 
-    protected void fireSelectedForDescription(E m) {
-        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(selectedSeries);
-        for ( SelectorPanelListener<E> l : snapshot) {
-            l.seriesSelectedForDescription(m);
-        }
-    }
-
-    protected void fireSelectedForDescription(TimeSeriesContext m) {
-        java.util.List<SelectorPanelListener<E>> snapshot = new ArrayList<SelectorPanelListener<E>>(selectedSeries);
-        for ( SelectorPanelListener<E> l : snapshot) {
-            l.contextSelectedForDescription(m);
-        }
-    }
-
-    protected ListSelectionActionModel<E> getSeriesActionModel() {
-        return seriesActionModel;
+    protected IdentifiableListActionModel getSelectionsActionModel() {
+        return selectionsActionModel;
     }
 
     protected abstract void addContextTreeListener();
@@ -97,20 +76,6 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         } finally {
             rootContext.getTreeLock().readLock().unlock();
         }
-    }
-
-    public static interface SelectorPanelListener<E extends UIPropertiesTimeSeries> {
-
-        void seriesSelectedForDescription(E s);
-
-        void contextSelectedForDescription(TimeSeriesContext m);
-    }
-
-    public static class SelectorPanelListenerAdapter<E extends UIPropertiesTimeSeries> implements SelectorPanelListener<E> {
-
-        public void seriesSelectedForDescription(E s) {}
-
-        public void contextSelectedForDescription(TimeSeriesContext m) {}
     }
 
     public static <E> List<E> getAffectedSeries(Class seriesClass, IdentifiableTreeEvent contextTreeEvent) {

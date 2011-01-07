@@ -19,18 +19,18 @@
 package com.od.jtimeseries.ui.selector;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ListSelectionActionModel;
-import com.od.swing.action.ModelDrivenAction;
 import com.od.swing.util.AwtSafeListener;
 
 
@@ -63,7 +63,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private Box titleBox;
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
-    private ListSelectionActionModel<E> seriesSelectionActionModel;
+    private IdentifiableListActionModel seriesSelectionActionModel;
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
@@ -80,7 +80,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         this.seriesClass = seriesClass;
         this.selectionList = new SeriesSelectionList<E>();
         setupTimeseries();
-        seriesSelectionActionModel = new ListSelectionActionModel<E>();
+        seriesSelectionActionModel = new IdentifiableListActionModel();
         treeSelector = new TreeSelector<E>(seriesSelectionActionModel, context, seriesClass);
         tableSelector = new TableSelector<E>(seriesSelectionActionModel, context, selectionText, seriesClass);
         createSelectorPanel();
@@ -100,7 +100,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setSelectorActionFactory(selectorActionFactory);
     }
 
-    public ListSelectionActionModel<E> getSeriesSelectionActionModel() {
+    public IdentifiableListActionModel getSeriesSelectionActionModel() {
         return seriesSelectionActionModel;
     }
 
@@ -129,8 +129,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     }
 
     private void addListeners() {
-        treeSelector.addSelectorListener(descriptionSettingSelectorListener);
-        tableSelector.addSelectorListener(descriptionSettingSelectorListener);
 
         context.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
@@ -259,10 +257,21 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         cardLayout.show(selectorPanel, "tree");
     }
 
-    private class DescriptionListener<E extends UIPropertiesTimeSeries> extends SelectorComponent.SelectorPanelListenerAdapter<E> {
+    private class DescriptionListener implements ActionModelListener {
 
-        public void seriesSelectedForDescription(E s) {
-            seriesDescriptionPanel.setSelectedSeries(s);
+        IdentifiableListActionModel seriesSelectionActionModel = getSeriesSelectionActionModel();
+
+        public DescriptionListener() {
+            seriesSelectionActionModel.addActionModelListener(this);
+        }
+
+        public void actionStateUpdated() {
+            if ( seriesSelectionActionModel.isModelValid() ) {
+                Identifiable i = seriesSelectionActionModel.getSelected().get(0);
+                if ( seriesClass.isAssignableFrom(i.getClass())) {
+                    seriesDescriptionPanel.setSelectedSeries((UIPropertiesTimeSeries)i);
+                }
+            }
         }
     }
 

@@ -21,11 +21,11 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.swing.action.ListSelectionActionModel;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -54,11 +54,11 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private TableColumnManager<E> tableColumnManager;
     private JToolBar toolbar = new JToolBar();
 
-    public TableSelector(ListSelectionActionModel<E> seriesActionModel,
+    public TableSelector(IdentifiableListActionModel selectionsActionModel,
                          TimeSeriesContext rootContext,
                          String selectionText,
                          Class<E> seriesClass) {
-        super(rootContext, seriesActionModel);
+        super(rootContext, selectionsActionModel);
         this.rootContext = rootContext;
         this.selectionText = selectionText;
         this.seriesClass = seriesClass;
@@ -123,7 +123,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
             new SelectorPopupMouseListener(this) {
 
                 protected List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent) {
-                    return new LinkedList<Identifiable>(getSeriesActionModel().getSelected());
+                    return new LinkedList<Identifiable>(getSelectionsActionModel().getSelected());
                 }
 
                 protected SelectorComponent getSelectorComponent() {
@@ -148,8 +148,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
                     if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
                         int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),timeSeriesTable.getSelectedRow());
                         E series = tableModel.getObject(modelRow);
-                        getSeriesActionModel().setSelected(series);
-                        fireSelectedForDescription(series);
+                        getSelectionsActionModel().setSelected(series);
                     }
                 }
             }

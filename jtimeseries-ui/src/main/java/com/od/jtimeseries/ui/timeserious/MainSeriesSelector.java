@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
@@ -52,6 +53,8 @@ public class MainSeriesSelector extends JPanel {
                     applicationActionModels.getVisualizerSelectionActionModel(),
                     selectionPanel.getSeriesSelectionActionModel());
 
+        //private Action refreshServerAction = new RefreshServerSeriesAction();
+
         public java.util.List<Action> getActions(SelectorComponent s, java.util.List<Identifiable> selectedIdentifiable) {
             return Collections.singletonList(
                     addSeriesAction
@@ -59,11 +62,21 @@ public class MainSeriesSelector extends JPanel {
         }
     }
 
-    private class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<ListSelectionActionModel<UIPropertiesTimeSeries>> {
+    private class RefreshServerSeriesAction extends ModelDrivenAction<ListSelectionActionModel<Identifiable>> {
+
+        public RefreshServerSeriesAction(ListSelectionActionModel<Identifiable> actionModel) {
+            super(actionModel);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+        }
+    }
+
+    private class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
         private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
-        public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, ListSelectionActionModel<UIPropertiesTimeSeries> actionModel) {
+        public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
             super(actionModel, "Add to Visualizer", ImageUtils.REMOTE_CHART_16x16);
             this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         }

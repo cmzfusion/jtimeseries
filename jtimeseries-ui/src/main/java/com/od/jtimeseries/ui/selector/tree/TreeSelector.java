@@ -19,13 +19,13 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
-import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.progress.AnimatedIconTree;
 import com.od.swing.util.AwtSafeListener;
 
@@ -63,8 +63,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private ContextNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
 
-    public TreeSelector(ListSelectionActionModel<E> seriesActionModel, TimeSeriesContext rootContext, Class seriesClass) {
-        super(rootContext, seriesActionModel);
+    public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, Class seriesClass) {
+        super(rootContext, selectionsActionModel);
         this.rootContext = rootContext;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
@@ -286,12 +286,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         public void valueChanged(TreeSelectionEvent e) {
             Object o = e.getPath().getLastPathComponent();
-            if ( o instanceof SeriesTreeNode ) {
-                getSeriesActionModel().setSelected(((SeriesTreeNode<E>)o).getTimeSeries());
-                fireSelectedForDescription(((SeriesTreeNode<E>)o).getTimeSeries());
-            } else if ( o instanceof ContextTreeNode ) {
-                fireSelectedForDescription(((ContextTreeNode)o).getContext());
-            }
+            getSelectionsActionModel().setSelected(((AbstractSeriesSelectionTreeNode)o).getIdentifiable());
         }
     }
 

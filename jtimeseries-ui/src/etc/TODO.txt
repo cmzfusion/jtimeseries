@@ -1,9 +1,5 @@
 
 Icon for table columns toolbar button
-Save server information and refresh servers on restart
-
-Handle fail to connect to server, server state stale
-Add reconnect to server action
 
 send to visualizer action in main series tree
 drag and drop series to visualizer
@@ -14,11 +10,7 @@ restrict time range in visualizer
 
 display name calculator
 
-fix to show charts correctly on startup
-
 store split pane position for tree and table
-
-remove server action
 
 auto populate visualizer by path pattern
 
@@ -33,6 +25,8 @@ named visualizers
 visualizer title on visualizer frame / iconified state
 
 colour schemes
+
+createContext - getOrCreateContext
 
 
 

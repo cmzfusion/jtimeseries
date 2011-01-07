@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActionModel> {
 
     public NewVisualizerAction(DesktopSelectionActionModel m) {
-        super(m, "New Visualizer", ImageUtils.SERIES_ICON_16x16);
+        super(m, "New Visualizer", ImageUtils.FRAME_ICON_16x16);
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }
 

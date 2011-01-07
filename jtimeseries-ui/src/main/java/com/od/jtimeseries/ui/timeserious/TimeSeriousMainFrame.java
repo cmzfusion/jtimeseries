@@ -76,7 +76,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private void initializeFrame() {
         setTitle("TimeSerious");
-        setIconImage(ImageUtils.SERIES_ICON_16x16.getImage());
+        setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 

@@ -26,7 +26,7 @@ public class VisualizerInternalFrame extends JInternalFrame {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
         visualizer.setToolbarVisible(false);
-        setFrameIcon(ImageUtils.SERIES_ICON_16x16);
+        setFrameIcon(ImageUtils.FRAME_ICON_16x16);
         getContentPane().add(visualizer);
         setSize(800,600);
 

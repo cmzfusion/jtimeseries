@@ -35,7 +35,7 @@ class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSel
     }
 
     protected Icon getIcon() {
-        return ImageUtils.REMOTE_CHART_16x16;
+        return ImageUtils.SERIES_ICON_16x16;
     }
 
     @Override

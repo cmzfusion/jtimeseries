@@ -106,7 +106,7 @@ public class MainSeriesSelector extends JPanel {
         private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
         public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
-            super(actionModel, "Add to Visualizer", ImageUtils.REMOTE_CHART_16x16);
+            super(actionModel, "Add to Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
             this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         }
 

@@ -87,12 +87,16 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
 
         ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
         series.putAllProperties(result.getSummaryStatsProperties());
-        c.addChild(series);
 
-        //must do this after adding the series to the context because the contextPath will not
-        //be complete until this is done, and the name calculation is based on the path
-        if ( displayNameCalculator != null) {
-            displayNameCalculator.setDisplayName(series);
+        //TODO - should we add extra handling if series already exists in target?
+        if ( ! c.containsChildWithId(series.getId())) {
+            c.addChild(series);
+
+            //must do this after adding the series to the context because the contextPath will not
+            //be complete until this is done, and the name calculation is based on the path
+            if ( displayNameCalculator != null) {
+                displayNameCalculator.setDisplayName(series);
+            }
         }
     }
 

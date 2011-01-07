@@ -287,11 +287,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         public void valueChanged(TreeSelectionEvent e) {
             List<Identifiable> selections = new LinkedList<Identifiable>();
-            for ( TreePath p : tree.getSelectionPaths()) {
-                AbstractSeriesSelectionTreeNode o = (AbstractSeriesSelectionTreeNode)p.getLastPathComponent();
-                selections.add(o.getIdentifiable());
+            TreePath[] paths = tree.getSelectionPaths();
+            if ( paths != null ) {
+                for ( TreePath p : tree.getSelectionPaths()) {
+                    AbstractSeriesSelectionTreeNode o = (AbstractSeriesSelectionTreeNode)p.getLastPathComponent();
+                    selections.add(o.getIdentifiable());
+                }
+                getSelectionsActionModel().setSelected(selections);
             }
-            getSelectionsActionModel().setSelected(selections);
         }
     }
 

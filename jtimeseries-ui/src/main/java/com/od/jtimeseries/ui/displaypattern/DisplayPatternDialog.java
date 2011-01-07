@@ -45,6 +45,7 @@ public class DisplayPatternDialog extends JDialog {
         setModal(false);
         setSize(DIALOG_WIDTH, 600);
         addComponents(patterns);
+        setIconImage(ImageUtils.DISPLAY_NAME_16x16.getImage());
     }
 
     public void addDisplayPatternListener(DisplayPatternListener l) {

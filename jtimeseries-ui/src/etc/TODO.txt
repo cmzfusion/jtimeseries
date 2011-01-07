@@ -6,15 +6,13 @@ visualizer should not require server dictionary if download is disabled
 
 restrict time range in visualizer
 
-display name calculator
+display name calculator apply to visualizers
 
 store split pane position for tree and table
 
 auto populate visualizer by path pattern
 
 select for charting by criteria
-
-multi select in selector
 
 default visualizer to table view
 
@@ -26,6 +24,9 @@ colour schemes
 
 createContext - getOrCreateContext
 
+check actions for multi selection
+
+visualizer has duplicate logic for adding series
 
 
 

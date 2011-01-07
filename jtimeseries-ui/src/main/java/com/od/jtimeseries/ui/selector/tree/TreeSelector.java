@@ -79,7 +79,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         tree.setShowsRootHandles(true);
         autoExpandTree();
 
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         cellRenderer = new SeriesTreeCellRenderer();
         tree.setCellRenderer(cellRenderer);
         tree.addTreeSelectionListener(new SeriesTreeSelectionListener());
@@ -284,9 +284,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private class SeriesTreeSelectionListener implements TreeSelectionListener {
 
+
         public void valueChanged(TreeSelectionEvent e) {
-            Object o = e.getPath().getLastPathComponent();
-            getSelectionsActionModel().setSelected(((AbstractSeriesSelectionTreeNode)o).getIdentifiable());
+            List<Identifiable> selections = new LinkedList<Identifiable>();
+            for ( TreePath p : tree.getSelectionPaths()) {
+                AbstractSeriesSelectionTreeNode o = (AbstractSeriesSelectionTreeNode)p.getLastPathComponent();
+                selections.add(o.getIdentifiable());
+            }
+            getSelectionsActionModel().setSelected(selections);
         }
     }
 

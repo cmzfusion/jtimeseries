@@ -143,15 +143,19 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     }
 
     private void addSeriesSelectionListener() {
-        timeSeriesTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        timeSeriesTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         timeSeriesTable.getSelectionModel().addListSelectionListener(
             new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
-                        int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),timeSeriesTable.getSelectedRow());
-                        E series = tableModel.getObject(modelRow);
-                        getSelectionsActionModel().setSelected(series);
+                        int[] selectedRows = timeSeriesTable.getSelectedRows();
+                        List<Identifiable> selectedSeries = new LinkedList<Identifiable>();
+                        for (int selectedRow : selectedRows) {
+                            int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),selectedRow);
+                            selectedSeries.add(tableModel.getObject(modelRow));
+                        }
+                        getSelectionsActionModel().setSelected(selectedSeries);
                     }
                 }
             }

@@ -214,12 +214,12 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createToolbar() {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
-            new ShowDownloadSeriesDialogAction(
-                new NewSeriesHandler(),
-                timeSeriesServerDictionary,
-                editDisplayNameAction.getDisplayNameCalculator(),
-                this
-            )
+                new ShowDownloadSeriesDialogAction(
+                        new NewSeriesHandler(),
+                        timeSeriesServerDictionary,
+                        editDisplayNameAction.getDisplayNameCalculator(),
+                        this
+                )
         ));
         toolbar.add(Box.createHorizontalStrut(5));
         toolbar.add(new JButton(editDisplayNameAction));
@@ -251,7 +251,11 @@ public class TimeSeriesVisualizer extends JPanel {
             TimeSeriesContext context = rootContext.createContext(c.getParentPath());
             try {
                 RemoteHttpTimeSeries remoteHttpTimeSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(c);
-                context.addChild(new ChartingTimeSeries(remoteHttpTimeSeries, c));
+
+                ChartingTimeSeries s = new ChartingTimeSeries(remoteHttpTimeSeries, c);
+                if ( ! context.containsChildWithId(s.getId())) {
+                    context.addChild(s);
+                }
             } catch (MalformedURLException e) {
                 logMethods.logError("Failed to reload time series with URL " + c.getTimeSeriesUrl() + " - bad URL", e);
             }

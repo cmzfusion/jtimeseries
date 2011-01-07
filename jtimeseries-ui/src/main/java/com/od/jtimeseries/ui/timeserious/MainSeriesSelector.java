@@ -53,19 +53,39 @@ public class MainSeriesSelector extends JPanel {
                     selectionPanel.getSelectionActionModel());
 
         private Action refreshServerAction = new RefreshServerSeriesAction(selectionPanel.getSelectionActionModel());
+        private Action removeServerAction = new RemoveServerAction(selectionPanel.getSelectionActionModel());
 
         public java.util.List<Action> getActions(SelectorComponent s, java.util.List<Identifiable> selectedIdentifiable) {
             return Arrays.asList(
                     addSeriesAction,
-                    refreshServerAction
+                    refreshServerAction,
+                    removeServerAction
             );
+        }
+    }
+
+    private class RemoveServerAction extends ModelDrivenAction<IdentifiableListActionModel> {
+
+        public RemoveServerAction(IdentifiableListActionModel actionModel) {
+            super(actionModel, "Remove server", ImageUtils.TIMESERIES_SERVER_REMOVE_ICON_16x16);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            java.util.List<TimeSeriesServerContext> serverContexts = getActionModel().getSelected(TimeSeriesServerContext.class);
+            for ( TimeSeriesServerContext s : serverContexts ) {
+                rootContext.removeChild(s);
+            }
+        }
+
+        public boolean isModelStateActionable() {
+            return getActionModel().isSelectionLimitedToType(TimeSeriesServerContext.class);
         }
     }
 
     private class RefreshServerSeriesAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
         public RefreshServerSeriesAction(IdentifiableListActionModel actionModel) {
-            super(actionModel, "Refresh Series from Server", ImageUtils.TIMESERIES_SERVER_RECONNECT_ICON_16x16);
+            super(actionModel, "Refresh Series from Server", ImageUtils.TIMESERIES_SERVER_REFRESH_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {

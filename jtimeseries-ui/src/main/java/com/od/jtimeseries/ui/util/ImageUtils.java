@@ -34,7 +34,8 @@ public class ImageUtils {
     public static ImageIcon REMOVE_ICON_16x16 = getImageIcon("/images/selection_delete16x16.png");
     public static ImageIcon CONNECT_ICON_16x16 = getImageIcon("/images/connect16x16.png");
     public static ImageIcon TIMESERIES_SERVER_OFFLINE_ICON_16x16 = getImageIcon("/images/server_client2_offline_16x16.png");
-    public static ImageIcon TIMESERIES_SERVER_RECONNECT_ICON_16x16 = getImageIcon("/images/server_client2_reconnect_16x16.png");
+    public static ImageIcon TIMESERIES_SERVER_REFRESH_ICON_16x16 = getImageIcon("/images/server_client2_refresh_16x16.png");
+    public static ImageIcon TIMESERIES_SERVER_REMOVE_ICON_16x16 = getImageIcon("/images/server_client2_remove_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_24x24 = getImageIcon("/images/server_client2_24x24.png");
     public static ImageIcon ADD_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_add_16x16.png");

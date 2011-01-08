@@ -1,7 +1,9 @@
 package com.od.jtimeseries.ui.selector.action;
 
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
@@ -13,32 +15,37 @@ import java.util.List;
 * Created by IntelliJ IDEA.
 * User: Nick Ebbutt
 */
-public class ReconnectSeriesAction<E extends UIPropertiesTimeSeries> extends ModelDrivenAction<ListSelectionActionModel<E>> {
+public class ReconnectSeriesAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
     private JComponent componentToRepaint;
 
-    public ReconnectSeriesAction(JComponent componentToRepaint, ListSelectionActionModel<E> seriesSelectionModel) {
-        super(seriesSelectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
+    public ReconnectSeriesAction(JComponent componentToRepaint, IdentifiableListActionModel selectionModel) {
+        super(selectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
         this.componentToRepaint = componentToRepaint;
     }
 
     public void actionPerformed(ActionEvent e) {
-        List<E> series = getActionModel().getSelected();
-        for ( E s : series) {
-           if ( s.isStale()) {
-               s.setStale(false);
+        List<Identifiable> series = getActionModel().getSelected();
+        for ( Identifiable s : series) {
+           if ( s instanceof UIPropertiesTimeSeries) {
+               if (((UIPropertiesTimeSeries)s).isStale()) {
+                    ((UIPropertiesTimeSeries)s).setStale(false);
+               }
            }
         }
         componentToRepaint.repaint();
     }
 
     protected boolean isModelStateActionable() {
-        for ( E s : getActionModel().getSelected()) {
-            if (s.isStale() ) {
-                return true;
+        boolean result = false;
+        if (getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class) ) {
+            result = true;
+            //actionable if all selected are stale
+            for (Identifiable i : getActionModel().getSelected()) {
+                result &= ((UIPropertiesTimeSeries)i).isStale();
             }
         }
-        return false;
+        return result;
     }
 
 }

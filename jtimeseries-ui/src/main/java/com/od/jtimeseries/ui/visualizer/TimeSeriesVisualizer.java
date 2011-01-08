@@ -278,6 +278,7 @@ public class TimeSeriesVisualizer extends JPanel {
             for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
                 if ( ! serverContextsCreated ) {
                     createServerContexts(s);
+                    serverContextsCreated = true;
                 }
 
                 TimeSeriesContext c = rootContext.createContext(s.getParentPath());

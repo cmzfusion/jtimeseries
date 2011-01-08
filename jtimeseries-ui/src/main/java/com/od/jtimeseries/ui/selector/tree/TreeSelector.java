@@ -89,6 +89,13 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         //add(toolbar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
+        setupDragAndDrop();
+    }
+
+    private void setupDragAndDrop() {
+        tree.setDragEnabled(true);
+        tree.setDropMode(DropMode.ON);
+        tree.setTransferHandler(new TreeSelectorTransferHandler(getSelectionsActionModel()));
     }
 
     public void setSeriesSelectionEnabled(boolean enabled) {

@@ -21,6 +21,9 @@ package com.od.jtimeseries.context.impl;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.context.ContextQueries;
+import com.od.jtimeseries.util.identifiable.DefaultIdentifiableQueries;
+import com.od.jtimeseries.util.identifiable.DefaultQueryResult;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
@@ -29,15 +32,14 @@ import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-public class DefaultContextQueries implements ContextQueries {
+public class DefaultContextQueries extends DefaultIdentifiableQueries implements ContextQueries {
 
     private TimeSeriesContext timeSeriesContext;
 
     public DefaultContextQueries(TimeSeriesContext timeSeriesContext) {
+        super(timeSeriesContext);
         this.timeSeriesContext = timeSeriesContext;
     }
 
@@ -206,38 +208,6 @@ public class DefaultContextQueries implements ContextQueries {
         return result;
     }
 
-    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
-        List<E> children = new ArrayList<E>();
-        addAllIdentifiableMatchingClassRecursive(children, timeSeriesContext, assignableToClass);
-        return new DefaultQueryResult<E>(children);
-    }
-
-    public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
-        return new DefaultQueryResult<E>(
-            findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
-        );
-    }
-
-    private <E extends Identifiable> List<E> findAllMatchingSearchPattern(String searchPattern, List<E> identifiables) {
-        Pattern p = Pattern.compile(searchPattern);
-        List<E> result = new ArrayList<E>();
-        for ( E i : identifiables) {
-            if ( p.matcher((i).getPath()).find() ) {
-                result.add(i);
-            }
-        }
-        return result;
-    }
-
-    private <E extends Identifiable> void addAllIdentifiableMatchingClassRecursive(List<E> l, Identifiable identifiable, Class<E> clazz) {
-        for ( Identifiable i : identifiable.getChildren()) {
-            if ( clazz.isAssignableFrom(i.getClass())) {
-                l.add((E)i);
-            }
-            addAllIdentifiableMatchingClassRecursive(l, i, clazz);
-        }
-    }
-
     private abstract class QueryByCapture<E extends Identifiable> {
 
         public List<E> findByCaptures() {
@@ -260,27 +230,4 @@ public class DefaultContextQueries implements ContextQueries {
         abstract boolean meetsCriteria(Capture c);
     }
 
-    private static class DefaultQueryResult<E extends Identifiable> implements QueryResult<E> {
-        private List<E> results;
-
-        public DefaultQueryResult(List<E> results) {
-            this.results = new LinkedList<E>(results);
-        }
-
-        public E getFirstMatch() {
-            return results.size() > 0 ? results.get(0) : null;
-        }
-
-        public List<E> getAllMatches() {
-            return new LinkedList<E>(results);
-        }
-
-        public int getNumberOfMatches() {
-            return results.size();
-        }
-
-        public boolean removeFromResults(E result) {
-            return results.remove(result);
-        }
-    }
 }

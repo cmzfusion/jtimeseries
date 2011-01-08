@@ -33,8 +33,8 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
-import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 
 import java.util.*;
 
@@ -183,10 +183,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     protected <E extends Identifiable> E doCreate(String id, String description, Class<E> classType, Object... parameters) {
         E result;
-        if ( TimeSeriesContext.class.isAssignableFrom(classType)) {
-            result = getContextFactory().createContext(this, id, description, classType, parameters);
-        }
-        else if ( IdentifiableTimeSeries.class.isAssignableFrom(classType)) {
+        if ( IdentifiableTimeSeries.class.isAssignableFrom(classType)) {
             result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, classType, parameters);
         }
         else if ( ValueSource.class.isAssignableFrom(classType) ) {
@@ -287,14 +284,6 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
 
     protected QueryResult<Scheduler> findSchedulers_Locked(Triggerable triggerable) {
         return contextQueries.findSchedulers(triggerable);
-    }
-
-    protected <E extends Identifiable> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass) {
-        return contextQueries.findAll(assignableToClass);
-    }
-
-    protected <E extends Identifiable> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass) {
-        return contextQueries.findAll(searchPattern, assignableToClass);
     }
 
     public String toString() {

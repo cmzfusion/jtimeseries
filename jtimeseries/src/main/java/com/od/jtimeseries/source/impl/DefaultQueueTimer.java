@@ -23,6 +23,7 @@ import com.od.jtimeseries.source.QueueTimer;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 
 import java.util.List;
 import java.util.Properties;
@@ -185,5 +186,13 @@ public class DefaultQueueTimer implements QueueTimer {
 
     public void fireNodeChanged(Object changeDescription) {
         timingSource.fireNodeChanged("change");
+    }
+
+    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
+        return timingSource.findAll(assignableToClass);
+    }
+
+    public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
+        return timingSource.findAll(searchPattern, assignableToClass);
     }
 }

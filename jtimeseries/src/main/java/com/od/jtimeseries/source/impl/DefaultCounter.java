@@ -22,6 +22,7 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 
 import java.util.List;
 import java.util.Properties;
@@ -185,5 +186,13 @@ public class DefaultCounter implements Counter {
 
     public void fireNodeChanged(Object changeDescription) {
         simpleSource.fireNodeChanged("change");
+    }
+
+    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
+        return simpleSource.findAll(assignableToClass);
+    }
+
+    public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
+        return simpleSource.findAll(searchPattern, assignableToClass);
     }
 }

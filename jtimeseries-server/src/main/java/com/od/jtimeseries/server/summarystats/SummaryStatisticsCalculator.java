@@ -18,12 +18,12 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
+import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
@@ -81,7 +81,7 @@ public class SummaryStatisticsCalculator {
 
         private void runSummaryStatsLoop() {
             while(true) {
-                ContextQueries.QueryResult<IdentifiableTimeSeries> r = rootContext.findAllTimeSeries();
+                QueryResult<IdentifiableTimeSeries> r = rootContext.findAllTimeSeries();
                 int numberOfSeries = r.getNumberOfMatches();
 
                 if ( numberOfSeries == 0) {
@@ -92,7 +92,7 @@ public class SummaryStatisticsCalculator {
             }
         }
 
-        private void doRecalculations(ContextQueries.QueryResult<IdentifiableTimeSeries> r, int numberOfSeries) {
+        private void doRecalculations(QueryResult<IdentifiableTimeSeries> r, int numberOfSeries) {
             long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
             logMethods.logDebug("Summary statistics sleep time to caculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
 

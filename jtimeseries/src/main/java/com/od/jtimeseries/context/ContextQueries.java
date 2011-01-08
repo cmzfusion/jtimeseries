@@ -23,9 +23,8 @@ import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-
-import java.util.List;
+import com.od.jtimeseries.util.identifiable.IdentifiableQueries;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 
 /**
  * There is a many to many relationship between ValueSource and TimeSeries - the Capture is the mapping entity
@@ -41,7 +40,7 @@ import java.util.List;
  * in the case that more than one entity matches the search parameters only the first matching instance is returned,
  * and this result is not guaranteed to be consistent on subsequent searches.
  */
-public interface ContextQueries {
+public interface ContextQueries extends IdentifiableQueries {
 
     QueryResult<IdentifiableTimeSeries> findTimeSeries(CaptureCriteria criteria);
 
@@ -79,28 +78,9 @@ public interface ContextQueries {
     QueryResult<Scheduler> findSchedulers(Triggerable triggerable);
 
 
-    <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass);
-
-    <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
-
-
     public static interface CaptureCriteria {
         boolean isMatchingCapture(Capture c);
     }
 
-
-    public static interface QueryResult<E extends Identifiable> {
-
-        /**
-         * @return the first item matching the query, or null if there are no matches
-         */
-        E getFirstMatch();
-
-        List<E> getAllMatches();
-
-        int getNumberOfMatches();
-
-        boolean removeFromResults(E item);
-    }
 
 }

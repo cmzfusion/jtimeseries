@@ -130,4 +130,9 @@ public interface Identifiable {
      * fire an event to IdentifiableTreeListener to indicate this node has changed
      */
     void fireNodeChanged(Object changeDescription);
+
+    <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass);
+
+    <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
+
 }

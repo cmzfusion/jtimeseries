@@ -268,4 +268,27 @@ public abstract class LockingIdentifiable implements Identifiable {
     }
 
     protected abstract Identifiable getRoot_Locked();
+
+
+    public final <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
+        try {
+            getTreeLock().readLock().lock();
+            return findAll_Locked(assignableToClass);
+        } finally {
+            getTreeLock().readLock().unlock();
+        }
+    }
+
+    protected abstract <E extends Identifiable> QueryResult<E> findAll_Locked(Class<E> assignableToClass);
+
+    public final <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
+        try {
+            getTreeLock().readLock().lock();
+            return findAll_Locked(searchPattern, assignableToClass);
+        } finally {
+            getTreeLock().readLock().unlock();
+        }
+    }
+
+    protected abstract <E extends Identifiable> QueryResult<E> findAll_Locked(String searchPattern, Class<E> assignableToClass);
 }

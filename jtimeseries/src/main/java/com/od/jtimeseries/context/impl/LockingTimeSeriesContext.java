@@ -6,6 +6,7 @@ import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.ContextFactory;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
@@ -420,25 +421,4 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     protected abstract QueryResult<Scheduler> findSchedulers_Locked(Triggerable triggerable);
 
-    public final <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
-        try {
-            getTreeLock().readLock().lock();
-            return findAllChildren_Locked(assignableToClass);
-        } finally {
-            getTreeLock().readLock().unlock();
-        }
-    }
-
-    protected abstract <E extends Identifiable> QueryResult<E> findAllChildren_Locked(Class<E> assignableToClass);
-
-    public final <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
-        try {
-            getTreeLock().readLock().lock();
-            return findAllChildren_Locked(searchPattern, assignableToClass);
-        } finally {
-            getTreeLock().readLock().unlock();
-        }
-    }
-
-    protected abstract <E extends Identifiable> QueryResult<E> findAllChildren_Locked(String searchPattern, Class<E> assignableToClass);
 }

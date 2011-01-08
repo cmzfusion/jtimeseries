@@ -45,6 +45,7 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     private List<IdentifiableTreeListener> treeListeners = new CopyOnWriteArrayList<IdentifiableTreeListener>();
     private ChildTreeEventPropagator childEventPropagator = new ChildTreeEventPropagator();
+    private DefaultIdentifiableQueries queries = new DefaultIdentifiableQueries(this);
 
     public IdentifiableBase(Identifiable parent, String id, String description) {
         this(id, description);
@@ -344,6 +345,15 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     protected String getPathForChild(String id) {
         return getPath() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + id;
+    }
+
+
+    protected <E extends Identifiable> QueryResult<E> findAll_Locked(Class<E> assignableToClass) {
+        return queries.findAll(assignableToClass);
+    }
+
+    protected <E extends Identifiable> QueryResult<E> findAll_Locked(String searchPattern, Class<E> assignableToClass) {
+        return queries.findAll(searchPattern, assignableToClass);
     }
     
     //receive events from children, propogate them with updated path

@@ -75,7 +75,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
 
         //add a time series server context when a new server is created
         public void serverAdded(TimeSeriesServer s) {
-            TimeSeriesServerContext context = new TimeSeriesServerContext(s);
+            TimeSeriesServerContext context = new TimeSeriesServerContext(TimeSeriousRootContext.this, s);
             TimeSeriousRootContext.this.addChild(context);
 
             new LoadSeriesFromServerCommand(

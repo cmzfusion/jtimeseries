@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.download.panel;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.util.Displayable;
@@ -27,8 +28,8 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements
         }
     };
 
-    public TimeSeriesServerContext(TimeSeriesServer server) {
-        super(server.getDescription(), server.getDescription());
+    public TimeSeriesServerContext(TimeSeriesContext parentContext, TimeSeriesServer server) {
+        super(parentContext, server.getDescription(), server.getDescription());
         this.server = server;
         addServerListener(server);
     }

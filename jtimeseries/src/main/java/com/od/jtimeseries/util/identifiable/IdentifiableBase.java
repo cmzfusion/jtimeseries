@@ -318,7 +318,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         } else {
             //create the next context in the path, and recusively call create
             String nextNode = p.removeFirstNode();
-            Identifiable c = create(nextNode, nextNode, Identifiable.class);
+            Identifiable c = create(nextNode, nextNode, Identifiable.class, parameters);
             return c.create(p.getRemainingPath(), description, clazz, parameters);
         }
     }

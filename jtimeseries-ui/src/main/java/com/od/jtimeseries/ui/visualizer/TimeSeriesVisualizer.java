@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
-import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
@@ -72,7 +71,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private JToolBar toolbar;
     private TimeSeriesChart chart;
     private SeriesSelectionPanel<ChartingTimeSeries> seriesSelectionPanel;
-    private TimeSeriesContext rootContext = JTimeSeries.createRootContext();
+    private VisualizerRootContext rootContext = new VisualizerRootContext();
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -247,19 +246,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
-        for ( UiTimeSeriesConfig c : chartConfigs) {
-            TimeSeriesContext context = rootContext.createContext(c.getParentPath());
-            try {
-                RemoteHttpTimeSeries remoteHttpTimeSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(c);
-
-                ChartingTimeSeries s = new ChartingTimeSeries(remoteHttpTimeSeries, c);
-                if ( ! context.containsChildWithId(s.getId())) {
-                    context.addChild(s);
-                }
-            } catch (MalformedURLException e) {
-                logMethods.logError("Failed to reload time series with URL " + c.getTimeSeriesUrl() + " - bad URL", e);
-            }
-        }
+        rootContext.addChartConfigs(chartConfigs);
     }
 
     private void addSeriesSelectionListener() {
@@ -271,44 +258,49 @@ public class TimeSeriesVisualizer extends JPanel {
         });
     }
 
+    public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
+        rootContext.addSeries(selectedSeries);
+    }
+
     private class NewSeriesHandler implements ShowDownloadSeriesDialogAction.NewSeriesHandler {
 
         public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
-            boolean serverContextsCreated = false;
-            for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
-                if ( ! serverContextsCreated ) {
-                    createServerContexts(s);
-                    serverContextsCreated = true;
-                }
-
-                TimeSeriesContext c = rootContext.createContext(s.getParentPath());
-
-                RemoteHttpTimeSeries r = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(s.getId(), s.getDescription(), s.getTimeSeriesURL(), Time.minutes(1));
-                ChartingTimeSeries series = new ChartingTimeSeries(r);
-
-                //TODO we may want to flag the conflict up to the user
-                if ( ! c.containsChildWithId(s.getId())) {
-                    c.addChild(series);
-                }
-            }
+            rootContext.addSeries(selectedTimeSeries);
+//            boolean serverContextsCreated = false;
+//            for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
+//                if ( ! serverContextsCreated ) {
+//                    createServerContexts(s);
+//                    serverContextsCreated = true;
+//                }
+//
+//                TimeSeriesContext c = rootContext.createContext(s.getParentPath());
+//
+//                RemoteHttpTimeSeries r = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(s.getId(), s.getDescription(), s.getTimeSeriesURL(), Time.minutes(1));
+//                ChartingTimeSeries series = new ChartingTimeSeries(r);
+//
+//                //TODO we may want to flag the conflict up to the user
+//                if ( ! c.containsChildWithId(s.getId())) {
+//                    c.addChild(series);
+//                }
+//            }
         }
-
-        //If there are any server contexts in the hierarchy of source
-        //timeseries which don't exist locally, create them here
-        private void createServerContexts(UIPropertiesTimeSeries s) {
-            Identifiable i = s.getRoot();
-            if ( i instanceof ContextQueries ) {
-                List<TimeSeriesServerContext> serverContexts =
-                        ((ContextQueries)i).findAll(TimeSeriesServerContext.class).getAllMatches();
-                for (TimeSeriesServerContext c : serverContexts) {
-                    if ( ! rootContext.containsChildWithId(c.getId())) {
-                        rootContext.addChild(new TimeSeriesServerContext(
-                                c.getServer()
-                        ));
-                    }
-                }
-
-            }
-        }
+//
+//        //If there are any server contexts in the hierarchy of source
+//        //timeseries which don't exist locally, create them here
+//        private void createServerContexts(UIPropertiesTimeSeries s) {
+//            Identifiable i = s.getRoot();
+//            if ( i instanceof ContextQueries ) {
+//                List<TimeSeriesServerContext> serverContexts =
+//                        ((ContextQueries)i).findAll(TimeSeriesServerContext.class).getAllMatches();
+//                for (TimeSeriesServerContext c : serverContexts) {
+//                    if ( ! rootContext.containsChildWithId(c.getId())) {
+//                        rootContext.addChild(new TimeSeriesServerContext(
+//                                c.getServer()
+//                        ));
+//                    }
+//                }
+//
+//            }
+//        }
     }
 }

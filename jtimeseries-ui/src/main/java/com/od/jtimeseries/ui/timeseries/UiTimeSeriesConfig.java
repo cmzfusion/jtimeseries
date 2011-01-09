@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.util.JTimeSeriesConstants;
+
 import java.awt.*;
 
 /**
@@ -112,5 +114,9 @@ public class UiTimeSeriesConfig {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public String getPath() {
+        return getParentPath() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + getId();
     }
 }

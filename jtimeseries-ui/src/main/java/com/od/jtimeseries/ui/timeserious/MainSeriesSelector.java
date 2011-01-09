@@ -5,11 +5,8 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -115,16 +112,10 @@ public class MainSeriesSelector extends JPanel {
 
         public void actionPerformed(ActionEvent e) {
             java.util.List<UIPropertiesTimeSeries> selectedSeries = getActionModel().getSelected(UIPropertiesTimeSeries.class);
-            java.util.List<UiTimeSeriesConfig> configs = new LinkedList<UiTimeSeriesConfig>();
-            for ( UIPropertiesTimeSeries s : selectedSeries ) {
-                configs.add(new UiTimeSeriesConfig(s));
-            }
 
             VisualizerInternalFrame v = visualizerSelectionActionModel.getSelectedVisualizer();
             if ( v != null) {
-                v.getVisualizer().addChartConfigs(
-                    configs
-                );
+                v.getVisualizer().addTimeSeries(selectedSeries);
             }
         }
 

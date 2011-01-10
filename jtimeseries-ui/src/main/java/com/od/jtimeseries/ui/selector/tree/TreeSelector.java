@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
+import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -95,7 +96,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private void setupDragAndDrop() {
         tree.setDragEnabled(true);
         tree.setDropMode(DropMode.ON);
-        tree.setTransferHandler(new TreeSelectorTransferHandler(getSelectionsActionModel()));
+        tree.setTransferHandler(new SelectorTransferHandler(getSelectionsActionModel()));
+    }
+
+    public void setTransferHandler(TransferHandler newHandler) {
+        tree.setTransferHandler(newHandler);
     }
 
     public void setSeriesSelectionEnabled(boolean enabled) {

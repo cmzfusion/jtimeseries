@@ -18,14 +18,12 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
-import com.od.jtimeseries.context.ContextQueries;
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
 import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
@@ -41,11 +39,9 @@ import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.time.Time;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,6 +100,13 @@ public class TimeSeriesVisualizer extends JPanel {
             }
         };
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
+        seriesSelectionPanel.setTransferHandler(new SelectorTransferHandler(
+            seriesSelectionPanel.getSelectionActionModel()) {
+
+            protected void doImport(List<Identifiable> data) {
+                rootContext.addIdentifiables(data);
+            }
+        });
     }
 
     private void layoutVisualizer() {
@@ -259,13 +262,13 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
-        rootContext.addSeries(selectedSeries);
+        rootContext.addIdentifiables(selectedSeries);
     }
 
     private class NewSeriesHandler implements ShowDownloadSeriesDialogAction.NewSeriesHandler {
 
         public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
-            rootContext.addSeries(selectedTimeSeries);
+            rootContext.addIdentifiables(selectedTimeSeries);
 //            boolean serverContextsCreated = false;
 //            for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
 //                if ( ! serverContextsCreated ) {

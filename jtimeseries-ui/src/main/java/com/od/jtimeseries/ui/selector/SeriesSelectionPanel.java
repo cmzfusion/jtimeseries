@@ -99,6 +99,11 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setSelectorActionFactory(selectorActionFactory);
     }
 
+    public void setTransferHandler(TransferHandler h) {
+        treeSelector.setTransferHandler(h);
+        tableSelector.setTransferHandler(h);
+    }
+
     public IdentifiableListActionModel getSelectionActionModel() {
         return selectionActionModel;
     }

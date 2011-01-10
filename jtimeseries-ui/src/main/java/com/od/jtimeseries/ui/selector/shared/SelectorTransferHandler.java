@@ -1,7 +1,8 @@
-package com.od.jtimeseries.ui.selector.tree;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SeriesTransferable;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
@@ -14,11 +15,11 @@ import java.util.List;
 * Time: 10:05
 * To change this template use File | Settings | File Templates.
 */
-public class TreeSelectorTransferHandler extends TransferHandler {
+public class SelectorTransferHandler extends TransferHandler {
 
     private IdentifiableListActionModel selectionsModel;
 
-    public TreeSelectorTransferHandler(IdentifiableListActionModel selectionsModel) {
+    public SelectorTransferHandler(IdentifiableListActionModel selectionsModel) {
         this.selectionsModel = selectionsModel;
     }
 
@@ -48,17 +49,19 @@ public class TreeSelectorTransferHandler extends TransferHandler {
 
         // Fetch the Transferable and its data
         Transferable t = supp.getTransferable();
-        List data = null;
+        List<Identifiable> data = null;
         try {
-            data = (List)t.getTransferData(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            data = (List<Identifiable>)t.getTransferData(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        for (Object l : data) {
-            System.out.println("imported " + l);
-        }
+        doImport(data);
         return true;
+    }
+
+    protected void doImport(List<Identifiable> data) {
+
     }
 
 

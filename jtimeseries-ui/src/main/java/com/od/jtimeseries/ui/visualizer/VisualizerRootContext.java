@@ -16,10 +16,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,8 +36,14 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
         setContextFactory(new VisualizerContextFactory());
     }
 
-    public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
-        for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
+    public void addIdentifiables(List<? extends Identifiable> identifiables) {
+
+        List<UIPropertiesTimeSeries> series = new LinkedList<UIPropertiesTimeSeries>();
+        for ( Identifiable i : identifiables) {
+            series.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
+        }
+
+        for ( UIPropertiesTimeSeries s : series) {
             //TODO we may want to flag the conflict up to the user
             if ( get(s.getPath()) == null) {
                 create(s.getPath(), s.getDescription(), ChartingTimeSeries.class, s.getRoot());

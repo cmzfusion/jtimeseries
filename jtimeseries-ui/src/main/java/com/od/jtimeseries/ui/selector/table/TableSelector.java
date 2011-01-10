@@ -24,6 +24,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
+import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -50,7 +51,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private String selectionText;
     private Class<E> seriesClass;
     private BeanPerRowModel<E> tableModel;
-    private SortableTable timeSeriesTable;
+    private SortableTable table;
     private JPopupMenu tablePopupMenu;
     private TableColumnManager<E> tableColumnManager;
     private JToolBar toolbar = new JToolBar();
@@ -67,10 +68,11 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         createToolbar();
         setupSeries();
         createPopupMenu();
+        setupDragAndDrop();
 
         setLayout(new BorderLayout());
         add(toolbar, BorderLayout.NORTH);
-        add(new JScrollPane(timeSeriesTable), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
         addSeriesSelectionListener();
     }
 
@@ -95,6 +97,12 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         ColumnSelectionDialog d = new ColumnSelectionDialog(getFrameForComponent(this), this, getTableColumnManager());
         d.setVisible(true);
         d.dispose();
+    }
+
+    private void setupDragAndDrop() {
+        table.setDragEnabled(true);
+        table.setDropMode(DropMode.ON);
+        table.setTransferHandler(new SelectorTransferHandler(getSelectionsActionModel()));
     }
 
     private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {
@@ -122,7 +130,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     }
 
     private void createPopupMenu() {
-        timeSeriesTable.addMouseListener(
+        table.addMouseListener(
             new SelectorPopupMouseListener(this) {
 
                 protected List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent) {
@@ -139,20 +147,20 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private void createTable() {
         tableModel = new TableModelCreator().createTableModel(seriesClass);
         tableColumnManager = new TableColumnManager<E>(tableModel, selectionText);
-        timeSeriesTable = new TimeSeriesTable<E>(tableModel, tableColumnManager);
+        table = new TimeSeriesTable<E>(tableModel, tableColumnManager);
     }
 
     private void addSeriesSelectionListener() {
-        timeSeriesTable.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        timeSeriesTable.getSelectionModel().addListSelectionListener(
+        table.getSelectionModel().addListSelectionListener(
             new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    if ( ! e.getValueIsAdjusting() && timeSeriesTable.getSelectedRow() > -1 ) {
-                        int[] selectedRows = timeSeriesTable.getSelectedRows();
+                    if ( ! e.getValueIsAdjusting() && table.getSelectedRow() > -1 ) {
+                        int[] selectedRows = table.getSelectedRows();
                         List<Identifiable> selectedSeries = new LinkedList<Identifiable>();
                         for (int selectedRow : selectedRows) {
-                            int modelRow = TableModelWrapperUtils.getActualRowAt(timeSeriesTable.getModel(),selectedRow);
+                            int modelRow = TableModelWrapperUtils.getActualRowAt(table.getModel(),selectedRow);
                             selectedSeries.add(tableModel.getObject(modelRow));
                         }
                         getSelectionsActionModel().setSelected(selectedSeries);

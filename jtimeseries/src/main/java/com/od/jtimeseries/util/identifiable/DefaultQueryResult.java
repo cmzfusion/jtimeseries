@@ -3,6 +3,7 @@ package com.od.jtimeseries.util.identifiable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.QueryResult;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class DefaultQueryResult<E extends Identifiable> implements QueryResult<E
     private List<E> results;
 
     public DefaultQueryResult(List<E> results) {
-        this.results = new LinkedList<E>(results);
+        this.results = results;
     }
 
     public E getFirstMatch() {
@@ -24,7 +25,7 @@ public class DefaultQueryResult<E extends Identifiable> implements QueryResult<E
     }
 
     public List<E> getAllMatches() {
-        return new LinkedList<E>(results);
+        return results.size() == 0 ? Collections.<E>emptyList() : new LinkedList<E>(results);
     }
 
     public int getNumberOfMatches() {

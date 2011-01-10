@@ -5,6 +5,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import javax.swing.*;
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 /**
@@ -31,9 +32,15 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         if ( c != null) {
             VisualizerConfiguration.setVisualizerConfiguration(visualizer, c);
             visualizerFrame.setBounds(c.getFrameBounds());
+
         }
         add(visualizerFrame);
         visualizerFrame.setVisible(true);
+        try {
+            visualizerFrame.setIcon(c.isIcon());
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+        }
     }
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
@@ -41,6 +48,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         for ( JInternalFrame v : getVisualizerFramesByPosition()) {
             VisualizerInternalFrame vf = (VisualizerInternalFrame) v;
             VisualizerConfiguration c = VisualizerConfiguration.createVisualizerConfiguration(vf.getVisualizer());
+            c.setIsIcon(v.isIcon());
             c.setFrameBounds(v.getBounds());
             l.add(c);
         }

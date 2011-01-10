@@ -216,12 +216,12 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createToolbar() {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
-                new ShowDownloadSeriesDialogAction(
-                        new NewSeriesHandler(),
-                        timeSeriesServerDictionary,
-                        editDisplayNameAction.getDisplayNameCalculator(),
-                        this
-                )
+            new ShowDownloadSeriesDialogAction(
+                new NewSeriesHandler(),
+                timeSeriesServerDictionary,
+                editDisplayNameAction.getDisplayNameCalculator(),
+                this
+            )
         ));
         toolbar.add(Box.createHorizontalStrut(5));
         toolbar.add(new JButton(editDisplayNameAction));

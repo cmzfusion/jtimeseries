@@ -47,6 +47,7 @@ public class VisualizerConfiguration {
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameBounds;
+    private boolean isIcon;
 
     public VisualizerConfiguration() {
     }
@@ -144,8 +145,17 @@ public class VisualizerConfiguration {
         this.frameBounds = frameBounds;
     }
 
+    public boolean isIcon() {
+        return isIcon;
+    }
+
+    public void setIsIcon(boolean frameExtendedState) {
+        this.isIcon = frameExtendedState;
+    }
+
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
-        return new VisualizerConfiguration( visualizer.getChartsTitle(),
+        return new VisualizerConfiguration(
+            visualizer.getChartsTitle(),
             visualizer.getDisplayNamePatterns(),
             visualizer.isTableSelectorVisible(),
             visualizer.getChartConfigs(),
@@ -158,6 +168,7 @@ public class VisualizerConfiguration {
     }
 
     public static void setVisualizerConfiguration(TimeSeriesVisualizer visualizer, VisualizerConfiguration c) {
+        visualizer.setChartsTitle(c.getChartsTitle());
         visualizer.setDisplayNamePatterns(c.getDisplayNamePatterns());
         visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
         visualizer.addChartConfigs(c.getChartConfigs());

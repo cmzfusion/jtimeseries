@@ -1,6 +1,5 @@
 
 send to visualizer action in main series tree
-drag and drop series to visualizer
 
 visualizer should not require server dictionary if download is disabled
 

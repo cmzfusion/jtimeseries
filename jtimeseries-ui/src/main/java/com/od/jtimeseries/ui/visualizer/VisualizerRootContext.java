@@ -45,6 +45,9 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
             //the same tree structure, parents appear before their descendants
             //Check we have not already added this node to the list before adding it,
             if ( ! series.contains(i)) {
+                if ( i instanceof UIPropertiesTimeSeries) {
+                    series.add((UIPropertiesTimeSeries)i);
+                }
                 series.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
             }
         }

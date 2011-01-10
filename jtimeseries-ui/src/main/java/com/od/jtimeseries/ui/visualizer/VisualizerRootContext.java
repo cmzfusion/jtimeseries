@@ -38,9 +38,15 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
 
     public void addIdentifiables(List<? extends Identifiable> identifiables) {
 
-        List<UIPropertiesTimeSeries> series = new LinkedList<UIPropertiesTimeSeries>();
+
+        LinkedHashSet<UIPropertiesTimeSeries> series = new LinkedHashSet<UIPropertiesTimeSeries>();
         for ( Identifiable i : identifiables) {
-            series.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
+            //identifiables in the list may be at different levels of the hierarchy from
+            //the same tree structure, parents appear before their descendants
+            //Check we have not already added this node to the list before adding it,
+            if ( ! series.contains(i)) {
+                series.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
+            }
         }
 
         for ( UIPropertiesTimeSeries s : series) {

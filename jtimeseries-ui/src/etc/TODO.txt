@@ -27,5 +27,11 @@ check actions for multi selection
 
 visualizer has duplicate logic for adding series
 
+tile visualizer windows, extra visualizer desktops
+
+refresh frequency for series
+
+check http series can be collected when no longer in use
+
 
 

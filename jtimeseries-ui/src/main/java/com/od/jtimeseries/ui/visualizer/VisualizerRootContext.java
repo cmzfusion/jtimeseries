@@ -108,6 +108,7 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
                 //use the config mechanism as a way of cloning the time series, the original
                 //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
                 httpSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
+                existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
             }
             return httpSeries;
         }

@@ -26,9 +26,11 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isDesktopSelected()) {
             String name = JOptionPane.showInputDialog(mainFrame, "Name for visualizer?", "Choose Name", JOptionPane.QUESTION_MESSAGE);
-            name = name.trim();
-            name = name.length() == 0 ? "Visualizer" : name;
-            getActionModel().getDesktop().createAndAddVisualizer(name);
+            if ( name != null) {
+                name = name.trim();
+                name = name.length() == 0 ? "Visualizer" : name;
+                getActionModel().getDesktop().createAndAddVisualizer(name);
+            }
         }
     }
 }

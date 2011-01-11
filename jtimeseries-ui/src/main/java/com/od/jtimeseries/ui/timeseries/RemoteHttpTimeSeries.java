@@ -97,6 +97,8 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             refreshTask.cancel(false);
         }
 
+        //A task which doesn't hold a strong reference to this series
+        //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
         ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
         //if the user has not selected to chart the series, we only refresh the stats, and much less frequently

@@ -8,5 +8,5 @@ package com.od.jtimeseries.ui.timeserious;
  * To change this template use File | Settings | File Templates.
  */
 public interface TimeSeriousDesktop {
-    void createAndAddVisualizer();
+    void createAndAddVisualizer(String title);
 }

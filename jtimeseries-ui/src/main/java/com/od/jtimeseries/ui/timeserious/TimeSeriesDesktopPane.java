@@ -22,17 +22,21 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
     }
 
-    public void createAndAddVisualizer() {
-        createAndAddVisualizer(null);
+    public void createAndAddVisualizer(String title) {
+        TimeSeriesVisualizer v = createVisualizer(title);
+        configureAndShowVisualizerFrame(null, v);
     }
 
     public void createAndAddVisualizer(VisualizerConfiguration c) {
-        TimeSeriesVisualizer visualizer = createVisualizer();
+        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
+        configureAndShowVisualizerFrame(c, visualizer);
+    }
+
+    private void configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
         VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer);
         if ( c != null) {
             VisualizerConfiguration.setVisualizerConfiguration(visualizer, c);
             visualizerFrame.setBounds(c.getFrameBounds());
-
         }
         add(visualizerFrame);
         visualizerFrame.setVisible(true);
@@ -74,9 +78,9 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         return jInternalFrames;
     }
 
-    private TimeSeriesVisualizer createVisualizer() {
+    private TimeSeriesVisualizer createVisualizer(String title) {
         return new TimeSeriesVisualizer(
-            "Visualizer",
+            title,
             timeSeriesServerDictionary
         );
     }

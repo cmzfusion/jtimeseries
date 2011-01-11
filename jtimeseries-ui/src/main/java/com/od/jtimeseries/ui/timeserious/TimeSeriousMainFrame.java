@@ -58,7 +58,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private void createActions(ApplicationActionModels actionModels) {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
-        newVisualizerAction = new NewVisualizerAction(desktopSelectionActionModel);
+        newVisualizerAction = new NewVisualizerAction(this, desktopSelectionActionModel);
         newServerAction = new NewServerAction(this, rootContext);
         editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
             rootContext,

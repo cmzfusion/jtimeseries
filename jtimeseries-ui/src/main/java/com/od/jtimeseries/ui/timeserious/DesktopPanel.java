@@ -28,8 +28,8 @@ public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAw
         add(desktopPane, BorderLayout.CENTER);
     }
 
-    public void createAndAddVisualizer() {
-        desktopPane.createAndAddVisualizer();
+    public void createAndAddVisualizer(String title) {
+        desktopPane.createAndAddVisualizer(title);
     }
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {

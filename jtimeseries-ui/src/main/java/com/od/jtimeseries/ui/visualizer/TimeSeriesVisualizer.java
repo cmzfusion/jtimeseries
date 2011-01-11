@@ -269,41 +269,6 @@ public class TimeSeriesVisualizer extends JPanel {
 
         public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
             rootContext.addIdentifiables(selectedTimeSeries);
-//            boolean serverContextsCreated = false;
-//            for ( UIPropertiesTimeSeries s : selectedTimeSeries) {
-//                if ( ! serverContextsCreated ) {
-//                    createServerContexts(s);
-//                    serverContextsCreated = true;
-//                }
-//
-//                TimeSeriesContext c = rootContext.createContext(s.getParentPath());
-//
-//                RemoteHttpTimeSeries r = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(s.getId(), s.getDescription(), s.getTimeSeriesURL(), Time.minutes(1));
-//                ChartingTimeSeries series = new ChartingTimeSeries(r);
-//
-//                //TODO we may want to flag the conflict up to the user
-//                if ( ! c.containsChildWithId(s.getId())) {
-//                    c.addChild(series);
-//                }
-//            }
         }
-//
-//        //If there are any server contexts in the hierarchy of source
-//        //timeseries which don't exist locally, create them here
-//        private void createServerContexts(UIPropertiesTimeSeries s) {
-//            Identifiable i = s.getRoot();
-//            if ( i instanceof ContextQueries ) {
-//                List<TimeSeriesServerContext> serverContexts =
-//                        ((ContextQueries)i).findAll(TimeSeriesServerContext.class).getAllMatches();
-//                for (TimeSeriesServerContext c : serverContexts) {
-//                    if ( ! rootContext.containsChildWithId(c.getId())) {
-//                        rootContext.addChild(new TimeSeriesServerContext(
-//                                c.getServer()
-//                        ));
-//                    }
-//                }
-//
-//            }
-//        }
     }
 }

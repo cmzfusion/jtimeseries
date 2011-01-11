@@ -18,11 +18,14 @@
  */
 package com.od.jtimeseries.net.httpd;
 
+import com.od.jtimeseries.util.NamedExecutors;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.Executor;
 
 /**
  * A simple, tiny, nicely embeddable HTTP 1.0 server in Java
@@ -64,6 +67,8 @@ import java.util.*;
  */
 public class NanoHTTPD
 {
+    private static Executor httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 5, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+
 	// ==================================================
 	// API parts
 	// ==================================================
@@ -297,9 +302,7 @@ public class NanoHTTPD
 		public HTTPSession( Socket s )
 		{
 			mySocket = s;
-			Thread t = new Thread( this );
-			t.setDaemon( true );
-			t.start();
+            httpExecutor.execute(this);
 		}
 
 		public void run()
@@ -395,6 +398,9 @@ public class NanoHTTPD
 			{
 				// Thrown by sendError, ignore and exit the thread.
 			}
+            catch (Throwable t) {
+                t.printStackTrace();
+            }
 		}
 
 		/**

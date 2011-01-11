@@ -40,10 +40,12 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         }
         add(visualizerFrame);
         visualizerFrame.setVisible(true);
-        try {
-            visualizerFrame.setIcon(c.isIcon());
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
+        if ( c != null) {
+            try {
+                visualizerFrame.setIcon(c.isIcon());
+            } catch (PropertyVetoException e) {
+                e.printStackTrace();
+            }
         }
     }
 

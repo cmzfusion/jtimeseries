@@ -77,9 +77,9 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
     }
 
     public void applyPatternsToAllTimeseries() {
-        List<IdentifiableTimeSeries> l = rootContext.findAllTimeSeries().getAllMatches();
-        for ( IdentifiableTimeSeries i : l) {
-            setDisplayName((ChartingTimeSeries)i);
+        List<UIPropertiesTimeSeries> l = rootContext.findAll(UIPropertiesTimeSeries.class).getAllMatches();
+        for ( UIPropertiesTimeSeries i : l) {
+            setDisplayName(i);
         }
     }
 

@@ -1,3 +1,4 @@
+refresh server series periodically
 
 send to visualizer action in main series tree
 
@@ -26,6 +27,8 @@ createContext - getOrCreateContext
 check actions for multi selection
 
 visualizer has duplicate logic for adding series
+
+export/import display patterns
 
 tile visualizer windows, extra visualizer desktops
 

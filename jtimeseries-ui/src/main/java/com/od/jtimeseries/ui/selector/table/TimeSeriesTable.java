@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.AutoFilterTableHeader;
 import com.jidesoft.grid.SortableTable;
+import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.*;
@@ -62,7 +63,8 @@ class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component c = super.prepareRenderer(renderer, row, column);
 
-        E object = tableModel.getObject(row);
+        int actualRow = TableModelWrapperUtils.getActualRowAt(getModel(), row);
+        E object = tableModel.getObject(actualRow);
         if (object.isStale()) {
             c.setBackground(STALE_SERIES_COLOR);
         } else {

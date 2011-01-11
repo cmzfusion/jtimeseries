@@ -18,6 +18,10 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -53,18 +57,21 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
         setDisplayName(c.getDisplayName());
         setColor(c.getColor());
         setSelected(c.isSelected());
+        addPropertyListeners();
     }
 
     private void addPropertyListeners() {
         //listen to and propagate the change events from wrapped series
-        addPropertyListener(URL_PROPERTY_NAME);
-        addPropertyListener(LAST_REFRESH_TIME_PROPERTY);
-        addPropertyListener(REFRESH_TIME_SECONDS_PROPERTY);
-        addPropertyListener(STALE_PROPERTY);
+        addEventPropagatingListeners(URL_PROPERTY_NAME);
+        addEventPropagatingListeners(LAST_REFRESH_TIME_PROPERTY);
+        addEventPropagatingListeners(REFRESH_TIME_SECONDS_PROPERTY);
+        addEventPropagatingListeners(STALE_PROPERTY);
     }
 
-    private void addPropertyListener(String propertyName) {
+    private void addEventPropagatingListeners(String propertyName) {
+        //propagate events from the wrapped series
         wrappedSeries.addPropertyChangeListener(propertyName, new WrappedSeriesPropertyChangeListener(propertyName));
+        wrappedSeries.addTreeListener(new WrappedSeriesTreeListener());
     }
 
     public String getDisplayName() {
@@ -151,6 +158,23 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
 
         public void propertyChange(PropertyChangeEvent evt) {
             firePropertyChange(propertyName, evt.getOldValue(), evt.getNewValue());
+        }
+    }
+
+
+    private class WrappedSeriesTreeListener implements IdentifiableTreeListener {
+
+        public void nodeChanged(Identifiable node, Object changeDescription) {
+            fireNodeChanged(changeDescription);
+        }
+
+        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+        }
+
+        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+        }
+
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
         }
     }
 }

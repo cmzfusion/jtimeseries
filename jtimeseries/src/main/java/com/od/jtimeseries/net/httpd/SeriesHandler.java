@@ -103,17 +103,15 @@ public class SeriesHandler extends AbstractHandler {
     }
 
     private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, StringBuilder builder, long lastTimestamp) {
-        Collection<TimeSeriesItem> seriesItems = timeSeries.getSnapshot();
+        Collection<TimeSeriesItem> seriesItems = timeSeries.getSubSeries(lastTimestamp + 1);  //we require anything more recent than last timestamp
         Date date = new Date();
         for ( TimeSeriesItem h : seriesItems) {
-            if ( h.getTimestamp() > lastTimestamp) {
-                builder.append("\n<").append(ElementName.seriesItem).append(" ");
-                builder.append(AttributeName.timestamp).append("=\"").append(h.getTimestamp()).append("\" ");
-                date.setTime(h.getTimestamp());
-                builder.append("datetime=\"").append(simpleDateFormat.format(date)).append("\" ");
-                builder.append(AttributeName.value).append("=\"").append(decinalFormat.format(h.getValue().doubleValue())).append("\" ");
-                builder.append("/>");
-            }
+            builder.append("\n<").append(ElementName.seriesItem).append(" ");
+            builder.append(AttributeName.timestamp).append("=\"").append(h.getTimestamp()).append("\" ");
+            date.setTime(h.getTimestamp());
+            builder.append("datetime=\"").append(simpleDateFormat.format(date)).append("\" ");
+            builder.append(AttributeName.value).append("=\"").append(decinalFormat.format(h.getValue().doubleValue())).append("\" ");
+            builder.append("/>");
         }
     }
 

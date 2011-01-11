@@ -371,7 +371,16 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public synchronized TimeSeries getSubSeries(long timestamp) {
-        return getRoundRobinSeries().getSubSeries(timestamp);
+        TimeSeries result;
+        //we can try to satisfy this from the list of append items in memory if
+        //possible, to avoid having to deserialize the series every tome
+        //for common 'most recent values' queries which result from polling
+        if ( writeBehindCache.getAppendItems().size() > 0 && writeBehindCache.getAppendItems().getEarliestTimestamp() < timestamp) {
+            result = writeBehindCache.getAppendItems().getSubSeries(timestamp);
+        } else {
+            result = getRoundRobinSeries().getSubSeries(timestamp);
+        }
+        return result;
     }
 
     public synchronized long getTimestampAfter(long timestamp) {
@@ -476,7 +485,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             }
         }
 
-        public List<TimeSeriesItem> getAppendItems() {
+        public TimeSeries getAppendItems() {
             return itemsToAppend;
         }
 

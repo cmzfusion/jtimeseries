@@ -39,7 +39,12 @@ public class SeriesHandler extends AbstractHandler {
     public static final String SERIES_POSTFIX = ".series";
     public final static String SERIES_XSL_RESOURCE = System.getProperty("JTimeSeriesSeriesXslResource", "series.xsl");
 
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
+        public SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        }
+    };
+
     private static final DecimalFormat decinalFormat = new DecimalFormat("#.##################");
 
 
@@ -109,7 +114,7 @@ public class SeriesHandler extends AbstractHandler {
             builder.append("\n<").append(ElementName.seriesItem).append(" ");
             builder.append(AttributeName.timestamp).append("=\"").append(h.getTimestamp()).append("\" ");
             date.setTime(h.getTimestamp());
-            builder.append("datetime=\"").append(simpleDateFormat.format(date)).append("\" ");
+            builder.append("datetime=\"").append(simpleDateFormat.get().format(date)).append("\" ");
             builder.append(AttributeName.value).append("=\"").append(decinalFormat.format(h.getValue().doubleValue())).append("\" ");
             builder.append("/>");
         }

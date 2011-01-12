@@ -19,7 +19,7 @@ public class TimeSeriousConfig {
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
-    private List<DisplayNamePattern> displayNamePatterns;
+    private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
 
     public Rectangle getFrameLocation(String frameName) {
         return frameLocations.get(frameName);

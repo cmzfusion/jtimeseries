@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
 
@@ -488,7 +489,7 @@ public class NanoHTTPD
 					pw.print("Content-Type: " + mime + "\r\n");
 
 				if ( header == null || header.getProperty( "Date" ) == null )
-					pw.print( "Date: " + gmtFrmt.format( new Date()) + "\r\n");
+					pw.print( "Date: " + gmtFrmt.get().format( new Date()) + "\r\n");
 
 				if ( header != null )
 				{
@@ -735,12 +736,13 @@ public class NanoHTTPD
 	/**
 	 * GMT date formatter
 	 */
-    private static java.text.SimpleDateFormat gmtFrmt;
-	static
-	{
-		gmtFrmt = new java.text.SimpleDateFormat( "E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
-		gmtFrmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
+    private static ThreadLocal<SimpleDateFormat> gmtFrmt =  new ThreadLocal<SimpleDateFormat>() {
+        public SimpleDateFormat initialValue() {
+            SimpleDateFormat s = new SimpleDateFormat( "E, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
+            s.setTimeZone(TimeZone.getTimeZone("GMT"));
+            return s;
+        }
+    };
 
 	/**
 	 * The distribution licence

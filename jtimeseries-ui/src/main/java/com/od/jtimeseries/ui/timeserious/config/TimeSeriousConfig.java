@@ -19,7 +19,11 @@ public class TimeSeriousConfig {
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
-    private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
+    private int splitPaneLocationWhenTableSelected = 0;
+    private int splitPaneLocationWhenTreeSelected = 0;
+    private boolean mainSeriesSelectorTableVisible;
+
+        private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
 
     public Rectangle getFrameLocation(String frameName) {
         return frameLocations.get(frameName);
@@ -59,6 +63,30 @@ public class TimeSeriousConfig {
 
     public List<DisplayNamePattern> getDisplayNamePatterns() {
         return displayNamePatterns;
+    }
+
+    public int getSplitPaneLocationWhenTableSelected() {
+        return splitPaneLocationWhenTableSelected;
+    }
+
+    public void setSplitPaneLocationWhenTableSelected(int splitPaneLocationWhenTableSelected) {
+        this.splitPaneLocationWhenTableSelected = splitPaneLocationWhenTableSelected;
+    }
+
+    public int getSplitPaneLocationWhenTreeSelected() {
+        return splitPaneLocationWhenTreeSelected;
+    }
+
+    public void setSplitPaneLocationWhenTreeSelected(int splitPaneLocationWhenTreeSelected) {
+        this.splitPaneLocationWhenTreeSelected = splitPaneLocationWhenTreeSelected;
+    }
+
+    public boolean isMainSeriesSelectorTableVisible() {
+        return mainSeriesSelectorTableVisible;
+    }
+
+    public void setMainSeriesSelectorTableVisible(boolean mainSeriesSelectorTableVisible) {
+        this.mainSeriesSelectorTableVisible = mainSeriesSelectorTableVisible;
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to

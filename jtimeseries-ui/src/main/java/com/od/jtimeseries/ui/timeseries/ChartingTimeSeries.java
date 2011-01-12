@@ -22,8 +22,6 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Date;
 import java.awt.*;
@@ -70,7 +68,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
 
     private void addEventPropagatingListeners(String propertyName) {
         //propagate events from the wrapped series
-        wrappedSeries.addPropertyChangeListener(propertyName, new WrappedSeriesPropertyChangeListener(propertyName));
+        wrappedSeries.addPropertyChangeListener(propertyName, getForwardingPropertyListener(propertyName));
         wrappedSeries.addTreeListener(new WrappedSeriesTreeListener());
     }
 
@@ -147,20 +145,6 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
     }
-    
-    private class WrappedSeriesPropertyChangeListener implements PropertyChangeListener {
-
-        private String propertyName;
-
-        public WrappedSeriesPropertyChangeListener(String propertyName) {
-            this.propertyName = propertyName;
-        }
-
-        public void propertyChange(PropertyChangeEvent evt) {
-            firePropertyChange(propertyName, evt.getOldValue(), evt.getNewValue());
-        }
-    }
-
 
     private class WrappedSeriesTreeListener implements IdentifiableTreeListener {
 

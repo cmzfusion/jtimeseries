@@ -16,10 +16,6 @@ select for charting by criteria
 
 default visualizer to table view
 
-named visualizers
-
-visualizer title on visualizer frame / iconified state
-
 colour schemes
 
 createContext - getOrCreateContext

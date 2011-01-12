@@ -38,6 +38,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,7 @@ import java.util.List;
  */
 public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPanel implements SelectionManager<E> {
 
+    public static final String TREE_VIEW_SELECTED_PROPERTY = "treeViewSelected";
     private static final int WIDTH = 250;
     private TimeSeriesContext context;
     private Class<E> seriesClass;
@@ -63,6 +66,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
     private IdentifiableListActionModel selectionActionModel;
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
         this(context, "Selected", seriesClass);
@@ -106,6 +110,14 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
 
     public IdentifiableListActionModel getSelectionActionModel() {
         return selectionActionModel;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     private void createTitlePanel() {
@@ -250,6 +262,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
             } else {
                 SeriesSelectionPanel.this.showTable();
             }
+            firePropertyChange(TREE_VIEW_SELECTED_PROPERTY, ! useTreeRadio.isSelected(), useTreeRadio.isSelected());
         }
     }
 

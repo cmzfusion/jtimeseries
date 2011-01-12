@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
 import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
@@ -18,6 +19,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 
 /**
@@ -40,6 +43,9 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private NewServerAction newServerAction;
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
     private UiTimeSeriesServerDictionary serverDictionary;
+    private final JSplitPane splitPane = new JSplitPane();
+    private int tableSplitPanePosition;
+    private int treeSplitPanePosition;
 
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
@@ -69,11 +75,31 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private void addListeners() {
         addWindowFocusListener(new DesktopSelectionWindowFocusListener());
+        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( seriesSelector.isTableSelectorVisible()) {
+                    tableSplitPanePosition = (Integer)evt.getNewValue();
+                } else {
+                    treeSplitPanePosition = (Integer)evt.getNewValue();
+                }
+            }
+        });
+    }
+
+    private void addSplitPaneListener() {
+        //set the split pane position when we change between tree and table view
+        seriesSelector.addPropertyChangeListener(SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
+        new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                splitPane.setDividerLocation(
+                    ((Boolean)evt.getNewValue()) ? treeSplitPanePosition : tableSplitPanePosition
+                );
+            }
+        });
     }
 
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
-        final JSplitPane splitPane = new JSplitPane();
         splitPane.setLeftComponent(seriesSelector);
         splitPane.setRightComponent(desktopPanel);
         getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -118,15 +144,23 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             setSize(800, 600);
             setLocationRelativeTo(null);
         }
+        splitPane.setDividerLocation(seriesSelector.isTableSelectorVisible() ?
+            config.getSplitPaneLocationWhenTableSelected() :
+            config.getSplitPaneLocationWhenTreeSelected());
+        tableSplitPanePosition = config.getSplitPaneLocationWhenTableSelected();
+        treeSplitPanePosition = config.getSplitPaneLocationWhenTreeSelected();
+        addSplitPaneListener();
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(desktopPanel, rootContext);
+        return Arrays.asList(desktopPanel, rootContext, seriesSelector);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
         config.setFrameLocation(MAIN_FRAME_NAME, getBounds());
         config.setFrameExtendedState(MAIN_FRAME_NAME, getExtendedState());
+        config.setSplitPaneLocationWhenTreeSelected(treeSplitPanePosition);
+        config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }
 
     public DesktopPanel getSelectedDesktop() {

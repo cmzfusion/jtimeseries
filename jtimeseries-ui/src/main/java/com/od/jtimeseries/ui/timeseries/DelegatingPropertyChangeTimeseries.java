@@ -1,8 +1,8 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DelegatingIdentifiableTimeSeries;
+import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -77,5 +77,9 @@ public abstract class DelegatingPropertyChangeTimeseries extends DelegatingIdent
 
     public boolean hasListeners(String propertyName) {
         return propertyChangeSupport.hasListeners(propertyName);
+    }
+
+    protected PropertyChangeListener getForwardingPropertyListener(String propertyName) {
+        return new ProxyingPropertyChangeListener(propertyName, propertyChangeSupport, this);
     }
 }

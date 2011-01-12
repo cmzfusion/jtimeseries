@@ -9,14 +9,20 @@ import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
+import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ModelDrivenAction;
+import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,12 +30,13 @@ import java.util.*;
  * Date: 24-Nov-2010
  * Time: 09:36:25
  */
-public class MainSeriesSelector extends JPanel {
+public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private TimeSeriesContext rootContext;
     private ApplicationActionModels applicationActionModels;
     private DisplayNameCalculator displayNameCalculator;
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator) {
         this.rootContext = rootContext;
@@ -42,8 +49,45 @@ public class MainSeriesSelector extends JPanel {
         selectionPanel.setSeriesSelectionEnabled(false);
         selectionPanel.setSelectorActionFactory(new MainSelectorActionFactory());
 
+        addProxyingPropertyListeners();
+
         setLayout(new BorderLayout());
         add(selectionPanel, BorderLayout.CENTER);
+    }
+
+    private void addProxyingPropertyListeners() {
+        //allow clients to subscribe to the main selector to receive
+        //tree view selected events from the selector panel
+        selectionPanel.addPropertyChangeListener(
+            SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
+            new ProxyingPropertyChangeListener(
+                SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY, propertyChangeSupport, this
+            )
+        );
+    }
+
+    public boolean isTableSelectorVisible() {
+        return selectionPanel.isTableSelectorVisible();
+    }
+
+    public void prepareConfigForSave(TimeSeriousConfig config) {
+        config.setMainSeriesSelectorTableVisible(selectionPanel.isTableSelectorVisible());
+    }
+
+    public void restoreConfig(TimeSeriousConfig config) {
+        selectionPanel.setTableSelectorVisible(config.isMainSeriesSelectorTableVisible());
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
     private class MainSelectorActionFactory implements SelectorActionFactory {

@@ -19,8 +19,8 @@ public class TimeSeriousConfig {
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
-    private int splitPaneLocationWhenTableSelected = 0;
-    private int splitPaneLocationWhenTreeSelected = 0;
+    private int splitPaneLocationWhenTableSelected = 350;
+    private int splitPaneLocationWhenTreeSelected = 250;
     private boolean mainSeriesSelectorTableVisible;
 
         private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();

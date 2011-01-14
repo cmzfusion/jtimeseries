@@ -33,31 +33,35 @@ import com.od.jtimeseries.timeseries.TimeSeriesListener;
  * Listeners which register with the wrapper time series will expect the source of events to be the
  * wrapper instance rather than the wrapped time series implementation
  */
-public class WrappedTimeSeriesEventHandler extends TimeSeriesListenerSupport implements TimeSeriesListener {
+public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport implements TimeSeriesListener {
 
     private Object proxySource;
 
-    public WrappedTimeSeriesEventHandler(Object proxySource) {
+    public ProxyTimeSeriesEventHandler(Object proxySource) {
         this.proxySource = proxySource;
     }
 
     public void itemsAdded(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createItemsAddedEvent(proxySource, h.getStartIndex(), h.getEndIndex(), h.getItems());
+        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+        h.setSource(proxySource);
         fireItemsAdded(e);
     }
 
     public void itemsRemoved(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createItemsRemovedEvent(proxySource, h.getStartIndex(), h.getEndIndex(), h.getItems());
+        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+        h.setSource(proxySource);
         fireItemsRemoved(e);
     }
 
     public void itemChanged(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createItemsChangedEvent(proxySource, h.getStartIndex(), h.getEndIndex(), h.getItems());
+        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+        h.setSource(proxySource);
         fireItemsChanged(e);
     }
 
     public void seriesChanged(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createSeriesChangedEvent(proxySource, h.getItems());
+        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+        h.setSource(proxySource);
         fireTimeSeriesChanged(e);
     }
 }

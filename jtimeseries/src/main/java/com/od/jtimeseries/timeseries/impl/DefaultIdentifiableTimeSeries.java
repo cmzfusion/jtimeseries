@@ -40,7 +40,7 @@ import java.util.Iterator;
 public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
 
     private TimeSeries timeSeries;
-    private WrappedTimeSeriesEventHandler eventHandler = new WrappedTimeSeriesEventHandler(this);
+    private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
     protected boolean remote;
 
     public DefaultIdentifiableTimeSeries(String id, String description) {

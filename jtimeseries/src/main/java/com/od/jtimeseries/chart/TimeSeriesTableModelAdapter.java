@@ -113,7 +113,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
     private class TableModelAdapterSeriesListener implements TimeSeriesListener {
 
-        public void itemsAdded(final TimeSeriesEvent h) {
+        public void itemsAdded(TimeSeriesEvent e) {
+            final ListTimeSeriesEvent h = getListEvent(e);
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -125,7 +126,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
             );
         }
 
-        public void itemsRemoved(final TimeSeriesEvent h) {
+        public void itemsRemoved(TimeSeriesEvent e) {
+            final ListTimeSeriesEvent h = getListEvent(e);
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -139,7 +141,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
             );
         }
 
-        public void itemChanged(final TimeSeriesEvent h) {
+        public void itemChanged(TimeSeriesEvent e) {
+            final ListTimeSeriesEvent h = getListEvent(e);
             SwingUtilities.invokeLater(
                 new Runnable() {
                     public void run() {
@@ -151,6 +154,14 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
                     }
                 }
             );
+        }
+
+        private ListTimeSeriesEvent getListEvent(TimeSeriesEvent e) {
+            if ( e instanceof ListTimeSeriesEvent) {
+                return (ListTimeSeriesEvent)e;
+            } else {
+                throw new UnsupportedOperationException("TimeSeriesTableModelAdapter only supports ListTimeSeries presently");
+            }
         }
 
         public void seriesChanged(final TimeSeriesEvent h) {

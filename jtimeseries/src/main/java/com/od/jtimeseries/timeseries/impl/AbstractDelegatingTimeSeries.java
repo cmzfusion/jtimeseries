@@ -35,7 +35,7 @@ import java.util.Iterator;
 public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
 
     private TimeSeries wrappedTimeSeries;
-    private WrappedTimeSeriesEventHandler eventHandler = new WrappedTimeSeriesEventHandler(this);
+    private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
 
     public AbstractDelegatingTimeSeries(TimeSeries wrappedTimeSeries) {
         this.wrappedTimeSeries = wrappedTimeSeries;

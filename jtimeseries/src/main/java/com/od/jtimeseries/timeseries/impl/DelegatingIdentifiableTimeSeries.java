@@ -4,14 +4,10 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +20,7 @@ public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implement
 
     private IdentifiableTimeSeries wrappedSeries;
 
-    private WrappedTimeSeriesEventHandler eventHandler = new WrappedTimeSeriesEventHandler(this);
+    private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
 
     public DelegatingIdentifiableTimeSeries(IdentifiableTimeSeries wrappedSeries) {
         super(wrappedSeries.getId(), wrappedSeries.getDescription());

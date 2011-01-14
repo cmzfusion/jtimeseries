@@ -24,7 +24,7 @@ import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.timeseries.impl.TimeSeriesOrderingException;
-import com.od.jtimeseries.timeseries.impl.WrappedTimeSeriesEventHandler;
+import com.od.jtimeseries.timeseries.impl.ProxyTimeSeriesEventHandler;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -67,7 +67,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private TimePeriod appendPeriod;
     private TimePeriod rewritePeriod;
     private FileHeader fileHeader;
-    private WrappedTimeSeriesEventHandler timeSeriesEventHandler = new WrappedTimeSeriesEventHandler(this);
+    private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new ProxyTimeSeriesEventHandler(this);
     private WriteBehindCache writeBehindCache;
     private long lastTimestamp = -1;
     private ScheduledFuture nextFlushTask;

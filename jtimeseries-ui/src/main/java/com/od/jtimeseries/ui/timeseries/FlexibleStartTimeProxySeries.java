@@ -3,7 +3,9 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 
+import java.lang.ref.SoftReference;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -17,6 +19,7 @@ public class FlexibleStartTimeProxySeries extends ProxyingPropertyChangeTimeseri
 
     TimeSeries wrappedSeries;
     private long startTimestamp;
+    private SoftReference<TimeSeries> localSnapshotSeries;
 
     public FlexibleStartTimeProxySeries(IdentifiableTimeSeries wrappedSeries) {
         super(wrappedSeries);
@@ -63,7 +66,7 @@ public class FlexibleStartTimeProxySeries extends ProxyingPropertyChangeTimeseri
     }
 
     public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        TimeSeriesItem result = null;
+        TimeSeriesItem result;
         if ( timestamp >= this.startTimestamp) {
             result = super.getFirstItemAtOrBefore(timestamp);
             if ( result != null && result.getTimestamp() < startTimestamp) {
@@ -74,71 +77,89 @@ public class FlexibleStartTimeProxySeries extends ProxyingPropertyChangeTimeseri
     }
 
     public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        TimeSeriesItem result = null;
+        TimeSeriesItem result = super.getFirstItemAtOrAfter(timestamp);
+        if ( result != null && result.getTimestamp() < startTimestamp ) {
+            result = null;
+        }
+        return result;
     }
 
     public long getTimestampAfter(long timestamp) {
-        return wrappedSeries.getTimestampAfter(timestamp);
+        return timestamp < startTimestamp ? startTimestamp : super.getTimestampAfter(timestamp);
     }
 
     public long getTimestampBefore(long timestamp) {
-        return wrappedSeries.getTimestampBefore(timestamp);
+        return timestamp <= startTimestamp ? -1 : super.getTimestampBefore(timestamp);
     }
 
     public Collection<TimeSeriesItem> getSnapshot() {
-        return wrappedSeries.getSnapshot();
+        DefaultTimeSeries s = new DefaultTimeSeries();
+        s.addAll(getLocalSnapshotSeries());
+        return s;
     }
 
     public int size() {
-        return wrappedSeries.size();
+        return getLocalSnapshotSeries().size();
     }
 
     public boolean isEmpty() {
-        return wrappedSeries.isEmpty();
+        return getLocalSnapshotSeries().isEmpty();
     }
 
     public boolean contains(Object o) {
-        return wrappedSeries.contains(o);
+        return getLocalSnapshotSeries().contains(o);
     }
 
     public Iterator<TimeSeriesItem> iterator() {
-        return wrappedSeries.iterator();
+        return getLocalSnapshotSeries().iterator();
     }
 
     public Object[] toArray() {
-        return wrappedSeries.toArray();
+        return getLocalSnapshotSeries().toArray();
     }
 
     public <T> T[] toArray(T[] a) {
-        return wrappedSeries.toArray(a);
+        return getLocalSnapshotSeries().toArray(a);
     }
 
     public boolean add(TimeSeriesItem timeSeriesItem) {
-        return wrappedSeries.add(timeSeriesItem);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public boolean remove(Object o) {
-        return wrappedSeries.remove(o);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public boolean containsAll(Collection<?> c) {
-        return wrappedSeries.containsAll(c);
+        return getLocalSnapshotSeries().containsAll(c);
     }
 
     public boolean addAll(Collection<? extends TimeSeriesItem> c) {
-        return wrappedSeries.addAll(c);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public boolean removeAll(Collection<?> c) {
-        return wrappedSeries.removeAll(c);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public boolean retainAll(Collection<?> c) {
-        return wrappedSeries.retainAll(c);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public void clear() {
-        wrappedSeries.clear();
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
+    }
+
+    private TimeSeries getLocalSnapshotSeries() {
+        TimeSeries result = null;
+        if ( localSnapshotSeries != null) {
+            result = localSnapshotSeries.get();
+        }
+        if ( result == null ) {
+            result = super.getSubSeries(startTimestamp);
+            localSnapshotSeries = new SoftReference<TimeSeries>(result);
+        }
+        return result;
     }
 
 }

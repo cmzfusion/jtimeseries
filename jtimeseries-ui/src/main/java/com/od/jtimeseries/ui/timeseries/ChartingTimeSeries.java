@@ -34,7 +34,7 @@ import java.awt.*;
  *
  * A time series used by the visualizer
  */
-public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
+public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
 
     private static ColorRotator colorRotator = new ColorRotator();
 
@@ -68,7 +68,7 @@ public class ChartingTimeSeries extends DelegatingPropertyChangeTimeseries imple
 
     private void addEventPropagatingListeners(String propertyName) {
         //propagate events from the wrapped series
-        wrappedSeries.addPropertyChangeListener(propertyName, getForwardingPropertyListener(propertyName));
+        wrappedSeries.addPropertyChangeListener(propertyName, getProxyingPropertyListener(propertyName));
         wrappedSeries.addTreeListener(new WrappedSeriesTreeListener());
     }
 

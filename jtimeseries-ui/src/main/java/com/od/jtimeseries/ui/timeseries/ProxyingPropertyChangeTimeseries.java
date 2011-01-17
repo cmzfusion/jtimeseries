@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.impl.DelegatingIdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import java.beans.PropertyChangeEvent;
@@ -15,12 +15,12 @@ import java.beans.PropertyChangeSupport;
  * Time: 16:48:41
  * To change this template use File | Settings | File Templates.
  */
-public abstract class DelegatingPropertyChangeTimeseries extends DelegatingIdentifiableTimeSeries {
+public abstract class ProxyingPropertyChangeTimeseries extends DefaultIdentifiableTimeSeries {
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public DelegatingPropertyChangeTimeseries(IdentifiableTimeSeries wrappedSeries){
-        super(wrappedSeries);
+    public ProxyingPropertyChangeTimeseries(IdentifiableTimeSeries wrappedSeries){
+        super(wrappedSeries.getId(), wrappedSeries.getDescription(), wrappedSeries);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -79,7 +79,7 @@ public abstract class DelegatingPropertyChangeTimeseries extends DelegatingIdent
         return propertyChangeSupport.hasListeners(propertyName);
     }
 
-    protected PropertyChangeListener getForwardingPropertyListener(String propertyName) {
+    protected PropertyChangeListener getProxyingPropertyListener(String propertyName) {
         return new ProxyingPropertyChangeListener(propertyName, propertyChangeSupport, this);
     }
 }

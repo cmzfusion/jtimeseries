@@ -1,35 +1,29 @@
-package com.od.jtimeseries.timeseries.impl;
+package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
- * User: nick
- * Date: 25-Nov-2010
- * Time: 17:07:26
- *
+ * User: Nick Ebbutt
+ * Date: 14/01/11
+ * Time: 17:27
  */
-public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
+public class FlexibleStartTimeProxySeries extends ProxyingPropertyChangeTimeseries {
 
-    private IdentifiableTimeSeries wrappedSeries;
+    TimeSeries wrappedSeries;
+    private long startTimestamp;
 
-    private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
-
-    public DelegatingIdentifiableTimeSeries(IdentifiableTimeSeries wrappedSeries) {
-        super(wrappedSeries.getId(), wrappedSeries.getDescription());
-        this.wrappedSeries = wrappedSeries;
-        wrappedSeries.addTimeSeriesListener(eventHandler);
+    public FlexibleStartTimeProxySeries(IdentifiableTimeSeries wrappedSeries) {
+        super(wrappedSeries);
     }
 
     public boolean prepend(TimeSeriesItem item) {
-        return wrappedSeries.prepend(item);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public boolean append(TimeSeriesItem value) {
@@ -37,43 +31,50 @@ public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implement
     }
 
     public TimeSeries getSubSeries(long timestamp) {
-        return wrappedSeries.getSubSeries(timestamp);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return wrappedSeries.getSubSeries(startTimestamp, endTimestamp);
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public TimeSeriesItem getEarliestItem() {
-        return wrappedSeries.getEarliestItem();
+        return super.getFirstItemAtOrAfter(startTimestamp);
     }
 
     public TimeSeriesItem getLatestItem() {
-        return wrappedSeries.getLatestItem();
+        return super.getLatestItem();
     }
 
     public TimeSeriesItem removeEarliestItem() {
-        return wrappedSeries.removeEarliestItem();
+        throw new UnsupportedOperationException("FlexibleStartTimeProxySeries does not yet support this operation");
     }
 
     public TimeSeriesItem removeLatestItem() {
-        return wrappedSeries.removeLatestItem();
+       return super.removeLatestItem();
     }
 
     public long getEarliestTimestamp() {
-        return wrappedSeries.getEarliestTimestamp();
+        return startTimestamp;
     }
 
     public long getLatestTimestamp() {
-        return wrappedSeries.getLatestTimestamp();
+        return super.getLatestTimestamp();
     }
 
     public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return wrappedSeries.getFirstItemAtOrBefore(timestamp);
+        TimeSeriesItem result = null;
+        if ( timestamp >= this.startTimestamp) {
+            result = super.getFirstItemAtOrBefore(timestamp);
+            if ( result != null && result.getTimestamp() < startTimestamp) {
+                result = null;
+            }
+        }
+        return null;
     }
 
     public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return wrappedSeries.getFirstItemAtOrAfter(timestamp);
+        TimeSeriesItem result = null;
     }
 
     public long getTimestampAfter(long timestamp) {
@@ -112,8 +113,8 @@ public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implement
         return wrappedSeries.toArray(a);
     }
 
-    public boolean add(TimeSeriesItem o) {
-        return wrappedSeries.add(o);
+    public boolean add(TimeSeriesItem timeSeriesItem) {
+        return wrappedSeries.add(timeSeriesItem);
     }
 
     public boolean remove(Object o) {
@@ -138,14 +139,6 @@ public class DelegatingIdentifiableTimeSeries extends IdentifiableBase implement
 
     public void clear() {
         wrappedSeries.clear();
-    }
-
-    public void addTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.addTimeSeriesListener(l);
-    }
-
-    public void removeTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.removeTimeSeriesListener(l);
     }
 
 }

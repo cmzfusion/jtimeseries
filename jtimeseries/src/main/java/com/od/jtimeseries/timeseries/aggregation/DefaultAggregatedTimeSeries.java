@@ -24,7 +24,7 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.interpolation.LinearInterpolationFunction;
-import com.od.jtimeseries.timeseries.impl.AbstractDelegatingTimeSeries;
+import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.DefaultInterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.InterpolatedTimeSeries;
@@ -37,9 +37,14 @@ import java.util.List;
  * User: nick
  * Date: 21-Jan-2009
  * Time: 19:52:00
- * To change this template use File | Settings | File Templates.
+ *
+ * A timeseries which subscribes to events from a number of associated
+ * series, and aggregates their values using a function.
+ * e.g. a timepoint in this series may represent the mean of the values for that timepoint in the associated series.
+ *
+ * A DefaultTimeSeries instance is used to store the aggregated values - but the time series implementation used to store the aggregated timepoints can be changed - this series proxies for the timeseries instance used to store the aggregated data values
  */
-public class DefaultAggregatedTimeSeries extends AbstractDelegatingTimeSeries implements AggregatedTimeSeries {
+public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries implements AggregatedTimeSeries {
 
     private AggregateFunction aggregateFunction;
     private List<InterpolatedTimeSeries> children = new ArrayList<InterpolatedTimeSeries>();

@@ -41,7 +41,6 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
 
     private TimeSeries timeSeries;
     private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
-    protected boolean remote;
 
     public DefaultIdentifiableTimeSeries(String id, String description) {
         this(id, description, new DefaultTimeSeries());
@@ -56,6 +55,13 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         super(id, description);
         this.timeSeries = timeSeries;
         timeSeries.addTimeSeriesListener(eventHandler);
+    }
+
+    //set an alternative handling for wrapped series events
+    protected void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
+        timeSeries.removeTimeSeriesListener(eventHandler);
+        timeSeries.addTimeSeriesListener(l);
+        eventHandler = l;
     }
 
     public synchronized boolean prepend(TimeSeriesItem item) {

@@ -21,6 +21,7 @@ package com.od.jtimeseries.timeseries.impl;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.impl.ProxyTimeSeriesEventHandler;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -32,12 +33,12 @@ import java.util.Iterator;
  * Time: 18:22:35
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractDelegatingTimeSeries implements TimeSeries {
+public abstract class AbstractProxyTimeSeries implements TimeSeries {
 
     private TimeSeries wrappedTimeSeries;
     private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
 
-    public AbstractDelegatingTimeSeries(TimeSeries wrappedTimeSeries) {
+    public AbstractProxyTimeSeries(TimeSeries wrappedTimeSeries) {
         this.wrappedTimeSeries = wrappedTimeSeries;
         wrappedTimeSeries.addTimeSeriesListener(eventHandler);        
     }

@@ -159,7 +159,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         int index = indexOf(o);
         if ( index != -1) {
             series.remove(o);
-            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList((TimeSeriesItem)o)));
+            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList((TimeSeriesItem) o)));
         }
         return index != -1;
     }
@@ -360,8 +360,17 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         return index;
     }
 
-    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
-        timeSeriesListenerSupport.addTimeSeriesListener(l);
+    public synchronized void addTimeSeriesListener(final TimeSeriesListener l) {
+        //add the listener on the event firing thread
+        //this is so that the client doesn't receive any previously fired events
+        //which are still on the event queue waiting to be processed
+        getSeriesEventExecutor().execute(
+            new Runnable() {
+                public void run() {
+                    timeSeriesListenerSupport.addTimeSeriesListener(l);
+                }
+            }
+        );
     }
 
     public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {

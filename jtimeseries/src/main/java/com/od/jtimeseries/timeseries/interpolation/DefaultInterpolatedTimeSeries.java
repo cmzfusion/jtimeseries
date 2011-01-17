@@ -21,7 +21,7 @@ package com.od.jtimeseries.timeseries.interpolation;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.interpolation.InterpolationFunction;
-import com.od.jtimeseries.timeseries.impl.AbstractDelegatingTimeSeries;
+import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,7 +30,7 @@ import com.od.jtimeseries.timeseries.impl.AbstractDelegatingTimeSeries;
  * Time: 23:24:59
  * To change this template use File | Settings | File Templates.
  */
-public class DefaultInterpolatedTimeSeries extends AbstractDelegatingTimeSeries implements InterpolatedTimeSeries {
+public class DefaultInterpolatedTimeSeries extends AbstractProxyTimeSeries implements InterpolatedTimeSeries {
 
     private InterpolationFunction interpolationFunction;
 

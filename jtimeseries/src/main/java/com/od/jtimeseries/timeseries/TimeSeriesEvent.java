@@ -32,7 +32,7 @@ public class TimeSeriesEvent implements Cloneable {
 
     /**
      * @param source        - time series source for event
-     * @param items         - list of items affected
+     * @param items         - list of items affected in order of timestamp
      */
     protected TimeSeriesEvent(Object source, List<TimeSeriesItem> items, EventType eventType) {
         this.items = items;
@@ -40,8 +40,16 @@ public class TimeSeriesEvent implements Cloneable {
         this.eventType = eventType;
     }
 
+    public long getFirstItemTimestamp() {
+        return items.get(0).getTimestamp();
+    }
+
+    public long getLastItemTimestamp() {
+        return items.get(items.size() - 1).getTimestamp();
+    }
+
     /**
-     * @return items affected
+     * @return items affected in order of timestamp
      */
     public List<TimeSeriesItem> getItems() {
         return items;
@@ -59,6 +67,10 @@ public class TimeSeriesEvent implements Cloneable {
      */
     public EventType getEventType() {
         return eventType;
+    }
+
+    public static TimeSeriesEvent createEvent(Object source, List<TimeSeriesItem> items, EventType eventType) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), eventType);
     }
 
     /**

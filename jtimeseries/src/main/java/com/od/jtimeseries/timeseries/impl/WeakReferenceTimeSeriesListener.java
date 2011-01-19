@@ -43,10 +43,10 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         this.timeSeriesListenerDelegate = new WeakReference<TimeSeriesListener>(actionListener);
     }
 
-    public void itemsAdded(TimeSeriesEvent h) {
+    public void itemsAddedOrInserted(TimeSeriesEvent h) {
         TimeSeriesListener l = timeSeriesListenerDelegate.get();
         if ( l != null ) {
-          l.itemsAdded(h);
+          l.itemsAddedOrInserted(h);
         } else {
             //it should be iterating over a snapshot of the listener list
             //so we don't get a concurrent modification exeception

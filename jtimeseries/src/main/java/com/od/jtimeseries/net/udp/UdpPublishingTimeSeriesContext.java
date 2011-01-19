@@ -109,7 +109,7 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
             this.minSendIntervalMillis = minSendIntervalMillis;
         }
 
-        public void itemsAdded(TimeSeriesEvent e) {
+        public void itemsAddedOrInserted(TimeSeriesEvent e) {
             long time = System.currentTimeMillis();
             if ( e.getItems().size() == 1 && (time - lastSentTime) > minSendIntervalMillis) {
                 udpClient.sendMessage(new TimeSeriesValueMessage(

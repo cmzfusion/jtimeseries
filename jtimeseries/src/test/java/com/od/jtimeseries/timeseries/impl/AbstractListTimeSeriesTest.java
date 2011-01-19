@@ -324,7 +324,7 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
 
     private void addCountdownListener() {
         timeSeries.addTimeSeriesListener(new TimeSeriesListener() {
-            public void itemsAdded(TimeSeriesEvent e) {
+            public void itemsAddedOrInserted(TimeSeriesEvent e) {
                 handleCallback(e);
             }
 

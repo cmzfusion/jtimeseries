@@ -113,7 +113,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
     private class TableModelAdapterSeriesListener implements TimeSeriesListener {
 
-        public void itemsAdded(TimeSeriesEvent e) {
+        public void itemsAddedOrInserted(TimeSeriesEvent e) {
             final ListTimeSeriesEvent h = getListEvent(e);
             SwingUtilities.invokeLater(
                 new Runnable() {

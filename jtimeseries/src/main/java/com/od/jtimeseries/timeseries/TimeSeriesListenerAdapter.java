@@ -26,7 +26,7 @@ package com.od.jtimeseries.timeseries;
  */
 public class TimeSeriesListenerAdapter implements TimeSeriesListener {
 
-    public void itemsAdded(TimeSeriesEvent e) {
+    public void itemsAddedOrInserted(TimeSeriesEvent e) {
     }
 
     public void itemsRemoved(TimeSeriesEvent e) {

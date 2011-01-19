@@ -159,7 +159,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
 
     private class AggregateViewListener implements TimeSeriesListener {
 
-        public void itemsAdded(TimeSeriesEvent h) {
+        public void itemsAddedOrInserted(TimeSeriesEvent h) {
             addNewValues();
         }
 

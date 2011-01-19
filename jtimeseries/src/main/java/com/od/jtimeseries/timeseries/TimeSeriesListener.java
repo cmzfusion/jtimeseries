@@ -23,7 +23,7 @@ public interface TimeSeriesListener {
     /**
      * A range of items were added/inserted to the series
      */
-    void itemsAdded(TimeSeriesEvent e);
+    void itemsAddedOrInserted(TimeSeriesEvent e);
 
     /**
      * A range of items in the series were removed

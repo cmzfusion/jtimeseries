@@ -79,8 +79,8 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - items added
      */
-    public static TimeSeriesEvent createItemsAddedEvent(Object source, List<TimeSeriesItem> items) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.INSERT);
+    public static TimeSeriesEvent createAddOrInsertEvent(Object source, List<TimeSeriesItem> items) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT);
     }
 
     /**
@@ -158,7 +158,7 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     public static enum EventType {
-        INSERT,
+        ADD_OR_INSERT,
         REMOVE,
         ITEM_CHANGE,
         SERIES_CHANGE

@@ -392,7 +392,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
             new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
-                    timeSeriesListenerSupport.fireTimeSeriesChanged(e);
+                    timeSeriesListenerSupport.fireSeriesChanged(e);
                     logMethods.logDebug("Finished firing event " + e);
                 }
             }

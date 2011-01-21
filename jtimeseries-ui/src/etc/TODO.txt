@@ -22,8 +22,6 @@ createContext - getOrCreateContext
 
 check actions for multi selection
 
-visualizer has duplicate logic for adding series
-
 export/import display patterns
 
 tile visualizer windows, extra visualizer desktops
@@ -32,5 +30,10 @@ refresh frequency for series
 
 check http series can be collected when no longer in use
 
+correct bug in jpopup positioning when tree scrolled
+
+selection groups and rules/criteria in visualizer
+
+properties / stats work for charting series
 
 

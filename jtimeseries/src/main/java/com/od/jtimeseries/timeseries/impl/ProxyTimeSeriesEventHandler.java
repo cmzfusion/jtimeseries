@@ -62,6 +62,6 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
     public void seriesChanged(TimeSeriesEvent h) {
         TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
         h.setSource(proxySource);
-        fireTimeSeriesChanged(e);
+        fireSeriesChanged(e);
     }
 }

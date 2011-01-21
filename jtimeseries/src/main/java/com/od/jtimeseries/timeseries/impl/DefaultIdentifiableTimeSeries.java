@@ -184,6 +184,10 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return timeSeries.getTimestampBefore(timestamp);
     }
 
+    public synchronized long getModCount() {
+        return timeSeries.getModCount();
+    }
+
     public String toString() {
         return "TimeSeries " + getPath();
     }

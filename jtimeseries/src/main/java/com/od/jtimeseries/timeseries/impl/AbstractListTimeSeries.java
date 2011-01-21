@@ -61,7 +61,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
             changed = true;
             series.addLast(item);
             int index = series.size() - 1;
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item));
+            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item), getModCount());
             queueItemsAddedEvent(t);
         }
         return changed;
@@ -72,7 +72,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         if ( size() == 0 || item.getTimestamp() <= getEarliestTimestamp()) {
             changed = true;
             series.addFirst(item);
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, 0, 0, Collections.singletonList(item));
+            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, 0, 0, Collections.singletonList(item), getModCount());
             queueItemsAddedEvent(t);
         }
         return changed;
@@ -96,7 +96,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         if ( series.size() > 0) {
             result = series.removeLast();
             int indexRemoved = series.size();
-            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, indexRemoved, indexRemoved, Collections.singletonList(result)));
+            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, indexRemoved, indexRemoved, Collections.singletonList(result), getModCount()));
         }
         return result;
     }
@@ -131,7 +131,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     public synchronized void clear() {
         series.clear();
-        TimeSeriesEvent e = TimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot());
+        TimeSeriesEvent e = ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), getModCount());
         queueSeriesChangedEvent(e);
     }
 
@@ -159,7 +159,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         int index = indexOf(o);
         if ( index != -1) {
             series.remove(o);
-            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList((TimeSeriesItem) o)));
+            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList((TimeSeriesItem) o), getModCount()));
         }
         return index != -1;
     }
@@ -170,25 +170,25 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         boolean added = series.add(timeSeriesItem);
         if ( added ) {
             int index = size() - 1;
-            queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(timeSeriesItem)));
+            queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
         }
         return added;
     }
 
     public synchronized TimeSeriesItem remove(int index) {
         TimeSeriesItem removed = series.remove(index);
-        queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(removed)));
+        queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(removed), getModCount()));
         return removed;
     }
 
     public synchronized void add(int index, TimeSeriesItem item) {
         series.add(index, item);
-        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item)));
+        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item), getModCount()));
     }
 
     public synchronized TimeSeriesItem set(int index, TimeSeriesItem item) {
         TimeSeriesItem replaced = series.set(index, item);
-        queueItemsChangedEvent(ListTimeSeriesEvent.createItemsChangedEvent(this, index, index, Collections.singletonList(item)));
+        queueItemsChangedEvent(ListTimeSeriesEvent.createItemsChangedEvent(this, index, index, Collections.singletonList(item), getModCount()));
         return replaced;
     }
 
@@ -208,7 +208,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         int startIndex = size();
         boolean result = series.addAll(c);
         if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c)));
+           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
     }
@@ -216,7 +216,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> c) {
         boolean result = series.addAll(index, c);
          if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c)));
+           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
 
@@ -338,6 +338,10 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         return result;
     }
 
+    public synchronized long getModCount() {
+        return series.getModCount();
+    }
+
     private int findLowestIndexSharingTimestamp(long timestamp, int index) {
         while ( index > 0) {
             if ( get(index - 1).getTimestamp() == timestamp) {
@@ -383,7 +387,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     private void queueSeriesChangeEventIfChanged(boolean changed) {
         if ( changed ) {
-            queueSeriesChangedEvent(TimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot()));
+            queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), getModCount()));
         }
     }
 

@@ -27,17 +27,19 @@ import java.util.List;
 public class TimeSeriesEvent implements Cloneable {
 
     private final List<TimeSeriesItem> items;
-    private EventType eventType;
+    private final EventType eventType;
     private Object source;
+    private final long seriesModCount;
 
     /**
      * @param source        - time series source for event
      * @param items         - list of items affected in order of timestamp
      */
-    protected TimeSeriesEvent(Object source, List<TimeSeriesItem> items, EventType eventType) {
+    protected TimeSeriesEvent(Object source, List<TimeSeriesItem> items, EventType eventType, long seriesModCount) {
         this.items = items;
         this.source = source;
         this.eventType = eventType;
+        this.seriesModCount = seriesModCount;
     }
 
     public long getFirstItemTimestamp() {
@@ -69,8 +71,12 @@ public class TimeSeriesEvent implements Cloneable {
         return eventType;
     }
 
-    public static TimeSeriesEvent createEvent(Object source, List<TimeSeriesItem> items, EventType eventType) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), eventType);
+    public long getSeriesModCount() {
+        return seriesModCount;
+    }
+
+    public static TimeSeriesEvent createEvent(Object source, List<TimeSeriesItem> items, EventType eventType, long seriesModCount) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), eventType, seriesModCount);
     }
 
     /**
@@ -79,8 +85,8 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - items added
      */
-    public static TimeSeriesEvent createAddOrInsertEvent(Object source, List<TimeSeriesItem> items) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT);
+    public static TimeSeriesEvent createItemsAddedEvent(Object source, List<TimeSeriesItem> items,long seriesModCount) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT, seriesModCount);
     }
 
     /**
@@ -89,8 +95,8 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - items removed
      */
-    public static TimeSeriesEvent createItemsRemovedEvent(Object source, List<TimeSeriesItem> items) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.REMOVE);
+    public static TimeSeriesEvent createItemsRemovedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.REMOVE, seriesModCount);
     }
 
     /**
@@ -101,8 +107,8 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - replacement items for indexes from startIndex to endIndex
      */
-    public static TimeSeriesEvent createItemsChangedEvent(Object source, List<TimeSeriesItem> items) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ITEM_CHANGE);
+    public static TimeSeriesEvent createItemsChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ITEM_CHANGE, seriesModCount);
     }
 
     /**
@@ -112,8 +118,8 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - new items in the series
      */
-    public static TimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.SERIES_CHANGE);
+    public static TimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
+        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.SERIES_CHANGE, seriesModCount);
     }
 
     @Override
@@ -132,8 +138,8 @@ public class TimeSeriesEvent implements Cloneable {
 
     @Override
     public int hashCode() {
-        int result = eventType != null ? eventType.hashCode() : 0;
-        result = 31 * result + (items != null ? items.hashCode() : 0);
+        int result = items != null ? items.hashCode() : 0;
+        result = 31 * result + (eventType != null ? eventType.hashCode() : 0);
         result = 31 * result + (source != null ? source.hashCode() : 0);
         return result;
     }
@@ -142,14 +148,15 @@ public class TimeSeriesEvent implements Cloneable {
         return new TimeSeriesEvent(
             source,
             items,
-            eventType
+            eventType,
+            seriesModCount
         );
     }
 
     public String toString() {
         return "TimeSeriesEvent{" + eventType +
                 (items.size() < 10 ? ", items " + items : ", first 10 items=" + items.subList(0, 10)) +
-                ", source=" + source +
+                ", source=" + source + ", modCount=" + seriesModCount +
                 '}';
     }
 

@@ -163,6 +163,10 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         return wrappedTimeSeries.getTimestampBefore(timestamp);
     }
 
+    public synchronized long getModCount() {
+        return wrappedTimeSeries.getModCount();
+    }
+
     @Override
     public boolean equals(Object o) {
         return wrappedTimeSeries.equals(o);

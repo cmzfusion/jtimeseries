@@ -22,8 +22,8 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param endIndex   - last index affected, inclusive
      * @param items      - list of items affected
      */
-    private ListTimeSeriesEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, EventType eventType) {
-        super(source, items, eventType);
+    private ListTimeSeriesEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, EventType eventType, long seriesModCount) {
+        super(source, items, eventType, seriesModCount);
         this.startIndex = startIndex;
         this.endIndex = endIndex;
     }
@@ -54,7 +54,8 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
             startIndex,
             endIndex,
             getItems(),
-            getEventType()
+            getEventType(),
+            getSeriesModCount()
         );
     }
 
@@ -66,8 +67,8 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param endIndex new index of last item which was added, inclusive
      * @param items - items added
      */
-    public static ListTimeSeriesEvent createItemsAddedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items) {
-        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT);
+    public static ListTimeSeriesEvent createItemsAddedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, long seriesModCount) {
+        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT, seriesModCount);
     }
 
     /**
@@ -78,8 +79,8 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param endIndex previous index of last item which was removed, inclusive
      * @param items - items removed
      */
-    public static ListTimeSeriesEvent createItemsRemovedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items) {
-        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.REMOVE);
+    public static ListTimeSeriesEvent createItemsRemovedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, long seriesModCount) {
+        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.REMOVE, seriesModCount);
     }
 
     /**
@@ -92,8 +93,8 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param endIndex previous index of last item which changed, inclusive
      * @param items - replacement items for indexes from startIndex to endIndex
      */
-    public static ListTimeSeriesEvent createItemsChangedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items) {
-        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.ITEM_CHANGE);
+    public static ListTimeSeriesEvent createItemsChangedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, long seriesModCount) {
+        return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.ITEM_CHANGE, seriesModCount);
     }
 
     /**
@@ -103,15 +104,38 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param source of event
      * @param items - new items in the series
      */
-    public static ListTimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items) {
-        return new ListTimeSeriesEvent(source, 0, items.size() - 1, Collections.unmodifiableList(items), EventType.SERIES_CHANGE);
+    public static ListTimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
+        return new ListTimeSeriesEvent(source, 0, items.size() - 1, Collections.unmodifiableList(items), EventType.SERIES_CHANGE, seriesModCount);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        ListTimeSeriesEvent that = (ListTimeSeriesEvent) o;
+
+        if (endIndex != that.endIndex) return false;
+        if (startIndex != that.startIndex) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + startIndex;
+        result = 31 * result + endIndex;
+        return result;
     }
 
     @Override
     public String toString() {
         return "TimeSeriesEvent{" + getEventType() +
                 (getItems().size() < 10 ? ", items " + getItems() : ", first 10 items=" + getItems().subList(0, 10)) +
-                ", source=" + getSource() + ", startIndex=" + startIndex + ", endIndex=" + endIndex +
+                ", source=" + getSource() + ", startIndex=" + startIndex + ", endIndex=" + endIndex + ", modCount=" + getSeriesModCount() +
++
                 '}';
     }
 }

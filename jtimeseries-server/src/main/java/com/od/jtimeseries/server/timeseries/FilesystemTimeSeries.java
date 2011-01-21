@@ -33,6 +33,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import javax.naming.OperationNotSupportedException;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -405,6 +406,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
         return getRoundRobinSeries().getFirstItemAtOrAfter(timestamp);
+    }
+
+    public long getModCount() {
+        //Not sensible for filesystem time series, unless the modcount is also persisted
+        throw new UnsupportedOperationException("Filesystem timeseries does not support modCount");
     }
 
     public FileHeader getFileHeader() {

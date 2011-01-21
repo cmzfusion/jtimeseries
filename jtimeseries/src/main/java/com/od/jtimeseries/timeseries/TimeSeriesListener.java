@@ -21,17 +21,17 @@ package com.od.jtimeseries.timeseries;
 public interface TimeSeriesListener {
 
     /**
-     * A range of items were added/inserted to the series
+     * Items were added/inserted to the series
      */
     void itemsAddedOrInserted(TimeSeriesEvent e);
 
     /**
-     * A range of items in the series were removed
+     * Items in the series were removed
      */
     void itemsRemoved(TimeSeriesEvent e);
 
     /**
-     * A range of items in the series were replaced or had values changed
+     * Items in the series were replaced or had values changed
      * The replacement items in event list may have different timestamp or numeric value but the items must be one to one
      * replacements for the current items in the affected range - this event cannot be used to add or remove items from the series
      */

@@ -47,6 +47,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     private String[] columnNames;
     private DefaultTimeSeries timeSeries;
     private String name;
+    private long timeSeriesModCountOnTableCreation;
 
     //keep this as a field - it is wrapped as a WeakReferenceListener and would otherwise get gc'd
     private TimeSeriesListener seriesListener = new TableModelAdapterSeriesListener();
@@ -62,9 +63,11 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         synchronized (timeSeries) {
             //if you remove getSnapshot() from the line below, you'll need to change RemoteChartingTimeSeries
             //to trigger its lazy load on another method call
-            this.timeSeries = new DefaultTimeSeries(timeSeries.getSnapshot());
+            this.timeSeries = new DefaultTimeSeries(timeSeries);
 
             if ( ! snapshotOnly) {
+                timeSeriesModCountOnTableCreation = timeSeries.getModCount();
+
                 // Wrap the timeseries listener in a weak reference listener so that
                 // the listener/table model can be garbage collected if all other references are cleared
                 timeSeries.addTimeSeriesListener(
@@ -111,70 +114,86 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         throw new UnsupportedOperationException();
     }
 
-    private class TableModelAdapterSeriesListener implements TimeSeriesListener {
+    private class TableModelAdapterSeriesListener extends ModCountAwareSeriesListener {
 
-        public void itemsAddedOrInserted(TimeSeriesEvent e) {
-            final ListTimeSeriesEvent h = getListEvent(e);
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        int index = h.getStartIndex();
-                        timeSeries.addAll(index, h.getItems());
-                        fireTableRowsInserted(h.getStartIndex(), h.getEndIndex());
-                    }
-                }
-            );
-        }
-
-        public void itemsRemoved(TimeSeriesEvent e) {
-            final ListTimeSeriesEvent h = getListEvent(e);
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        //TODO - need to add a remove range to ListTimeSeries to implement this efficiently
-                        for (int loop=0; loop < h.getItems().size(); loop++) {
-                            timeSeries.remove(h.getStartIndex());
-                        }
-                        fireTableRowsDeleted(h.getStartIndex(), h.getEndIndex());
-                    }
-                }
-            );
-        }
-
-        public void itemChanged(TimeSeriesEvent e) {
-            final ListTimeSeriesEvent h = getListEvent(e);
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        int index = h.getStartIndex();
-                        for (TimeSeriesItem i : h.getItems()) {
-                            timeSeries.set(index++, i);
-                        }
-                        fireTableRowsUpdated(h.getStartIndex(), h.getEndIndex());
-                    }
-                }
-            );
-        }
-
-        private ListTimeSeriesEvent getListEvent(TimeSeriesEvent e) {
-            if ( e instanceof ListTimeSeriesEvent) {
-                return (ListTimeSeriesEvent)e;
-            } else {
-                throw new UnsupportedOperationException("TimeSeriesTableModelAdapter only supports ListTimeSeries presently");
+        public void doItemsAddedOrInserted(TimeSeriesEvent e) {
+            if (e.getFirstItemTimestamp() >= timeSeries.getLatestTimestamp()) {
+                timeSeries.addAll(e.getItems());
             }
         }
 
-        public void seriesChanged(final TimeSeriesEvent h) {
-            SwingUtilities.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        timeSeries = new DefaultTimeSeries(h.getItems());
-                        fireTableDataChanged();
-                    }
-                }
-            );
+        public void doItemsRemoved(TimeSeriesEvent e) {
+
         }
 
+        public void doItemChanged(TimeSeriesEvent e) {
+
+        }
+
+        public void doSeriesChanged(final TimeSeriesEvent h) {
+
+        }
+
+     }
+
+    /**
+     * Process series events on the swing thread, but only if the modCount of the timeseries event
+     * is > the modCount of the series at the point the table model was initialized
+     * (this protects against processing older events queued up from the timeseries event thread)
+     */
+     abstract class ModCountAwareSeriesListener implements TimeSeriesListener {
+
+         public final void itemsAddedOrInserted(final TimeSeriesEvent e) {
+             Runnable runnable = new Runnable() {
+                 public void run() {
+                     if ( e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                         doItemsAddedOrInserted(e);
+                     }
+                 }
+             };
+             SwingUtilities.invokeLater(runnable);
+         }
+
+         protected abstract void doItemsAddedOrInserted(TimeSeriesEvent e);
+
+         public final void itemsRemoved(final TimeSeriesEvent e) {
+             Runnable runnable = new Runnable() {
+                 public void run() {
+                     if ( e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                         doItemsRemoved(e);
+                     }
+                 }
+             };
+             SwingUtilities.invokeLater(runnable);
+         }
+
+         protected abstract void doItemsRemoved(TimeSeriesEvent e);
+
+         public final void itemChanged(final TimeSeriesEvent e) {
+             Runnable runnable = new Runnable() {
+                 public void run() {
+                     if ( e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                         doItemChanged(e);
+                     }
+                 }
+             };
+             SwingUtilities.invokeLater(runnable);
+         }
+
+         protected abstract void doItemChanged(TimeSeriesEvent e);
+
+         public final void seriesChanged(final TimeSeriesEvent e) {
+             Runnable runnable = new Runnable() {
+                 public void run() {
+                     if ( e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                         doSeriesChanged(e);
+                     }
+                 }
+             };
+             SwingUtilities.invokeLater(runnable);
+         }
+
+         protected abstract void doSeriesChanged(TimeSeriesEvent e);
      }
     
 }

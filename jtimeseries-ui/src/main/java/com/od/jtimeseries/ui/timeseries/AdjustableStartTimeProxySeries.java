@@ -50,7 +50,7 @@ public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimese
                 }
             }
 
-            public void itemChanged(TimeSeriesEvent t) {
+            public void itemsChanged(TimeSeriesEvent t) {
                 if (t.getLastItemTimestamp() >= startTimestamp) {
                     localSnapshotSeries = null;
                     super.fireItemsChanged(getRestrictedEvent(t, t.getEventType()));

@@ -63,10 +63,10 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         }
     }
 
-    public void itemChanged(TimeSeriesEvent e) {
+    public void itemsChanged(TimeSeriesEvent e) {
         TimeSeriesListener l = timeSeriesListenerDelegate.get();
         if ( l != null ) {
-          l.itemChanged(e);
+          l.itemsChanged(e);
         }  else {
             series.removeTimeSeriesListener(this);
         }

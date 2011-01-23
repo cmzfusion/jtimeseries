@@ -167,7 +167,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
             addNewValues();
         }
 
-        public void itemChanged(TimeSeriesEvent e) {
+        public void itemsChanged(TimeSeriesEvent e) {
             addNewValues();
         }
 

@@ -24,8 +24,8 @@ public class TestTimeSeriesItem extends Assert {
         assertEquals(item1.hashCode(), item2.hashCode());
 
         item1 = new TimeSeriesItem(time, LongNumeric.valueOf(value-1));
-        assertFalse(item1.equals(item2));
-        assertFalse(item1.hashCode() == item2.hashCode());
+        assertEquals(item1, item2);
+        assertEquals(item1.hashCode(), item2.hashCode());
 
         item1 = new TimeSeriesItem(time -1, LongNumeric.valueOf(value));
         assertFalse(item1.equals(item2));

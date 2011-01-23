@@ -67,7 +67,7 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
      * @param endIndex new index of last item which was added, inclusive
      * @param items - items added
      */
-    public static ListTimeSeriesEvent createItemsAddedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, long seriesModCount) {
+    public static ListTimeSeriesEvent createItemsAddedOrInsertedEvent(Object source, int startIndex, int endIndex, List<TimeSeriesItem> items, long seriesModCount) {
         return new ListTimeSeriesEvent(source, startIndex, endIndex, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT, seriesModCount);
     }
 

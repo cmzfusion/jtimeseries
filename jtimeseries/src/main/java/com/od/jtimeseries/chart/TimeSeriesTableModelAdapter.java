@@ -126,7 +126,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
         }
 
-        public void doItemChanged(TimeSeriesEvent e) {
+        public void doItemsChanged(TimeSeriesEvent e) {
 
         }
 
@@ -169,18 +169,18 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
          protected abstract void doItemsRemoved(TimeSeriesEvent e);
 
-         public final void itemChanged(final TimeSeriesEvent e) {
+         public final void itemsChanged(final TimeSeriesEvent e) {
              Runnable runnable = new Runnable() {
                  public void run() {
                      if ( e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
-                         doItemChanged(e);
+                         doItemsChanged(e);
                      }
                  }
              };
              SwingUtilities.invokeLater(runnable);
          }
 
-         protected abstract void doItemChanged(TimeSeriesEvent e);
+         protected abstract void doItemsChanged(TimeSeriesEvent e);
 
          public final void seriesChanged(final TimeSeriesEvent e) {
              Runnable runnable = new Runnable() {

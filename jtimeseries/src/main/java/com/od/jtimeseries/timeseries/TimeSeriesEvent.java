@@ -29,7 +29,7 @@ public class TimeSeriesEvent implements Cloneable {
     private final List<TimeSeriesItem> items;
     private final EventType eventType;
     private Object source;
-    private final long seriesModCount;
+    private long seriesModCount;
 
     /**
      * @param source        - time series source for event
@@ -75,6 +75,10 @@ public class TimeSeriesEvent implements Cloneable {
         return seriesModCount;
     }
 
+    public void setSeriesModCount(long modCount) {
+        this.seriesModCount = modCount;
+    }
+
     public static TimeSeriesEvent createEvent(Object source, List<TimeSeriesItem> items, EventType eventType, long seriesModCount) {
         return new TimeSeriesEvent(source, Collections.unmodifiableList(items), eventType, seriesModCount);
     }
@@ -85,7 +89,7 @@ public class TimeSeriesEvent implements Cloneable {
      * @param source of event
      * @param items - items added
      */
-    public static TimeSeriesEvent createItemsAddedEvent(Object source, List<TimeSeriesItem> items,long seriesModCount) {
+    public static TimeSeriesEvent createItemsAddedOrInsertedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
         return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT, seriesModCount);
     }
 

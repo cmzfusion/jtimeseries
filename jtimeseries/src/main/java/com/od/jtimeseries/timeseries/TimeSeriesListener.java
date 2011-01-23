@@ -31,11 +31,9 @@ public interface TimeSeriesListener {
     void itemsRemoved(TimeSeriesEvent e);
 
     /**
-     * Items in the series were replaced or had values changed
-     * The replacement items in event list may have different timestamp or numeric value but the items must be one to one
-     * replacements for the current items in the affected range - this event cannot be used to add or remove items from the series
+     * Items in the series had their values changed
      */
-    void itemChanged(TimeSeriesEvent e);
+    void itemsChanged(TimeSeriesEvent e);
 
     /**
      * The time series changed in a way which could not be efficiently

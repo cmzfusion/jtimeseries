@@ -60,7 +60,7 @@ class TimeSeriesListenerSupport {
     public void fireItemsChanged(TimeSeriesEvent e) {
         TimeSeriesListener[] listeners = getListenerSnapshot();
         for (TimeSeriesListener l : listeners) {
-            l.itemChanged(e);
+            l.itemsChanged(e);
         }
     }
 

@@ -33,7 +33,6 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import javax.naming.OperationNotSupportedException;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.Executor;
@@ -68,11 +67,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private TimePeriod appendPeriod;
     private TimePeriod rewritePeriod;
     private FileHeader fileHeader;
-    private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new ProxyTimeSeriesEventHandler(this);
+    private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new LocalModCountProxyTimeSeriesEventHandler(this);
     private WriteBehindCache writeBehindCache;
     private long lastTimestamp = -1;
     private ScheduledFuture nextFlushTask;
     private volatile boolean persistenceStopped = false;
+    private volatile long modCount;
 
     public FilesystemTimeSeries(Identifiable parentContext, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(parentContext, id, description);
@@ -148,8 +148,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private void fireAddEvent(final TimeSeriesItem i) {
-        final TimeSeriesEvent e = ListTimeSeriesEvent.createItemsAddedEvent(
-                FilesystemTimeSeries.this, size() -1, size() -1, Collections.singletonList(i)
+        final TimeSeriesEvent e = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
+                FilesystemTimeSeries.this, size() - 1, size() - 1, Collections.singletonList(i), ++modCount
         );
 
         eventExecutor.execute(new Runnable() {
@@ -409,8 +409,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public long getModCount() {
-        //Not sensible for filesystem time series, unless the modcount is also persisted
-        throw new UnsupportedOperationException("Filesystem timeseries does not support modCount");
+        return modCount;
     }
 
     public FileHeader getFileHeader() {
@@ -592,6 +591,41 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     //testing hook
     synchronized boolean isSeriesCollected() {
         return softSeriesReference.get() == null;
+    }
+
+    private class LocalModCountProxyTimeSeriesEventHandler extends ProxyTimeSeriesEventHandler {
+
+        public LocalModCountProxyTimeSeriesEventHandler(Object proxySource) {
+            super(proxySource);
+        }
+
+        public void itemsAddedOrInserted(TimeSeriesEvent h) {
+            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+            h.setSource(FilesystemTimeSeries.this);
+            h.setSeriesModCount(++modCount);
+            fireItemsAdded(e);
+        }
+
+        public void itemsRemoved(TimeSeriesEvent h) {
+            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+            h.setSource(FilesystemTimeSeries.this);
+            h.setSeriesModCount(++modCount);
+            fireItemsRemoved(e);
+        }
+
+        public void itemsChanged(TimeSeriesEvent h) {
+            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+            h.setSource(FilesystemTimeSeries.this);
+            h.setSeriesModCount(++modCount);
+            fireItemsChanged(e);
+        }
+
+        public void seriesChanged(TimeSeriesEvent h) {
+            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
+            h.setSource(FilesystemTimeSeries.this);
+            h.setSeriesModCount(++modCount);
+            fireSeriesChanged(e);
+        }
     }
 
 }

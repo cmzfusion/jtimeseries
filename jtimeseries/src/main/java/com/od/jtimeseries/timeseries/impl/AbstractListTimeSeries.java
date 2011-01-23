@@ -61,7 +61,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
             changed = true;
             series.addLast(item);
             int index = series.size() - 1;
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item), getModCount());
+            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount());
             queueItemsAddedEvent(t);
         }
         return changed;
@@ -72,7 +72,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         if ( size() == 0 || item.getTimestamp() <= getEarliestTimestamp()) {
             changed = true;
             series.addFirst(item);
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedEvent(this, 0, 0, Collections.singletonList(item), getModCount());
+            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, 0, 0, Collections.singletonList(item), getModCount());
             queueItemsAddedEvent(t);
         }
         return changed;
@@ -170,7 +170,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         boolean added = series.add(timeSeriesItem);
         if ( added ) {
             int index = size() - 1;
-            queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
+            queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
         }
         return added;
     }
@@ -183,12 +183,15 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     public synchronized void add(int index, TimeSeriesItem item) {
         series.add(index, item);
-        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index, Collections.singletonList(item), getModCount()));
+        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
     }
 
     public synchronized TimeSeriesItem set(int index, TimeSeriesItem item) {
         TimeSeriesItem replaced = series.set(index, item);
-        queueItemsChangedEvent(ListTimeSeriesEvent.createItemsChangedEvent(this, index, index, Collections.singletonList(item), getModCount()));
+        //there's no specific event currently to signify a replace, so we represent this as a remove/insert
+        queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(replaced), getModCount()));
+        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
+
         return replaced;
     }
 
@@ -208,7 +211,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         int startIndex = size();
         boolean result = series.addAll(c);
         if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
     }
@@ -216,7 +219,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> c) {
         boolean result = series.addAll(index, c);
          if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
 

@@ -25,10 +25,14 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * User: Nick Ebbutt
  * Date: 03-Dec-2008
  * Time: 15:37:48
+ *
+ * TimeSeries are made up of TimeSeriesItem, each TimeSeriesItem has a timestamp with an associated value
+ *
+ * The timestamp of a TimeSeriesItem is fixed, but it is permitted for the associated value to change
  */
 public class TimeSeriesItem {
 
-    private long timestamp;
+    private final long timestamp;
     private Numeric value;
 
     public TimeSeriesItem(long timeStamp, Numeric value) {
@@ -52,25 +56,21 @@ public class TimeSeriesItem {
         return value.longValue();
     }
 
-    public int hashCode() {
-        int result = 17;
-        result = 31 * result + (int)(timestamp ^ (timestamp >>> 32));
-        result = 31 * result + value.hashCode();
-        return result;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TimeSeriesItem that = (TimeSeriesItem) o;
+
+        if (timestamp != that.timestamp) return false;
+
+        return true;
     }
 
-    public boolean equals(Object o) {
-        boolean result = false;
-        if ( o == this ) {
-            result = true;
-        } else {
-            if ( o instanceof TimeSeriesItem ) {
-                TimeSeriesItem i = (TimeSeriesItem)o;
-                result = i.getTimestamp() == getTimestamp() &&
-                        i.getValue().equals(getValue());
-            }
-        }
-        return result;
+    @Override
+    public int hashCode() {
+        return (int) (timestamp ^ (timestamp >>> 32));
     }
 
     public String toString() {

@@ -24,54 +24,15 @@ import java.util.List;
  */
 public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimeseries {
 
-    private volatile long startTimestamp = 0;
+    private volatile long startTimestamp = Long.MAX_VALUE;
     private SoftReference<TimeSeries> localSnapshotSeries;
     private ProxyTimeSeriesEventHandler eventHandler;
+    private long modCount = 0;
 
     public AdjustableStartTimeProxySeries(IdentifiableTimeSeries wrappedSeries) {
         super(wrappedSeries);
 
-        eventHandler = new ProxyTimeSeriesEventHandler(this) {
-            public void itemsAddedOrInserted(TimeSeriesEvent t) {
-                TimeSeries s = getLocalSnapshotSeries(false);
-                if (s != null && t.getFirstItemTimestamp() >= s.getLatestTimestamp()) {
-                    s.addAll(t.getItems());
-                    super.fireItemsAdded(getRestrictedEvent(t, t.getEventType()));
-                } else {
-                    localSnapshotSeries = null;
-                    super.fireItemsAdded(getRestrictedEvent(t, t.getEventType()));
-                }
-            }
-
-            public void itemsRemoved(TimeSeriesEvent t) {
-                if (t.getLastItemTimestamp() >= startTimestamp) {
-                    localSnapshotSeries = null;
-                    super.fireItemsRemoved(getRestrictedEvent(t, t.getEventType()));
-                }
-            }
-
-            public void itemsChanged(TimeSeriesEvent t) {
-                if (t.getLastItemTimestamp() >= startTimestamp) {
-                    localSnapshotSeries = null;
-                    super.fireItemsChanged(getRestrictedEvent(t, t.getEventType()));
-                }
-            }
-
-            public void seriesChanged(TimeSeriesEvent t) {
-                localSnapshotSeries = null;
-                super.fireSeriesChanged(getRestrictedEvent(t, t.getEventType()));
-            }
-
-            private TimeSeriesEvent getRestrictedEvent(TimeSeriesEvent t, TimeSeriesEvent.EventType eventType) {
-                List<TimeSeriesItem> items = new LinkedList<TimeSeriesItem>();
-                for (TimeSeriesItem i : t.getItems()) {
-                    if (i.getTimestamp() >= startTimestamp) {
-                        items.add(i);
-                    }
-                }
-                return TimeSeriesEvent.createEvent(FlexibleStartTimeProxySeries.this, items, eventType, t.getSeriesModCount());
-            }
-        };
+        eventHandler = new LocalModCountEventHandler();
         setProxyEventHandler(eventHandler);
     }
 
@@ -79,8 +40,9 @@ public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimese
         this.startTimestamp = startTimestamp;
         localSnapshotSeries = null;
         eventHandler.fireSeriesChanged(TimeSeriesEvent.createSeriesChangedEvent(
-            this,
-            new LinkedList<TimeSeriesItem>(getLocalSnapshotSeries(true))
+            AdjustableStartTimeProxySeries.this,
+            new LinkedList<TimeSeriesItem>(getLocalSnapshotSeries(true)),
+            ++modCount
         ));
 
     }
@@ -223,4 +185,65 @@ public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimese
         return result;
     }
 
+    private class LocalModCountEventHandler extends ProxyTimeSeriesEventHandler {
+
+        public LocalModCountEventHandler() {
+            super(AdjustableStartTimeProxySeries.this);
+        }
+
+        public void itemsAddedOrInserted(TimeSeriesEvent t) {
+            synchronized (AdjustableStartTimeProxySeries.this) {
+                TimeSeries s = getLocalSnapshotSeries(false);
+                TimeSeriesEvent restrictedEvent = getRestrictedEvent(t, t.getEventType());
+                if ( restrictedEvent.getItems().size() > 0 ) {
+                    if (s != null && t.getFirstItemTimestamp() >= s.getLatestTimestamp()) {
+                        s.addAll(t.getItems());
+                        super.fireItemsAdded(restrictedEvent);
+                    } else {
+                        localSnapshotSeries = null;
+                        super.fireItemsAdded(restrictedEvent);
+                    }
+                }
+            }
+        }
+
+        public void itemsRemoved(TimeSeriesEvent t) {
+            synchronized (AdjustableStartTimeProxySeries.this) {
+                if (t.getLastItemTimestamp() >= startTimestamp) {
+                    TimeSeriesEvent restrictedEvent = getRestrictedEvent(t, t.getEventType());
+                    localSnapshotSeries = null;
+                    super.fireItemsRemoved(restrictedEvent);
+                }
+            }
+        }
+
+        public void itemsChanged(TimeSeriesEvent t) {
+            synchronized (AdjustableStartTimeProxySeries.this) {
+                if (t.getLastItemTimestamp() >= startTimestamp) {
+                    localSnapshotSeries = null;
+                    TimeSeriesEvent restrictedEvent = getRestrictedEvent(t, t.getEventType());
+                    super.fireItemsChanged(restrictedEvent);
+                }
+            }
+        }
+
+        public void seriesChanged(TimeSeriesEvent t) {
+            synchronized(AdjustableStartTimeProxySeries.this) {
+                localSnapshotSeries = null;
+                super.fireSeriesChanged(getRestrictedEvent(t, t.getEventType()));
+            }
+        }
+
+        //get an event which contains only timeseries items >= startTime for this adjustable start time series
+        //also use the local modCount, since modCount also changes when startTime is changed
+        private TimeSeriesEvent getRestrictedEvent(TimeSeriesEvent t, TimeSeriesEvent.EventType eventType) {
+            List<TimeSeriesItem> items = new LinkedList<TimeSeriesItem>();
+            for (TimeSeriesItem i : t.getItems()) {
+                if (i.getTimestamp() >= startTimestamp) {
+                    items.add(i);
+                }
+            }
+            return TimeSeriesEvent.createEvent(AdjustableStartTimeProxySeries.this, items, eventType, ++modCount);
+        }
+    }
 }

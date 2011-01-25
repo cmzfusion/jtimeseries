@@ -49,7 +49,7 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
           l.itemsAddedOrInserted(h);
         } else {
             //it should be iterating over a snapshot of the listener list
-            //so we don't get a concurrent modification exeception
+            //so we don't get a concurrent modification exception
             series.removeTimeSeriesListener(this);
         }
     }

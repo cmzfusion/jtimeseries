@@ -34,7 +34,7 @@ import java.awt.*;
  *
  * A time series used by the visualizer
  */
-public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
+public class ChartingTimeSeries extends AdjustableStartTimeProxySeries implements UIPropertiesTimeSeries {
 
     private static ColorRotator colorRotator = new ColorRotator();
 

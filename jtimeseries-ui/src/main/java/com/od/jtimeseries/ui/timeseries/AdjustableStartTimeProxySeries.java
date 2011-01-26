@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimeseries {
 
-    private volatile long startTimestamp = Long.MAX_VALUE;
+    private volatile long startTimestamp = -1;
     private SoftReference<TimeSeries> localSnapshotSeries;
     private ProxyTimeSeriesEventHandler eventHandler;
     private long modCount = 0;

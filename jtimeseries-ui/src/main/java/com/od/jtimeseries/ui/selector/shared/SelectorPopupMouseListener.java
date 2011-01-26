@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.selector.shared;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -44,7 +45,14 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
                 for ( JMenuItem i : menuItems) {
                     menu.add(i);
                 }
-                menu.show(selectorComponent, e.getX() + 3, e.getY() + 3);
+
+                //fix for when component is in scroll pane viewport
+                Point offset = new Point(0,0);
+                if ( selectorComponent.getParent() instanceof JViewport) {
+                    JViewport v = (JViewport)selectorComponent.getParent();
+                    offset = v.getViewPosition();
+                }
+                menu.show(selectorComponent, e.getX() + 3 - offset.x, e.getY() + 3 - offset.y);
             }
         }
     }

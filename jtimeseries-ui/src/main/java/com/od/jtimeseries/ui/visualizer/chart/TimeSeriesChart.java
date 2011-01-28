@@ -27,6 +27,8 @@ import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.ui.RectangleInsets;
 
 import javax.swing.*;
@@ -67,6 +69,7 @@ public class TimeSeriesChart extends JPanel {
     };
     private JFreeChart chart;
     private boolean showLegend = true;
+    private DomainSelection domainSelection = new DomainSelection();
 
     public TimeSeriesChart(String title) {
         this.title = title;
@@ -141,6 +144,13 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
+    public void setChartDomainSelection(DomainSelection newValue) {
+        if ( ! this.domainSelection.equals(newValue) ) {
+            this.domainSelection = newValue;
+            createAndSetChart();
+        }
+    }
+
     public void setShowLegend(boolean showLegend) {
         if ( this.showLegend != showLegend) {
             this.showLegend = showLegend;
@@ -164,6 +174,7 @@ public class TimeSeriesChart extends JPanel {
     private JFreeChart createNewChart() {
         JFreeChart chart = createChart();
         XYPlot plot = (XYPlot)chart.getPlot();
+        XYItemRenderer r = plot.getRenderer();
         plot.setBackgroundPaint(chartBackgroundColor);
         plot.setAxisOffset(new RectangleInsets(5,5,5,5));
         addSeries(chart);
@@ -171,7 +182,7 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void addSeries(JFreeChart chart) {
-        ChartSeriesPopulator c = new ChartSeriesPopulator(chart, chartRangeMode);
+        ChartSeriesPopulator c = new ChartSeriesPopulator(chart.getXYPlot(), chartRangeMode, domainSelection);
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
             ChartingTimeSeries series = timeSeriesList.get(loop);
             c.addSeriesToChart(series, loop);
@@ -216,4 +227,5 @@ public class TimeSeriesChart extends JPanel {
             chart.setTitle(title);
         }
     }
+
 }

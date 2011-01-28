@@ -25,6 +25,8 @@ import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Enumeration;
 
 /**
@@ -41,6 +43,7 @@ public class ChartControlPanel extends JPanel {
     private ColorComboBox colorComboBox = new ColorComboBox();
     private ButtonGroup radioButtonGroup;
     private JCheckBox showLegendCheckbox = new JCheckBox("Legend");
+    private RangeSelectorComponent rangeSelectorComponent = new RangeSelectorComponent();
 
     public ChartControlPanel(TimeSeriesChart timeSeriesChart) {
         this.timeSeriesChart = timeSeriesChart;
@@ -49,6 +52,7 @@ public class ChartControlPanel extends JPanel {
         createRangeModeRadioButtons();
         layoutPanel();
         refreshStateFromChart();
+        addRangeSelectorListener();
     }
 
     public void refreshStateFromChart() {
@@ -66,6 +70,17 @@ public class ChartControlPanel extends JPanel {
                 break;
             }
         }
+    }
+
+    private void addRangeSelectorListener() {
+        rangeSelectorComponent.addPropertyChangeListener(
+            RangeSelectorComponent.DOMAIN_SELECTION_PROPERTY,
+            new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    timeSeriesChart.setChartDomainSelection((DomainSelection)evt.getNewValue());
+                }
+            }
+        );
     }
 
     private void createShowLegendCheckbox() {
@@ -99,6 +114,14 @@ public class ChartControlPanel extends JPanel {
         }
     }
 
+    private void addActionListener(JRadioButton b, final ChartRangeMode m) {
+        b.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ChartControlPanel.this.timeSeriesChart.setChartRangeMode(m);
+            }
+        });
+    }
+
     private void layoutPanel() {
         Box b = Box.createHorizontalBox();
         b.add(Box.createHorizontalGlue());
@@ -107,6 +130,8 @@ public class ChartControlPanel extends JPanel {
         b.add(showLegendCheckbox);
         b.add(Box.createHorizontalStrut(5));
         b.add(radioButtonBox);
+        b.add(Box.createHorizontalStrut(5));
+        b.add(rangeSelectorComponent);
 
         setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
         setLayout(new BorderLayout());
@@ -115,11 +140,4 @@ public class ChartControlPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void addActionListener(JRadioButton b, final ChartRangeMode m) {
-        b.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ChartControlPanel.this.timeSeriesChart.setChartRangeMode(m);
-            }
-        });
-    }
 }

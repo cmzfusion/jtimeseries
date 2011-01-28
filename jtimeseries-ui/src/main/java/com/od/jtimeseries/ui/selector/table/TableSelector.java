@@ -131,7 +131,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     private void createPopupMenu() {
         table.addMouseListener(
-            new SelectorPopupMouseListener(this) {
+            new SelectorPopupMouseListener(this, table) {
 
                 protected List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent) {
                     return new LinkedList<Identifiable>(getSelectionsActionModel().getSelected());

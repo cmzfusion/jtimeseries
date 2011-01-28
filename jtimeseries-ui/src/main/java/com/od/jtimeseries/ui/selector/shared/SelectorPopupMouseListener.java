@@ -19,9 +19,11 @@ import java.util.List;
 public abstract class SelectorPopupMouseListener extends MouseAdapter {
 
     private SelectorComponent selectorComponent;
+    private JComponent eventSource;
 
-    public SelectorPopupMouseListener(SelectorComponent selectorComponent) {
+    public SelectorPopupMouseListener(SelectorComponent selectorComponent, JComponent eventSource) {
         this.selectorComponent = selectorComponent;
+        this.eventSource = eventSource;
     }
 
     public void mousePressed(MouseEvent e) {
@@ -45,14 +47,7 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
                 for ( JMenuItem i : menuItems) {
                     menu.add(i);
                 }
-
-                //fix for when component is in scroll pane viewport
-                Point offset = new Point(0,0);
-                if ( selectorComponent.getParent() instanceof JViewport) {
-                    JViewport v = (JViewport)selectorComponent.getParent();
-                    offset = v.getViewPosition();
-                }
-                menu.show(selectorComponent, e.getX() + 3 - offset.x, e.getY() + 3 - offset.y);
+                menu.show(eventSource, e.getX() + 3, e.getY() + 3);
             }
         }
     }

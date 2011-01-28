@@ -19,11 +19,9 @@
 package com.od.jtimeseries.ui.visualizer.chart;
 
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYDataset;
 import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
@@ -41,23 +39,24 @@ import java.util.HashMap;
  */
 public class ChartSeriesPopulator {
 
-    private JFreeChart chart;
-    XYPlot plot;
+    private XYPlot plot;
     private ChartRangeMode chartRangeMode;
     private HashMap<String, NumberAxis> axisBySeriesId = new HashMap<String, NumberAxis>();
     private HashMap<String, Integer> axisIndexBySeriesId = new HashMap<String, Integer>();
+    private DomainSelection domainSelection;
 
-
-    public ChartSeriesPopulator(JFreeChart chart, ChartRangeMode chartRangeMode) {
-        this.chart = chart;
+    public ChartSeriesPopulator(XYPlot plot, ChartRangeMode chartRangeMode, DomainSelection domainSelection) {
+        this.plot = plot;
         this.chartRangeMode = chartRangeMode;
-        this.plot = (XYPlot)chart.getPlot();
+        this.domainSelection = domainSelection;
     }
 
     public void addSeriesToChart(ChartingTimeSeries contextTimeSeries, int seriesId) {
         XYDataset dataSet = createDataSet(contextTimeSeries);
         plot.setDataset(seriesId, dataSet);
-        XYItemRenderer renderer2 = new StandardXYItemRenderer();
+        EfficientXYLineAndShapeRenderer renderer2 = new EfficientXYLineAndShapeRenderer();
+//        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
+
         plot.setRenderer(seriesId, renderer2);
         createRangeAxes(contextTimeSeries, seriesId, plot);
         setSeriesColor(plot, seriesId, contextTimeSeries);
@@ -112,7 +111,7 @@ public class ChartSeriesPopulator {
 
 
     private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
-        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(contextTimeSeries);
+        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(contextTimeSeries, domainSelection.getStartTime());
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
     }
 

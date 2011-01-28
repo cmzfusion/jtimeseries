@@ -8,8 +8,6 @@ restrict time range in visualizer
 
 display name calculator apply to visualizers
 
-store split pane position for tree and table
-
 auto populate visualizer by path pattern
 
 select for charting by criteria

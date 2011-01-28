@@ -48,7 +48,6 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
     private String[] columnNames;
     private DefaultTimeSeries timeSeries;
-    private String name;
     private long timeSeriesModCountOnTableCreation;
 
     //keep this as a field - it is wrapped as a WeakReferenceListener and would otherwise get gc'd
@@ -56,16 +55,34 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     private boolean snapshotOnly;
     private final IdentifiableTimeSeries wrappedSeries;
     private WeakReferenceTimeSeriesListener weakRefListener;
+    private volatile long startTime;
 
     public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries) {
-        this(timeSeries, false);
-        name = timeSeries.getDescription();
+        this(timeSeries, false, 0);
     }
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries, boolean snapshotOnly) {
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries, long startTime) {
+        this(timeSeries, false, startTime);
+    }
+
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries, boolean snapshotOnly, long startTime) {
         this.snapshotOnly = snapshotOnly;
+        this.startTime = startTime;
         columnNames = new String[]{"Date Time", timeSeries.getDescription()};
         this.wrappedSeries = timeSeries;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                invalidateAndFireDataChange();
+            }
+        });
     }
 
     //table model series is a snapshot of wrappedSeries owned by swing event thread, kept up to date by subscribing to
@@ -75,7 +92,11 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         synchronized (wrappedSeries) {
             //if you remove getSnapshot() from the line below, you'll need to change RemoteChartingTimeSeries
             //to trigger its lazy load on another method call
-            this.timeSeries = new DefaultTimeSeries(wrappedSeries);
+            TimeSeries seriesToCopy = wrappedSeries;
+            if ( startTime > 0) {
+                seriesToCopy = wrappedSeries.getSubSeries(startTime);
+            }
+            this.timeSeries = new DefaultTimeSeries(seriesToCopy);
 
             if (!snapshotOnly) {
                 timeSeriesModCountOnTableCreation = timeSeries.getModCount();
@@ -96,10 +117,6 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
                 );
             }
         }
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getRowCount() {

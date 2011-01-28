@@ -198,7 +198,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         //add a listener for mouse clicks on the tree, to populate the fileSelectionModel
         //this is done as a mouse listener rather than a tree selection listener so that we still get an event even if the selection is not changed
-        tree.addMouseListener(new SelectorPopupMouseListener(this) {
+        tree.addMouseListener(new SelectorPopupMouseListener(this, tree) {
             protected List<Identifiable> getSelectedIdentifiable(MouseEvent e) {
                 //only support single selection at present
                 List<Identifiable> result = Collections.emptyList();

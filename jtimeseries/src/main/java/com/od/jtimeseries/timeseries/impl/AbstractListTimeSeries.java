@@ -47,10 +47,6 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         series = new OrderValidatingRandomAccessDeque(new RandomAccessDeque<TimeSeriesItem>());
     }
 
-    protected AbstractListTimeSeries(ListTimeSeries l) {
-        this(l.getSnapshot());
-    }
-
     protected AbstractListTimeSeries(Collection<TimeSeriesItem> items) {
         series = new OrderValidatingRandomAccessDeque(new RandomAccessDeque<TimeSeriesItem>(items));
     }

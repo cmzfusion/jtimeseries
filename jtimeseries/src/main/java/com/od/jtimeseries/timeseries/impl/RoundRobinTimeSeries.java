@@ -47,11 +47,6 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
         this.maxSize = maxSize;
     }
 
-    public RoundRobinTimeSeries(ListTimeSeries l, int maxSize) {
-        super(l);
-        this.maxSize = maxSize;
-    }
-
     public RoundRobinTimeSeries(Collection<TimeSeriesItem> items, int maxSize) {
         super(items);
         this.maxSize = maxSize;

@@ -149,9 +149,11 @@ public interface TimeSeries extends Collection<TimeSeriesItem> {
 
 
     /**
-     * modCount should increase by at least 1 whenever the series data is modified
-     * It can be used to detect changes, or ignore TimeSeriesEvent which result from changes before a certain modCount
-     * was reached.
+     * modCount should increase by at least 1 whenever series data is modified
+     * It can be used to detect that changes have occurred
+     *
+     * TimeSeriesEvent also supply the new modCount of the series
+     *
      * @return the modification count of this timeseries
      */
     long getModCount();

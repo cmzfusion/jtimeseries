@@ -30,14 +30,16 @@ import java.util.Collection;
  * Time: 12:02:05
  *
  * A List based series which has an unlimited length
+ *
+ * This default implementation should have very good performance for appends or prepends
+ * (and for removing items at either end), and supports RandomAccess to list elements
+ * by list index, since the underlying datastructure is an array-based dequeue
+ *
+ * The performance for insert operations
  */
 public class DefaultTimeSeries extends AbstractListTimeSeries {
 
     public DefaultTimeSeries() {
-    }
-
-    public DefaultTimeSeries(ListTimeSeries l) {
-        super(l);
     }
 
     public DefaultTimeSeries(Collection<TimeSeriesItem> items) {

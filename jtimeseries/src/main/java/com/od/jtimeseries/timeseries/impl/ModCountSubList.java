@@ -29,14 +29,14 @@ import java.util.*;
 *
 * Reproduce SubList logic which has default access in AbstractList
 */
-class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountList<E> {
+class ModCountSubList<E> extends AbstractList<E> implements RandomAccess, ModCountList<E> {
 
     private ModCountList<E> modCountList;
     private int offset;
     private int size;
     private long expectedModCount;
 
-    DequeSubList(ModCountList<E> list, int fromIndex, int toIndex) {
+    ModCountSubList(ModCountList<E> list, int fromIndex, int toIndex) {
         if (fromIndex < 0)
             throw new IndexOutOfBoundsException("fromIndex = " + fromIndex);
         if (toIndex > list.size())
@@ -171,7 +171,7 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
     }
 
     public List<E> subList(int fromIndex, int toIndex) {
-        return new DequeSubList<E>(this, fromIndex, toIndex);
+        return new ModCountSubList<E>(this, fromIndex, toIndex);
     }
 
     private void rangeCheck(int index) {

@@ -534,6 +534,29 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals(9, movingWindowSeries.size());
     }
 
+    public void testSubList() {
+        List l = movingWindowSeries.subList(0, 1);
+        assertEquals(TimeSeriesTestUtils.createItemsForTimestamps(4), l);
+
+        l = movingWindowSeries.subList(1, 2);
+        assertEquals(TimeSeriesTestUtils.createItemsForTimestamps(5), l);
+
+        CountDownLatchSeriesListener countDownListener = addCountDownListener();
+        l.remove(0);
+        waitForCountdown(countDownListener);
+        TimeSeriesItem item5 = TimeSeriesTestUtils.createItemWithTimestamp(5);
+        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
+                movingWindowSeries,
+                1,
+                1,
+                Collections.singletonList(item5),
+                0
+        );
+        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
+
+
+    }
+
 
     private void waitForCountdown(CountDownLatchSeriesListener countDownListener) {
         try {

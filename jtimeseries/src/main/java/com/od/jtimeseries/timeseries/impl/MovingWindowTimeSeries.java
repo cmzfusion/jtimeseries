@@ -313,7 +313,11 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     }
 
     public List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
-        return wrappedTimeSeries.subList(fromIndex, toIndex);
+        if ( fromIndex < 0 || toIndex > size() || fromIndex > toIndex) {
+            throw new ArrayIndexOutOfBoundsException();
+        } else {
+            return new ModCountSubList<TimeSeriesItem>(new ModCountWrappedList(), getRealIndex(fromIndex), getRealIndex(toIndex));
+        }
     }
 
     public boolean prepend(TimeSeriesItem item) {
@@ -558,7 +562,7 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
 
         public boolean addAll(int index, Collection<? extends TimeSeriesItem> c) {
-            throw new UnsupportedOperationException();
+            return MovingWindowTimeSeries.this.addAll(index, c);
         }
 
         public boolean removeAll(Collection<?> c) {
@@ -613,7 +617,15 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
 
         public ListIterator<TimeSeriesItem> listIterator(int index) {
-            throw new UnsupportedOperationException();
+            return new WindowIterator(getViewIndex(index)) {
+                public int nextIndex() {
+                    return getRealIndex(super.nextIndex());
+                }
+
+                public int previousIndex() {
+                    return getRealIndex(super.previousIndex());
+                }
+            };
         }
 
         public List<TimeSeriesItem> subList(int fromIndex, int toIndex) {

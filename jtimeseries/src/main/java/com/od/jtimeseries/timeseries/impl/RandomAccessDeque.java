@@ -941,7 +941,7 @@ class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable
     }
 
     public List<E> subList(int fromIndex, int toIndex) {
-        return new DequeSubList<E>(this, fromIndex, toIndex);
+        return new ModCountSubList<E>(this, fromIndex, toIndex);
     }
 
     //from AbstractList

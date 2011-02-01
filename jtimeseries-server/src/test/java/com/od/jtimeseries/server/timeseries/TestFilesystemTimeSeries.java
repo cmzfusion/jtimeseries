@@ -4,7 +4,7 @@ import com.od.jtimeseries.timeseries.impl.AbstractListTimeSeriesTest;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
-import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
+import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
@@ -51,7 +51,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         assertEquals(0, series.getFileHeader().getCurrentSize());
 
         //size taken from the soft reference round robin series in memory, but series on disk and file header not yet updated
-        series.add(createItemWithTimestamp(1));
+        series.add(TimeSeriesTestUtils.createItemWithTimestamp(1));
         assertEquals(1, series.size());
         assertEquals(0, series.getFileHeader().getCurrentSize());
 
@@ -68,7 +68,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
 
         //size taken from the values in the write behind cache since the round robin series collected
         //file header not yet updated, no need to load the series back into memory to calc the size
-        series.append(createItemWithTimestamp(2));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(2));
         assertEquals(2, series.getCacheAppendListSize());
         assertEquals(2, series.size());
         assertEquals(0, series.getFileHeader().getCurrentSize());
@@ -81,7 +81,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         assertEquals(2, series.getFileHeader().getCurrentSize());  //now the header has been updated on the flush/append, so size is updated in the header
         assertEquals(2, series.size());
 
-        series.add(createItemWithTimestamp(4));  //after this we have one item in our write behind cache
+        series.add(TimeSeriesTestUtils.createItemWithTimestamp(4));  //after this we have one item in our write behind cache
         assertEquals(3, series.size());
 
         //collect the main series
@@ -92,7 +92,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         //doing an insert should trigger derserialization because we can't use the in memory append list in the cache
         //any values in the local append cache should be appended to the deserialized series and the cache cleared
         //before the insert takes place, so we end up with an up to date series in memory
-        series.add(2, createItemWithTimestamp(3));
+        series.add(2, TimeSeriesTestUtils.createItemWithTimestamp(3));
         assertFalse(series.isSeriesCollected());
         assertTrue(series.isSeriesInWriteCache());
 
@@ -130,10 +130,10 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         //after creation, we have just read the header, not deserialized the series yet
         assertTrue(series.isSeriesCollected());
 
-        series.append(createItemWithTimestamp(1));
-        series.append(createItemWithTimestamp(2));
-        series.append(createItemWithTimestamp(3));
-        series.append(createItemWithTimestamp(4));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(1));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(2));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(3));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(4));
 
         assertEquals(3, series.size());
         assertEquals(2, series.get(0).getTimestamp());
@@ -141,7 +141,7 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         series.triggerGarbageCollection();
         series.flush();
 
-        series.append(createItemWithTimestamp(5));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(5));
         assertEquals(3, series.size());
         assertEquals(1, series.getCacheAppendListSize());
         assertTrue(series.isSeriesCollected());
@@ -149,10 +149,10 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         assertEquals(3, series.get(0).getTimestamp());
         assertFalse(series.isSeriesCollected());
 
-        series.append(createItemWithTimestamp(6));
-        series.append(createItemWithTimestamp(7));
-        series.append(createItemWithTimestamp(8));
-        series.append(createItemWithTimestamp(9));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(6));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(7));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(8));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(9));
 
         series.triggerGarbageCollection();
         assertEquals(3, series.size());
@@ -172,17 +172,17 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         FilesystemTimeSeries series = getTimeSeries();
         assertEquals(-1, series.getLatestTimestamp());
 
-        series.append(createItemWithTimestamp(1));
+        series.append(TimeSeriesTestUtils.createItemWithTimestamp(1));
         assertEquals(1, series.getLatestTimestamp());
 
         series.triggerGarbageCollection();
         series.flush();
 
         assertEquals(1, series.getLatestTimestamp());
-        series.add(createItemWithTimestamp(3));
+        series.add(TimeSeriesTestUtils.createItemWithTimestamp(3));
         assertEquals(3, series.getLatestTimestamp());
 
-        series.add(1, createItemWithTimestamp(2));
+        series.add(1, TimeSeriesTestUtils.createItemWithTimestamp(2));
         assertEquals(3, series.getLatestTimestamp());
 
         //the file header is out of date because we have local changes, until we flush

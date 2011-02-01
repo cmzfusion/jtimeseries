@@ -18,10 +18,7 @@
  */
 package com.od.jtimeseries.timeseries.aggregation;
 
-import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesEvent;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.interpolation.LinearInterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
@@ -111,7 +108,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         aggregateFunction.clear();
         boolean success = addValuesFromChildSeries(nextTimepoint, aggregateFunction);
         if (success) {
-            append(new TimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
+            append(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
             lastTimepoint = nextTimepoint;
         }
         return success;

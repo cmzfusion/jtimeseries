@@ -25,7 +25,7 @@ import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -103,7 +103,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             if ( oldFunctionInstance != DUMMY_FUNCTION ) {
                 Numeric value = oldFunctionInstance.calculateAggregateValue();
                 getTimeSeries().append(
-                   new TimeSeriesItem(timestamp, value)
+                   new DefaultTimeSeriesItem(timestamp, value)
                 );
             }
 

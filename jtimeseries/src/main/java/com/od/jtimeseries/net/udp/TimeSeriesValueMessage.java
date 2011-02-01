@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -69,7 +70,7 @@ public class TimeSeriesValueMessage extends UdpMessage {
     }
 
     public TimeSeriesItem getTimeSeriesItem() {
-        return new TimeSeriesItem(
+        return new DefaultTimeSeriesItem(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),
             DoubleNumeric.valueOf(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
         );

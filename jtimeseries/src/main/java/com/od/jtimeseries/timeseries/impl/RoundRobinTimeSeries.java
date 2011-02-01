@@ -19,7 +19,6 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.util.Collection;

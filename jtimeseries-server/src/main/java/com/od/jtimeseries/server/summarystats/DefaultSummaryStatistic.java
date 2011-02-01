@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 
 /**

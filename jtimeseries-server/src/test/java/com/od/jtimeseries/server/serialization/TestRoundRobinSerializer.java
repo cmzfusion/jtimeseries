@@ -2,6 +2,7 @@ package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.ServerDefaults;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.ListTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
@@ -162,7 +163,7 @@ public class TestRoundRobinSerializer extends TestCase {
     public void testAppendSpeed() throws SerializationException {
         long startTime = System.currentTimeMillis();
         for ( int loop=0; loop < 1000; loop++) {
-            serializer.append(fileHeader, Collections.singletonList(new TimeSeriesItem(loop, DoubleNumeric.valueOf(loop))));
+            serializer.append(fileHeader, Collections.singletonList((TimeSeriesItem)new DefaultTimeSeriesItem(loop, DoubleNumeric.valueOf(loop))));
         }
         long endTime = System.currentTimeMillis();
         assertEquals(7, fileHeader.getCurrentSize());
@@ -196,7 +197,7 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public static TimeSeriesItem createItemForTimestamp(long timestampsForItem) {
-        return new TimeSeriesItem(timestampsForItem,  DoubleNumeric.valueOf(timestampsForItem));
+        return new DefaultTimeSeriesItem(timestampsForItem,  DoubleNumeric.valueOf(timestampsForItem));
     }
 
 

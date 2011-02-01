@@ -31,10 +31,10 @@ import java.util.*;
 */
 class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountList<E> {
 
-    private ModCountList<E> l;
+    private ModCountList<E> modCountList;
     private int offset;
     private int size;
-    private int expectedModCount;
+    private long expectedModCount;
 
     DequeSubList(ModCountList<E> list, int fromIndex, int toIndex) {
         if (fromIndex < 0)
@@ -44,22 +44,22 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
         if (fromIndex > toIndex)
             throw new IllegalArgumentException("fromIndex(" + fromIndex +
                                                ") > toIndex(" + toIndex + ")");
-        l = list;
+        modCountList = list;
         offset = fromIndex;
         size = toIndex - fromIndex;
-        expectedModCount = l.getModCount();
+        expectedModCount = modCountList.getModCount();
     }
 
     public E set(int index, E element) {
         rangeCheck(index);
         checkForComodification();
-        return l.set(index+offset, element);
+        return modCountList.set(index+offset, element);
     }
 
     public E get(int index) {
         rangeCheck(index);
         checkForComodification();
-        return l.get(index+offset);
+        return modCountList.get(index+offset);
     }
 
     public int size() {
@@ -71,8 +71,8 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
         if (index<0 || index>size)
             throw new IndexOutOfBoundsException();
         checkForComodification();
-        l.add(index+offset, element);
-        expectedModCount = l.getModCount();
+        modCountList.add(index+offset, element);
+        expectedModCount = modCountList.getModCount();
         size++;
         modCount++;
     }
@@ -80,8 +80,8 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
     public E remove(int index) {
         rangeCheck(index);
         checkForComodification();
-        E result = l.remove(index+offset);
-        expectedModCount = l.getModCount();
+        E result = modCountList.remove(index+offset);
+        expectedModCount = modCountList.getModCount();
         size--;
         modCount++;
         return result;
@@ -100,8 +100,8 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
             return false;
 
         checkForComodification();
-        l.addAll(offset+index, c);
-        expectedModCount = l.getModCount();
+        modCountList.addAll(offset+index, c);
+        expectedModCount = modCountList.getModCount();
         size += cSize;
         modCount++;
         return true;
@@ -118,7 +118,7 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
                 "Index: "+index+", Size: "+size);
 
         return new ListIterator<E>() {
-            private ListIterator<E> i = l.listIterator(index+offset);
+            private ListIterator<E> i = modCountList.listIterator(index+offset);
 
             public boolean hasNext() {
                 return nextIndex() < size;
@@ -152,7 +152,7 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
 
             public void remove() {
                 i.remove();
-                expectedModCount = l.getModCount();
+                expectedModCount = modCountList.getModCount();
                 size--;
                 modCount++;
             }
@@ -163,7 +163,7 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
 
             public void add(E o) {
                 i.add(o);
-                expectedModCount = l.getModCount();
+                expectedModCount = modCountList.getModCount();
                 size++;
                 modCount++;
             }
@@ -181,11 +181,11 @@ class DequeSubList<E> extends AbstractList<E> implements RandomAccess, ModCountL
     }
 
     private void checkForComodification() {
-        if (l.getModCount() != expectedModCount)
+        if (modCountList.getModCount() != expectedModCount)
             throw new ConcurrentModificationException();
     }
 
-    public int getModCount() {
+    public long getModCount() {
         return modCount;
     }
 

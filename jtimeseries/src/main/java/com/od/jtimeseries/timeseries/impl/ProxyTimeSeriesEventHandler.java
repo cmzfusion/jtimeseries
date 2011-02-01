@@ -44,7 +44,7 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
     public void itemsAddedOrInserted(TimeSeriesEvent h) {
         TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
         h.setSource(proxySource);
-        fireItemsAdded(e);
+        fireItemsAddedOrInserted(e);
     }
 
     public void itemsRemoved(TimeSeriesEvent h) {

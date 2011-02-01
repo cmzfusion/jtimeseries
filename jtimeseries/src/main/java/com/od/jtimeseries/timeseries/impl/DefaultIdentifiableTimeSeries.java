@@ -18,10 +18,7 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 

@@ -1,16 +1,14 @@
 package com.od.jtimeseries.util;
 
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.After;
-import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.capture.CaptureListenerAdapter;
 import com.od.jtimeseries.capture.Capture;

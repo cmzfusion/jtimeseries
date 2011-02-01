@@ -58,7 +58,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
             series.addLast(item);
             int index = series.size() - 1;
             TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount());
-            queueItemsAddedEvent(t);
+            queueItemsAddedOrInsertedEvent(t);
         }
         return changed;
     }
@@ -69,7 +69,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
             changed = true;
             series.addFirst(item);
             TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, 0, 0, Collections.singletonList(item), getModCount());
-            queueItemsAddedEvent(t);
+            queueItemsAddedOrInsertedEvent(t);
         }
         return changed;
     }
@@ -166,7 +166,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         boolean added = series.add(timeSeriesItem);
         if ( added ) {
             int index = size() - 1;
-            queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
+            queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
         }
         return added;
     }
@@ -179,14 +179,14 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     public synchronized void add(int index, TimeSeriesItem item) {
         series.add(index, item);
-        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
+        queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
     }
 
     public synchronized TimeSeriesItem set(int index, TimeSeriesItem item) {
         TimeSeriesItem replaced = series.set(index, item);
         //there's no specific event currently to signify a replace, so we represent this as a remove/insert
         queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(replaced), getModCount()));
-        queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
+        queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
 
         return replaced;
     }
@@ -207,7 +207,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         int startIndex = size();
         boolean result = series.addAll(c);
         if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+           queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
     }
@@ -215,7 +215,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> c) {
         boolean result = series.addAll(index, c);
          if ( result ) {
-           queueItemsAddedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+           queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
         }
         return result;
 
@@ -242,25 +242,25 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     }
 
     public synchronized boolean equals(Object o) {
-        return series.equals(o);
+        return o == this || series.equals(o);
     }
 
     public synchronized int hashCode() {
         return series.hashCode();
     }
 
-    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+    public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
         return getItemsInRange(startTimestamp, endTimestamp);
     }
 
-    public synchronized TimeSeries getSubSeries(long timestamp) {
+    public synchronized ListTimeSeries getSubSeries(long timestamp) {
         return getItemsInRange(timestamp, Long.MAX_VALUE);
     }
 
-    private TimeSeries getItemsInRange(long earliest, long latest) {
+    private ListTimeSeries getItemsInRange(long earliest, long latest) {
         int startIndex = getIndexOfFirstItemAtOrAfter(earliest);
         int endIndex = getIndexOfFirstItemAtOrBefore(latest);
-        TimeSeries result;
+        ListTimeSeries result;
         if ( startIndex != -1 && endIndex != -1) {
             result = new DefaultTimeSeries(subList(startIndex,endIndex + 1));
         } else {
@@ -272,7 +272,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     int binarySearchForItemWithTimestamp(long timestamp) {
         return Collections.binarySearch(
             this,
-            new TimeSeriesItem(timestamp, DoubleNumeric.valueOf(0)),
+            new DefaultTimeSeriesItem(timestamp, DoubleNumeric.valueOf(0)),
             new Comparator<TimeSeriesItem>() {
                 public int compare(TimeSeriesItem o1, TimeSeriesItem o2) {
                     return o1.getTimestamp() == o2.getTimestamp() ? 0 :
@@ -390,7 +390,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         }
     }
 
-    private void queueSeriesChangedEvent(final TimeSeriesEvent e) {
+    protected void queueSeriesChangedEvent(final TimeSeriesEvent e) {
         getSeriesEventExecutor().execute(
             new Runnable() {
                 public void run() {
@@ -402,19 +402,19 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         );
     }
 
-    private void queueItemsAddedEvent(final TimeSeriesEvent e) {
+    protected void queueItemsAddedOrInsertedEvent(final TimeSeriesEvent e) {
         getSeriesEventExecutor().execute(
             new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
-                    timeSeriesListenerSupport.fireItemsAdded(e);
+                    timeSeriesListenerSupport.fireItemsAddedOrInserted(e);
                     logMethods.logDebug("Finished firing event " + e);
                 }
             }
         );
     }
 
-    private void queueItemsRemovedEvent(final TimeSeriesEvent e) {
+    protected void queueItemsRemovedEvent(final TimeSeriesEvent e) {
         getSeriesEventExecutor().execute(
             new Runnable() {
                 public void run() {
@@ -426,7 +426,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         );
     }
 
-    private void queueItemsChangedEvent(final TimeSeriesEvent e) {
+    protected void queueItemsChangedEvent(final TimeSeriesEvent e) {
         getSeriesEventExecutor().execute(
             new Runnable() {
                 public void run() {

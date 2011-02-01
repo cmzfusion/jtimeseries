@@ -27,5 +27,5 @@ import java.util.List;
 * Time: 14:40:07
 */
 interface ModCountList<E> extends List<E> {
-    int getModCount();
+    long getModCount();
 }

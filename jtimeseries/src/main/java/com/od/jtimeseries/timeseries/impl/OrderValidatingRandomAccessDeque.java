@@ -239,7 +239,7 @@ class OrderValidatingRandomAccessDeque implements List<TimeSeriesItem> {
         return wrappedDeque.listIterator(index);
     }
 
-    public int getModCount() {
+    public long getModCount() {
         return wrappedDeque.getModCount();
     }
 

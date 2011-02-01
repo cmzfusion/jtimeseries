@@ -26,9 +26,13 @@ import java.util.List;
  * Date: 06-Jan-2009
  * Time: 15:17:29
  *
- * Classes which implement TimeSeries usually allow consecutive items to have the same timestamp, although this may be implementation specific.
- * This is in fact a fairly likely occurrance since it is very easy to capture several values to a timeseries in the same
- * millisecond, and the system clock may not have granularity to a millisecond, making duplicate timestamp capture more likely.
+ * A TimeSeries which also implements the List interface
+ * Does not support null elements in the List.
+ *
+ * ListTimeSeries may allow consecutive items to have the same timestamp, although this is implementation specific.
+ * This is quite likely to occur in practise since it is very easy to capture several values to a series in the same
+ * millisecond, and a system clock may not have sub-millisecond granularity, making duplicate timestamp capture
+ * likely.
  */
 public interface ListTimeSeries extends List<TimeSeriesItem>, TimeSeries {
 
@@ -38,6 +42,16 @@ public interface ListTimeSeries extends List<TimeSeriesItem>, TimeSeries {
      * @return a List of the TimeSeriesItem in this TimeSeries
      */
     List<TimeSeriesItem> getSnapshot();
+
+    /**
+     * @return A new Timeseries containing all items with timestamps greater than or equal to the supplied timestamp
+     */
+    ListTimeSeries getSubSeries(long timestamp);
+
+    /**
+     * @return A new TimeSeries containing all items between start and end timestamps, inclusive
+     */
+    ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp);
 
     /**
      * @return  index of the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or -1 if there is no such item

@@ -154,7 +154,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         eventExecutor.execute(new Runnable() {
             public void run() {
-                timeSeriesEventHandler.fireItemsAdded(e);
+                timeSeriesEventHandler.fireItemsAddedOrInserted(e);
             }
         });
     }
@@ -367,12 +367,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return getRoundRobinSeries().hashCode();
     }
 
-    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+    public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
         return getRoundRobinSeries().getSubSeries(startTimestamp, endTimestamp);
     }
 
-    public synchronized TimeSeries getSubSeries(long timestamp) {
-        TimeSeries result;
+    public synchronized ListTimeSeries getSubSeries(long timestamp) {
+        ListTimeSeries result;
         //we can try to satisfy this from the list of append items in memory if
         //possible, to avoid having to deserialize the series every tome
         //for common 'most recent values' queries which result from polling
@@ -490,7 +490,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             }
         }
 
-        public TimeSeries getAppendItems() {
+        public RoundRobinTimeSeries getAppendItems() {
             return itemsToAppend;
         }
 
@@ -603,7 +603,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
             h.setSource(FilesystemTimeSeries.this);
             h.setSeriesModCount(++modCount);
-            fireItemsAdded(e);
+            fireItemsAddedOrInserted(e);
         }
 
         public void itemsRemoved(TimeSeriesEvent h) {

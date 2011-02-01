@@ -929,14 +929,14 @@ class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable
     }
 
     public ListIterator<E> listIterator() {
-        return new DequeListIterator<E>(this);
+        return new ModCountListIterator<E>(this);
     }
 
     public ListIterator<E> listIterator(int index) {
-        return new DequeListIterator<E>(this,index);
+        return new ModCountListIterator<E>(this,index);
     }
 
-    public int getModCount() {
+    public long getModCount() {
         return modCount;
     }
 

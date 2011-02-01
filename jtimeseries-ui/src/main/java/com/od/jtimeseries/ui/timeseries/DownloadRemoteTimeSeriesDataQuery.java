@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.net.httpd.AttributeName;
 import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.context.ContextProperties;
@@ -92,7 +93,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
         //only add latest items
         if ( destinationSeries.size() == 0 || longTimestamp > destinationSeries.getLatestTimestamp()) {
-            TimeSeriesItem newItem = new TimeSeriesItem(longTimestamp, DoubleNumeric.valueOf(doubleValue));
+            TimeSeriesItem newItem = new DefaultTimeSeriesItem(longTimestamp, DoubleNumeric.valueOf(doubleValue));
             itemsToAdd.add(newItem);
         }
     }

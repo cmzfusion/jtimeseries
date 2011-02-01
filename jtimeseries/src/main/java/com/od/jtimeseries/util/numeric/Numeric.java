@@ -27,8 +27,8 @@ package com.od.jtimeseries.util.numeric;
  * Time Series in JTimeseries store Numeric instances against timestamp rather than a standard numeric wrapper type such as Double or Long
  * This is for additional flexibility, since we may wish to store more information against each timepoint than a single number
  *
- * Although the provided LongNumeric and DoubleNumeric are immutable, immutable versions are possible, and may be necssary for certain
- * high performance algorithms.
+ * Although the provided LongNumeric and DoubleNumeric are immutable, mutable versions are possible, and may be necessary for certain
+ * high performance algorithms where we don't wish to create a new Numeric instance for every calculation.
  *
  * Although each Numeric must at minimum be able to supply a single double value (so that this value may for example be graphed)
  * Numeric classes may be defined which internally store more information, e.g min and max over a time period.

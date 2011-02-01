@@ -1,8 +1,9 @@
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import junit.framework.Assert;
 import org.junit.Test;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 
 /**
@@ -18,16 +19,16 @@ public class TestTimeSeriesItem extends Assert {
     public void testEqualityAndHashcode() {
         long time = System.currentTimeMillis();
         long value = (long)(Math.random() * Long.MAX_VALUE);
-        TimeSeriesItem item1 = new TimeSeriesItem(time, LongNumeric.valueOf(value));
-        TimeSeriesItem item2 = new TimeSeriesItem(time, LongNumeric.valueOf(value));
+        TimeSeriesItem item1 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value));
+        TimeSeriesItem item2 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value));
         assertEquals(item1, item2);
         assertEquals(item1.hashCode(), item2.hashCode());
 
-        item1 = new TimeSeriesItem(time, LongNumeric.valueOf(value-1));
-        assertEquals(item1, item2);
-        assertEquals(item1.hashCode(), item2.hashCode());
+        item1 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value-1));
+        assertFalse(item1.equals(item2));
+        assertFalse(item1.hashCode() == item2.hashCode());
 
-        item1 = new TimeSeriesItem(time -1, LongNumeric.valueOf(value));
+        item1 = new DefaultTimeSeriesItem(time -1, LongNumeric.valueOf(value));
         assertFalse(item1.equals(item2));
     }
 }

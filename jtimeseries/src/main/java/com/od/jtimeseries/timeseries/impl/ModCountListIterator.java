@@ -31,16 +31,16 @@ import java.util.NoSuchElementException;
  *
  * iterator logic which has protected access in AbstractList
  */
-class DequeListIterator<E> implements ListIterator<E> {
+class ModCountListIterator<E> implements ListIterator<E> {
 
     private ModCountList<E> modCountList;
 
-    public DequeListIterator(ModCountList<E> modCountList) {
+    public ModCountListIterator(ModCountList<E> modCountList) {
         this.modCountList = modCountList;
         this.expectedModCount = modCountList.getModCount();
     }
 
-    public DequeListIterator(ModCountList<E> modCountList, int index) {
+    public ModCountListIterator(ModCountList<E> modCountList, int index) {
         this.modCountList = modCountList;
         this.cursor = index;
         this.expectedModCount = modCountList.getModCount();
@@ -63,7 +63,7 @@ class DequeListIterator<E> implements ListIterator<E> {
 	 * List should have.  If this expectation is violated, the iterator
 	 * has detected concurrent modification.
 	 */
-	int expectedModCount;
+	long expectedModCount;
 
 	public boolean hasNext() {
             return cursor != modCountList.size();

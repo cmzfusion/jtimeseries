@@ -3,7 +3,7 @@ package com.od.jtimeseries.server.message;
 import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpClientConfig;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -11,7 +11,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -49,7 +48,7 @@ public class AppendToSeriesPerformanceHarness {
             path,
             "test description which is a good few words long in order to effectively simulate a real " +
                     "description on a real message, after all we are testing performance aspects here.",
-            new TimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
+            new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
         );
 
         udpClient.sendMessage(timeSeriesValueMessage);

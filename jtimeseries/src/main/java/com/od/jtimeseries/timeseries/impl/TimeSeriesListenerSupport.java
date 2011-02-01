@@ -50,7 +50,7 @@ class TimeSeriesListenerSupport {
         }
     }
 
-    public void fireItemsAdded(TimeSeriesEvent e) {
+    public void fireItemsAddedOrInserted(TimeSeriesEvent e) {
         TimeSeriesListener[] listeners = getListenerSnapshot();
         for (TimeSeriesListener l : listeners) {
             l.itemsAddedOrInserted(e);

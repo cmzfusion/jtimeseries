@@ -18,13 +18,12 @@
  */
 package com.od.jtimeseries.capture.impl;
 
-import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
@@ -51,15 +50,15 @@ public class DefaultCapture extends AbstractCapture implements ValueSourceCaptur
             if ( getState() == CaptureState.STOPPED) {
                 valueSourceListener = new ValueSourceListener() {
                     public void newValue(long value) {
-                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), LongNumeric.valueOf(value)));
+                        getTimeSeries().append(new DefaultTimeSeriesItem(System.currentTimeMillis(), LongNumeric.valueOf(value)));
                     }
 
                     public void newValue(double value) {
-                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(value)));
+                        getTimeSeries().append(new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(value)));
                     }
 
                     public void newValue(Numeric sourceValue) {
-                        getTimeSeries().append(new TimeSeriesItem(System.currentTimeMillis(), sourceValue));
+                        getTimeSeries().append(new DefaultTimeSeriesItem(System.currentTimeMillis(), sourceValue));
                     }
                 };
                 getValueSource().addValueListener(valueSourceListener);

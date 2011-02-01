@@ -1,9 +1,6 @@
 package com.od.jtimeseries.ui.timeseries;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesEvent;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 import com.od.jtimeseries.timeseries.impl.ProxyTimeSeriesEventHandler;
 
@@ -198,10 +195,10 @@ public class AdjustableStartTimeProxySeries extends ProxyingPropertyChangeTimese
                 if ( restrictedEvent.getItems().size() > 0 ) {
                     if (s != null && t.getFirstItemTimestamp() >= s.getLatestTimestamp()) {
                         s.addAll(t.getItems());
-                        super.fireItemsAdded(restrictedEvent);
+                        super.fireItemsAddedOrInserted(restrictedEvent);
                     } else {
                         localSnapshotSeries = null;
-                        super.fireItemsAdded(restrictedEvent);
+                        super.fireItemsAddedOrInserted(restrictedEvent);
                     }
                 }
             }

@@ -18,9 +18,11 @@
  */
 package com.od.jtimeseries.timeseries.function.interpolation;
 
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.Numeric;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,6 +42,10 @@ public class LinearInterpolationFunction implements InterpolationFunction {
         double y0 = beforeItem.getValue().doubleValue();
         double y1 = afterItem.getValue().doubleValue();
         double y = y0 + (x - x0) * (y1 - y0 ) / (x1 - x0);
-        return y0 == y1 ? new TimeSeriesItem(x, DoubleNumeric.valueOf(y0)) : new TimeSeriesItem(x, DoubleNumeric.valueOf(y));
+        return y0 == y1 ? createTimeSeriesItem(x, DoubleNumeric.valueOf(y0)) : createTimeSeriesItem(x, DoubleNumeric.valueOf(y));
+    }
+
+    protected TimeSeriesItem createTimeSeriesItem(long timestamp, Numeric value) {
+        return new DefaultTimeSeriesItem(timestamp, value);
     }
 }

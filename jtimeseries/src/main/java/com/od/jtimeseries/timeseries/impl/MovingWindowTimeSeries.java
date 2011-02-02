@@ -6,13 +6,14 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.FixedTimeSource;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
-import org.jfree.data.time.MovingAverage;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -58,9 +59,10 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     private TimeSource endTimeSource;
     private TimePeriod frequencyToCheckWindow;
     private final AtomicLong modCount = new AtomicLong(0);
+    private ScheduledFuture windowCheckFuture;
 
     public MovingWindowTimeSeries() {
-        this(OPEN_START_TIME, OPEN_END_TIME, Time.seconds(10));
+        this(OPEN_START_TIME, OPEN_END_TIME, null);
     }
 
     public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource, TimePeriod frequencyToCheckWindow) {
@@ -68,6 +70,16 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         this.endTimeSource = endTimeSource;
         this.frequencyToCheckWindow = frequencyToCheckWindow;
         findStartAndEndAndFireChange(false);
+        if ( frequencyToCheckWindow != null) {
+            UpdateWindowTask task = new UpdateWindowTask(this);
+            windowCheckFuture = scheduledExecutorService.scheduleWithFixedDelay(
+                task,
+                frequencyToCheckWindow.getLengthInMillis(),
+                frequencyToCheckWindow.getLengthInMillis(),
+                TimeUnit.MILLISECONDS
+            );
+            task.setFuture(windowCheckFuture);
+        }
     }
 
     private synchronized void findStartAndEndAndFireChange(boolean forceChangeEvent) {
@@ -667,5 +679,33 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
 
     private int getRealIndex(int viewIndex) {
         return viewIndex + startIndex;
+    }
+
+    private static class UpdateWindowTask implements Runnable {
+
+        private WeakReference<MovingWindowTimeSeries> series;
+        private volatile ScheduledFuture future;
+
+        public UpdateWindowTask(MovingWindowTimeSeries s) {
+            this.series = new WeakReference<MovingWindowTimeSeries>(s);
+        }
+
+        public void setFuture(ScheduledFuture future) {
+            this.future = future;
+        }
+
+        public void run() {
+            MovingWindowTimeSeries s = series.get();
+            if ( s != null ) {
+                s.findStartAndEndAndFireChange(false);
+            } else {
+                if ( future != null ) {
+                    future.cancel(false);
+                } else {
+                    //throwing an exception should also cancel the task
+                    throw new RuntimeException("Cannot find future to cancel task");
+                }
+            }
+        }
     }
 }

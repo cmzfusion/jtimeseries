@@ -155,7 +155,7 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         return added;
     }
 
-    public boolean remove(Object o) {
+    public synchronized boolean remove(Object o) {
         int realIndex = wrappedTimeSeries.indexOf(o);
         int viewIndex = getViewIndex(realIndex);
         if ( realIndex != -1) {
@@ -268,14 +268,14 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
     }
 
-    public TimeSeriesItem set(int index, TimeSeriesItem element) {
+    public synchronized TimeSeriesItem set(int index, TimeSeriesItem element) {
         TimeSeriesItem result = wrappedTimeSeries.set(index, element);
         //TODO - could be more efficient
         findStartAndEndAndFireChange(true);
         return result;
     }
 
-    public void add(int realIndex, TimeSeriesItem item) {
+    public synchronized void add(int realIndex, TimeSeriesItem item) {
         wrappedTimeSeries.add(realIndex, item);
         //is within current window by index, or just outside by index but within time range
         if ( isInWindow(item)) {
@@ -300,25 +300,25 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
     }
 
-    public int indexOf(Object o) {
+    public synchronized int indexOf(Object o) {
         int realIndex = wrappedTimeSeries.indexOf(o);
         return getViewIndex(realIndex);
     }
 
-    public int lastIndexOf(Object o) {
+    public synchronized int lastIndexOf(Object o) {
         int realIndex = wrappedTimeSeries.lastIndexOf(o);
         return getViewIndex(realIndex);
     }
 
-    public ListIterator<TimeSeriesItem> listIterator() {
+    public synchronized ListIterator<TimeSeriesItem> listIterator() {
         return new WindowIterator();
     }
 
-    public ListIterator<TimeSeriesItem> listIterator(int index) {
+    public synchronized ListIterator<TimeSeriesItem> listIterator(int index) {
         return new WindowIterator(index);
     }
 
-    public List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
+    public synchronized List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
         if ( fromIndex < 0 || toIndex > size() || fromIndex > toIndex) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
@@ -326,70 +326,91 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
     }
 
-    public boolean prepend(TimeSeriesItem item) {
-        add(0, item);
-        return true;
+    public synchronized boolean prepend(TimeSeriesItem item) {
+        boolean result = item.getTimestamp() <= wrappedTimeSeries.getEarliestTimestamp();
+        if ( result ) {
+            add(0, item);
+        }
+        return result;
     }
 
-    public boolean append(TimeSeriesItem value) {
-        return wrappedTimeSeries.append(value);
+    public synchronized boolean append(TimeSeriesItem item) {
+        boolean result = item.getTimestamp() >= wrappedTimeSeries.getLatestTimestamp();
+        if ( result ) {
+            add(item);
+        }
+        return result;
     }
 
-    public ListTimeSeries getSubSeries(long timestamp) {
-        return wrappedTimeSeries.getSubSeries(timestamp);
+    public synchronized ListTimeSeries getSubSeries(long timestamp) {
+        long start = Math.max(timestamp, startTime);
+        return wrappedTimeSeries.getSubSeries(start, endTime);
     }
 
-    public ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return wrappedTimeSeries.getSubSeries(startTimestamp, endTimestamp);
+    public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
+        long start = Math.max(startTimestamp, startTime);
+        long end = Math.min(endTimestamp, endTime);
+        return wrappedTimeSeries.getSubSeries(start, end);
     }
 
-    public TimeSeriesItem getEarliestItem() {
-        return wrappedTimeSeries.getEarliestItem();
+    public synchronized TimeSeriesItem getEarliestItem() {
+        return isEmpty() ? null : wrappedTimeSeries.get(startIndex);
     }
 
-    public TimeSeriesItem getLatestItem() {
-        return wrappedTimeSeries.getLatestItem();
+    public synchronized TimeSeriesItem getLatestItem() {
+        return isEmpty() ? null : wrappedTimeSeries.get(endIndex);
     }
 
-    public TimeSeriesItem removeEarliestItem() {
-        return wrappedTimeSeries.removeEarliestItem();
+    /**
+     * as do all methods which add/remove data, this operates on the complete series, and will remove the
+     * earliest from the wrapped series not the current window
+     */
+    public synchronized TimeSeriesItem removeEarliestItem() {
+        return wrappedTimeSeries.size() > 0 ? remove(0) : null;
     }
 
-    public TimeSeriesItem removeLatestItem() {
-        return wrappedTimeSeries.removeLatestItem();
+    /**
+     * as do all methods which add/remove data, this operates on the complete series, and will remove the
+     * earliest from the wrapped series not the current window
+     */
+    public synchronized TimeSeriesItem removeLatestItem() {
+        return wrappedTimeSeries.size() > 0 ? remove(wrappedTimeSeries.size() - 1) : null;
     }
 
-    public long getEarliestTimestamp() {
-        return wrappedTimeSeries.getEarliestTimestamp();
+    public synchronized long getEarliestTimestamp() {
+        return isEmpty() ? -1 : getEarliestItem().getTimestamp();
     }
 
-    public long getLatestTimestamp() {
-        return wrappedTimeSeries.getLatestTimestamp();
+    public synchronized long getLatestTimestamp() {
+        return isEmpty() ? -1 : getLatestItem().getTimestamp();
     }
 
-    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return wrappedTimeSeries.getFirstItemAtOrBefore(timestamp);
+    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+        TimeSeriesItem i = wrappedTimeSeries.getFirstItemAtOrBefore(timestamp);
+        return i == null ? null : isInWindow(i) ? i : null;
     }
 
-    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return wrappedTimeSeries.getFirstItemAtOrAfter(timestamp);
+    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+        TimeSeriesItem i = wrappedTimeSeries.getFirstItemAtOrAfter(timestamp);
+        return i == null ? null : isInWindow(i) ? i : null;
     }
 
-    public long getTimestampAfter(long timestamp) {
-        return wrappedTimeSeries.getTimestampAfter(timestamp);
+    public synchronized long getTimestampAfter(long timestamp) {
+        long time = wrappedTimeSeries.getTimestampAfter(timestamp);
+        return time == -1 ? -1 : isTimestampInWindow(time) ? time : -1;
     }
 
-    public long getTimestampBefore(long timestamp) {
-        return wrappedTimeSeries.getTimestampBefore(timestamp);
-    }
+    public synchronized long getTimestampBefore(long timestamp) {
+        long time = wrappedTimeSeries.getTimestampBefore(timestamp);
+        return time == -1 ? -1 : isTimestampInWindow(time) ? time : -1;    }
 
-    public void addTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
         super.addTimeSeriesListener(l);
     }
 
-    public void removeTimeSeriesListener(TimeSeriesListener l) {
+    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
         super.removeTimeSeriesListener(l);
@@ -426,34 +447,20 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         setEndTime(new FixedTimeSource(endTime));
     }
 
-    @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        MovingWindowTimeSeries that = (MovingWindowTimeSeries) o;
-
-        if (endTimeSource != null ? !endTimeSource.equals(that.endTimeSource) : that.endTimeSource != null)
-            return false;
-        if (frequencyToCheckWindow != null ? !frequencyToCheckWindow.equals(that.frequencyToCheckWindow) : that.frequencyToCheckWindow != null)
-            return false;
-        if (startTimeSource != null ? !startTimeSource.equals(that.startTimeSource) : that.startTimeSource != null)
-            return false;
-        if (wrappedTimeSeries != null ? !wrappedTimeSeries.equals(that.wrappedTimeSeries) : that.wrappedTimeSeries != null)
-            return false;
-
-        return true;
+        return subList(0, size()).equals(o);
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (wrappedTimeSeries != null ? wrappedTimeSeries.hashCode() : 0);
-        result = 31 * result + (startTimeSource != null ? startTimeSource.hashCode() : 0);
-        result = 31 * result + (endTimeSource != null ? endTimeSource.hashCode() : 0);
-        result = 31 * result + (frequencyToCheckWindow != null ? frequencyToCheckWindow.hashCode() : 0);
-        return result;
+    //from abstractList
+    public synchronized int hashCode() {
+        int hashCode = 1;
+        Iterator i = iterator();
+            while (i.hasNext()) {
+            Object obj = i.next();
+            hashCode = 31*hashCode + (obj==null ? 0 : obj.hashCode());
+        }
+        return hashCode;
     }
 
     //an iterator backed by the wrapped series, which exposes only the items currently in the window
@@ -638,6 +645,10 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         public List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
             throw new UnsupportedOperationException();
         }
+    }
+
+    private boolean isTimestampInWindow(long timestamp) {
+        return timestamp >= startTime && timestamp <= endTime;
     }
 
     private boolean isInWindow(int realIndex) {

@@ -51,10 +51,10 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         waitForLatch();
 
         ListTimeSeriesEvent actual = events.get(0);
-        ListTimeSeriesEvent itemsAddedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsForTimestamps(1), 0);
+        ListTimeSeriesEvent itemsAddedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsWithTimestamps(1), 0);
         assertEquals(itemsAddedEvent, actual);
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(3), 0), events.get(1));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(2), 0), events.get(2));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(3), 0), events.get(1));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(2), 0), events.get(2));
     }
 
     @Test
@@ -63,10 +63,10 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         super.testAddAll();
         waitForLatch();
 
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsForTimestamps(1), 0), events.get(0));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(4), 0), events.get(1));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 2, TimeSeriesTestUtils.createItemsForTimestamps(2, 3), 0), events.get(2));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 4, 5, TimeSeriesTestUtils.createItemsForTimestamps(5, 6), 0), events.get(3));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsWithTimestamps(1), 0), events.get(0));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(4), 0), events.get(1));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 2, TimeSeriesTestUtils.createItemsWithTimestamps(2, 3), 0), events.get(2));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 4, 5, TimeSeriesTestUtils.createItemsWithTimestamps(5, 6), 0), events.get(3));
     }
 
     @Test
@@ -74,8 +74,8 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         initializeCountdown(7);
         super.testRemove();
         waitForLatch();
-        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 2, 2, TimeSeriesTestUtils.createItemsForTimestamps(3), 0), events.get(5));
-        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 3, 3, TimeSeriesTestUtils.createItemsForTimestamps(5), 0), events.get(6));
+        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 2, 2, TimeSeriesTestUtils.createItemsWithTimestamps(3), 0), events.get(5));
+        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 3, 3, TimeSeriesTestUtils.createItemsWithTimestamps(5), 0), events.get(6));
     }
 
     @Test
@@ -83,7 +83,7 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         initializeCountdown(8);
         super.testRemoveAll();
         waitForLatch();
-        assertEquals(ListTimeSeriesEvent.createSeriesChangedEvent(timeSeries, TimeSeriesTestUtils.createItemsForTimestamps(1, 2, 5, 6), 0), events.get(6));
+        assertEquals(ListTimeSeriesEvent.createSeriesChangedEvent(timeSeries, TimeSeriesTestUtils.createItemsWithTimestamps(1, 2, 5, 6), 0), events.get(6));
     }
 
     @Test
@@ -91,8 +91,8 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         initializeCountdown(5);
         super.testSet();
         waitForLatch();
-        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(3), 0), events.get(3));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(2), 0), events.get(4));
+        assertEquals(ListTimeSeriesEvent.createItemsRemovedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(3), 0), events.get(3));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(2), 0), events.get(4));
     }
 
     private void initializeCountdown(int count) {
@@ -115,8 +115,8 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         testContainsConsecutiveNumbersStartingFromOne(timeSeries, 2);
 
         waitForLatch();
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsForTimestamps(1), 0), events.get(0));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsForTimestamps(2), 0), events.get(1));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsWithTimestamps(1), 0), events.get(0));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 1, 1, TimeSeriesTestUtils.createItemsWithTimestamps(2), 0), events.get(1));
     }
 
     @Test
@@ -130,8 +130,8 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
         testContainsConsecutiveNumbersStartingFromOne(timeSeries, 2);
 
         waitForLatch();
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsForTimestamps(2), 0), events.get(0));
-        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsForTimestamps(1), 0), events.get(1));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsWithTimestamps(2), 0), events.get(0));
+        assertEquals(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(timeSeries, 0, 0, TimeSeriesTestUtils.createItemsWithTimestamps(1), 0), events.get(1));
     }
 
     @Test
@@ -211,14 +211,14 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
     public void testAddAllProtectsTimestampOrdering() {
         addNewItemsForTimestamps(10);
         try {
-            timeSeries.addAll(TimeSeriesTestUtils.createItemsForTimestamps(9, 10, 11));
+            timeSeries.addAll(TimeSeriesTestUtils.createItemsWithTimestamps(9, 10, 11));
             fail("Should cause TimeSeriesOrderingException");
         } catch (TimeSeriesOrderingException e) {
             checkExceptionDetails(e, 1, 9);
         }
 
         try {
-            timeSeries.addAll(TimeSeriesTestUtils.createItemsForTimestamps(11, 7, 12));
+            timeSeries.addAll(TimeSeriesTestUtils.createItemsWithTimestamps(11, 7, 12));
             fail("Should cause TimeSeriesOrderingException");
         } catch (TimeSeriesOrderingException e) {
             checkExceptionDetails(e, 1, 7);
@@ -229,14 +229,14 @@ public abstract class AbstractListTimeSeriesTest<E extends ListTimeSeries> exten
     public void testAddAllAtIndexProtectsTimestampOrdering() {
         addNewItemsForTimestamps(10, 20);
         try {
-            timeSeries.addAll(1, TimeSeriesTestUtils.createItemsForTimestamps(9, 11));
+            timeSeries.addAll(1, TimeSeriesTestUtils.createItemsWithTimestamps(9, 11));
             fail("Should cause TimeSeriesOrderingException");
         } catch (TimeSeriesOrderingException e) {
             checkExceptionDetails(e, 1, 9);
         }
 
         try {
-            timeSeries.addAll(1, TimeSeriesTestUtils.createItemsForTimestamps(11, 21));
+            timeSeries.addAll(1, TimeSeriesTestUtils.createItemsWithTimestamps(11, 21));
             fail("Should cause TimeSeriesOrderingException");
         } catch (TimeSeriesOrderingException e) {
             checkExceptionDetails(e, 1, 21);

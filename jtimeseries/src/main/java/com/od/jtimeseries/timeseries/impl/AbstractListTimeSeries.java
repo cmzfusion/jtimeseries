@@ -43,6 +43,8 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     private final OrderValidatingRandomAccessDeque series;
     private final TimeSeriesListenerSupport timeSeriesListenerSupport = new TimeSeriesListenerSupport();
 
+    private final String toStringDescription = "Series-" + getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
+
     protected AbstractListTimeSeries() {
         series = new OrderValidatingRandomAccessDeque(new RandomAccessDeque<TimeSeriesItem>());
     }
@@ -106,11 +108,7 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     }
 
     public synchronized TimeSeriesItem removeEarliestItem() {
-        TimeSeriesItem result = null;
-        if ( series.size() > 0) {
-            result = series.removeFirst();
-        }
-        return result;
+        return series.size() > 0 ? series.removeFirst() : null;
     }
 
     public synchronized boolean isEmpty() {
@@ -443,5 +441,9 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     //have been added.)
     protected synchronized void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
         series.addAll(c);
+    }
+
+    public String toString() {
+        return toStringDescription;
     }
 }

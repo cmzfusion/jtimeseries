@@ -20,7 +20,6 @@ package com.od.jtimeseries.timeseries.impl;
 
 import java.util.*;
 
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import org.junit.Before;
 import org.junit.Assert;
@@ -131,7 +130,7 @@ public abstract class AbstractListTest extends Assert {
 
         li = list.subList(0, list.size()).listIterator(list.size());
         start = list.size();
-        while( li.hasNext()) {
+        while( li.hasPrevious()) {
             assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(start--), li.previous());
         }
 
@@ -220,7 +219,7 @@ public abstract class AbstractListTest extends Assert {
     @Test
     public void testRemoveAll() {
         addNewItemsForTimestamps(1,2,3,4,5,6);
-        list.removeAll(TimeSeriesTestUtils.createItemsForTimestamps(3, 4));
+        list.removeAll(TimeSeriesTestUtils.createItemsWithTimestamps(3, 4));
         checkListContentsByTimestamp(1,2,5,6);
     }
 

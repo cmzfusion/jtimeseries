@@ -851,20 +851,28 @@ class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable
         return oldElement;
     }
 
-    //TODO performance here will be bad
-    //need to improve the performance of this
+
     public void add(int index, E element) {
         if ( index < 0 || index > size()) {
             throw new IndexOutOfBoundsException();
         }
-        //first let's use addLast to expand the dequeue by 1, this may cause a capacity change
-        //the element we are adding will be replaced in the next section
-        addLast(element);
-        //now move all the elements from index to size() - 1 forward by 1 slot and set the new item at index
-        for ( int loop=size() - 1; loop >= index; loop--) {
-            set(loop + 1, get(loop));
+
+        if ( index == 0) {
+            addFirst(element);
+        } else if ( index == size()) {
+            addLast(element);
+        } else {
+            //TODO performance here will be bad
+            //need to improve the performance of this
+            //first let's use addLast to expand the dequeue by 1, this may cause a capacity change
+            //the element we are adding will be replaced in the next section
+            addLast(element);
+            //now move all the elements from index to size() - 1 forward by 1 slot and set the new item at index
+            for ( int loop=size() - 1; loop >= index; loop--) {
+                set(loop + 1, get(loop));
+            }
+            set(index, element);
         }
-        set(index, element);
     }
 
     //TODO performance here will be bad

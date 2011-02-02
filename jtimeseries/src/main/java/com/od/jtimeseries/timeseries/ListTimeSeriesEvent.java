@@ -134,7 +134,7 @@ public class ListTimeSeriesEvent extends TimeSeriesEvent {
     public String toString() {
         return "TimeSeriesEvent{" + getEventType() +
                 (getItems().size() < 10 ? ", items " + getItems() : ", first 10 items=" + getItems().subList(0, 10)) +
-                ", source=" + getSource() + ", startIndex=" + startIndex + ", endIndex=" + endIndex + ", modCount=" + getSeriesModCount() +
+                ", startIndex=" + startIndex + ", endIndex=" + endIndex + ", modCount=" + getSeriesModCount() +
 +
                 '}';
     }

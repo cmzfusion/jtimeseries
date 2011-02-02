@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class TimeSeriesTestUtils {
 
-    public static List<TimeSeriesItem> createItemsForTimestamps(long... timestampsForItems) {
+    public static List<TimeSeriesItem> createItemsWithTimestamps(long... timestampsForItems) {
         List<TimeSeriesItem> items = new ArrayList<TimeSeriesItem>();
         for (long timestampsForItem : timestampsForItems) {
             items.add(createItemWithTimestamp(timestampsForItem));

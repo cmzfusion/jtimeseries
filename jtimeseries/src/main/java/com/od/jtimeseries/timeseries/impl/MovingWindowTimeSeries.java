@@ -1,13 +1,16 @@
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.ListTimeSeries;
+import com.od.jtimeseries.timeseries.ListTimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.FixedTimeSource;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
+import org.jfree.data.time.MovingAverage;
 
-import javax.naming.OperationNotSupportedException;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
@@ -68,17 +71,20 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     }
 
     private synchronized void findStartAndEndAndFireChange(boolean forceChangeEvent) {
-        startTime = startTimeSource.getTime();
-        endTime = endTimeSource.getTime();
-
+        long oldStartTime = startTime;
+        long oldEndTime = endTime;
         int oldStartIndex = startIndex;
         int oldEndIndex = endIndex;
 
+        startTime = startTimeSource.getTime();
+        endTime = endTimeSource.getTime();
         startIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrAfter(startTime);
         endIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrBefore(endTime);
 
-        if ( oldStartIndex != startIndex || oldEndIndex != endIndex) {
-            queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), modCount.incrementAndGet() ));
+        if ( forceChangeEvent || oldStartIndex != startIndex || oldEndIndex != endIndex || oldStartTime != startTime || oldEndTime != endTime ) {
+            //need to do this to invalidate iterators even if no event fired
+            long newModCount = modCount.incrementAndGet();
+            queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), newModCount ));
         }
     }
 
@@ -321,7 +327,8 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     }
 
     public boolean prepend(TimeSeriesItem item) {
-        return wrappedTimeSeries.prepend(item);
+        add(0, item);
+        return true;
     }
 
     public boolean append(TimeSeriesItem value) {
@@ -518,7 +525,7 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     private class ModCountWrappedList implements ModCountList<TimeSeriesItem> {
 
         public long getModCount() {
-            return wrappedTimeSeries.getModCount();
+            return MovingWindowTimeSeries.this.getModCount();
         }
 
         public int size() {

@@ -534,6 +534,44 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals(9, movingWindowSeries.size());
     }
 
+    public void testChangingStartAndEndInvalidateIterator() {
+        ListIterator<TimeSeriesItem> li = movingWindowSeries.listIterator();
+        li.next();
+        movingWindowSeries.setStartTime(1000);
+        try {
+            li.next();
+            fail("Should cause concurrent mod");
+        } catch(ConcurrentModificationException c) {}
+
+        setStartAndEndTime(4, 6);
+        li = movingWindowSeries.listIterator();
+        li.next();
+        movingWindowSeries.setEndTime(1000);
+        try {
+            li.next();
+            fail("Should cause concurrent mod");
+        } catch(ConcurrentModificationException c) {}
+
+        setStartAndEndTime(4, 6);
+        li = movingWindowSeries.subList(0, movingWindowSeries.size()).listIterator();
+        li.next();
+        movingWindowSeries.setStartTime(1000);
+        try {
+            li.next();
+            fail("Should cause concurrent mod");
+        } catch(ConcurrentModificationException c) {}
+
+        setStartAndEndTime(4, 6);
+        li = movingWindowSeries.subList(0, movingWindowSeries.size()).listIterator();
+        li.next();
+        movingWindowSeries.setEndTime(1000);
+        try {
+            li.next();
+            fail("Should cause concurrent mod");
+        } catch(ConcurrentModificationException c) {}
+
+    }
+
     public void testSubList() {
         List l = movingWindowSeries.subList(0, 1);
         assertEquals(TimeSeriesTestUtils.createItemsForTimestamps(4), l);
@@ -553,10 +591,16 @@ public class TestMovingWindowTimeSeries extends TestCase {
                 0
         );
         assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
+        assertEquals(3, movingWindowSeries.size());
 
+        try {
+            l = movingWindowSeries.subList(0, 4);
+            fail("There should now be only 3 items it movable window");
+        } catch ( IndexOutOfBoundsException i){}
 
+        l = movingWindowSeries.subList(1, 3);
+        assertEquals(TimeSeriesTestUtils.createItemsForTimestamps(5, 6), l);
     }
-
 
     private void waitForCountdown(CountDownLatchSeriesListener countDownListener) {
         try {

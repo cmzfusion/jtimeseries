@@ -34,6 +34,7 @@ import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
+import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -161,6 +162,14 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public ChartRangeMode getChartRangeMode() {
         return chart.getChartRangeMode();
+    }
+
+    public DomainTimeSelection getDomainStartTimeSelection() {
+        return chart.getDomainStartTimeSelection();
+    }
+
+    public void setDomainStartTimeSelection(DomainTimeSelection domainTimeSelection) {
+        chart.setDomainStartTimeSelection(domainTimeSelection);
     }
 
     public void setChartRangeMode(ChartRangeMode chartRangeMode) {

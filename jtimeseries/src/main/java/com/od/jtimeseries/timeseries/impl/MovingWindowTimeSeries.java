@@ -1,15 +1,14 @@
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.ListTimeSeries;
-import com.od.jtimeseries.timeseries.ListTimeSeriesEvent;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.FixedTimeSource;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
 
+import javax.swing.*;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -57,9 +56,9 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     private long endTime;
     private int endIndex = -1;
     private TimeSource endTimeSource;
-    private TimePeriod frequencyToCheckWindow;
     private final AtomicLong modCount = new AtomicLong(0);
     private ScheduledFuture windowCheckFuture;
+    private boolean checkWindowInSwingThread;
 
     public MovingWindowTimeSeries() {
         this(OPEN_START_TIME, OPEN_END_TIME, null);
@@ -68,7 +67,6 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
     public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource, TimePeriod frequencyToCheckWindow) {
         this.startTimeSource = startTimeSource;
         this.endTimeSource = endTimeSource;
-        this.frequencyToCheckWindow = frequencyToCheckWindow;
         findStartAndEndAndFireChange(false);
         if ( frequencyToCheckWindow != null) {
             UpdateWindowTask task = new UpdateWindowTask(this);
@@ -82,22 +80,41 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
     }
 
-    private synchronized void findStartAndEndAndFireChange(boolean forceChangeEvent) {
-        long oldStartTime = startTime;
-        long oldEndTime = endTime;
-        int oldStartIndex = startIndex;
-        int oldEndIndex = endIndex;
+    private void findStartAndEndAndFireChange(final boolean forceChangeEvent) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                synchronized (MovingWindowTimeSeries.this) {
+                    long oldStartTime = startTime;
+                    long oldEndTime = endTime;
+                    int oldStartIndex = startIndex;
+                    int oldEndIndex = endIndex;
 
-        startTime = startTimeSource.getTime();
-        endTime = endTimeSource.getTime();
-        startIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrAfter(startTime);
-        endIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrBefore(endTime);
+                    startTime = startTimeSource.getTime();
+                    endTime = endTimeSource.getTime();
+                    startIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrAfter(startTime);
+                    endIndex = wrappedTimeSeries.getIndexOfFirstItemAtOrBefore(endTime);
 
-        if ( forceChangeEvent || oldStartIndex != startIndex || oldEndIndex != endIndex || oldStartTime != startTime || oldEndTime != endTime ) {
-            //need to do this to invalidate iterators even if no event fired
-            long newModCount = modCount.incrementAndGet();
-            queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), newModCount ));
+                    if ( forceChangeEvent || oldStartIndex != startIndex || oldEndIndex != endIndex || oldStartTime != startTime || oldEndTime != endTime ) {
+                        //need to do this to invalidate iterators even if no event fired
+                        long newModCount = modCount.incrementAndGet();
+                        queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), newModCount ));
+                    }
+                }
+            }
+        };
+        if ( checkWindowInSwingThread && ! SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }  else {
+            runnable.run();
         }
+    }
+
+    public void setCheckWindowInSwingThread(boolean checkWindowInSwingThread) {
+        this.checkWindowInSwingThread = checkWindowInSwingThread;
     }
 
     public synchronized List<TimeSeriesItem> getSnapshot() {
@@ -155,13 +172,13 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
             }
 
             queueItemsAddedOrInsertedEvent(
-                ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                    this,
-                    getViewIndex(endIndex),
-                    getViewIndex(endIndex),
-                    Collections.singletonList(timeSeriesItem),
-                    modCount.incrementAndGet()
-                )
+                    ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
+                            this,
+                            getViewIndex(endIndex),
+                            getViewIndex(endIndex),
+                            Collections.singletonList(timeSeriesItem),
+                            modCount.incrementAndGet()
+                    )
             );
         }
         return added;
@@ -459,6 +476,14 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         setEndTime(new FixedTimeSource(endTime));
     }
 
+    /**
+     * Changing this data in any way may corrupt the windowed view
+     * @return the underlying series data for this windowed time series
+     */
+    public TimeSeries getWrappedSeries() {
+        return wrappedTimeSeries;
+    }
+
     public synchronized boolean equals(Object o) {
         if (this == o) return true;
         return subList(0, size()).equals(o);
@@ -695,9 +720,9 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
         }
 
         public void run() {
-            MovingWindowTimeSeries s = series.get();
+            final MovingWindowTimeSeries s = series.get();
             if ( s != null ) {
-                s.findStartAndEndAndFireChange(false);
+               s.findStartAndEndAndFireChange(false);
             } else {
                 if ( future != null ) {
                     future.cancel(false);

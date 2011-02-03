@@ -188,29 +188,11 @@ public class JTimeSeriesDemo {
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {
-        return new VisualizerConfiguration(
-                visualizer.getChartsTitle(),
-                visualizer.getDisplayNamePatterns(),
-                visualizer.isTableSelectorVisible(),
-                visualizer.getChartConfigs(),
-                visualizer.getChartRangeMode(),
-                visualizer.getDividerLocation(),
-                visualizer.isShowLegendOnChart(),
-                visualizer.getChartBackgroundColor(),
-                visualizer.getColumns()
-        );
+        return VisualizerConfiguration.createVisualizerConfiguration(visualizer);
     }
 
     private void configureVisualizer(VisualizerConfiguration config) {
-        visualizer.setDisplayNamePatterns(config.getDisplayNamePatterns());
-        visualizer.setTableSelectorVisible(config.isTableSelectorVisible());
-        visualizer.setDividerLocation(config.getDividorLocation());
-        visualizer.setChartRangeMode(ChartRangeMode.valueOf(config.getChartRangeMode()));
-        visualizer.setChartsTitle(config.getChartsTitle());
-        visualizer.setShowLegendOnChart(config.isShowLegendOnChart());
-        visualizer.setChartBackgroundColor(config.getChartBackgroundColor());
-        visualizer.addChartConfigs(config.getChartConfigs());
-        visualizer.setColumns(config.getTableColumns());
+        VisualizerConfiguration.setVisualizerConfiguration(visualizer, config);
     }
 
     public class DemoMainFrame extends JFrame {

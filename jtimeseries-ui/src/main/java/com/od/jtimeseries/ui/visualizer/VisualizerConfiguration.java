@@ -22,6 +22,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class VisualizerConfiguration {
     private int dividorLocation;
     private boolean showLegendOnChart = true;
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
+    private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameBounds;
@@ -53,11 +55,12 @@ public class VisualizerConfiguration {
     }
 
     public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
-                                   ChartRangeMode chartRangeMode, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
+                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
         this.chartsTitle = chartsTitle;
         this.displayNamePatterns = displayNamePatterns;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
+        this.domainStartTimeSelection = domainStartTimeSelection;
         this.chartRangeMode = chartRangeMode.name();
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
@@ -79,6 +82,14 @@ public class VisualizerConfiguration {
 
     public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
         this.displayNamePatterns = displayNamePatterns;
+    }
+
+    public DomainTimeSelection getDomainStartTimeSelection() {
+        return domainStartTimeSelection;
+    }
+
+    public void setDomainStartTimeSelection(DomainTimeSelection domainStartTimeSelection) {
+        this.domainStartTimeSelection = domainStartTimeSelection;
     }
 
     public boolean isTableSelectorVisible() {
@@ -160,6 +171,7 @@ public class VisualizerConfiguration {
             visualizer.isTableSelectorVisible(),
             visualizer.getChartConfigs(),
             visualizer.getChartRangeMode(),
+            visualizer.getDomainStartTimeSelection(),
             visualizer.getDividerLocation(),
             visualizer.isShowLegendOnChart(),
             visualizer.getChartBackgroundColor(),
@@ -173,6 +185,7 @@ public class VisualizerConfiguration {
         visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
         visualizer.addChartConfigs(c.getChartConfigs());
         visualizer.setChartRangeMode(ChartRangeMode.valueOf(c.getChartRangeMode()));
+        visualizer.setDomainStartTimeSelection(c.getDomainStartTimeSelection());
         visualizer.setDividerLocation(c.getDividorLocation());
         visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
@@ -181,6 +194,16 @@ public class VisualizerConfiguration {
         if ( c.getTableColumns().size() > 0) {
             visualizer.setColumns(c.getTableColumns());
         }
+    }
+
+    //the readResolve method allows us to handle migrations where we add fields which need to
+    //be initialised - xstream sets the fields null even if a default is
+    //assigned when the field is defined
+    private Object readResolve() {
+        if ( domainStartTimeSelection == null) {
+            domainStartTimeSelection = new DomainTimeSelection();
+        }
+        return this;
     }
 
 }

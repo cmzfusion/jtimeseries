@@ -19,14 +19,16 @@
 package com.od.jtimeseries.chart;
 
 import com.od.jtimeseries.timeseries.*;
-import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
+import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
+import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.util.time.TimeSource;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,36 +49,79 @@ import java.util.List;
 public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
     private String[] columnNames;
-    private DefaultTimeSeries timeSeries;
-    private long timeSeriesModCountOnTableCreation;
+    private MovingWindowTimeSeries movingWindowSeries;
+    private long wrappedSeriesModCount;
 
     //keep this as a field - it is wrapped as a WeakReferenceListener and would otherwise get gc'd
     private TimeSeriesListener seriesListener = new TableModelAdapterSeriesListener();
     private boolean snapshotOnly;
     private final IdentifiableTimeSeries wrappedSeries;
     private WeakReferenceTimeSeriesListener weakRefListener;
-    private volatile long startTime;
+    private volatile TimeSource startTime;
+    private boolean valid;
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries) {
-        this(timeSeries, false, 0);
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly) {
+        this(wrappedSeries, snapshotOnly, MovingWindowTimeSeries.OPEN_START_TIME);
     }
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries, long startTime) {
-        this(timeSeries, false, startTime);
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries) {
+        this(wrappedSeries, false, MovingWindowTimeSeries.OPEN_START_TIME);
     }
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries timeSeries, boolean snapshotOnly, long startTime) {
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, TimeSource startTime) {
+        this(wrappedSeries, false, startTime);
+    }
+
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly, TimeSource startTime) {
         this.snapshotOnly = snapshotOnly;
         this.startTime = startTime;
-        columnNames = new String[]{"Date Time", timeSeries.getDescription()};
-        this.wrappedSeries = timeSeries;
+        columnNames = new String[]{"Date Time", wrappedSeries.getDescription()};
+        this.wrappedSeries = wrappedSeries;
+
+        TimePeriod t = snapshotOnly ? null : Time.seconds(10);
+
+        this.movingWindowSeries = new MovingWindowTimeSeries(startTime, MovingWindowTimeSeries.OPEN_END_TIME, t) {
+            //fire events synchronously, since this moving window series becomes part of the swing
+            //table model and should only be updated / fire events on the swing event thread
+            protected Executor getSeriesEventExecutor() {
+                return new Executor() {
+                    public void execute(Runnable command) {
+                        command.run();
+                    }
+                };
+            }
+        };
+        movingWindowSeries.setCheckWindowInSwingThread(true);
+
+        movingWindowSeries.addTimeSeriesListener(
+            new TimeSeriesListener() {
+                public void itemsAddedOrInserted(TimeSeriesEvent e) {
+                    ListTimeSeriesEvent l = (ListTimeSeriesEvent)e;
+                    fireTableRowsInserted(l.getStartIndex(), l.getEndIndex());
+                }
+
+                public void itemsRemoved(TimeSeriesEvent e) {
+                    ListTimeSeriesEvent l = (ListTimeSeriesEvent)e;
+                    fireTableRowsDeleted(l.getStartIndex(), l.getEndIndex());
+                }
+
+                public void itemsChanged(TimeSeriesEvent e) {
+                    ListTimeSeriesEvent l = (ListTimeSeriesEvent)e;
+                    fireTableRowsUpdated(l.getStartIndex(), l.getEndIndex());
+                }
+
+                public void seriesChanged(TimeSeriesEvent e) {
+                    fireTableDataChanged();
+                }
+            }
+        );
     }
 
-    public long getStartTime() {
+    public TimeSource getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public void setStartTime(TimeSource startTime) {
         this.startTime = startTime;
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -88,25 +133,22 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     //table model series is a snapshot of wrappedSeries owned by swing event thread, kept up to date by subscribing to
     //series events from wrappedSeries
     private void createTableModelSeries() {
-
+        valid = true;
         synchronized (wrappedSeries) {
+
+            // Wrap the timeseries listener in a weak reference listener so that
+            // the listener/table model can be garbage collected if all other references are cleared
+            if (weakRefListener != null) {
+                wrappedSeries.removeTimeSeriesListener(weakRefListener);
+            }
+
+            movingWindowSeries.clear();
             //if you remove getSnapshot() from the line below, you'll need to change RemoteChartingTimeSeries
             //to trigger its lazy load on another method call
-            TimeSeries seriesToCopy = wrappedSeries;
-            if ( startTime > 0) {
-                seriesToCopy = wrappedSeries.getSubSeries(startTime);
-            }
-            this.timeSeries = new DefaultTimeSeries(seriesToCopy);
+            movingWindowSeries.addAll(wrappedSeries.getSnapshot());
 
             if (!snapshotOnly) {
-                timeSeriesModCountOnTableCreation = timeSeries.getModCount();
-
-
-                // Wrap the timeseries listener in a weak reference listener so that
-                // the listener/table model can be garbage collected if all other references are cleared
-                if (weakRefListener != null) {
-                    wrappedSeries.removeTimeSeriesListener(weakRefListener);
-                }
+                wrappedSeriesModCount = movingWindowSeries.getModCount();
 
                 weakRefListener = new WeakReferenceTimeSeriesListener(
                         wrappedSeries,
@@ -121,7 +163,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
     public int getRowCount() {
         checkAndInitializeSeries();
-        return timeSeries.size();
+        return movingWindowSeries.size();
     }
 
     public int getColumnCount() {
@@ -143,8 +185,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         checkAndInitializeSeries();
         return columnIndex == 0 ?
-                timeSeries.get(rowIndex).getTimestamp() :
-                timeSeries.get(rowIndex).getValue();
+                movingWindowSeries.get(rowIndex).getTimestamp() :
+                movingWindowSeries.get(rowIndex).getValue();
     }
 
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
@@ -152,7 +194,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     }
 
     private void checkAndInitializeSeries() {
-        if (timeSeries == null) {
+        if (! valid) {
             createTableModelSeries();
         }
     }
@@ -166,16 +208,10 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     private class TableModelAdapterSeriesListener extends ModCountAwareSeriesListener {
 
         public void doItemsAddedOrInserted(TimeSeriesEvent e) {
-            if (e.getFirstItemTimestamp() > timeSeries.getLatestTimestamp()) {
-                int insertIndex = timeSeries.size();
-                timeSeries.addAll(e.getItems());
-                fireTableRowsInserted(insertIndex, timeSeries.size() - 1);
-            } else if (e.getLastItemTimestamp() < timeSeries.getEarliestTimestamp()) {
-                List<TimeSeriesItem> toPrepend = new ArrayList(e.getItems()); //ensure random access
-                for (int loop = toPrepend.size() - 1; loop >= 0; loop--) {
-                    timeSeries.prepend(toPrepend.get(loop));
-                }
-                fireTableRowsInserted(0, toPrepend.size() - 1);
+            if (e.getFirstItemTimestamp() > movingWindowSeries.getWrappedSeries().getLatestTimestamp()) {
+                movingWindowSeries.addAll(e.getItems());
+            } else if (e.getLastItemTimestamp() < movingWindowSeries.getWrappedSeries().getEarliestTimestamp()) {
+                movingWindowSeries.addAll(0, e.getItems());
             } else {
                 invalidateAndFireDataChange();
             }
@@ -194,11 +230,10 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         public void doSeriesChanged(final TimeSeriesEvent h) {
             invalidateAndFireDataChange();
         }
-
     }
 
     private void invalidateAndFireDataChange() {
-        this.timeSeries = null;
+        valid = false;
         fireTableDataChanged();
     }
 
@@ -212,7 +247,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         public final void itemsAddedOrInserted(final TimeSeriesEvent e) {
             Runnable runnable = new Runnable() {
                 public void run() {
-                    if (e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
                         doItemsAddedOrInserted(e);
                     }
                 }
@@ -225,7 +260,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         public final void itemsRemoved(final TimeSeriesEvent e) {
             Runnable runnable = new Runnable() {
                 public void run() {
-                    if (e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
                         doItemsRemoved(e);
                     }
                 }
@@ -238,7 +273,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         public final void itemsChanged(final TimeSeriesEvent e) {
             Runnable runnable = new Runnable() {
                 public void run() {
-                    if (e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
                         doItemsChanged(e);
                     }
                 }
@@ -251,7 +286,7 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
         public final void seriesChanged(final TimeSeriesEvent e) {
             Runnable runnable = new Runnable() {
                 public void run() {
-                    if (e.getSeriesModCount() > timeSeriesModCountOnTableCreation) {
+                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
                         doSeriesChanged(e);
                     }
                 }

@@ -28,7 +28,6 @@ import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.ui.RectangleInsets;
 
 import javax.swing.*;
@@ -69,7 +68,7 @@ public class TimeSeriesChart extends JPanel {
     };
     private JFreeChart chart;
     private boolean showLegend = true;
-    private DomainSelection domainSelection = new DomainSelection();
+    private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
 
     public TimeSeriesChart(String title) {
         this.title = title;
@@ -144,9 +143,13 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
-    public void setChartDomainSelection(DomainSelection newValue) {
-        if ( ! this.domainSelection.equals(newValue) ) {
-            this.domainSelection = newValue;
+    public DomainTimeSelection getDomainStartTimeSelection() {
+        return domainStartTimeSelection;
+    }
+
+    public void setDomainStartTimeSelection(DomainTimeSelection newValue) {
+        if ( ! this.domainStartTimeSelection.equals(newValue) ) {
+            this.domainStartTimeSelection = newValue;
             createAndSetChart();
         }
     }
@@ -182,7 +185,7 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void addSeries(JFreeChart chart) {
-        ChartSeriesPopulator c = new ChartSeriesPopulator(chart.getXYPlot(), chartRangeMode, domainSelection);
+        ChartSeriesPopulator c = new ChartSeriesPopulator(chart.getXYPlot(), chartRangeMode, domainStartTimeSelection);
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
             ChartingTimeSeries series = timeSeriesList.get(loop);
             c.addSeriesToChart(series, loop);

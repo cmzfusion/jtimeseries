@@ -1,5 +1,7 @@
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.od.jtimeseries.util.time.TimeSource;
+
 import java.util.Calendar;
 
 /**
@@ -8,16 +10,16 @@ import java.util.Calendar;
  * Date: 28/01/11
  * Time: 06:45
  */
-public class DomainSelection {
+public class DomainTimeSelection implements TimeSource {
 
     private ChartDomainMode mode;
     private int multiple;
 
-    public DomainSelection() {
+    public DomainTimeSelection() {
         this(ChartDomainMode.DAYS, 1);
     }
 
-    public DomainSelection(ChartDomainMode mode, int multiple) {
+    public DomainTimeSelection(ChartDomainMode mode, int multiple) {
         this.mode = mode;
         this.multiple = multiple;
     }
@@ -30,7 +32,7 @@ public class DomainSelection {
         return multiple;
     }
 
-    public long getStartTime() {
+    public long getTime() {
         long time = 0;
         switch (mode) {
             case MINUTES :
@@ -38,21 +40,22 @@ public class DomainSelection {
                 break;
             case HOURS :
                 time = System.currentTimeMillis() - ((long)60000 * 60 * multiple);
-            case DAYS :
+                break;
+            case DAYS : // 1 day = start of current day, 2 days = start of current - 24hrs
                 Calendar c = getStartOfDay();
                 c.add(Calendar.DATE, - (multiple - 1));
                 time = c.getTimeInMillis();
                 break;
-            case WEEKS :
+            case WEEKS :   // 1 week = start of current week, 2 weeks = start of current week - 7 days
                 c = getStartOfDay();
-                c.set(Calendar.DAY_OF_WEEK, 0);
-                c.add(Calendar.WEEK_OF_YEAR, -(multiple - 1));
+                c.set(Calendar.DAY_OF_WEEK, c.getFirstDayOfWeek());
+                c.add(Calendar.WEEK_OF_YEAR, - ( multiple - 1));
                 time = c.getTimeInMillis();
                 break;
-            case MONTHS:
+            case MONTHS:  // 1 month = start of current month, 2 months = start of current - 1 months
                 c = getStartOfDay();
                 c.set(Calendar.DAY_OF_MONTH, 1);
-                c.add(Calendar.MONTH, -(multiple - 1));
+                c.add(Calendar.MONTH, - (multiple - 1));
                 time = c.getTimeInMillis();
                 break;
             case YEARS:
@@ -76,12 +79,11 @@ public class DomainSelection {
         return c;
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DomainSelection that = (DomainSelection) o;
+        DomainTimeSelection that = (DomainTimeSelection) o;
 
         if (multiple != that.multiple) return false;
         if (mode != that.mode) return false;
@@ -89,10 +91,10 @@ public class DomainSelection {
         return true;
     }
 
-    @Override
     public int hashCode() {
         int result = mode != null ? mode.hashCode() : 0;
         result = 31 * result + multiple;
         return result;
     }
+
 }

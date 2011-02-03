@@ -43,9 +43,9 @@ public class ChartSeriesPopulator {
     private ChartRangeMode chartRangeMode;
     private HashMap<String, NumberAxis> axisBySeriesId = new HashMap<String, NumberAxis>();
     private HashMap<String, Integer> axisIndexBySeriesId = new HashMap<String, Integer>();
-    private DomainSelection domainSelection;
+    private DomainTimeSelection domainSelection;
 
-    public ChartSeriesPopulator(XYPlot plot, ChartRangeMode chartRangeMode, DomainSelection domainSelection) {
+    public ChartSeriesPopulator(XYPlot plot, ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection) {
         this.plot = plot;
         this.chartRangeMode = chartRangeMode;
         this.domainSelection = domainSelection;
@@ -111,7 +111,10 @@ public class ChartSeriesPopulator {
 
 
     private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
-        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(contextTimeSeries, domainSelection.getStartTime());
+        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(
+            contextTimeSeries,
+            domainSelection
+        );
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
     }
 

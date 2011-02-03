@@ -21,7 +21,7 @@ public class RangeSelectorComponent extends JPanel {
     private JComboBox rangeModeList = new JComboBox();
     private JFormattedTextField multipleTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-    private DomainSelection domainSelection = new DomainSelection();
+    private DomainTimeSelection domainSelection = new DomainTimeSelection();
 
     public RangeSelectorComponent() {
         setLayout(new FlowLayout());
@@ -50,7 +50,7 @@ public class RangeSelectorComponent extends JPanel {
                     nfe.printStackTrace();
                 }
                 if ( newMultiple != null ) {
-                    setDomainSelection(new DomainSelection(
+                    setDomainSelection(new DomainTimeSelection(
                         domainSelection.getMode(),
                         newMultiple
                     ));
@@ -61,7 +61,7 @@ public class RangeSelectorComponent extends JPanel {
         rangeModeList.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ChartDomainMode selectedMode = (ChartDomainMode) rangeModeList.getSelectedItem();
-                setDomainSelection(new DomainSelection(
+                setDomainSelection(new DomainTimeSelection(
                         selectedMode,
                         domainSelection.getMultiple()
                 ));
@@ -69,12 +69,12 @@ public class RangeSelectorComponent extends JPanel {
         });
     }
 
-    public DomainSelection getDomainSelection() {
+    public DomainTimeSelection getDomainSelection() {
         return domainSelection;
     }
 
-    public void setDomainSelection(DomainSelection domainSelection) {
-        DomainSelection oldSelection = this.domainSelection;
+    public void setDomainSelection(DomainTimeSelection domainSelection) {
+        DomainTimeSelection oldSelection = this.domainSelection;
         this.domainSelection = domainSelection;
         if (!oldSelection.equals(domainSelection)) {
             showCurrentSelection();

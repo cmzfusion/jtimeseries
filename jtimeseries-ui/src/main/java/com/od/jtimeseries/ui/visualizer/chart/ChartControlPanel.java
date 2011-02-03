@@ -21,7 +21,6 @@ package com.od.jtimeseries.ui.visualizer.chart;
 import com.jidesoft.combobox.ColorComboBox;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -57,8 +56,14 @@ public class ChartControlPanel extends JPanel {
 
     public void refreshStateFromChart() {
         updateSelectedRangeMode();
+        updateDomainSelection();
         showLegendCheckbox.setSelected(timeSeriesChart.isShowLegend());
         colorComboBox.setSelectedColor(timeSeriesChart.getChartBackgroundColor());
+    }
+
+    private void updateDomainSelection() {
+        DomainTimeSelection d = timeSeriesChart.getDomainStartTimeSelection();
+        rangeSelectorComponent.setDomainSelection(d);
     }
 
     private void updateSelectedRangeMode() {
@@ -77,7 +82,7 @@ public class ChartControlPanel extends JPanel {
             RangeSelectorComponent.DOMAIN_SELECTION_PROPERTY,
             new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
-                    timeSeriesChart.setChartDomainSelection((DomainSelection)evt.getNewValue());
+                    timeSeriesChart.setDomainStartTimeSelection((DomainTimeSelection) evt.getNewValue());
                 }
             }
         );

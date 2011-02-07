@@ -21,8 +21,8 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.net.httpd.HttpParameterName;
 import com.od.jtimeseries.ui.util.ExecuteWeakReferencedCommandTask;
 import com.od.jtimeseries.util.NamedExecutors;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 import swingcommand.BackgroundTask;
@@ -32,8 +32,7 @@ import swingcommand.TaskListenerAdapter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
-import java.util.concurrent.Executors;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -54,8 +53,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
+    private final Map<UIPropertiesTimeSeries, UIPropertiesTimeSeries> weakClientSeries =
+            Collections.synchronizedMap(new WeakHashMap<UIPropertiesTimeSeries, UIPropertiesTimeSeries>());
+
     private static ScheduledExecutorService refreshExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeriesRefresh");
-    private static final int STATS_ONLY_REFRESH_TIME_SECONDS = 60 * 30;
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
     private volatile ScheduledFuture refreshTask;
@@ -81,7 +82,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     public void setRefreshTimeSeconds(int seconds) {
         super.setRefreshTimeSeconds(Math.max(seconds, MIN_REFRESH_TIME_SECONDS));
         RemoteHttpTimeSeries.logMethods.logInfo("Changing refresh time for series " + getId() + " to " + getRefreshTimeSeconds() + " seconds");
-        scheduleRefresh();
+        scheduleRefreshIfDisplayed();
     }
 
     public void setStale(boolean stale) {
@@ -92,38 +93,56 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     //Cancel any existing task and schedule a new one if series selected
-    private void scheduleRefresh() {
+    private void scheduleRefreshIfDisplayed() {
         if ( refreshTask != null ) {
             refreshTask.cancel(false);
         }
 
-        //A task which doesn't hold a strong reference to this series
-        //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
-        ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
+        if ( displayedChartCount > 0) {
 
-        //if the user has not selected to chart the series, we only refresh the stats, and much less frequently
-        int refreshTime = (displayedChartCount > 0) ? this.refreshTimeSeconds : STATS_ONLY_REFRESH_TIME_SECONDS;
-        refreshTask = refreshExecutor.scheduleAtFixedRate(
-            runCommandTask, 0, refreshTime, TimeUnit.SECONDS
-        );
+            //A task which doesn't hold a strong reference to this series
+            //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
+            ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
-        //cancel refresh task if this series is gc'd
-        runCommandTask.setFutureToCancel(refreshTask);
+            refreshTask = refreshExecutor.scheduleAtFixedRate(
+                    runCommandTask, refreshTimeSeconds, refreshTimeSeconds, TimeUnit.SECONDS
+            );
+
+            //cancel refresh task if this series is gc'd
+            runCommandTask.setFutureToCancel(refreshTask);
+        }
     }
 
     public void chartSeriesChanged(ChartSeriesEvent e) {
-        switch(e.getChartSeriesEventType()) {
-            case SERIES_CHART_DISPLAYED:
-                displayedChartCount++;
-                if ( displayedChartCount == 1) {
-                    scheduleRefresh(); //may want to change refresh rate
-                }
-                break;
-            case SERIES_CHART_HIDDEN:
-                displayedChartCount = Math.max(0, displayedChartCount - 1);
-                scheduleRefresh(); //may want to change refresh rate
-                break;
-            default:
+        weakClientSeries.put(e.getSourceSeries(), e.getSourceSeries());
+//        switch(e.getChartSeriesEventType()) {
+//            case SERIES_CHART_DISPLAYED:
+//            case SERIES_CHART_HIDDEN:
+//                weakClientSeries.put(e.getSourceSeries(), e.getSourceSeries());
+//            case SERIES_CHART_DISPOSED:
+//                weakClientSeries.remove(e.getSourceSeries());
+//            default:
+//        }
+        updateDisplayedChartCountAndReschedule();
+    }
+
+    private void updateDisplayedChartCountAndReschedule() {
+
+        Set<UIPropertiesTimeSeries> series;
+        synchronized(weakClientSeries) {
+            series = new HashSet<UIPropertiesTimeSeries>(weakClientSeries.keySet());
+        }
+
+        int displayedCount = 0;
+        for ( UIPropertiesTimeSeries s : series) {
+            if ( s.isSelected()) {
+                displayedCount++;
+            }
+        }
+
+        if ( displayedChartCount != displayedCount) {
+            this.displayedChartCount = displayedCount;
+            scheduleRefreshIfDisplayed();
         }
     }
 
@@ -135,6 +154,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             //if we exceed the error count when running the load, set the series to stale
             //the user will need to re-enable it to start the load off again
             addTaskListener(new SetStaleOnErrorListener());
+            addTaskListener(new RescheduleListener());
         }
 
         protected Task createTask() {
@@ -174,6 +194,12 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                 }
             }
         }
+
+        private class RescheduleListener extends TaskListenerAdapter {
+            public void finished(Task task) {
+                updateDisplayedChartCountAndReschedule();
+            }
+        }
     }
 
 
@@ -182,13 +208,13 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
         RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(id, description, timeSeriesUrl, refreshTime);
-        r.scheduleRefresh();
+        r.scheduleRefreshIfDisplayed();
         return r;
     }
 
     public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
         RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
-        r.scheduleRefresh();
+        r.scheduleRefreshIfDisplayed();
         return r;
     }
 

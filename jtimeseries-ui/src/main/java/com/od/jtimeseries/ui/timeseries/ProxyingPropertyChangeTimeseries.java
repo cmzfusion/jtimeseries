@@ -79,7 +79,7 @@ public abstract class ProxyingPropertyChangeTimeseries extends DefaultIdentifiab
         return propertyChangeSupport.hasListeners(propertyName);
     }
 
-    protected PropertyChangeListener getProxyingPropertyListener(String propertyName) {
-        return new ProxyingPropertyChangeListener(propertyName, propertyChangeSupport, this);
+    protected PropertyChangeListener getProxyingPropertyListener() {
+        return new ProxyingPropertyChangeListener(propertyChangeSupport);
     }
 }

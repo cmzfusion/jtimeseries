@@ -15,6 +15,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
 
-    private static Map<String, RemoteHttpTimeSeries> existingHttpSeries = Collections.synchronizedMap(new WeakHashMap<String, RemoteHttpTimeSeries>());
+    private static Map<String, WeakReference<RemoteHttpTimeSeries>> existingHttpSeries = Collections.synchronizedMap(new HashMap<String, WeakReference<RemoteHttpTimeSeries>>());
 
     public VisualizerRootContext() {
         setTimeSeriesFactory(new VisualizerTimeSeriesFactory());
@@ -39,20 +40,22 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
     public void addIdentifiables(List<? extends Identifiable> identifiables) {
 
 
-        LinkedHashSet<UIPropertiesTimeSeries> series = new LinkedHashSet<UIPropertiesTimeSeries>();
+        LinkedHashSet<UIPropertiesTimeSeries> toAdd = new LinkedHashSet<UIPropertiesTimeSeries>();
         for ( Identifiable i : identifiables) {
             //identifiables in the list may be at different levels of the hierarchy from
             //the same tree structure, parents appear before their descendants
             //Check we have not already added this node to the list before adding it,
-            if ( ! series.contains(i)) {
+            if ( ! toAdd.contains(i)) {
+
+                //this node, plus any children
                 if ( i instanceof UIPropertiesTimeSeries) {
-                    series.add((UIPropertiesTimeSeries)i);
+                    toAdd.add((UIPropertiesTimeSeries)i);
                 }
-                series.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
+                toAdd.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
             }
         }
 
-        for ( UIPropertiesTimeSeries s : series) {
+        for ( UIPropertiesTimeSeries s : toAdd) {
             //TODO we may want to flag the conflict up to the user
             if ( get(s.getPath()) == null) {
                 create(s.getPath(), s.getDescription(), ChartingTimeSeries.class, s.getRoot());
@@ -103,14 +106,20 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
         }
 
         private RemoteHttpTimeSeries getOrCreateHttpSeries(UiTimeSeriesConfig config) throws MalformedURLException {
-            RemoteHttpTimeSeries httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
-            if ( httpSeries == null) {
+            RemoteHttpTimeSeries result = null;
+            WeakReference<RemoteHttpTimeSeries> httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
+            if ( httpSeries != null ) {
+                result = httpSeries.get();
+            }
+
+            if ( result == null ) {
                 //use the config mechanism as a way of cloning the time series, the original
                 //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
-                httpSeries = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
+                result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
+                httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
                 existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
             }
-            return httpSeries;
+            return result;
         }
 
     }

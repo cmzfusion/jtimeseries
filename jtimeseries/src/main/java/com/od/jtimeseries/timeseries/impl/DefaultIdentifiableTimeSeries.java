@@ -38,7 +38,6 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
 
     private TimeSeries timeSeries;
     private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
-
     public DefaultIdentifiableTimeSeries(String id, String description) {
         this(id, description, new DefaultTimeSeries());
     }
@@ -51,13 +50,17 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
     public DefaultIdentifiableTimeSeries(String id, String description, TimeSeries timeSeries) {
         super(id, description);
         this.timeSeries = timeSeries;
-        timeSeries.addTimeSeriesListener(eventHandler);
+        setProxyEventHandler(eventHandler);
     }
 
     //set an alternative handling for wrapped series events
     protected void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
         timeSeries.removeTimeSeriesListener(eventHandler);
-        timeSeries.addTimeSeriesListener(l);
+        //add as a weak reference listener, in general we don't want the
+        //wrapped series to retain a strong reference to the wrapper.
+        WeakReferenceTimeSeriesListener weakReferenceTimeSeriesListener = new
+                WeakReferenceTimeSeriesListener(timeSeries, l);
+        timeSeries.addTimeSeriesListener(weakReferenceTimeSeriesListener);
         eventHandler = l;
     }
 

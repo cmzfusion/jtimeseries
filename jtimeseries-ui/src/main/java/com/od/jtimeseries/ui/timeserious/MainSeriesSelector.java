@@ -61,7 +61,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         selectionPanel.addPropertyChangeListener(
             SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
             new ProxyingPropertyChangeListener(
-                SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY, propertyChangeSupport, this
+                propertyChangeSupport
             )
         );
     }

@@ -21,7 +21,9 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
+import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Date;
 import java.awt.*;
@@ -42,11 +44,13 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
     private String displayName;
     private Color color = colorRotator.getNextColor();
     private RemoteHttpTimeSeries wrappedSeries;
+    public WrappedSeriesTreeListener wrappedSeriesTreeListener;
+    public PropertyChangeListener proxyingPropertyListener;
 
     public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries) {
         super(wrappedSeries);
         this.wrappedSeries = wrappedSeries;
-        addPropertyListeners();
+        addListenersToWrappedSeries();
     }
 
     public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries, UiTimeSeriesConfig c) {
@@ -55,21 +59,29 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         setDisplayName(c.getDisplayName());
         setColor(c.getColor());
         setSelected(c.isSelected());
-        addPropertyListeners();
+        addListenersToWrappedSeries();
     }
 
-    private void addPropertyListeners() {
+    //all listeners are weak reference listeners
+    //we want the charting series to remain available for gc, so don't want the listeners to
+    //keep strong references
+    private void addListenersToWrappedSeries() {
         //listen to and propagate the change events from wrapped series
+        proxyingPropertyListener = getProxyingPropertyListener();
         addEventPropagatingListeners(URL_PROPERTY_NAME);
         addEventPropagatingListeners(LAST_REFRESH_TIME_PROPERTY);
         addEventPropagatingListeners(REFRESH_TIME_SECONDS_PROPERTY);
         addEventPropagatingListeners(STALE_PROPERTY);
+
+        wrappedSeriesTreeListener = new WrappedSeriesTreeListener();
+        WeakReferenceListener l = new WeakReferenceListener(wrappedSeriesTreeListener);
+        l.addListenerTo(wrappedSeries);
     }
 
     private void addEventPropagatingListeners(String propertyName) {
         //propagate events from the wrapped series
-        wrappedSeries.addPropertyChangeListener(propertyName, getProxyingPropertyListener(propertyName));
-        wrappedSeries.addTreeListener(new WrappedSeriesTreeListener());
+        WeakReferenceListener p = new WeakReferenceListener(propertyName, proxyingPropertyListener);
+        p.addListenerTo(wrappedSeries);
     }
 
     public String getDisplayName() {

@@ -53,8 +53,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
-    private final Map<UIPropertiesTimeSeries, UIPropertiesTimeSeries> weakClientSeries =
-            Collections.synchronizedMap(new WeakHashMap<UIPropertiesTimeSeries, UIPropertiesTimeSeries>());
+    private final Map<UIPropertiesTimeSeries, UIPropertiesTimeSeries> weakClientSeries = new WeakHashMap<UIPropertiesTimeSeries, UIPropertiesTimeSeries>();
 
     private static ScheduledExecutorService refreshExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeriesRefresh");
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
@@ -105,7 +104,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
             refreshTask = refreshExecutor.scheduleAtFixedRate(
-                    runCommandTask, refreshTimeSeconds, refreshTimeSeconds, TimeUnit.SECONDS
+                runCommandTask, 0, refreshTimeSeconds, TimeUnit.SECONDS
             );
 
             //cancel refresh task if this series is gc'd
@@ -114,7 +113,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     public void chartSeriesChanged(ChartSeriesEvent e) {
-        weakClientSeries.put(e.getSourceSeries(), e.getSourceSeries());
+        UIPropertiesTimeSeries sourceSeries = (UIPropertiesTimeSeries) e.getSourceSeries();
+        synchronized(weakClientSeries) {
+            weakClientSeries.put(sourceSeries, sourceSeries);
+        }
 //        switch(e.getChartSeriesEventType()) {
 //            case SERIES_CHART_DISPLAYED:
 //            case SERIES_CHART_HIDDEN:

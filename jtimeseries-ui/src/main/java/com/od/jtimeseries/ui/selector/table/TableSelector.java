@@ -156,14 +156,18 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         table.getSelectionModel().addListSelectionListener(
             new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
-                    if ( ! e.getValueIsAdjusting() && table.getSelectedRow() > -1 ) {
-                        int[] selectedRows = table.getSelectedRows();
-                        List<Identifiable> selectedSeries = new LinkedList<Identifiable>();
-                        for (int selectedRow : selectedRows) {
-                            int modelRow = TableModelWrapperUtils.getActualRowAt(table.getModel(),selectedRow);
-                            selectedSeries.add(tableModel.getObject(modelRow));
+                    if ( ! e.getValueIsAdjusting() ) {
+                        if ( table.getSelectedRow() > -1 ) {
+                            int[] selectedRows = table.getSelectedRows();
+                            List<Identifiable> selectedSeries = new LinkedList<Identifiable>();
+                            for (int selectedRow : selectedRows) {
+                                int modelRow = TableModelWrapperUtils.getActualRowAt(table.getModel(),selectedRow);
+                                selectedSeries.add(tableModel.getObject(modelRow));
+                            }
+                            getSelectionsActionModel().setSelected(selectedSeries);
+                        } else {
+                            getSelectionsActionModel().clearActionModelState();
                         }
-                        getSelectionsActionModel().setSelected(selectedSeries);
                     }
                 }
             }

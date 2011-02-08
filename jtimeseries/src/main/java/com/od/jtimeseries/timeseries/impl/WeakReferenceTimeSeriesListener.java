@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 
 import java.lang.ref.WeakReference;
@@ -36,11 +36,11 @@ import java.lang.ref.WeakReference;
 public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
 
     private WeakReference<TimeSeriesListener> timeSeriesListenerDelegate;
-    private IdentifiableTimeSeries series;
+    private TimeSeries observedSeries;
 
-    public WeakReferenceTimeSeriesListener(IdentifiableTimeSeries series, TimeSeriesListener actionListener) {
-        this.series = series;
-        this.timeSeriesListenerDelegate = new WeakReference<TimeSeriesListener>(actionListener);
+    public WeakReferenceTimeSeriesListener(TimeSeries observedSeries, TimeSeriesListener seriesListener) {
+        this.observedSeries = observedSeries;
+        this.timeSeriesListenerDelegate = new WeakReference<TimeSeriesListener>(seriesListener);
     }
 
     public void itemsAddedOrInserted(TimeSeriesEvent h) {
@@ -50,7 +50,7 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         } else {
             //it should be iterating over a snapshot of the listener list
             //so we don't get a concurrent modification exception
-            series.removeTimeSeriesListener(this);
+            observedSeries.removeTimeSeriesListener(this);
         }
     }
 
@@ -59,7 +59,7 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         if ( l != null ) {
           l.itemsRemoved(h);
         }  else {
-            series.removeTimeSeriesListener(this);
+            observedSeries.removeTimeSeriesListener(this);
         }
     }
 
@@ -68,7 +68,7 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         if ( l != null ) {
           l.itemsChanged(e);
         }  else {
-            series.removeTimeSeriesListener(this);
+            observedSeries.removeTimeSeriesListener(this);
         }
     }
 
@@ -77,7 +77,7 @@ public class WeakReferenceTimeSeriesListener implements TimeSeriesListener {
         if ( l != null ) {
           l.seriesChanged(e);
         }  else {
-            series.removeTimeSeriesListener(this);
+            observedSeries.removeTimeSeriesListener(this);
         }
     }
 

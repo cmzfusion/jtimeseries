@@ -296,7 +296,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private class SeriesTreeSelectionListener implements TreeSelectionListener {
 
-
         public void valueChanged(TreeSelectionEvent e) {
             List<Identifiable> selections = new LinkedList<Identifiable>();
             TreePath[] paths = tree.getSelectionPaths();
@@ -306,6 +305,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
                     selections.add(o.getIdentifiable());
                 }
                 getSelectionsActionModel().setSelected(selections);
+            } else {
+                getSelectionsActionModel().clearActionModelState();
             }
         }
     }

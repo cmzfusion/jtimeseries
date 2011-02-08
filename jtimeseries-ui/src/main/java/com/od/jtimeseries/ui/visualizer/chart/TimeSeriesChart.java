@@ -95,6 +95,7 @@ public class TimeSeriesChart extends JPanel {
         if ( timeSeriesList.size() == 0) {
             if ( chartPanel != null) {
                 remove(chartPanel);
+                chartPanel = null;
                 chart = null;
             }
             add(noChartsPanel, BorderLayout.CENTER);

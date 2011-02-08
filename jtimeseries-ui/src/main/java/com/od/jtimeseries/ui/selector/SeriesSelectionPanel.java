@@ -55,7 +55,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private static final int WIDTH = 250;
     private TimeSeriesContext context;
     private Class<E> seriesClass;
-    private SeriesSelectionList<E> selectionList;
+    private SeriesSelectionList<E> selectionListForCharting;
     private SeriesDescriptionPanel seriesDescriptionPanel = new SeriesDescriptionPanel();
     private JRadioButton useTreeRadio = new JRadioButton("Tree", true);
     private JRadioButton useTableRadio = new JRadioButton("Table");
@@ -81,7 +81,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     public SeriesSelectionPanel(TimeSeriesContext context, String selectionText, Class<E> seriesClass) {
         this.context = context;
         this.seriesClass = seriesClass;
-        this.selectionList = new SeriesSelectionList<E>();
+        this.selectionListForCharting = new SeriesSelectionList<E>();
         setupTimeseries();
         selectionActionModel = new IdentifiableListActionModel();
         treeSelector = new TreeSelector<E>(selectionActionModel, context, seriesClass);
@@ -149,41 +149,48 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         getSelectionActionModel().addActionModelListener(descriptionSettingSelectorListener);
 
         context.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
-                new IdentifiableTreeListener() {
+                AwtSafeListener.getAwtSafeListener(
+                        new IdentifiableTreeListener() {
 
-                    public void nodeChanged(Identifiable node, Object changeDescription) {
-                    }
-
-                    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, false);
-                        addToSelection(seriesAffected);
-                    }
-
-                    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-                        addToSelection(seriesAffected);
-                    }
-
-                    private void addToSelection(List<E> seriesAffected) {
-                        for (E series : seriesAffected) {
-                            if (series.isSelected()) {
-                                selectionList.addSelection(series);
-                            } else {
-                                selectionList.removeSelection(series);
+                            public void nodeChanged(Identifiable node, Object changeDescription) {
                             }
-                        }
-                    }
 
-                    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                        List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-                        for ( E series : seriesAffected) {
-                            selectionList.removeSelection(series);
-                        }
-                    }
-                },
-                IdentifiableTreeListener.class
-            )
+                            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, false);
+                                modifySelectedForCharting(seriesAffected);
+                            }
+
+                            public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
+                                modifySelectedForCharting(seriesAffected);
+                            }
+
+                            private void modifySelectedForCharting(List<E> seriesAffected) {
+                                for (E series : seriesAffected) {
+                                    if (series.isSelected()) {
+                                        selectionListForCharting.addSelection(series);
+                                    } else {
+                                        selectionListForCharting.removeSelection(series);
+                                    }
+                                }
+                            }
+
+                            public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+                                //remove those series selected for charting
+                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
+                                for (E series : seriesAffected) {
+                                    selectionListForCharting.removeSelection(series);
+                                }
+
+                                //remove those identifiable selected/highlighted in tree/table
+//                                List<Identifiable> allIdentifiable = SelectorComponent.getAffectedSeries(Identifiable.class, contextTreeEvent, true);
+//                                for ( Identifiable i : allIdentifiable) {
+//                                    selectionActionModel.removeSelected(i);
+//                                }
+                            }
+                        },
+                        IdentifiableTreeListener.class
+                )
         );
     }
 
@@ -197,31 +204,31 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     }
 
     public SeriesSelectionList getSelectionList() {
-        return selectionList;
+        return selectionListForCharting;
     }
 
     public List<E> getSelectedTimeSeries() {
-        return selectionList.getSelectedTimeSeries();
+        return selectionListForCharting.getSelectedTimeSeries();
     }
 
     public void addSelectionListener(TimeSeriesSelectorListener<E> l) {
-        selectionList.addSelectionListener(l);
+        selectionListForCharting.addSelectionListener(l);
     }
 
     public void removeSelectionListener(TimeSeriesSelectorListener<E> l) {
-        selectionList.removeSelectionListener(l);
+        selectionListForCharting.removeSelectionListener(l);
     }
 
     public void addSelection(E s) {
-        selectionList.addSelection(s);
+        selectionListForCharting.addSelection(s);
     }
 
     public void removeSelection(E s) {
-        selectionList.removeSelection(s);
+        selectionListForCharting.removeSelection(s);
     }
 
     public void setSelectedTimeSeries(List<E> selections) {
-        selectionList.setSelectedTimeSeries(selections);
+        selectionListForCharting.setSelectedTimeSeries(selections);
     }
 
     public void setColumns(List<ColumnSettings> columnSettings) {
@@ -252,7 +259,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
                 selections.add(s);
             }
         }
-        selectionList.setSelectedTimeSeries(selections);
+        selectionListForCharting.setSelectedTimeSeries(selections);
     }
 
     private class RadioButtonSelectionListener implements ActionListener {

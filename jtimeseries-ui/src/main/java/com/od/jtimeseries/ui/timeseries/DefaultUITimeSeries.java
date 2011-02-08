@@ -59,6 +59,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         String oldValue = this.displayName;
         this.displayName = displayName;
         firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, displayName);
+        fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
     }
 
     public Date getLastRefreshTime() {
@@ -69,6 +70,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         Date oldValue = lastRefreshTime;
         this.lastRefreshTime = time;
         firePropertyChange(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY, oldValue, time);
+        fireNodeChanged(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY);
     }
 
     public URL getTimeSeriesURL() {
@@ -89,6 +91,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         long oldValue = this.refreshTimeSeconds;
         this.refreshTimeSeconds = refreshTimeSeconds;
         firePropertyChange(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY, oldValue, refreshTimeSeconds);
+        fireNodeChanged(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
     }
 
     public Color getColor() {
@@ -99,5 +102,6 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         Color oldColor = this.color;
         this.color = color;
         firePropertyChange(UIPropertiesTimeSeries.COLOUR_PROPERTY, oldColor, color);
+        fireNodeChanged(UIPropertiesTimeSeries.COLOUR_PROPERTY);
     }
 }

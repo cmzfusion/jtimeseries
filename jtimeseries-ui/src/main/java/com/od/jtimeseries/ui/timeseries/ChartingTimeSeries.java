@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -36,11 +37,11 @@ import java.awt.*;
  *
  * A time series used by the visualizer
  */
-public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries implements UIPropertiesTimeSeries {
+public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries implements UIPropertiesTimeSeries, Disposable {
 
     private static ColorRotator colorRotator = new ColorRotator();
 
-    private boolean selected;
+    private volatile boolean selected;
     private String displayName;
     private Color color = colorRotator.getNextColor();
     private RemoteHttpTimeSeries wrappedSeries;
@@ -156,6 +157,15 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
+    }
+
+    public void dispose() {
+        if ( selected ) {
+            wrappedSeries.chartSeriesChanged(new ChartSeriesEvent(
+                this,
+                ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_DISPOSED
+            ));
+        }
     }
 
     private class WrappedSeriesTreeListener implements IdentifiableTreeListener {

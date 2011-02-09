@@ -12,9 +12,10 @@ import java.util.Date;
  */
 public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIPropertiesTimeSeries {
 
-    private static ColorRotator colorRotator = new ColorRotator();
+    private static final ColorRotator colorRotator = new ColorRotator();
+    private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
-    private boolean selected;
+    private volatile boolean selected;
     private volatile boolean stale = false;
     protected String displayName;
     private Date lastRefreshTime;
@@ -89,8 +90,8 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
 
     public void setRefreshTimeSeconds(int refreshTimeSeconds) {
         long oldValue = this.refreshTimeSeconds;
-        this.refreshTimeSeconds = refreshTimeSeconds;
-        firePropertyChange(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY, oldValue, refreshTimeSeconds);
+        this.refreshTimeSeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
+        firePropertyChange(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY, oldValue, this.refreshTimeSeconds);
         fireNodeChanged(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
     }
 

@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.selector.action;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
@@ -26,6 +27,10 @@ public class RemoveSeriesAction extends ModelDrivenAction<IdentifiableListAction
         for ( Identifiable s : series) {
             TimeSeriesContext c = (TimeSeriesContext)s.getParent();
             c.removeChild(s);
+
+            if ( s instanceof Disposable) {
+                ((Disposable)s).dispose();
+            }
         }
     }
 }

@@ -11,15 +11,15 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
  */
 public class ChartSeriesEvent {
 
-    private IdentifiableTimeSeries sourceSeries;
+    private UIPropertiesTimeSeries sourceSeries;
     private ChartSeriesEventType chartEvent;
 
-    public ChartSeriesEvent(IdentifiableTimeSeries sourceSeries, ChartSeriesEventType chartEvent) {
+    public ChartSeriesEvent(UIPropertiesTimeSeries sourceSeries, ChartSeriesEventType chartEvent) {
         this.sourceSeries = sourceSeries;
         this.chartEvent = chartEvent;
     }
 
-    public IdentifiableTimeSeries getSourceSeries() {
+    public UIPropertiesTimeSeries getSourceSeries() {
         return sourceSeries;
     }
 
@@ -33,6 +33,7 @@ public class ChartSeriesEvent {
 
     public static enum ChartSeriesEventType {
         SERIES_CHART_DISPLAYED,
-        SERIES_CHART_HIDDEN
+        SERIES_CHART_HIDDEN,
+        SERIES_CHART_DISPOSED
     }
 }

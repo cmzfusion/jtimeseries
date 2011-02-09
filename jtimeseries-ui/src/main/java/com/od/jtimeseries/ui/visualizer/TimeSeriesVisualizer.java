@@ -280,4 +280,11 @@ public class TimeSeriesVisualizer extends JPanel {
             rootContext.addIdentifiables(selectedTimeSeries);
         }
     }
+
+    //when this visualizer is garbage collected, give its series the chance to
+    //dispose themselves / disable any subscriptions
+    public void finalize() throws Throwable {
+        rootContext.dispose();
+        super.finalize();
+    }
 }

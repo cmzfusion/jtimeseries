@@ -10,8 +10,10 @@ import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -38,7 +40,6 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
     }
 
     public void addIdentifiables(List<? extends Identifiable> identifiables) {
-
 
         LinkedHashSet<UIPropertiesTimeSeries> toAdd = new LinkedHashSet<UIPropertiesTimeSeries>();
         for ( Identifiable i : identifiables) {
@@ -67,6 +68,14 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
         for ( UiTimeSeriesConfig c : chartConfigs ) {
             if ( get(c.getPath()) == null) {
                 create(c.getPath(), c.getDescription(), ChartingTimeSeries.class, c);
+            }
+        }
+    }
+
+    public void dispose() {
+        for (Identifiable i : findAll(Identifiable.class).getAllMatches()) {
+            if ( i instanceof Disposable) {
+                ((Disposable)i).dispose();
             }
         }
     }

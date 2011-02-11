@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -29,5 +30,17 @@ import java.util.List;
 public interface TimeSeriesServerDictionary {
 
     List<TimeSeriesServer> getKnownTimeSeriesServer();
+
+    /**
+     * If there is an existing server for this host and port, return it
+     * In this case the returned server may have a description which differs from the description supplied
+     *
+     * If there is no existing server for this hort and port, create one, with the description provided
+     *
+     * @param description, description to use when creating a new server
+     * @return The existing TimeSeriesServer for this host and port, or a new server with the description provided
+     * @throws UnknownHostException
+     */
+    TimeSeriesServer getOrCreateServer(String host, int port, String description) throws UnknownHostException;
 
 }

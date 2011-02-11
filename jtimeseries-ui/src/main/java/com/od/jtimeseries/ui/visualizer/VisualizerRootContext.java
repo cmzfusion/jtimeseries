@@ -4,6 +4,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
@@ -12,6 +13,7 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -19,6 +21,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.*;
 
 /**
@@ -31,10 +35,10 @@ import java.util.*;
 public class VisualizerRootContext extends DefaultTimeSeriesContext {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
+    private TimeSeriesServerDictionary serverDictionary;
 
-    private static Map<String, WeakReference<RemoteHttpTimeSeries>> existingHttpSeries = Collections.synchronizedMap(new HashMap<String, WeakReference<RemoteHttpTimeSeries>>());
-
-    public VisualizerRootContext() {
+    public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary) {
+        this.serverDictionary = serverDictionary;
         setTimeSeriesFactory(new VisualizerTimeSeriesFactory());
         setContextFactory(new VisualizerContextFactory());
     }
@@ -66,10 +70,37 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
 
     public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
         for ( UiTimeSeriesConfig c : chartConfigs ) {
-            if ( get(c.getPath()) == null) {
-                create(c.getPath(), c.getDescription(), ChartingTimeSeries.class, c);
+
+            URL url = null;
+            try {
+
+                //the first node in the path was the server description
+                //when the series was saved.
+                //the same server may have a different description
+                //locally
+                PathParser p = new PathParser(c.getPath());
+                String serverDescription = p.removeFirstNode();
+                TimeSeriesServer s = getTimeSeriesServer(c, serverDescription);
+
+                String newLocalPath = s.getDescription() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + p.getRemainingPath();
+                if ( get(newLocalPath) == null) {
+                    create(newLocalPath, c.getDescription(), ChartingTimeSeries.class, c);
+                }
+            } catch (Exception e) {
+                logMethods.logError("Failed to create series for config " + c, e);
             }
         }
+    }
+
+    private TimeSeriesServer getTimeSeriesServer(UiTimeSeriesConfig c, String serverDescription) throws MalformedURLException, UnknownHostException {
+        URL url;//the host and port in the URL uniquely defines the server
+        //get the local server which corresponds to this host + port
+        url = new URL(c.getTimeSeriesUrl());
+        return serverDictionary.getOrCreateServer(
+            url.getHost(),
+            url.getPort(),
+            serverDescription
+        );
     }
 
     public void dispose() {
@@ -107,30 +138,12 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
         private <E extends Identifiable> E getChartingTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
             //http series are unique by URL, to minimise unnecessary queries.
             //Get or create the instance for this URL
-            RemoteHttpTimeSeries httpSeries = getOrCreateHttpSeries(config);
+            RemoteHttpTimeSeries httpSeries = RemoteHttpTimeSeries.getOrCreateHttpSeries(config);
 
             //the http series is wrapped with a ChartingTimeSeries instance which is unique to
             //this visualizier, and so can have local settings for display name, colour etc.
             return (E)new ChartingTimeSeries(httpSeries, config);
         }
-
-        private RemoteHttpTimeSeries getOrCreateHttpSeries(UiTimeSeriesConfig config) throws MalformedURLException {
-            RemoteHttpTimeSeries result = null;
-            WeakReference<RemoteHttpTimeSeries> httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
-            if ( httpSeries != null ) {
-                result = httpSeries.get();
-            }
-
-            if ( result == null ) {
-                //use the config mechanism as a way of cloning the time series, the original
-                //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
-                result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
-                httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
-                existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
-            }
-            return result;
-        }
-
     }
 
     private class VisualizerContextFactory extends DefaultContextFactory {
@@ -148,6 +161,13 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
                         if ( otherContext instanceof TimeSeriesServerContext) {
                             TimeSeriesServer server = ((TimeSeriesServerContext) otherContext).getServer();
                             result = (E)new TimeSeriesServerContext(parent, server);
+                        }
+                    } else if (parameters[0] instanceof UiTimeSeriesConfig) {
+                        try {
+                            TimeSeriesServer server = getTimeSeriesServer(((UiTimeSeriesConfig)parameters[0]), id);
+                            result = (E)new TimeSeriesServerContext(parent, server);
+                        } catch (Exception e) {
+                           logMethods.logError("Failed to create ServerContext for " + id, e);
                         }
                     }
                 }

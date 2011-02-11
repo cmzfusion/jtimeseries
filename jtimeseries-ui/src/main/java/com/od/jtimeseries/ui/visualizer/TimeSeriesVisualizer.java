@@ -68,7 +68,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private JToolBar toolbar;
     private TimeSeriesChart chart;
     private SeriesSelectionPanel<ChartingTimeSeries> seriesSelectionPanel;
-    private VisualizerRootContext rootContext = new VisualizerRootContext();
+    private VisualizerRootContext rootContext;
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private EditDisplayNamePatternsAction editDisplayNameAction;
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -80,6 +80,7 @@ public class TimeSeriesVisualizer extends JPanel {
         JideInitialization.setupJide();
 
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
+        this.rootContext = new VisualizerRootContext(timeSeriesServerDictionary);
         chart = new TimeSeriesChart(title);
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();

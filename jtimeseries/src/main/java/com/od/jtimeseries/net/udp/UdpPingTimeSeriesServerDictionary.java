@@ -21,6 +21,7 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
@@ -34,14 +35,47 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
     
     private static LogMethods logMethods = LogUtils.getLogMethods(UdpPingTimeSeriesServerDictionary.class);
 
-    private final Set<TimeSeriesServer> serverSet = Collections.synchronizedSet(new TreeSet<TimeSeriesServer>());
+    private final Map<TimeSeriesServer.ServerKey, TimeSeriesServer> serverKeyToServer = Collections.synchronizedMap(new HashMap<TimeSeriesServer.ServerKey, TimeSeriesServer>());
+    private final Map<String, InetAddress> hostnameToInetAddress = Collections.synchronizedMap(new HashMap<String, InetAddress>());
 
     public List<TimeSeriesServer> getKnownTimeSeriesServer() {
         ArrayList<TimeSeriesServer> servers = new ArrayList<TimeSeriesServer>();
-        synchronized (serverSet) {
-            servers.addAll(serverSet);
+        synchronized (serverKeyToServer) {
+            servers.addAll(serverKeyToServer.values());
         }
         return servers;
+    }
+
+    /**
+     * If there is an existing server for this host and port, return it
+     * In this case the returned server may have a description which differs from the description supplied
+     *
+     * If there is no existing server for this hort and port, create one, with the description provided
+     *
+     * @param description, description to use when creating a new server
+     * @return The existing TimeSeriesServer for this host and port, or a new server with the description provided
+     * @throws UnknownHostException
+     */
+    public TimeSeriesServer getOrCreateServer(String host, int port, String description) throws UnknownHostException {
+        InetAddress i = getInetAddress(host);
+        TimeSeriesServer.ServerKey s = new TimeSeriesServer.ServerKey(i, port);
+        synchronized (serverKeyToServer) {
+            TimeSeriesServer server = serverKeyToServer.get(s);
+            if (server == null) {
+                server = new TimeSeriesServer(i, port, description);
+                addServer(server);
+            }
+            return server;
+        }
+    }
+
+    private InetAddress getInetAddress(String host) throws UnknownHostException {
+        InetAddress i = hostnameToInetAddress.get(host);
+        if ( i == null ) {
+            i = InetAddress.getByName(host);
+            hostnameToInetAddress.put(host, i);
+        }
+        return i;
     }
 
     public void udpMessageReceived(UdpMessage udpMessage) {
@@ -57,9 +91,11 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
     }
 
     public boolean removeServer(TimeSeriesServer server) {
-        boolean removed = serverSet.remove(server);
-        if ( removed ) {
+        boolean removed = false;
+        TimeSeriesServer s = serverKeyToServer.remove(server.getServerKey());
+        if ( s != null ) {
             serverRemoved(server);
+            removed = true;
         }
         return removed;
     }
@@ -68,13 +104,16 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
     protected void serverRemoved(TimeSeriesServer server) {
     }
 
-    public boolean addServer(TimeSeriesServer remoteTimeSeriesServer) {
-        if ( ! serverSet.remove(remoteTimeSeriesServer) ) {
-            logMethods.logDebug("New TimeSeriesServer " + remoteTimeSeriesServer);
+    public boolean addServer(TimeSeriesServer s) {
+        boolean added = false;
+        synchronized (serverKeyToServer) {
+            if (! serverKeyToServer.containsKey(s.getServerKey())) {
+                serverKeyToServer.put(s.getServerKey(), s);
+                added = true;
+            }
         }
-        boolean added = serverSet.add(remoteTimeSeriesServer);
         if ( added ) {
-            serverAdded(remoteTimeSeriesServer);
+            serverAdded(s);
         }
         return added;
     }

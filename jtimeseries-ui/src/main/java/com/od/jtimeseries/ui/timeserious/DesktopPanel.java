@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -20,11 +21,11 @@ import java.util.List;
  */
 public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAware {
 
-    private TimeSeriesServerDictionary timeSeriesServerDictionary = new UdpPingTimeSeriesServerDictionary();
-    private TimeSeriesDesktopPane desktopPane = new TimeSeriesDesktopPane(timeSeriesServerDictionary);
+    private TimeSeriesDesktopPane desktopPane;
 
-    public DesktopPanel() {
+    public DesktopPanel(UiTimeSeriesServerDictionary dictionary) {
         super(new BorderLayout());
+        desktopPane = new TimeSeriesDesktopPane(dictionary);
         add(desktopPane, BorderLayout.CENTER);
     }
 

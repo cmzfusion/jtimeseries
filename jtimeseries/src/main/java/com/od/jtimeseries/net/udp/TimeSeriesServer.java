@@ -29,32 +29,35 @@ import java.util.Date;
  * User: Nick Ebbutt
  * Date: 13-Jan-2009
  * Time: 12:38:49
+ *
+ * TimeSeriesServer is uniquely identified by a ServerKey (inet address and port)
+ * - it also has several other attributes, e.g. description
  */
 public class TimeSeriesServer implements Comparable {
 
-    private final InetAddress serverAddress;
-    private final int port;
-
+    private ServerKey serverKey;
     private String description;
     private long lastAnnounceTimestamp;
     private boolean connectionFailed;
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
+    public TimeSeriesServer(InetAddress serverAddress, int port, String description) {
+        this(serverAddress, port, description, 0);
+    }
+
     public TimeSeriesServer(InetAddress serverAddress, int port, String description, long lastAnnounceTimestamp) {
-        this.serverAddress = serverAddress;
-        this.port = port;
+        this.serverKey = new ServerKey(serverAddress, port);
         this.description = description;
         this.lastAnnounceTimestamp = lastAnnounceTimestamp;
     }
 
-
-    public InetAddress getServerAddress() {
-        return serverAddress;
+    public InetAddress getInetAddress() {
+        return serverKey.getInetAddress();
     }
 
     public int getPort() {
-        return port;
+        return serverKey.getPort();
     }
 
     public long getLastAnnounceTimestamp() {
@@ -88,25 +91,24 @@ public class TimeSeriesServer implements Comparable {
     }
 
     public String getAddressAndPort() {
-        return serverAddress + ":" + port;
+        return getInetAddress() + ":" + getPort();
     }
 
-    public int hashCode() {
-        int result = 17;
-        result = 31 * result + serverAddress.hashCode();
-        result = 31 * result + port;
-        return result;
-    }
-
+    @Override
     public boolean equals(Object o) {
-        boolean result = false;
-        if ( o == this ) {
-            result = true;
-        } else if ( o instanceof TimeSeriesServer) {
-            TimeSeriesServer r = (TimeSeriesServer)o;
-            result = serverAddress.equals(r.getServerAddress()) && port == r.getPort();
-        }
-        return result;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TimeSeriesServer that = (TimeSeriesServer) o;
+
+        if (serverKey != null ? !serverKey.equals(that.serverKey) : that.serverKey != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return serverKey != null ? serverKey.hashCode() : 0;
     }
 
     public int compareTo(Object o) {
@@ -121,10 +123,9 @@ public class TimeSeriesServer implements Comparable {
     @Override
     public String toString() {
         return "TimeSeriesServer{" +
-                "serverAddress=" + serverAddress +
-                ", port=" + port +
+                "serverKey=" + serverKey +
                 ", description='" + description + '\'' +
-                ", lastAnnounceTimestamp=" + new Date(lastAnnounceTimestamp) +
+                ", lastAnnounceTimestamp=" + lastAnnounceTimestamp +
                 '}';
     }
 
@@ -153,5 +154,55 @@ public class TimeSeriesServer implements Comparable {
         int port = p.getPort();
         String description = p.getDescription();
         return new TimeSeriesServer(i, port, description, System.currentTimeMillis());
+    }
+
+    public ServerKey getServerKey() {
+        return serverKey;
+    }
+
+    public static class ServerKey {
+
+        private final InetAddress inetAddress;
+        private final int port;
+
+        public ServerKey(InetAddress inetAddress, int port) {
+            this.inetAddress = inetAddress;
+            this.port = port;
+        }
+
+        public InetAddress getInetAddress() {
+            return inetAddress;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ServerKey serverKey = (ServerKey) o;
+
+            if (port != serverKey.port) return false;
+            if (inetAddress != null ? !inetAddress.equals(serverKey.inetAddress) : serverKey.inetAddress != null)
+                return false;
+
+            return true;
+        }
+
+        public int hashCode() {
+            int result = inetAddress != null ? inetAddress.hashCode() : 0;
+            result = 31 * result + port;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "ServerKey{" +
+                    "inetAddress=" + inetAddress +
+                    ", port=" + port +
+                    '}';
+        }
     }
 }

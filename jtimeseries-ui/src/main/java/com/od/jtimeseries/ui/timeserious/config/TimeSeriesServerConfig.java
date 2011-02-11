@@ -19,7 +19,7 @@ public class TimeSeriesServerConfig {
     private int port;
 
     public TimeSeriesServerConfig(TimeSeriesServerContext c) {
-        this.serverAddress = c.getServer().getServerAddress();
+        this.serverAddress = c.getServer().getInetAddress();
         this.description = c.getServer().getDescription();
         this.port = c.getServer().getPort();
     }

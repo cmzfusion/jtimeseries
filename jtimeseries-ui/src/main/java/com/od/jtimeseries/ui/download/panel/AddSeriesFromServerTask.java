@@ -23,8 +23,6 @@ import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
-import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -54,7 +52,7 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
     }
 
     private URL createUrl() throws MalformedURLException {
-        return new URL("http", server.getServerAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
+        return new URL("http", server.getInetAddress().getHostName(), server.getPort(), "/" + TimeSeriesIndexHandler.INDEX_POSTFIX);
     }
 
     private TimeSeriesServerContext findOrCreateServerContext() {

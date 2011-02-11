@@ -4,8 +4,6 @@ send to visualizer action in main series tree
 
 visualizer should not require server dictionary if download is disabled
 
-restrict time range in visualizer
-
 display name calculator apply to visualizers
 
 auto populate visualizer by path pattern
@@ -24,14 +22,12 @@ export/import display patterns
 
 tile visualizer windows, extra visualizer desktops
 
-refresh frequency for series
-
-check http series can be collected when no longer in use
-
-correct bug in jpopup positioning when tree scrolled
-
 selection groups and rules/criteria in visualizer
 
 properties / stats work for charting series
+
+show tabular data
+
+rename visualizer frame
 
 

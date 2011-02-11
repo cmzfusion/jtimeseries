@@ -14,13 +14,14 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
 
     private static final ColorRotator colorRotator = new ColorRotator();
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
+    private static final int DEFAULT_REFRESH_TIME_SECONDS = 60;
 
+    protected volatile int refreshTimeSeconds = DEFAULT_REFRESH_TIME_SECONDS;
     private volatile boolean selected;
-    private volatile boolean stale = false;
+    private volatile boolean stale;
     protected String displayName;
     private Date lastRefreshTime;
     protected URL timeSeriesUrl;
-    protected volatile int refreshTimeSeconds;
     private Color color = colorRotator.getNextColor();
 
     public DefaultUITimeSeries(String id, String description) {

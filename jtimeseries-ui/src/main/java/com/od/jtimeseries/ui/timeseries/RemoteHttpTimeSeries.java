@@ -30,6 +30,7 @@ import swingcommand.SwingCommand;
 import swingcommand.Task;
 import swingcommand.TaskListenerAdapter;
 
+import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -50,6 +51,9 @@ import java.util.concurrent.TimeUnit;
  * events should only be fired on the AWT
  */
 public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSeriesListener {
+
+    private static final long STARTUP_TIME = System.currentTimeMillis();
+    private static Map<String, WeakReference<RemoteHttpTimeSeries>> existingHttpSeries = Collections.synchronizedMap(new HashMap<String, WeakReference<RemoteHttpTimeSeries>>());
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
@@ -124,7 +128,11 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private boolean setTickingFlag() {
         long timeSinceUpdate = System.currentTimeMillis() - getLatestTimestamp();
-        boolean ticking = timeSinceUpdate > Time.hours(1).getLengthInMillis();
+
+         //enough time for local timeserious generated metrics to start to get datapoints
+        boolean justStarted = System.currentTimeMillis() - STARTUP_TIME < 60000;
+
+        boolean ticking = timeSinceUpdate < Time.hours(1).getLengthInMillis() || justStarted;
         boolean result = ticking != this.ticking;
         this.ticking = ticking;
         return result;
@@ -222,20 +230,27 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         }
     }
 
-
-
-    //Factory methods to construct, ensuring refresh is also scheduled after construction
-
-    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
-        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(id, description, timeSeriesUrl, refreshTime);
+    private static RemoteHttpTimeSeries createRemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
+        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
         r.scheduleRefreshIfDisplayed(true);
         return r;
     }
 
-    public static RemoteHttpTimeSeries createRemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
-        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
-        r.scheduleRefreshIfDisplayed(true);
-        return r;
+    public static RemoteHttpTimeSeries getOrCreateHttpSeries(UiTimeSeriesConfig config) throws MalformedURLException {
+        RemoteHttpTimeSeries result = null;
+        WeakReference<RemoteHttpTimeSeries> httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
+        if ( httpSeries != null ) {
+            result = httpSeries.get();
+        }
+
+        if ( result == null ) {
+            //use the config mechanism as a way of cloning the time series, the original
+            //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
+            result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
+            httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
+            existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
+        }
+        return result;
     }
 
 }

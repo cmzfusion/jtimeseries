@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
@@ -27,9 +28,11 @@ import java.util.List;
 public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements ConfigAware {
 
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator(this);
+    private TimeSeriesServerDictionary serverDictionary;
 
-    public TimeSeriousRootContext() {
+    public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary) {
         super("TmeSeriousRootContext", "Root context for TimeSerious application");
+        this.serverDictionary = serverDictionary;
         addBusListener();
     }
 
@@ -57,12 +60,12 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
 
     public void restoreConfig(TimeSeriousConfig config) {
         for (TimeSeriesServerConfig c : config.getServerConfigs()) {
-            final TimeSeriesServer s = c.createServer();
-            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-                public void sendEvent(TimeSeriousBusListener listener) {
-                    listener.serverAdded(s);
-                }
-            });
+//            final TimeSeriesServer s = c.createServer();
+//            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
+//                public void sendEvent(TimeSeriousBusListener listener) {
+//                    listener.serverAdded(s);
+//                }
+//            });
         }
         displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
     }

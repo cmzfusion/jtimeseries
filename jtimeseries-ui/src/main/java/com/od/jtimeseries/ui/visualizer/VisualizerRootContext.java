@@ -82,7 +82,7 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
                 String serverDescription = p.removeFirstNode();
                 TimeSeriesServer s = getTimeSeriesServer(c, serverDescription);
 
-                String newLocalPath = s.getDescription() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + p.getRemainingPath();
+                String newLocalPath = s.getServerContextIdentifier() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + p.getRemainingPath();
                 if ( get(newLocalPath) == null) {
                     create(newLocalPath, c.getDescription(), ChartingTimeSeries.class, c);
                 }

@@ -4,6 +4,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.util.Displayable;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.swing.util.UIUtilities;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
@@ -29,7 +30,9 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements
     };
 
     public TimeSeriesServerContext(TimeSeriesContext parentContext, TimeSeriesServer server) {
-        super(parentContext, server.getDescription(), server.getDescription());
+        //the server context renderer will render the description, which may change
+        //the actual identifier is the address + port, which forms the unchanging key for the server
+        super(parentContext, server.getServerContextIdentifier(), server.getServerContextIdentifier());
         this.server = server;
         addServerListener(server);
     }

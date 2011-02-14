@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.util.JTimeSeriesConstants;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
@@ -90,8 +92,12 @@ public class TimeSeriesServer implements Comparable {
         firePropertyChange("connectionFailed", oldValue, this.connectionFailed);
     }
 
-    public String getAddressAndPort() {
+    private String getAddressAndPort() {
         return getInetAddress() + ":" + getPort();
+    }
+
+    public String getServerContextIdentifier() {
+        return getAddressAndPort().replaceAll(JTimeSeriesConstants.NAMESPACE_SEPARATOR_REGEX_TOKEN, "_");
     }
 
     @Override

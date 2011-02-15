@@ -192,10 +192,9 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
                 TimeSeriesServer server = null;
                 try {
                     server = new TimeSeriesServer(
-                        InetAddress.getByName(url.getHost()),
+                        url.getHost(),
                         url.getPort(),
-                        "Server at " + url.getHost() + ":" + url.getPort(),
-                        0
+                        "Server at " + url.getHost() + ":" + url.getPort()
                     );
                 } catch (UnknownHostException e) {
                     JOptionPane.showMessageDialog(this, "Cannot find address for host " + url.getHost(), "Server not found", JOptionPane.WARNING_MESSAGE);

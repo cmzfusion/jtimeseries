@@ -33,7 +33,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public static final String MAIN_FRAME_NAME = "mainFrame";
 
-    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext();
+    private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel;
     private MainSeriesSelector seriesSelector;
@@ -49,6 +49,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
+        this.rootContext = new TimeSeriousRootContext(serverDictionary);
         this.desktopPanel = new DesktopPanel(serverDictionary);
         this.seriesSelector = new MainSeriesSelector(
             rootContext,

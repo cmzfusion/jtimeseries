@@ -62,7 +62,7 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
         synchronized (serverKeyToServer) {
             TimeSeriesServer server = serverKeyToServer.get(s);
             if (server == null) {
-                server = new TimeSeriesServer(i, port, description);
+                server = new TimeSeriesServer(host, port, description);
                 addServer(server);
             }
             return server;

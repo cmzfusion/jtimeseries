@@ -24,7 +24,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,15 +42,21 @@ public class TimeSeriesServer implements Comparable {
     private boolean connectionFailed;
 
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private String hostName;
 
-    public TimeSeriesServer(InetAddress serverAddress, int port, String description) {
-        this(serverAddress, port, description, 0);
+    public TimeSeriesServer(String hostName, int port, String description) throws UnknownHostException {
+        this(hostName, port, description, 0);
     }
 
-    public TimeSeriesServer(InetAddress serverAddress, int port, String description, long lastAnnounceTimestamp) {
-        this.serverKey = new ServerKey(serverAddress, port);
+    public TimeSeriesServer(String hostName, int port, String description, long lastAnnounceTimestamp) throws UnknownHostException {
+        this.hostName = hostName;
+        this.serverKey = new ServerKey(InetAddress.getByName(hostName), port);
         this.description = description;
         this.lastAnnounceTimestamp = lastAnnounceTimestamp;
+    }
+
+    public String getHostName() {
+        return hostName;
     }
 
     public InetAddress getInetAddress() {
@@ -92,12 +97,12 @@ public class TimeSeriesServer implements Comparable {
         firePropertyChange("connectionFailed", oldValue, this.connectionFailed);
     }
 
-    private String getAddressAndPort() {
-        return getInetAddress() + ":" + getPort();
+    private String getHostAndPort() {
+        return getHostName() + ":" + getPort();
     }
 
     public String getServerContextIdentifier() {
-        return getAddressAndPort().replaceAll(JTimeSeriesConstants.NAMESPACE_SEPARATOR_REGEX_TOKEN, "_");
+        return getHostAndPort().replaceAll(JTimeSeriesConstants.NAMESPACE_SEPARATOR_REGEX_TOKEN, "_");
     }
 
     @Override
@@ -156,10 +161,9 @@ public class TimeSeriesServer implements Comparable {
     }
 
     public static TimeSeriesServer create(AnnouncementMessage p) throws UnknownHostException {
-        InetAddress i = InetAddress.getByName(p.getInetAddress());
         int port = p.getPort();
         String description = p.getDescription();
-        return new TimeSeriesServer(i, port, description, System.currentTimeMillis());
+        return new TimeSeriesServer(p.getHostname(), port, description, System.currentTimeMillis());
     }
 
     public ServerKey getServerKey() {

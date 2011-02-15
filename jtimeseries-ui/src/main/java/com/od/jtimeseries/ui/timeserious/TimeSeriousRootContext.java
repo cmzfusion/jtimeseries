@@ -11,9 +11,12 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +29,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements ConfigAware {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator(this);
     private TimeSeriesServerDictionary serverDictionary;
@@ -60,12 +65,15 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
 
     public void restoreConfig(TimeSeriousConfig config) {
         for (TimeSeriesServerConfig c : config.getServerConfigs()) {
-//            final TimeSeriesServer s = c.createServer();
-//            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-//                public void sendEvent(TimeSeriousBusListener listener) {
-//                    listener.serverAdded(s);
-//                }
-//            });
+            try {
+                serverDictionary.getOrCreateServer(
+                    c.getHostName(),
+                    c.getPort(),
+                    c.getDescription()
+                );
+            } catch (UnknownHostException e) {
+                logMethods.logError("Could not create server " + serverDictionary, e);
+            }
         }
         displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
     }

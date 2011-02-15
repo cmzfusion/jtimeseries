@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
 * Created by IntelliJ IDEA.
@@ -14,22 +15,33 @@ import java.net.InetAddress;
 */
 public class TimeSeriesServerConfig {
 
-    private InetAddress serverAddress;
-    private String description;
+    private String hostName;
     private int port;
+    private String description;
 
     public TimeSeriesServerConfig(TimeSeriesServerContext c) {
-        this.serverAddress = c.getServer().getInetAddress();
+        this.hostName = c.getServer().getHostName();
         this.description = c.getServer().getDescription();
         this.port = c.getServer().getPort();
     }
 
-    public TimeSeriesServer createServer() {
+    public String getHostName() {
+        return hostName;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public TimeSeriesServer createServer() throws UnknownHostException {
         return new TimeSeriesServer(
-                serverAddress,
+                hostName,
                 port,
-                description,
-                0
+                description
         );
     }
 

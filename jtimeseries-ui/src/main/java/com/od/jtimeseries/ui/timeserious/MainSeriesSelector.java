@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
@@ -36,12 +37,14 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
     private TimeSeriesContext rootContext;
     private ApplicationActionModels applicationActionModels;
     private DisplayNameCalculator displayNameCalculator;
+    private TimeSeriesServerDictionary dictionary;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator) {
+    public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator, TimeSeriesServerDictionary dictionary) {
         this.rootContext = rootContext;
         this.applicationActionModels = applicationActionModels;
         this.displayNameCalculator = displayNameCalculator;
+        this.dictionary = dictionary;
         selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
             UIPropertiesTimeSeries.class
@@ -117,7 +120,16 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         public void actionPerformed(ActionEvent e) {
             java.util.List<TimeSeriesServerContext> serverContexts = getActionModel().getSelected(TimeSeriesServerContext.class);
             for ( TimeSeriesServerContext s : serverContexts ) {
-                rootContext.removeChild(s);
+                int remove = JOptionPane.showConfirmDialog(
+                    SwingUtilities.getRoot(MainSeriesSelector.this),
+                    "Remove Server " + s.getServer().getDescription() + ", and all its timeseries?",
+                    "Remove Server?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+                );
+                if ( remove == JOptionPane.YES_OPTION) {
+                    dictionary.removeServer(s.getServer());
+                }
             }
         }
 

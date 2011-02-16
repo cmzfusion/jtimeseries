@@ -43,4 +43,7 @@ public interface TimeSeriesServerDictionary {
      */
     TimeSeriesServer getOrCreateServer(String host, int port, String description) throws UnknownHostException;
 
+    boolean serverExists(String host, int port) throws UnknownHostException;
+
+    boolean removeServer(TimeSeriesServer server);
 }

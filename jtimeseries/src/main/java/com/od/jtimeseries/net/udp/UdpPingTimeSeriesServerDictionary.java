@@ -69,6 +69,12 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
         }
     }
 
+    @Override
+    public boolean serverExists(String host, int port) throws UnknownHostException {
+        InetAddress i = getInetAddress(host);
+        return serverKeyToServer.containsKey(new TimeSeriesServer.ServerKey(i, port));
+    }
+
     private InetAddress getInetAddress(String host) throws UnknownHostException {
         InetAddress i = hostnameToInetAddress.get(host);
         if ( i == null ) {

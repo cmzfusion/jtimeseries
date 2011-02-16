@@ -54,7 +54,8 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         this.seriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,
-            rootContext.getDisplayNameCalculator()
+            rootContext.getDisplayNameCalculator(),
+            serverDictionary
         );
         createActions(actionModels);
         initializeFrame();
@@ -67,7 +68,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private void createActions(ApplicationActionModels actionModels) {
         desktopSelectionActionModel = actionModels.getDesktopSelectionActionModel();
         newVisualizerAction = new NewVisualizerAction(this, desktopSelectionActionModel);
-        newServerAction = new NewServerAction(this, rootContext);
+        newServerAction = new NewServerAction(this, rootContext, serverDictionary);
         editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
             rootContext,
             TimeSeriousMainFrame.this,

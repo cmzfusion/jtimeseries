@@ -7,10 +7,12 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.PathParser;
@@ -18,6 +20,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.swing.eventbus.UIEventBus;
 
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
@@ -41,6 +44,11 @@ public class VisualizerRootContext extends DefaultTimeSeriesContext {
         this.serverDictionary = serverDictionary;
         setTimeSeriesFactory(new VisualizerTimeSeriesFactory());
         setContextFactory(new VisualizerContextFactory());
+
+        UIEventBus.getInstance().addEventListener(
+            TimeSeriousBusListener.class,
+            new ContextUpdatingBusListener(this)
+        );
     }
 
     public void addIdentifiables(List<? extends Identifiable> identifiables) {

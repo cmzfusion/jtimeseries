@@ -9,6 +9,7 @@ import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
@@ -42,11 +43,13 @@ public class NewServerAction extends AbstractAction {
 
     private JFrame frame;
     private TimeSeriesContext rootContext;
+    private TimeSeriesServerDictionary serverDictionary;
 
-    public NewServerAction(JFrame frame, TimeSeriesContext rootContext) {
+    public NewServerAction(JFrame frame, TimeSeriesContext rootContext, TimeSeriesServerDictionary serverDictionary) {
         super("New Server", ImageUtils.ADD_SERVER_ICON_16x16);
         this.frame = frame;
         this.rootContext = rootContext;
+        this.serverDictionary = serverDictionary;
         super.putValue(SHORT_DESCRIPTION, "Add a new server to connect and download series data");
     }
 
@@ -85,6 +88,7 @@ public class NewServerAction extends AbstractAction {
 
             private JTextField hostField = new JTextField(20);
             private JTextField portField = new JTextField(20);
+            private JTextField descriptionField = new JTextField(20);
             JPanel serverFormPanel = new JPanel();
 
             public ServerDetailsPage(String title, String description) {
@@ -94,6 +98,14 @@ public class NewServerAction extends AbstractAction {
 
             public String getHostName() {
                 return hostField.getText();
+            }
+
+            public String getServerDescription() {
+                return descriptionField.getText();
+            }
+
+            public void setServerDescription(String s) {
+                descriptionField.setText(s);
             }
 
             public int getPort() {
@@ -108,7 +120,7 @@ public class NewServerAction extends AbstractAction {
             public void initContentPane() {
                 FormLayout layout = new FormLayout(
                         "10dlu:grow, pref:none:right, 3dlu:none, pref:none, 10dlu:grow",
-                        "2dlu:grow, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 10dlu:grow"
+                        "2dlu:grow, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 5dlu:none, pref:none, 10dlu:grow"
                 );
 
                 //layout.setRowGroups(new int[][]{{2,4,6}});
@@ -119,6 +131,8 @@ public class NewServerAction extends AbstractAction {
                 serverFormPanel.add(hostField, cc.xy(4, 4));
                 serverFormPanel.add(new JLabel("Port"), cc.xy(2, 6));
                 serverFormPanel.add(portField, cc.xy(4, 6));
+                serverFormPanel.add(new JLabel("Description"), cc.xy(2, 8));
+                serverFormPanel.add(descriptionField, cc.xy(4, 8));
 
                 addComponent(serverFormPanel);
             }
@@ -141,6 +155,11 @@ public class NewServerAction extends AbstractAction {
             public void actionPerformed(ActionEvent e) {
                 addProgressPane(0.8f, 24, 15);
 
+                //create a default description if not set
+                if ( serverDetailsPage.getServerDescription().trim().length() == 0) {
+                    serverDetailsPage.setServerDescription(serverDetailsPage.getHostName() + ":" + serverDetailsPage.getPort());
+                }
+
                 final CheckAndCreateServerCommand checkServerCommand = new CheckAndCreateServerCommand();
                 checkServerCommand.execute(
                     new ProgressIndicatorTaskListener("Checking Server", serverDetailsPage.serverFormPanel) {
@@ -158,9 +177,6 @@ public class NewServerAction extends AbstractAction {
 
             private class CheckAndCreateServerCommand extends SwingCommand {
 
-                TimeSeriesServer server;
-                private TimeSeriesServerContext context;
-
                 @Override
                 protected Task createTask() {
                     return new BackgroundTask() {
@@ -168,18 +184,11 @@ public class NewServerAction extends AbstractAction {
                         @Override
                         protected void doInBackground() throws Exception {
 
-                            server = new TimeSeriesServer(
-                                serverDetailsPage.getHostName(),
-                                serverDetailsPage.getPort(),
-                                serverDetailsPage.getHostName(),
-                                0
-                            );
-
                             class CheckServerQuery extends AbstractRemoteQuery {
 
                                 private boolean success;
 
-                                public CheckServerQuery(TimeSeriesServer s) throws MalformedURLException {
+                                public CheckServerQuery() throws MalformedURLException {
                                     super(new URL(getServerConnectionUrl()));
                                 }
 
@@ -199,18 +208,26 @@ public class NewServerAction extends AbstractAction {
                                 }
                             }
 
-                            CheckServerQuery q = new CheckServerQuery(server);
+                            CheckServerQuery q = new CheckServerQuery();
                             q.runQuery();
 
                             if (!q.success) {
                                 throw new Exception("Failed to connect to timeseries server at " + q.getQueryUrl());
                             }
 
-                            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-                                public void sendEvent(TimeSeriousBusListener listener) {
-                                    listener.serverAdded(server);
-                                }
-                            });
+                            if ( serverDictionary.serverExists(serverDetailsPage.getHostName(), serverDetailsPage.getPort())) {
+                                JOptionPane.showMessageDialog(NewServerWizard.this,
+                                    "A server with this address already exists",
+                                    "Duplicate Server",
+                                    JOptionPane.INFORMATION_MESSAGE
+                                );
+                            } else {
+                                serverDictionary.getOrCreateServer(
+                                    serverDetailsPage.getHostName(),
+                                    serverDetailsPage.getPort(),
+                                    serverDetailsPage.getServerDescription()
+                                );
+                            }
                         }
 
                         @Override

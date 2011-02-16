@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
@@ -11,6 +12,7 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.EventSender;
@@ -44,7 +46,7 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
     private void addBusListener() {
         UIEventBus.getInstance().addEventListener(
             TimeSeriousBusListener.class,
-                new AddServerBusListener()
+                new AddServerBusListener(this)
         );
     }
 
@@ -82,7 +84,11 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
         return Collections.emptyList();
     }
 
-    private class AddServerBusListener extends TimeSeriousBusListenerAdapter {
+    private class AddServerBusListener extends ContextUpdatingBusListener {
+
+        public AddServerBusListener(TimeSeriesContext rootContext) {
+            super(rootContext);
+        }
 
         //add a time series server context when a new server is created
         public void serverAdded(TimeSeriesServer s) {
@@ -94,5 +100,6 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
                 displayNameCalculator
             ).execute(s);
         }
+
     }
 }

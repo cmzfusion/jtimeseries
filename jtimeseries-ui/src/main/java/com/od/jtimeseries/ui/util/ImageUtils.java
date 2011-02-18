@@ -37,6 +37,7 @@ public class ImageUtils {
     public static ImageIcon TIMESERIES_SERVER_OFFLINE_ICON_16x16 = getImageIcon("/images/server_client2_offline_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_REFRESH_ICON_16x16 = getImageIcon("/images/server_client2_refresh_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_REMOVE_ICON_16x16 = getImageIcon("/images/server_client2_remove_16x16.png");
+    public static ImageIcon TIMESERIES_SERVER_RENAME_ICON_16x16 = getImageIcon("/images/server_client2_rename_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_24x24 = getImageIcon("/images/server_client2_24x24.png");
     public static ImageIcon ADD_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_add_16x16.png");
@@ -46,6 +47,7 @@ public class ImageUtils {
     public static ImageIcon DISPLAY_NAME_16x16 = getImageIcon("/images/displayName16x16.png");
     public static ImageIcon OK_16x16 = getImageIcon("/images/ok16x16.png");
     public static ImageIcon TABLE_COLUMN_ADD_16x16 = getImageIcon("/images/table_column_add_16x16.png");
+            ;
 
     public static ImageIcon getImageIcon(String name) {
         ImageIcon imageIcon = null;

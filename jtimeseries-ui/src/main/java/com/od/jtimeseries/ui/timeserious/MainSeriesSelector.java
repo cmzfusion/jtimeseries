@@ -101,20 +101,43 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
         private Action refreshServerAction = new RefreshServerSeriesAction(selectionPanel.getSelectionActionModel());
         private Action removeServerAction = new RemoveServerAction(selectionPanel.getSelectionActionModel());
+        private Action renameServerAction = new RenameServerAction(selectionPanel.getSelectionActionModel());
 
         public java.util.List<Action> getActions(SelectorComponent s, java.util.List<Identifiable> selectedIdentifiable) {
             return Arrays.asList(
                     addSeriesAction,
                     refreshServerAction,
-                    removeServerAction
+                    removeServerAction,
+                    renameServerAction
             );
+        }
+    }
+
+    private class RenameServerAction extends ModelDrivenAction<IdentifiableListActionModel> {
+
+        public RenameServerAction(IdentifiableListActionModel actionModel) {
+            super(actionModel, "Rename Server", ImageUtils.TIMESERIES_SERVER_RENAME_ICON_16x16);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+             java.util.List<TimeSeriesServerContext> serverContexts = getActionModel().getSelected(TimeSeriesServerContext.class);
+             for ( TimeSeriesServerContext s : serverContexts ) {
+                String name = JOptionPane.showInputDialog(
+                        SwingUtilities.getRoot(MainSeriesSelector.this),
+                        "Rename Server " + s.getServer().getDescription() + "?",
+                        s.getServer().getDescription()
+                );
+                if ( name != null && name.length() > 0) {
+                    s.getServer().setDescription(name);
+                }
+            }
         }
     }
 
     private class RemoveServerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
         public RemoveServerAction(IdentifiableListActionModel actionModel) {
-            super(actionModel, "Remove server", ImageUtils.TIMESERIES_SERVER_REMOVE_ICON_16x16);
+            super(actionModel, "Remove Server", ImageUtils.TIMESERIES_SERVER_REMOVE_ICON_16x16);
         }
 
         public void actionPerformed(ActionEvent e) {

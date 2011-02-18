@@ -225,7 +225,7 @@ public class NewServerAction extends AbstractAction {
                                 serverDictionary.getOrCreateServer(
                                     serverDetailsPage.getHostName(),
                                     serverDetailsPage.getPort(),
-                                    serverDetailsPage.getServerDescription()
+                                    serverDetailsPage.getDescription()
                                 );
                             }
                         }

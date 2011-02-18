@@ -29,6 +29,12 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements
         }
     };
 
+    private PropertyChangeListener descriptionListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            fireNodeChanged("description");
+        }
+    };
+
     public TimeSeriesServerContext(TimeSeriesContext parentContext, TimeSeriesServer server) {
         //the server context renderer will render the description, which may change
         //the actual identifier is the address + port, which forms the unchanging key for the server
@@ -45,6 +51,9 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements
             new Runnable() {
                 public void run() {
                     WeakReferenceListener l = new WeakReferenceListener("connectionFailed", connectionListener);
+                    l.addListenerTo(server);
+
+                    l = new WeakReferenceListener("description", descriptionListener);
                     l.addListenerTo(server);
                 }
             }

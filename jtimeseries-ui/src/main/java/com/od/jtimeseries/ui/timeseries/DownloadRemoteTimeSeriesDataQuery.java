@@ -73,7 +73,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
     private void refreshSummaryStatsProperties(Attributes attributes) {
         String stats = attributes.getValue(AttributeName.summaryStats.name());
-        Properties p = ContextProperties.getSummaryStatsProperties(stats);
+        Properties p = ContextProperties.createSummaryStatsProperties(stats);
         destinationSeries.putAllProperties(p);
     }
 

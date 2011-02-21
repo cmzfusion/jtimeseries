@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -28,6 +29,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Date;
 import java.awt.*;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -115,6 +117,27 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         );
         firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
         fireNodeChanged(SELECTED_PROPERTY);
+    }
+
+    //support summary stats properties from wrapped series
+    public Properties getProperties_Locked() {
+        Properties wrappedStatsProperties;
+        synchronized (wrappedSeries) {
+            wrappedStatsProperties = ContextProperties.getStatsProperties(wrappedSeries.getProperties());
+        }
+
+        Properties result = super.getProperties_Locked();
+        result.putAll(wrappedStatsProperties);
+        return result;
+    }
+
+    //support summary stats properties from wrapped series
+    public String getProperty_Locked(String propertyName) {
+        String result = null;
+        if ( ContextProperties.isSummaryStatsProperty(propertyName)) {
+            result = wrappedSeries.getProperty(propertyName);
+        }
+        return result;
     }
 
     public Color getColor() {

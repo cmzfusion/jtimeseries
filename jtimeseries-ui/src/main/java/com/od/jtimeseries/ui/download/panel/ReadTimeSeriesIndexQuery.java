@@ -103,7 +103,7 @@ public class ReadTimeSeriesIndexQuery extends AbstractRemoteQuery {
             this.id = id;
             this.description = description;
             this.seriesURL = seriesURL;
-            this.summaryStats = ContextProperties.getSummaryStatsProperties(summaryStats);
+            this.summaryStats = ContextProperties.createSummaryStatsProperties(summaryStats);
         }
 
         public String getId() {

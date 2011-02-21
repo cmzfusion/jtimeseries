@@ -144,9 +144,9 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected Properties getProperties_Locked() {
-            Properties p = new Properties();
-            p.putAll(properties);
-            return p;
+        Properties p = new Properties();
+        p.putAll(properties);
+        return p;
     }
 
     protected void putAllProperties_Locked(Properties p) {

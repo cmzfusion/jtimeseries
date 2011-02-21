@@ -65,7 +65,7 @@ public class ContextProperties {
         return sb.toString();
     }
 
-    public static Properties getSummaryStatsProperties(String summaryStatsStringRepresentation) {
+    public static Properties createSummaryStatsProperties(String summaryStatsStringRepresentation) {
         Properties p = new Properties();
         StringTokenizer st = new StringTokenizer(summaryStatsStringRepresentation, SUMMARY_STATS_SEPARATOR_TOKEN);
         String property;
@@ -76,6 +76,17 @@ public class ContextProperties {
             p.setProperty(nameAndValue[0], nameAndValue[1]);
         }
         return p;
+    }
+
+    public static Properties getStatsProperties(Properties p) {
+        Properties result = new Properties();
+        for (Object key : p.keySet()) {
+            String propertyName = (String) key;
+            if ( ContextProperties.isSummaryStatsProperty(propertyName)) {
+                result.setProperty(propertyName, p.getProperty(propertyName));
+            }
+        }
+        return result;
     }
 
     /**

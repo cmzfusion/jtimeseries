@@ -43,10 +43,10 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     private static ColorRotator colorRotator = new ColorRotator();
 
+    private final RemoteHttpTimeSeries wrappedSeries;
     private volatile boolean selected;
     private String displayName;
     private Color color = colorRotator.getNextColor();
-    private RemoteHttpTimeSeries wrappedSeries;
     public WrappedSeriesTreeListener wrappedSeriesTreeListener;
     public PropertyChangeListener proxyingPropertyListener;
 
@@ -121,14 +121,14 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     //support summary stats properties from wrapped series
     public Properties getProperties_Locked() {
-        Properties wrappedStatsProperties;
+        Properties properties = super.getProperties_Locked();
         synchronized (wrappedSeries) {
-            wrappedStatsProperties = ContextProperties.getStatsProperties(wrappedSeries.getProperties());
+            ContextProperties.addStatsProperties(
+                wrappedSeries.getProperties(),
+                properties
+            );
         }
-
-        Properties result = super.getProperties_Locked();
-        result.putAll(wrappedStatsProperties);
-        return result;
+        return properties;
     }
 
     //support summary stats properties from wrapped series

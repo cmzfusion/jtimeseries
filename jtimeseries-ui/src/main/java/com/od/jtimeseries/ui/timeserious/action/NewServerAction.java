@@ -42,13 +42,11 @@ import java.net.URL;
 public class NewServerAction extends AbstractAction {
 
     private JFrame frame;
-    private TimeSeriesContext rootContext;
     private TimeSeriesServerDictionary serverDictionary;
 
-    public NewServerAction(JFrame frame, TimeSeriesContext rootContext, TimeSeriesServerDictionary serverDictionary) {
+    public NewServerAction(JFrame frame, TimeSeriesServerDictionary serverDictionary) {
         super("New Server", ImageUtils.ADD_SERVER_ICON_16x16);
         this.frame = frame;
-        this.rootContext = rootContext;
         this.serverDictionary = serverDictionary;
         super.putValue(SHORT_DESCRIPTION, "Add a new server to connect and download series data");
     }
@@ -225,7 +223,7 @@ public class NewServerAction extends AbstractAction {
                                 serverDictionary.getOrCreateServer(
                                     serverDetailsPage.getHostName(),
                                     serverDetailsPage.getPort(),
-                                    serverDetailsPage.getDescription()
+                                    serverDetailsPage.getServerDescription()
                                 );
                             }
                         }

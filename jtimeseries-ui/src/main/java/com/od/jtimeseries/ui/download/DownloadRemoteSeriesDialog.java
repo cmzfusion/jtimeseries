@@ -19,16 +19,27 @@
 package com.od.jtimeseries.ui.download;
 
 import com.od.jtimeseries.JTimeSeries;
+import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
+import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
+import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
+import java.net.MalformedURLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,13 +55,18 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private ProgressLayeredPane progressLayeredPane;
     private AbstractDownloadWizardPanel.WizardPanelListener panelListener;
     private SelectServerPanel selectServerPanel;
-    private TimeSeriesContext contextToStoreRemoteSeries = JTimeSeries.createRootContext();
+    private TimeSeriesContext contextToStoreRemoteSeries;
     private ChooseSeriesPanel chooseSeriesPanel;
-    private DisplayNameCalculator displayNameCalculator;
-    private List<? extends UIPropertiesTimeSeries> selectedSeries = new LinkedList<UIPropertiesTimeSeries>();
+    private TimeSeriesContext destinationRootContext;
 
-    public DownloadRemoteSeriesDialog(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, JComponent dialogPositionComponent) {
-        this.displayNameCalculator = displayNameCalculator;
+    public DownloadRemoteSeriesDialog(TimeSeriesServerDictionary serverDictionary, JComponent dialogPositionComponent, TimeSeriesContext destinationRootContext) {
+        //context into which we want to add selected series from remote server
+        this.destinationRootContext = destinationRootContext;
+
+        //a temporary context to use for times series selector, so that we can display all remote series
+        //and give the user a chance to select the ones to add to destinationContext
+        contextToStoreRemoteSeries = new SelectionRootContext(serverDictionary);
+
         setTitle("Download Time Series");
         setAlwaysOnTop(true);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -64,12 +80,8 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         setLocationRelativeTo(dialogPositionComponent);
     }
 
-    public List<? extends UIPropertiesTimeSeries> getSelectedSeries() {
-        return selectedSeries;
-    }
-
     private void createPanels(TimeSeriesServerDictionary serverDictionary) {
-        selectServerPanel = new SelectServerPanel(panelListener, serverDictionary, contextToStoreRemoteSeries, displayNameCalculator);
+        selectServerPanel = new SelectServerPanel(panelListener, serverDictionary, contextToStoreRemoteSeries);
     }
 
     private void createPanelListener() {
@@ -78,12 +90,12 @@ public class DownloadRemoteSeriesDialog extends JFrame {
             public void seriesLoaded() {
                 chooseSeriesPanel = new ChooseSeriesPanel(panelListener, contextToStoreRemoteSeries);
                 progressLayeredPane.setViewComponent(
-                        chooseSeriesPanel
+                    chooseSeriesPanel
                 );
             }
 
             public void seriesSelected(java.util.List<? extends UIPropertiesTimeSeries> series) {
-                DownloadRemoteSeriesDialog.this.selectedSeries = series;
+                addSelectedSeriesToDestinationContext(series);
                 dispose();
             }
 
@@ -91,5 +103,46 @@ public class DownloadRemoteSeriesDialog extends JFrame {
                 dispose();
             }
         };
+    }
+
+    private void addSelectedSeriesToDestinationContext(List<? extends UIPropertiesTimeSeries> series) {
+        for ( UIPropertiesTimeSeries p : series ) {
+            String path = p.getPath();
+            //TODO - should we add extra handling if series already exists in target?
+            if (!destinationRootContext.contains(path)) {
+                //we don't know what type of UIPropertiesTimeSeries the destination context should contain
+                //defer construction to the context's factories by using the generic create method on context
+                destinationRootContext.create(
+                    path,
+                    p.getDescription(),
+                    UIPropertiesTimeSeries.class,
+                    p
+                );
+            }
+        }
+    }
+
+    private class SelectionRootContext extends AbstractUIRootContext {
+
+        public SelectionRootContext(TimeSeriesServerDictionary serverDictionary) {
+            super(serverDictionary);
+            initializeFactoriesAndBusListener();
+        }
+
+        protected ContextFactory createContextFactory() {
+            return new ServerContextCreatingContextFactory();
+        }
+
+        protected TimeSeriesFactory createTimeSeriesFactory() {
+            return new AbstractUIContextTimeSeriesFactory() {
+                protected <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+                    return (E)new ServerTimeSeries(config);
+                }
+            };
+        }
+
+        protected ContextUpdatingBusListener createContextBusListener() {
+            return new ContextUpdatingBusListener(this);
+        }
     }
 }

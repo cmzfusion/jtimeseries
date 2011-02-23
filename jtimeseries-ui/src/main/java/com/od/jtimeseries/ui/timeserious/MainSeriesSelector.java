@@ -169,7 +169,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
         public void actionPerformed(ActionEvent e) {
             java.util.List<TimeSeriesServerContext> serverContexts = getActionModel().getSelected(TimeSeriesServerContext.class);
-            LoadSeriesFromServerCommand l = new LoadSeriesFromServerCommand(rootContext, displayNameCalculator );
+            LoadSeriesFromServerCommand l = new LoadSeriesFromServerCommand(rootContext);
             for ( TimeSeriesServerContext c : serverContexts ) {
                 l.execute(c.getServer());
             }

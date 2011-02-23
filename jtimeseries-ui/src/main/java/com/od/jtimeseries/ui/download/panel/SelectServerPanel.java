@@ -64,9 +64,9 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
     private JButton downloadButton = new JButton(new DownloadAction());
     private LoadSeriesFromServerCommand loadSeriesFromServerCommand;
 
-    public SelectServerPanel(WizardPanelListener panelListener, TimeSeriesServerDictionary serverDictionary, TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
+    public SelectServerPanel(WizardPanelListener panelListener, TimeSeriesServerDictionary serverDictionary, TimeSeriesContext destinationContext) {
         super(panelListener);
-        loadSeriesFromServerCommand = new LoadSeriesFromServerCommand(destinationContext, displayNameCalculator);
+        loadSeriesFromServerCommand = new LoadSeriesFromServerCommand(destinationContext);
         loadSeriesFromServerCommand.addTaskListener(new TaskListenerAdapter<String>() {
             public void success(Task task) {
                 getPanelListener().seriesLoaded();

@@ -79,9 +79,10 @@ public class VisualizerRootContext extends AbstractUIRootContext {
                 String serverDescription = p.removeFirstNode();
                 TimeSeriesServer s = getTimeSeriesServer(c, serverDescription);
 
+                //TODO - handle case where we already have a series with this path?
                 String newLocalPath = s.getServerContextIdentifier() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + p.getRemainingPath();
-                if ( get(newLocalPath) == null) {
-                    create(newLocalPath, c.getDescription(), ChartingTimeSeries.class, c);
+                if ( ! contains(newLocalPath)) {
+                    create(newLocalPath, c.getDescription(), UIPropertiesTimeSeries.class, c);
                 }
             } catch (Exception e) {
                 logMethods.logError("Failed to create series for config " + c, e);

@@ -105,8 +105,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
             TimeSeriousRootContext.this.addChild(context);
 
             new LoadSeriesFromServerCommand(
-                TimeSeriousRootContext.this,
-                displayNameCalculator
+                TimeSeriousRootContext.this
             ).execute(s);
         }
 

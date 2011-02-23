@@ -22,7 +22,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,16 +41,16 @@ import java.util.concurrent.Callable;
  */
 public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.RemoteTimeSeries>> {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AddSeriesFromServerTask.class);
+
     private URL remoteContextUrl;
     private TimeSeriesContext destinationRootContext;
     private TimeSeriesServerContext serverContext;
     private TimeSeriesServer server;
-    private DisplayNameCalculator displayNameCalculator;
 
-    public AddSeriesFromServerTask(TimeSeriesContext destinationRootContext, TimeSeriesServer server, DisplayNameCalculator displayNameCalculator) throws MalformedURLException {
+    public AddSeriesFromServerTask(TimeSeriesContext destinationRootContext, TimeSeriesServer server) throws MalformedURLException {
         this.destinationRootContext = destinationRootContext;
         this.server = server;
-        this.displayNameCalculator = displayNameCalculator;
         this.serverContext = findOrCreateServerContext();
         this.remoteContextUrl = createUrl();
     }
@@ -57,7 +61,7 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
 
     private TimeSeriesServerContext findOrCreateServerContext() {
         TimeSeriesServerContext serverContext = (TimeSeriesServerContext) destinationRootContext.get(server.getServerContextIdentifier());
-        if ( serverContext == null) {
+        if (serverContext == null) {
             serverContext = new TimeSeriesServerContext(destinationRootContext, server);
             destinationRootContext.addChild(serverContext);
         }
@@ -69,8 +73,8 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
             serverContext.setLoading(true); //this will cause loading animations to be shown for the node representing this server in the context tree
             ReadTimeSeriesIndexQuery readIndexQuery = new ReadTimeSeriesIndexQuery(remoteContextUrl);
             readIndexQuery.runQuery();
-            for ( ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
-                createAndAddToContext(timeSeriesResult);
+            for (ReadTimeSeriesIndexQuery.RemoteTimeSeries timeSeriesResult : readIndexQuery.getResult()) {
+                createAndAddToContext(serverContext, timeSeriesResult);
             }
             return readIndexQuery.getResult();
 
@@ -79,24 +83,36 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
         }
     }
 
-    private void createAndAddToContext(ReadTimeSeriesIndexQuery.RemoteTimeSeries result) {
+    private void createAndAddToContext(TimeSeriesServerContext serverContext, ReadTimeSeriesIndexQuery.RemoteTimeSeries series) {
 
-//        TimeSeriesContext c = serverContext.createContext(result.getParentPath());
+        String path =
+            serverContext.getId() +
+            JTimeSeriesConstants.NAMESPACE_SEPARATOR +
+            series.getParentPath() +
+            JTimeSeriesConstants.NAMESPACE_SEPARATOR +
+            series.getId();
 
-//        ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
-//        series.putAllProperties(result.getSummaryStatsProperties());
-//
-//        //TODO - should we add extra handling if series already exists in target?
-//        if ( ! c.containsChildWithId(series.getId())) {
-//            c.addChild(series);
-//
-//            //must do this after adding the series to the context because the contextPath will not
-//            //be complete until this is done, and the name calculation is based on the path
-//            if ( displayNameCalculator != null) {
-//                displayNameCalculator.setDisplayName(series);
-//            }
-//        }
+        try {
+            UiTimeSeriesConfig config = new UiTimeSeriesConfig();
+            config.setId(series.getId());
+            config.setParentPath(series.getParentPath());
+            config.setDescription(series.getDescription());
+            config.setTimeSeriesUrl(series.getSeriesURL().toString());
 
+            //TODO - should we add extra handling if series already exists in target?
+            if (!destinationRootContext.contains(path)) {
+                //we don't know what type of UIPropertiesTimeSeries the destination context should contain
+                //defer construction to the context's factories by using the generic create method on context
+                destinationRootContext.create(
+                    path,
+                    series.getDescription(),
+                    UIPropertiesTimeSeries.class,
+                    config
+                );
+            }
+        } catch (Throwable t) {
+            logMethods.logError("Error adding series from server " + path + " in context " + destinationRootContext, t);
+        }
     }
 
 }

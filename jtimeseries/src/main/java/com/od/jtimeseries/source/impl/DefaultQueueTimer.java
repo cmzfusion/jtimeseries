@@ -195,4 +195,8 @@ public class DefaultQueueTimer implements QueueTimer {
     public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         return timingSource.findAll(searchPattern, assignableToClass);
     }
+
+    public boolean contains(String path) {
+        return timingSource.contains(path);
+    }
 }

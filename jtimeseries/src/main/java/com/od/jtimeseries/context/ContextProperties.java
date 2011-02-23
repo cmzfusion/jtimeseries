@@ -78,15 +78,13 @@ public class ContextProperties {
         return p;
     }
 
-    public static Properties getStatsProperties(Properties p) {
-        Properties result = new Properties();
+    public static void addStatsProperties(Properties p, Properties destination) {
         for (Object key : p.keySet()) {
             String propertyName = (String) key;
             if ( ContextProperties.isSummaryStatsProperty(propertyName)) {
-                result.setProperty(propertyName, p.getProperty(propertyName));
+                destination.setProperty(propertyName, p.getProperty(propertyName));
             }
         }
-        return result;
     }
 
     /**

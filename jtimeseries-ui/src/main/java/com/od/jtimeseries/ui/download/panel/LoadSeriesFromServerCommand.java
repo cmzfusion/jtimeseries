@@ -24,12 +24,6 @@ public class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, 
 
     private static LogMethods logMethods = LogUtils.getLogMethods(LoadSeriesFromServerCommand.class);
     private TimeSeriesContext destinationContext;
-    private DisplayNameCalculator displayNameCalculator;
-
-    public LoadSeriesFromServerCommand(TimeSeriesContext destinationContext, DisplayNameCalculator displayNameCalculator) {
-        this(destinationContext);
-        this.displayNameCalculator = displayNameCalculator;
-    }
 
     public LoadSeriesFromServerCommand(TimeSeriesContext destinationContext) {
         this.destinationContext = destinationContext;
@@ -56,8 +50,7 @@ public class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, 
 
                 AddSeriesFromServerTask t = new AddSeriesFromServerTask(
                     destinationContext,
-                    server,
-                    displayNameCalculator
+                    server
                 );
                 t.call();
             }

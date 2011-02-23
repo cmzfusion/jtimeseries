@@ -64,6 +64,8 @@ public interface Identifiable {
 
     Identifiable get(String path);
 
+    boolean contains(String path);
+
     <E extends Identifiable> E get(String path, Class<E> classType);
 
     <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);

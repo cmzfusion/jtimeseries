@@ -227,10 +227,9 @@ public class TimeSeriesVisualizer extends JPanel {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
             new ShowDownloadSeriesDialogAction(
-                new NewSeriesHandler(),
                 timeSeriesServerDictionary,
-                editDisplayNameAction.getDisplayNameCalculator(),
-                this
+                this,
+                rootContext
             )
         ));
         toolbar.add(Box.createHorizontalStrut(5));
@@ -243,10 +242,6 @@ public class TimeSeriesVisualizer extends JPanel {
         chartPanel.add(chart, BorderLayout.CENTER);
         chartPanel.add(chartControlPanel, BorderLayout.SOUTH);
         return chartPanel;
-    }
-
-    public SeriesSelectionPanel getSeriesSelectionPanel() {
-        return seriesSelectionPanel;
     }
 
     public List<UiTimeSeriesConfig> getChartConfigs() {
@@ -273,13 +268,6 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
         rootContext.addIdentifiables(selectedSeries);
-    }
-
-    private class NewSeriesHandler implements ShowDownloadSeriesDialogAction.NewSeriesHandler {
-
-        public void addSeries(List<? extends UIPropertiesTimeSeries> selectedTimeSeries) {
-            rootContext.addIdentifiables(selectedTimeSeries);
-        }
     }
 
     //when this visualizer is garbage collected, give its series the chance to

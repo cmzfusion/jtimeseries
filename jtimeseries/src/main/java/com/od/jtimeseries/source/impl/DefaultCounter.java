@@ -195,4 +195,8 @@ public class DefaultCounter implements Counter {
     public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         return simpleSource.findAll(searchPattern, assignableToClass);
     }
+
+    public boolean contains(String path) {
+        return simpleSource.contains(path);
+    }
 }

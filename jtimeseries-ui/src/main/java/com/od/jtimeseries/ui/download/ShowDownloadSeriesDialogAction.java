@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.download;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
@@ -39,37 +40,24 @@ import java.awt.event.WindowEvent;
 */
 public class ShowDownloadSeriesDialogAction extends AbstractAction {
 
-    private SeriesSelectionPanel seriesSelectionPanel;
-    private NewSeriesHandler selectionHandler;
     private TimeSeriesServerDictionary serverDictionary;
-    private DisplayNameCalculator displayNameCalculator;
+    private TimeSeriesContext destinationRootContext;
     private JComponent componentForDialogPositioning;
 
-    public ShowDownloadSeriesDialogAction(NewSeriesHandler selectionHandler, TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, JComponent componentForDialogPositioning) {
+    public ShowDownloadSeriesDialogAction(TimeSeriesServerDictionary serverDictionary, JComponent componentForDialogPositioning, TimeSeriesContext destinationRootContext) {
         super("Download Series", ImageUtils.DOWNLOAD_16x16);
-        this.selectionHandler = selectionHandler;
         this.serverDictionary = serverDictionary;
-        this.displayNameCalculator = displayNameCalculator;
+        this.destinationRootContext = destinationRootContext;
         this.componentForDialogPositioning = componentForDialogPositioning;
     }
 
     public void actionPerformed(ActionEvent e) {
         final DownloadRemoteSeriesDialog d = new DownloadRemoteSeriesDialog(
                 serverDictionary,
-                displayNameCalculator,
-                componentForDialogPositioning
+                componentForDialogPositioning,
+                destinationRootContext
         );
 
         d.setVisible(true);
-        d.addWindowListener(new WindowAdapter() {
-            public void windowClosed(WindowEvent e) {
-                selectionHandler.addSeries(d.getSelectedSeries());
-            }
-        });
-    }
-
-    public static interface NewSeriesHandler {
-
-        public void addSeries(java.util.List<? extends UIPropertiesTimeSeries> selectedTimeSeries);
     }
 }

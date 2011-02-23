@@ -35,6 +35,7 @@ import com.od.jtimeseries.util.time.Time;
 
 import javax.swing.*;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -56,7 +57,22 @@ public class JTimeSeriesDemo {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {}
-        new JTimeSeriesDemo();
+
+        try {
+            SwingUtilities.invokeAndWait(
+                new Runnable() {
+                    public void run() {
+                        try {
+                            new JTimeSeriesDemo();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public JTimeSeriesDemo() throws IOException {

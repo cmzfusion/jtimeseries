@@ -137,6 +137,10 @@ public abstract class LockingIdentifiable implements Identifiable {
     }
     protected abstract <E extends Identifiable> E get_Locked(String path, Class<E> classType);
 
+    public boolean contains(String path) {
+        Identifiable i = get(path);
+        return i != null;
+    }
 
     public <E extends Identifiable> E getFromAncestors(String id, Class<E> classType) {
         try {
@@ -236,7 +240,7 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract Identifiable addChild_Locked(Identifiable... identifiables);
 
-    public void addTreeListener(IdentifiableTreeListener l) {
+    public final void addTreeListener(IdentifiableTreeListener l) {
         try {
             getTreeLock().readLock().lock();
             addTreeListener_Locked(l);
@@ -247,7 +251,7 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract void addTreeListener_Locked(IdentifiableTreeListener l);
 
-    public void removeTreeListener(IdentifiableTreeListener l) {
+    public final void removeTreeListener(IdentifiableTreeListener l) {
         try {
             getTreeLock().readLock().lock();
             removeTreeListener_Locked(l);

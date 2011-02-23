@@ -84,7 +84,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters) {
             E result = null;
             try {
-                if (clazzType.isAssignableFrom(ChartingTimeSeries.class) && parameters.length == 1) {
+                if (clazzType.isAssignableFrom(UIPropertiesTimeSeries.class) && parameters.length == 1) {
                     //if the parameter is a root context - this means we are trying to recreate a series from
                     //another context tree within this visualizer's context tree
                     if (parameterIsOtherRoot(parameters[0])) {
@@ -108,7 +108,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         protected abstract <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException;
     }
 
-    protected class ServerContextCreatingContextFactory extends DefaultContextFactory {
+    public class ServerContextCreatingContextFactory extends DefaultContextFactory {
 
         //if we are creating a context in this tree and another root context is the parameter, we may be able to use
         //the information from the parameter to help us create a more specific type of context locally -
@@ -117,9 +117,8 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
             E result = null;
             if (classType.isAssignableFrom(TimeSeriesServerContext.class)) {
                 if (parent == AbstractUIRootContext.this && parameters.length == 1) {
-                    if ( parameterIsOtherRoot(parameters[0])) {
-                        Identifiable otherContext = ((Identifiable)parameters[0]).get(
-                            parent.getPath() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + id);
+                    if ( parameters[0] instanceof Identifiable) {
+                        Identifiable otherContext = ((Identifiable)parameters[0]).getRoot().get(id);
                         if ( otherContext instanceof TimeSeriesServerContext) {
                             TimeSeriesServer server = ((TimeSeriesServerContext) otherContext).getServer();
                             result = (E)new TimeSeriesServerContext(parent, server);

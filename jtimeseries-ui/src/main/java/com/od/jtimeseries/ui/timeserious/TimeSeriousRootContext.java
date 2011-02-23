@@ -1,23 +1,27 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
+import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -30,24 +34,27 @@ import java.util.List;
  * Time: 07:19:42
  * To change this template use File | Settings | File Templates.
  */
-public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements ConfigAware {
+public class TimeSeriousRootContext extends AbstractUIRootContext implements ConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator(this);
-    private TimeSeriesServerDictionary serverDictionary;
 
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary) {
-        super("TmeSeriousRootContext", "Root context for TimeSerious application");
-        this.serverDictionary = serverDictionary;
-        addBusListener();
+        super(serverDictionary);
+        initializeFactoriesAndBusListener();
     }
 
-    private void addBusListener() {
-        UIEventBus.getInstance().addEventListener(
-            TimeSeriousBusListener.class,
-                new AddServerBusListener(this)
-        );
+    protected ContextFactory createContextFactory() {
+        return new DefaultContextFactory();
+    }
+
+    protected TimeSeriesFactory createTimeSeriesFactory() {
+        return new RootContextTimeSeriesFactory();
+    }
+
+    protected ContextUpdatingBusListener createContextBusListener() {
+        return new ServerSeriesLoadingBusListener(this);
     }
 
     public DisplayNameCalculator getDisplayNameCalculator() {
@@ -84,13 +91,15 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
         return Collections.emptyList();
     }
 
-    private class AddServerBusListener extends ContextUpdatingBusListener {
+    private class ServerSeriesLoadingBusListener extends ContextUpdatingBusListener {
 
-        public AddServerBusListener(TimeSeriesContext rootContext) {
+        public ServerSeriesLoadingBusListener(TimeSeriesContext rootContext) {
             super(rootContext);
         }
 
-        //add a time series server context when a new server is created
+        //add a time series server context when a new server is created, and load its series
+        //visualizer contexts don't do this automatically otherwise the visualizers would end up with all the
+        //known servers, even if they don't have any series
         public void serverAdded(TimeSeriesServer s) {
             TimeSeriesServerContext context = new TimeSeriesServerContext(TimeSeriousRootContext.this, s);
             TimeSeriousRootContext.this.addChild(context);
@@ -101,5 +110,12 @@ public class TimeSeriousRootContext extends DefaultTimeSeriesContext implements 
             ).execute(s);
         }
 
+    }
+
+    private class RootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
+
+        protected <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+            return (E)new ServerTimeSeries(config);
+        }
     }
 }

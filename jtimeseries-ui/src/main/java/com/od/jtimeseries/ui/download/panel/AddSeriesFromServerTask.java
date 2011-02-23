@@ -37,14 +37,14 @@ import java.util.concurrent.Callable;
  */
 public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesIndexQuery.RemoteTimeSeries>> {
 
-    private TimeSeriesServerContext serverContext;
     private URL remoteContextUrl;
-    private TimeSeriesContext rootContext;
+    private TimeSeriesContext destinationRootContext;
+    private TimeSeriesServerContext serverContext;
     private TimeSeriesServer server;
     private DisplayNameCalculator displayNameCalculator;
 
-    public AddSeriesFromServerTask(TimeSeriesContext rootContext, TimeSeriesServer server, DisplayNameCalculator displayNameCalculator) throws MalformedURLException {
-        this.rootContext = rootContext;
+    public AddSeriesFromServerTask(TimeSeriesContext destinationRootContext, TimeSeriesServer server, DisplayNameCalculator displayNameCalculator) throws MalformedURLException {
+        this.destinationRootContext = destinationRootContext;
         this.server = server;
         this.displayNameCalculator = displayNameCalculator;
         this.serverContext = findOrCreateServerContext();
@@ -56,10 +56,10 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
     }
 
     private TimeSeriesServerContext findOrCreateServerContext() {
-        TimeSeriesServerContext serverContext = (TimeSeriesServerContext)rootContext.get(server.getServerContextIdentifier());
+        TimeSeriesServerContext serverContext = (TimeSeriesServerContext) destinationRootContext.get(server.getServerContextIdentifier());
         if ( serverContext == null) {
-            serverContext = new TimeSeriesServerContext(rootContext, server);
-            rootContext.addChild(serverContext);
+            serverContext = new TimeSeriesServerContext(destinationRootContext, server);
+            destinationRootContext.addChild(serverContext);
         }
         return serverContext;
     }
@@ -80,21 +80,23 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
     }
 
     private void createAndAddToContext(ReadTimeSeriesIndexQuery.RemoteTimeSeries result) {
-        TimeSeriesContext c = serverContext.createContext(result.getParentPath());
 
-        ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
-        series.putAllProperties(result.getSummaryStatsProperties());
+//        TimeSeriesContext c = serverContext.createContext(result.getParentPath());
 
-        //TODO - should we add extra handling if series already exists in target?
-        if ( ! c.containsChildWithId(series.getId())) {
-            c.addChild(series);
+//        ServerTimeSeries series = new ServerTimeSeries(result.getId(), result.getDescription(), result.getSeriesURL());
+//        series.putAllProperties(result.getSummaryStatsProperties());
+//
+//        //TODO - should we add extra handling if series already exists in target?
+//        if ( ! c.containsChildWithId(series.getId())) {
+//            c.addChild(series);
+//
+//            //must do this after adding the series to the context because the contextPath will not
+//            //be complete until this is done, and the name calculation is based on the path
+//            if ( displayNameCalculator != null) {
+//                displayNameCalculator.setDisplayName(series);
+//            }
+//        }
 
-            //must do this after adding the series to the context because the contextPath will not
-            //be complete until this is done, and the name calculation is based on the path
-            if ( displayNameCalculator != null) {
-                displayNameCalculator.setDisplayName(series);
-            }
-        }
     }
 
 }

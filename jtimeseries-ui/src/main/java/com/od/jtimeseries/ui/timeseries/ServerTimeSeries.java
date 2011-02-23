@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeseries;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -10,8 +11,8 @@ import java.net.URL;
  */
 public class ServerTimeSeries extends DefaultUITimeSeries implements UIPropertiesTimeSeries {
 
-    public ServerTimeSeries(String id, String description, URL seriesUrl) {
-        super(id, description);
-        setTimeSeriesURL(seriesUrl);
+    public ServerTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
+        super(config.getId(), config.getDescription());
+        setTimeSeriesURL(new URL(config.getTimeSeriesUrl()));
     }
 }

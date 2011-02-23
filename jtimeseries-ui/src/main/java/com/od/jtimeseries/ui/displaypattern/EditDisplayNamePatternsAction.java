@@ -39,10 +39,6 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
     private DisplayNameCalculator displayNameCalculator;
     private List<DisplayPatternDialog.DisplayPatternListener> displayPatternListeners = new ArrayList<DisplayPatternDialog.DisplayPatternListener>();
 
-    public EditDisplayNamePatternsAction(TimeSeriesContext rootContext, Component componentToPositionDialog) {
-        this(rootContext, componentToPositionDialog, new DisplayNameCalculator(rootContext));
-    }
-
     public EditDisplayNamePatternsAction(TimeSeriesContext rootContext, Component componentToPositionDialog, DisplayNameCalculator displayNameCalculator) {
         super("Display Name Patterns", ImageUtils.DISPLAY_NAME_16x16);
         this.componentToPositionDialog = componentToPositionDialog;

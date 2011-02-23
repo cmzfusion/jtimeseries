@@ -8,6 +8,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
@@ -35,9 +36,11 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     protected static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
     protected TimeSeriesServerDictionary serverDictionary;
+    private DisplayNameCalculator displayNameCalculator;
 
-    public AbstractUIRootContext(TimeSeriesServerDictionary serverDictionary) {
+    public AbstractUIRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         this.serverDictionary = serverDictionary;
+        this.displayNameCalculator = displayNameCalculator;
     }
 
     protected void initializeFactoriesAndBusListener() {
@@ -82,7 +85,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
     protected abstract class AbstractUIContextTimeSeriesFactory extends DefaultTimeSeriesFactory {
 
         public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters) {
-            E result = null;
+            UIPropertiesTimeSeries result = null;
             try {
                 if (clazzType.isAssignableFrom(UIPropertiesTimeSeries.class) && parameters.length == 1) {
                     //if the parameter is a root context - this means we are trying to recreate a series from
@@ -91,21 +94,25 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
                         TimeSeriesContext otherRoot = (TimeSeriesContext) parameters[0];
                         UIPropertiesTimeSeries otherSeries = otherRoot.get(path, UIPropertiesTimeSeries.class);
                         UiTimeSeriesConfig config = new UiTimeSeriesConfig(otherSeries);
-                        result = (E) createTimeSeriesForConfig(config);
+                        result = createTimeSeriesForConfig(config);
                     //the parameter may be a deserialized config
                     } else if (parameters[0] instanceof UiTimeSeriesConfig) {
-                        result = (E) createTimeSeriesForConfig((UiTimeSeriesConfig) parameters[0]);
+                        result = createTimeSeriesForConfig((UiTimeSeriesConfig) parameters[0]);
                     } else if (parameters[0] instanceof UIPropertiesTimeSeries) {
-                        result = (E) createTimeSeriesForConfig(new UiTimeSeriesConfig((UIPropertiesTimeSeries)parameters[0]));
+                        result = createTimeSeriesForConfig(new UiTimeSeriesConfig((UIPropertiesTimeSeries)parameters[0]));
                     }
                 }
             } catch (Exception e) {
                 logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
             }
-            return result;
+
+            if ( result != null) {
+                displayNameCalculator.setDisplayName(result);
+            }
+            return (E)result;
         }
 
-        protected abstract <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException;
+        protected abstract UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException;
     }
 
     public class ServerContextCreatingContextFactory extends DefaultContextFactory {

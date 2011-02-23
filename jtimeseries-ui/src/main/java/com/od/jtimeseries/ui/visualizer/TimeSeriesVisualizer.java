@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
 import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
@@ -74,13 +75,21 @@ public class TimeSeriesVisualizer extends JPanel {
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
     private final ChartControlPanel chartControlPanel;
     private boolean toolbarVisible = true;
+    private DisplayNameCalculator displayNameCalculator;
 
     public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary) {
+        this(title, timeSeriesServerDictionary, new DisplayNameCalculator());
+    }
+
+    public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator) {
+        this.displayNameCalculator = displayNameCalculator;
         JideInitialization.applyLicense();
         JideInitialization.setupJide();
 
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
-        this.rootContext = new VisualizerRootContext(timeSeriesServerDictionary);
+        this.rootContext = new VisualizerRootContext(timeSeriesServerDictionary, displayNameCalculator);
+        displayNameCalculator.addRootContext(rootContext);
+
         chart = new TimeSeriesChart(title);
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();
@@ -127,7 +136,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private void createDisplayNameAction() {
-        editDisplayNameAction = new EditDisplayNamePatternsAction(rootContext, this);
+        editDisplayNameAction = new EditDisplayNamePatternsAction(rootContext, this, displayNameCalculator);
 
         editDisplayNameAction.addDisplayPatternListener(new DisplayPatternDialog.DisplayPatternListener() {
             public void displayPatternsChanged(List<DisplayNamePattern> newPatterns, boolean applyNow) {
@@ -229,7 +238,8 @@ public class TimeSeriesVisualizer extends JPanel {
             new ShowDownloadSeriesDialogAction(
                 timeSeriesServerDictionary,
                 this,
-                rootContext
+                rootContext,
+                displayNameCalculator
             )
         ));
         toolbar.add(Box.createHorizontalStrut(5));

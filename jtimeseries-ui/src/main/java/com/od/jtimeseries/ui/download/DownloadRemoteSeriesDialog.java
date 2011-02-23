@@ -59,13 +59,13 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private ChooseSeriesPanel chooseSeriesPanel;
     private TimeSeriesContext destinationRootContext;
 
-    public DownloadRemoteSeriesDialog(TimeSeriesServerDictionary serverDictionary, JComponent dialogPositionComponent, TimeSeriesContext destinationRootContext) {
+    public DownloadRemoteSeriesDialog(TimeSeriesServerDictionary serverDictionary, JComponent dialogPositionComponent, TimeSeriesContext destinationRootContext, DisplayNameCalculator displayNameCalculator) {
         //context into which we want to add selected series from remote server
         this.destinationRootContext = destinationRootContext;
 
         //a temporary context to use for times series selector, so that we can display all remote series
         //and give the user a chance to select the ones to add to destinationContext
-        contextToStoreRemoteSeries = new SelectionRootContext(serverDictionary);
+        contextToStoreRemoteSeries = new SelectionRootContext(serverDictionary, displayNameCalculator);
 
         setTitle("Download Time Series");
         setAlwaysOnTop(true);
@@ -124,8 +124,8 @@ public class DownloadRemoteSeriesDialog extends JFrame {
 
     private class SelectionRootContext extends AbstractUIRootContext {
 
-        public SelectionRootContext(TimeSeriesServerDictionary serverDictionary) {
-            super(serverDictionary);
+        public SelectionRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
+            super(serverDictionary, displayNameCalculator);
             initializeFactoriesAndBusListener();
         }
 
@@ -135,8 +135,8 @@ public class DownloadRemoteSeriesDialog extends JFrame {
 
         protected TimeSeriesFactory createTimeSeriesFactory() {
             return new AbstractUIContextTimeSeriesFactory() {
-                protected <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
-                    return (E)new ServerTimeSeries(config);
+                protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+                    return new ServerTimeSeries(config);
                 }
             };
         }

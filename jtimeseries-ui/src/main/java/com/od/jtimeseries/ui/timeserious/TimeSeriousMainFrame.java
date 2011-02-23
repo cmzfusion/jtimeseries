@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
@@ -42,6 +43,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private NewVisualizerAction newVisualizerAction;
     private NewServerAction newServerAction;
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
+    private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
     private UiTimeSeriesServerDictionary serverDictionary;
     private final JSplitPane splitPane = new JSplitPane();
     private int tableSplitPanePosition;
@@ -49,12 +51,12 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
-        this.rootContext = new TimeSeriousRootContext(serverDictionary);
+        this.rootContext = new TimeSeriousRootContext(serverDictionary, displayNameCalculator);
         this.desktopPanel = new DesktopPanel(serverDictionary);
         this.seriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,
-            rootContext.getDisplayNameCalculator(),
+            displayNameCalculator,
             serverDictionary
         );
         createActions(actionModels);
@@ -72,7 +74,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
             rootContext,
             TimeSeriousMainFrame.this,
-            rootContext.getDisplayNameCalculator()
+            displayNameCalculator
         );
     }
 

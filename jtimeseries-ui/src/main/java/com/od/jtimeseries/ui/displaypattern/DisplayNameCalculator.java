@@ -23,10 +23,8 @@ import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.ref.WeakReference;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,10 +41,15 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
 
     private List<DisplayNamePattern> displayNamePatterns = new ArrayList<DisplayNamePattern>();
     private Map<DisplayNamePattern, Pattern> patternMap = new HashMap<DisplayNamePattern, Pattern>();
-    private TimeSeriesContext rootContext;
 
-    public DisplayNameCalculator(TimeSeriesContext rootContext) {
-        this.rootContext = rootContext;
+    //allow contexts to be garbage collected
+    private List<WeakReference<TimeSeriesContext>> rootContexts = new LinkedList<WeakReference<TimeSeriesContext>>();
+
+    public DisplayNameCalculator() {
+    }
+
+    public void addRootContext(TimeSeriesContext rootContext) {
+        rootContexts.add(new WeakReference<TimeSeriesContext>(rootContext));
     }
 
     public void setDisplayName(UIPropertiesTimeSeries s) {
@@ -77,9 +80,18 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
     }
 
     public void applyPatternsToAllTimeseries() {
-        List<UIPropertiesTimeSeries> l = rootContext.findAll(UIPropertiesTimeSeries.class).getAllMatches();
-        for ( UIPropertiesTimeSeries i : l) {
-            setDisplayName(i);
+        Iterator<WeakReference<TimeSeriesContext>> i = rootContexts.iterator();
+        while(i.hasNext()) {
+            WeakReference<TimeSeriesContext> s = i.next();
+            TimeSeriesContext c = s.get();
+            if ( c != null) {
+                List<UIPropertiesTimeSeries> l = c.findAll(UIPropertiesTimeSeries.class).getAllMatches();
+                for ( UIPropertiesTimeSeries ts : l) {
+                    setDisplayName(ts);
+                }
+            } else {
+                i.remove();
+            }
         }
     }
 

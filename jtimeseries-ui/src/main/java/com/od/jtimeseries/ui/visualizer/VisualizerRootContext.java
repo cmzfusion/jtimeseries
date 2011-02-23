@@ -4,6 +4,7 @@ import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -25,8 +26,8 @@ import java.util.*;
  */
 public class VisualizerRootContext extends AbstractUIRootContext {
 
-    public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary) {
-        super(serverDictionary);
+    public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
+        super(serverDictionary, displayNameCalculator);
         initializeFactoriesAndBusListener();
     }
 
@@ -50,7 +51,6 @@ public class VisualizerRootContext extends AbstractUIRootContext {
             //the same tree structure, parents appear before their descendants
             //Check we have not already added this node to the list before adding it,
             if ( ! toAdd.contains(i)) {
-
                 //this node, plus any children
                 if ( i instanceof UIPropertiesTimeSeries) {
                     toAdd.add((UIPropertiesTimeSeries)i);
@@ -61,8 +61,8 @@ public class VisualizerRootContext extends AbstractUIRootContext {
 
         for ( UIPropertiesTimeSeries s : toAdd) {
             //TODO we may want to flag the conflict up to the user
-            if ( get(s.getPath()) == null) {
-                create(s.getPath(), s.getDescription(), ChartingTimeSeries.class, s.getRoot());
+            if ( ! contains(s.getPath())) {
+                create(s.getPath(), s.getDescription(), UIPropertiesTimeSeries.class, s.getRoot());
             }
         }
     }
@@ -92,14 +92,14 @@ public class VisualizerRootContext extends AbstractUIRootContext {
 
     private class VisualizerTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
 
-        protected <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+        protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
             //http series are unique by URL, to minimise unnecessary queries.
             //Get or create the instance for this URL
             RemoteHttpTimeSeries httpSeries = RemoteHttpTimeSeries.getOrCreateHttpSeries(config);
 
             //the http series is wrapped with a ChartingTimeSeries instance which is unique to
             //this visualizier, and so can have local settings for display name, colour etc.
-            return (E)new ChartingTimeSeries(httpSeries, config);
+            return new ChartingTimeSeries(httpSeries, config);
         }
     }
 

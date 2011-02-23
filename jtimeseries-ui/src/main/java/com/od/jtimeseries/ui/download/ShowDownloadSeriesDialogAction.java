@@ -43,19 +43,22 @@ public class ShowDownloadSeriesDialogAction extends AbstractAction {
     private TimeSeriesServerDictionary serverDictionary;
     private TimeSeriesContext destinationRootContext;
     private JComponent componentForDialogPositioning;
+    private DisplayNameCalculator displayNameCalculator;
 
-    public ShowDownloadSeriesDialogAction(TimeSeriesServerDictionary serverDictionary, JComponent componentForDialogPositioning, TimeSeriesContext destinationRootContext) {
+    public ShowDownloadSeriesDialogAction(TimeSeriesServerDictionary serverDictionary, JComponent componentForDialogPositioning, TimeSeriesContext destinationRootContext, DisplayNameCalculator displayNameCalculator) {
         super("Download Series", ImageUtils.DOWNLOAD_16x16);
         this.serverDictionary = serverDictionary;
         this.destinationRootContext = destinationRootContext;
         this.componentForDialogPositioning = componentForDialogPositioning;
+        this.displayNameCalculator = displayNameCalculator;
     }
 
     public void actionPerformed(ActionEvent e) {
         final DownloadRemoteSeriesDialog d = new DownloadRemoteSeriesDialog(
-                serverDictionary,
-                componentForDialogPositioning,
-                destinationRootContext
+            serverDictionary,
+            componentForDialogPositioning,
+            destinationRootContext,
+            displayNameCalculator
         );
 
         d.setVisible(true);

@@ -11,6 +11,7 @@ import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
@@ -38,10 +39,11 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
-    private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator(this);
+    private DisplayNameCalculator displayNameCalculator;
 
-    public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary) {
-        super(serverDictionary);
+    public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
+        super(serverDictionary, displayNameCalculator);
+        this.displayNameCalculator = displayNameCalculator;
         initializeFactoriesAndBusListener();
     }
 
@@ -113,8 +115,8 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private class RootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
 
-        protected <E extends Identifiable> E createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
-            return (E)new ServerTimeSeries(config);
+        protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+            return new ServerTimeSeries(config);
         }
     }
 }

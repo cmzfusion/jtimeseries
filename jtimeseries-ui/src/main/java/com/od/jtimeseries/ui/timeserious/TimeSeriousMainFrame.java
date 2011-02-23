@@ -52,7 +52,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
         this.rootContext = new TimeSeriousRootContext(serverDictionary, displayNameCalculator);
-        this.desktopPanel = new DesktopPanel(serverDictionary);
+        this.desktopPanel = new DesktopPanel(serverDictionary, displayNameCalculator);
         this.seriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,

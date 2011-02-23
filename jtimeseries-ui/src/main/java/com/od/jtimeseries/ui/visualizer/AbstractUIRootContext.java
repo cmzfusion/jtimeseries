@@ -41,6 +41,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
     public AbstractUIRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         this.serverDictionary = serverDictionary;
         this.displayNameCalculator = displayNameCalculator;
+        displayNameCalculator.addRootContext(this);
     }
 
     protected void initializeFactoriesAndBusListener() {

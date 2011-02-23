@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -17,9 +18,11 @@ import java.util.*;
 public class TimeSeriesDesktopPane extends JDesktopPane {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
+    private DisplayNameCalculator displayNameCalculator;
 
-    public TimeSeriesDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary) {
+    public TimeSeriesDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator) {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
+        this.displayNameCalculator = displayNameCalculator;
     }
 
     public void createAndAddVisualizer(String title) {
@@ -83,7 +86,8 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
     private TimeSeriesVisualizer createVisualizer(String title) {
         return new TimeSeriesVisualizer(
             title,
-            timeSeriesServerDictionary
+            timeSeriesServerDictionary,
+            displayNameCalculator
         );
     }
 

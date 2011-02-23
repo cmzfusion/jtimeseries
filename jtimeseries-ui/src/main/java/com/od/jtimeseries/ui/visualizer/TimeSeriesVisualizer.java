@@ -88,8 +88,6 @@ public class TimeSeriesVisualizer extends JPanel {
 
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.rootContext = new VisualizerRootContext(timeSeriesServerDictionary, displayNameCalculator);
-        displayNameCalculator.addRootContext(rootContext);
-
         chart = new TimeSeriesChart(title);
         chartControlPanel = new ChartControlPanel(chart);
         createDisplayNameAction();

@@ -59,10 +59,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         return new ServerSeriesLoadingBusListener(this);
     }
 
-    public DisplayNameCalculator getDisplayNameCalculator() {
-        return displayNameCalculator;
-    }
-
     public void prepareConfigForSave(TimeSeriousConfig config) {
         List<TimeSeriesServerContext> serverContexts = findAll(TimeSeriesServerContext.class).getAllMatches();
 

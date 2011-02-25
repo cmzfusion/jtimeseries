@@ -40,7 +40,7 @@ import java.util.List;
 public class EditableColumnsTableModel<E> extends AbstractTableModel implements BeanPerRowModel<E>, ContextSensitiveTableModel {
 
     private BeanPerRowModel<E> wrappedModel;
-    private FixedColumns[] fixedColumns = FixedColumns.values();
+    private FixedColumn[] fixedColumns = FixedColumn.values();
 
     public EditableColumnsTableModel(BeanPerRowModel<E> wrappedModel) {
         this.wrappedModel = wrappedModel;

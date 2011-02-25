@@ -22,7 +22,8 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     public static final String DISPLAY_NAME_PROPERTY = "displayName";
     public static final String COLOUR_PROPERTY = "color";
     public static final String LAST_REFRESH_TIME_PROPERTY = "lastRefreshTime";
-    public static final String REFRESH_TIME_SECONDS_PROPERTY = "refreshTimeSeconds";
+    public static final String STATS_REFRESH_TIME_PROPERTY = "statsRefreshTime";
+    public static final String REFRESH_FREQUENCY_PROPERTY = "refreshFrequencySeconds";
     public static final String URL_PROPERTY_NAME = "timeSeriesURL";
 
     boolean isSelected();
@@ -49,11 +50,15 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
 
     void setTimeSeriesURL(URL url);
 
-    int getRefreshTimeSeconds();
+    int getRefreshFrequencySeconds();
 
     void setLastRefreshTime(Date time);
 
     Date getLastRefreshTime();
 
-    void setRefreshTimeSeconds(int refreshTimeSeconds);
+    void setRefreshFrequencySeconds(int refreshTimeSeconds);
+
+    void setStatsRefreshTime(Date time);
+
+    Date getStatsRefreshTime();
 }

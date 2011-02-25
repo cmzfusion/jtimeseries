@@ -125,9 +125,9 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
     private TableColumn createColumn(String columnName) {
         TableColumn newColumn = new TableColumn(
             getColumnIndex(columnName),
-            FixedColumns.getDefaultColumnWidth(columnName)
+            FixedColumn.getDefaultColumnWidth(columnName)
         );
-        TableCellRenderer r = FixedColumns.getCellRenderer(columnName);
+        TableCellRenderer r = FixedColumn.getCellRenderer(columnName);
         if ( r != null ) {
             newColumn.setCellRenderer(r);
         }
@@ -138,7 +138,7 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
     private void setColumnIdentifier(String columnName, TableColumn newColumn) {
         //support special column name for selected column
         String columnIdentifier = columnName;
-        if ( columnName.equals(FixedColumns.Selected.getColumnName())) {
+        if ( columnName.equals(FixedColumn.Selected.getColumnName())) {
             columnIdentifier = selectionColumnName;
         }
         //handle the special stats column names
@@ -196,9 +196,9 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
 
     private List<ColumnSettings> getDefaultColumnSettings() {
         List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
-        FixedColumns.addFixedColumn(columns, FixedColumns.Selected);
-        FixedColumns.addFixedColumn(columns, FixedColumns.DisplayName);
-        FixedColumns.addFixedColumn(columns, FixedColumns.Color);
+        FixedColumn.addFixedColumn(columns, FixedColumn.Selected);
+        FixedColumn.addFixedColumn(columns, FixedColumn.DisplayName);
+        FixedColumn.addFixedColumn(columns, FixedColumn.Color);
         return columns;
     }
 }

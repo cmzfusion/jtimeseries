@@ -186,9 +186,9 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     public void setSeriesSelectionEnabled(boolean selectable) {
         if (selectable) {
-            tableColumnManager.addColumn(FixedColumns.Selected.getColumnName());
+            tableColumnManager.addColumn(FixedColumn.Selected.getColumnName());
         } else {
-            tableColumnManager.removeColumn(FixedColumns.Selected.getColumnName());
+            tableColumnManager.removeColumn(FixedColumn.Selected.getColumnName());
         }
     }
 }

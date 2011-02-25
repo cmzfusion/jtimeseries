@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
@@ -50,6 +53,8 @@ public interface BeanPerRowModel<E> extends TableModel {
      * Wrap the jide model as a BeanPerRowModel
      */
     public static class JideBeanModelWrapper<E> extends AbstractTableModel implements BeanPerRowModel<E>  {
+
+        private static LogMethods logMethods = LogUtils.getLogMethods(JideBeanModelWrapper.class);
 
         private FixedColumnsBeanModel<E> wrappedModel;
 

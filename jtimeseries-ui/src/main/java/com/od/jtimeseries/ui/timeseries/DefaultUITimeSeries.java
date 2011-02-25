@@ -23,6 +23,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     private Date lastRefreshTime;
     protected URL timeSeriesUrl;
     private Color color = colorRotator.getNextColor();
+    private Date statsRefreshTime;
 
     public DefaultUITimeSeries(String id, String description) {
         super(id, description);
@@ -85,15 +86,25 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
         firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
     }
 
-    public int getRefreshTimeSeconds() {
+    public int getRefreshFrequencySeconds() {
         return refreshTimeSeconds;
     }
 
-    public void setRefreshTimeSeconds(int refreshTimeSeconds) {
+    public void setRefreshFrequencySeconds(int refreshTimeSeconds) {
         long oldValue = this.refreshTimeSeconds;
         this.refreshTimeSeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
-        firePropertyChange(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY, oldValue, this.refreshTimeSeconds);
-        fireNodeChanged(UIPropertiesTimeSeries.REFRESH_TIME_SECONDS_PROPERTY);
+        firePropertyChange(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, oldValue, this.refreshTimeSeconds);
+        fireNodeChanged(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY);
+    }
+
+    public Date getStatsRefreshTime() {
+        return statsRefreshTime;
+    }
+
+    public void setStatsRefreshTime(Date statsRefreshTime) {
+        Date oldValue = this.statsRefreshTime;
+        this.statsRefreshTime = statsRefreshTime;
+        firePropertyChange("statsRefreshTime", oldValue, this.statsRefreshTime);
     }
 
     public Color getColor() {

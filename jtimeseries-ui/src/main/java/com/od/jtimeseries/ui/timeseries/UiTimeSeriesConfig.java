@@ -46,7 +46,7 @@ public class UiTimeSeriesConfig {
         this.id = s.getId();
         this.description = s.getDescription();
         this.timeSeriesUrl = s.getTimeSeriesURL().toExternalForm();
-        this.refreshTimeSeconds = s.getRefreshTimeSeconds();
+        this.refreshTimeSeconds = s.getRefreshFrequencySeconds();
         this.selected = s.isSelected();
         this.displayName = s.getDisplayName();
         this.color = s.getColor();

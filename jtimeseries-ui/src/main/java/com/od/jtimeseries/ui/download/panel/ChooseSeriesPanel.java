@@ -21,8 +21,7 @@ package com.od.jtimeseries.ui.download.panel;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
-import com.od.jtimeseries.ui.selector.table.FixedColumns;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.selector.table.FixedColumn;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
@@ -96,8 +95,8 @@ public class ChooseSeriesPanel extends AbstractDownloadWizardPanel {
 
     private List<ColumnSettings> getDefaultColumnSettings() {
         List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
-        FixedColumns.addFixedColumn(columns, FixedColumns.Selected);
-        FixedColumns.addFixedColumn(columns, FixedColumns.DisplayName);
+        FixedColumn.addFixedColumn(columns, FixedColumn.Selected);
+        FixedColumn.addFixedColumn(columns, FixedColumn.DisplayName);
         return columns;
     }
 

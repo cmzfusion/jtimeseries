@@ -40,7 +40,7 @@ public class FixedColumnsBeanModel<E> extends BeanTableModel<E> {
       //jide BeanTableModel requires the propertyNames and column display names as a String[]
     private static String[] generateColumnConfigStringForBeanTableModel() {
         java.util.List<String> colConfigStrings = new LinkedList<String>();
-        for(FixedColumns c : FixedColumns.values()) {
+        for(FixedColumn c : FixedColumn.values()) {
             colConfigStrings.add(c.getPropertyName());
             colConfigStrings.add(c.getColumnName());
         }
@@ -49,6 +49,6 @@ public class FixedColumnsBeanModel<E> extends BeanTableModel<E> {
     }
 
     public String getColumnDescription(int colIndex) {
-        return FixedColumns.values()[colIndex].getDescription();
+        return FixedColumn.values()[colIndex].getDescription();
     }
 }

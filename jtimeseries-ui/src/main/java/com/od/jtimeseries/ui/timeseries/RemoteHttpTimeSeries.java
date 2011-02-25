@@ -81,12 +81,12 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
         super(id, description);
         setTimeSeriesURL(timeSeriesUrl);
-        setRefreshTimeSeconds((int)refreshTime.getLengthInMillis() / 1000);
+        setRefreshFrequencySeconds((int) refreshTime.getLengthInMillis() / 1000);
     }
 
-    public void setRefreshTimeSeconds(int seconds) {
-        super.setRefreshTimeSeconds(Math.max(seconds, MIN_REFRESH_TIME_SECONDS));
-        RemoteHttpTimeSeries.logMethods.logInfo("Changing refresh time for series " + getId() + " to " + getRefreshTimeSeconds() + " seconds");
+    public void setRefreshFrequencySeconds(int seconds) {
+        super.setRefreshFrequencySeconds(Math.max(seconds, MIN_REFRESH_TIME_SECONDS));
+        RemoteHttpTimeSeries.logMethods.logInfo("Changing refresh time for series " + getId() + " to " + getRefreshFrequencySeconds() + " seconds");
         scheduleRefreshIfDisplayed(false);
     }
 

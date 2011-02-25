@@ -73,7 +73,7 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         proxyingPropertyListener = getProxyingPropertyListener();
         addEventPropagatingListeners(URL_PROPERTY_NAME);
         addEventPropagatingListeners(LAST_REFRESH_TIME_PROPERTY);
-        addEventPropagatingListeners(REFRESH_TIME_SECONDS_PROPERTY);
+        addEventPropagatingListeners(REFRESH_FREQUENCY_PROPERTY);
         addEventPropagatingListeners(STALE_PROPERTY);
 
         wrappedSeriesTreeListener = new WrappedSeriesTreeListener();
@@ -140,6 +140,14 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         return result;
     }
 
+    public Date getStatsRefreshTime() {
+        return wrappedSeries.getStatsRefreshTime();
+    }
+
+    public void setStatsRefreshTime(Date statsRefreshTime) {
+        wrappedSeries.setStatsRefreshTime(statsRefreshTime);
+    }
+
     public Color getColor() {
         return color;
     }
@@ -166,8 +174,8 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         wrappedSeries.setStale(seriesStale);
     }
 
-    public int getRefreshTimeSeconds() {
-        return wrappedSeries.getRefreshTimeSeconds();
+    public int getRefreshFrequencySeconds() {
+        return wrappedSeries.getRefreshFrequencySeconds();
     }
 
     public void setLastRefreshTime(Date time) {
@@ -178,8 +186,8 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         return wrappedSeries.getLastRefreshTime();
     }
 
-    public void setRefreshTimeSeconds(int refreshTimeSeconds) {
-        wrappedSeries.setRefreshTimeSeconds(refreshTimeSeconds);
+    public void setRefreshFrequencySeconds(int refreshTimeSeconds) {
+        wrappedSeries.setRefreshFrequencySeconds(refreshTimeSeconds);
     }
 
     public void dispose() {

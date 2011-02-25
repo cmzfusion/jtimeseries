@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.ColorCellRenderer;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.table.TableCellRenderer;
 import java.util.HashMap;
@@ -34,20 +35,21 @@ import java.util.Map;
 *
 * Predefined static columns
 */
-public enum FixedColumns {
+public enum FixedColumn {
 
-    Selected("selected", "Selected", 110, true, "Select a series"),
-    DisplayName("displayName", "Display Name", 175, true, "Name to use when displaying series in chart"),
+    Selected(UIPropertiesTimeSeries.SELECTED_PROPERTY, "Selected", 110, true, "Select a series"),
+    DisplayName(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, "Display Name", 175, true, "Name to use when displaying series in chart"),
     Id("id", "Id", 150, false, "Series ID"),
-    RefreshTimeSeconds("refreshTimeSeconds", "Refresh(s)", 120, true, "Frequency of series data refresh"),
+    RefreshFrequency(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, "Refresh Frequency(s)", 120, true, "Frequency of series data refresh"),
     Path("path", "Path", 120, false, "Full path identifying series"),
-    Url("timeSeriesURL", "URL", 120, false, "URL for series data subscription"),
-    LastRefreshTime("lastRefreshTime", "Last Refresh", 120, new TimeRenderer(), false, "Last series data refresh time"),
-    Color("color", "Colour", 110, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
+    Url(UIPropertiesTimeSeries.URL_PROPERTY_NAME, "URL", 120, false, "URL for series data subscription"),
+    LastRefreshTime(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY, "Last Refresh Time", 120, new TimeRenderer(), false, "Last series data refresh time"),
+    StatsRefreshTime(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY, "Stats Refresh Time", 120, new TimeRenderer(), false, "Last refresh time for series stats metadata"),
+    Color(UIPropertiesTimeSeries.COLOUR_PROPERTY, "Colour", 110, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
 
     private static Map<String, Integer> columnWidths = new HashMap<String,Integer>();
     static {
-        for ( FixedColumns f : FixedColumns.values()) {
+        for ( FixedColumn f : FixedColumn.values()) {
            columnWidths.put(f.getColumnName(), f.getDefaultWidth());
         }
     }
@@ -59,11 +61,11 @@ public enum FixedColumns {
     private boolean isEditable;
     private String description;
 
-    FixedColumns(String propertyName, String columnName, int defaultWidth, boolean isEditable, String description) {
+    FixedColumn(String propertyName, String columnName, int defaultWidth, boolean isEditable, String description) {
         this(propertyName, columnName, defaultWidth, null, isEditable, description);
     }
 
-    FixedColumns(String propertyName, String columnName, int defaultWidth, TableCellRenderer cellRenderer, boolean isEditable, String description) {
+    FixedColumn(String propertyName, String columnName, int defaultWidth, TableCellRenderer cellRenderer, boolean isEditable, String description) {
         this.propertyName = propertyName;
         this.columnName = columnName;
         this.defaultWidth = defaultWidth;
@@ -99,7 +101,7 @@ public enum FixedColumns {
 
     public static TableCellRenderer getCellRenderer(String columnName) {
         TableCellRenderer result = null;
-        for ( FixedColumns i : FixedColumns.values()) {
+        for ( FixedColumn i : FixedColumn.values()) {
             if ( i.getColumnName().equals(columnName)) {
                 result = i.getCellRenderer();
             }
@@ -111,7 +113,7 @@ public enum FixedColumns {
         return description;
     }
 
-    public static void addFixedColumn(List<ColumnSettings> columns, FixedColumns fixedColumn) {
+    public static void addFixedColumn(List<ColumnSettings> columns, FixedColumn fixedColumn) {
         columns.add(new ColumnSettings(fixedColumn.getColumnName(), fixedColumn.getDefaultWidth()));
     }
 }

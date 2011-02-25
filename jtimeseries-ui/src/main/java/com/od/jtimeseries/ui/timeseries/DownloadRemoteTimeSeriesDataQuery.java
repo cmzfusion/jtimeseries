@@ -31,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -75,6 +76,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
         String stats = attributes.getValue(AttributeName.summaryStats.name());
         Properties p = ContextProperties.createSummaryStatsProperties(stats);
         destinationSeries.putAllProperties(p);
+        destinationSeries.setStatsRefreshTime(new Date());
     }
 
 

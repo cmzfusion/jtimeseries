@@ -116,6 +116,7 @@ public interface BeanPerRowModel<E> extends TableModel {
         public void addDynamicColumn(String columnName) {
             //this is the bottom level model
             //no decorator models managed to handle this - so we failed to add this dynamic column
+            logMethods.logError("Cannot add column " + columnName + " this column is not supported");
             throw new UnsupportedOperationException();
         }
 

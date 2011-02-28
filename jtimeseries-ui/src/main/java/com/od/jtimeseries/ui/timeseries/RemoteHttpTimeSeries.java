@@ -237,20 +237,32 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     public static RemoteHttpTimeSeries getOrCreateHttpSeries(UiTimeSeriesConfig config) throws MalformedURLException {
+        RemoteHttpTimeSeries result = getWeakReferencedSeries(config);
+        if ( result == null ) {
+            //use the config mechanism as a way of cloning the time series, the original
+            //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
+            result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
+            WeakReference<RemoteHttpTimeSeries> httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
+            existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
+        }
+        return result;
+    }
+
+    private static RemoteHttpTimeSeries getWeakReferencedSeries(UiTimeSeriesConfig config) {
         RemoteHttpTimeSeries result = null;
         WeakReference<RemoteHttpTimeSeries> httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
         if ( httpSeries != null ) {
             result = httpSeries.get();
         }
-
-        if ( result == null ) {
-            //use the config mechanism as a way of cloning the time series, the original
-            //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
-            result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
-            httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
-            existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
-        }
         return result;
+    }
+
+    public static void updateSummaryStats(UiTimeSeriesConfig config, Properties summaryStats) {
+        RemoteHttpTimeSeries s = getWeakReferencedSeries(config);
+        if (s != null) {
+            s.putAllProperties(summaryStats);
+            s.setStatsRefreshTime(new Date());
+        }
     }
 
 }

@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
@@ -112,6 +113,9 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
                 i.putAllProperties(series.getSummaryStatsProperties());
                 ((UIPropertiesTimeSeries)i).setStatsRefreshTime(new Date());
             }
+
+            //update the summary stats on the shared remote http series, if it exists
+            RemoteHttpTimeSeries.updateSummaryStats(config, series.getSummaryStatsProperties());
         } catch (Throwable t) {
             logMethods.logError("Error adding series from server " + path + " in context " + destinationRootContext, t);
         }

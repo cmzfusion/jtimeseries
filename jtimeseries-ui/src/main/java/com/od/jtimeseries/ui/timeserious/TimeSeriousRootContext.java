@@ -41,6 +41,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
     private static final ScheduledExecutorService loadSeriesFromServerExecutor = NamedExecutors.newSingleThreadScheduledExecutor("LoadSeriesFromServer");
+    private static final int SERVER_REFRESH_RATE_MINS = 1;
 
     private final ConcurrentMap<TimeSeriesServer, ScheduledFuture> loadTasksByServer = new ConcurrentHashMap<TimeSeriesServer, ScheduledFuture>();
 
@@ -131,7 +132,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
                     }
                 }
             };
-            ScheduledFuture f = loadSeriesFromServerExecutor.scheduleWithFixedDelay(loadTask, 0, 1, TimeUnit.MINUTES);
+            ScheduledFuture f = loadSeriesFromServerExecutor.scheduleWithFixedDelay(loadTask, 0, SERVER_REFRESH_RATE_MINS, TimeUnit.MINUTES);
             loadTasksByServer.put(s, f);
         }
 

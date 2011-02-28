@@ -17,6 +17,7 @@ import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriesServerConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -27,6 +28,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +40,9 @@ import java.util.List;
 public class TimeSeriousRootContext extends AbstractUIRootContext implements ConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
+    private static final ScheduledExecutorService loadSeriesFromServerExecutor = NamedExecutors.newSingleThreadScheduledExecutor("LoadSeriesFromServer");
+
+    private final ConcurrentMap<TimeSeriesServer, ScheduledFuture> loadTasksByServer = new ConcurrentHashMap<TimeSeriesServer, ScheduledFuture>();
 
     private DisplayNameCalculator displayNameCalculator;
 
@@ -101,10 +106,33 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         public void serverAdded(TimeSeriesServer s) {
             TimeSeriesServerContext context = new TimeSeriesServerContext(TimeSeriousRootContext.this, s);
             TimeSeriousRootContext.this.addChild(context);
+            addServerLoadTask(s);
+        }
 
-            new LoadSeriesFromServerCommand(
-                TimeSeriousRootContext.this
-            ).execute(s);
+        public void serverRemoved(TimeSeriesServer s) {
+            synchronized (loadTasksByServer) {
+                ScheduledFuture f = loadTasksByServer.remove(s);
+                f.cancel(false);
+            }
+            super.serverRemoved(s);
+        }
+
+        private void addServerLoadTask(final TimeSeriesServer s) {
+            Runnable loadTask = new Runnable() {
+                public void run() {
+                    synchronized (loadTasksByServer) {
+                        //if the server has been removed from the map, this means the user has removed the server
+                        //we don't want to run the refresh
+                        if ( loadTasksByServer.containsKey(s)) {
+                            new LoadSeriesFromServerCommand(
+                                TimeSeriousRootContext.this
+                            ).execute(s);
+                        }
+                    }
+                }
+            };
+            ScheduledFuture f = loadSeriesFromServerExecutor.scheduleWithFixedDelay(loadTask, 0, 1, TimeUnit.MINUTES);
+            loadTasksByServer.put(s, f);
         }
 
     }

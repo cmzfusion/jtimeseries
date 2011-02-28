@@ -25,11 +25,13 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -101,18 +103,29 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
 
             //TODO - should we add extra handling if series already exists in target?
             if (!destinationRootContext.contains(path)) {
-                //we don't know what type of UIPropertiesTimeSeries the destination context should contain
-                //defer construction to the context's factories by using the generic create method on context
-                destinationRootContext.create(
-                    path,
-                    series.getDescription(),
-                    UIPropertiesTimeSeries.class,
-                    config
-                );
+                createNewSeries(series, path, config);
+            }
+
+            //always refresh summary stats
+            Identifiable i = destinationRootContext.get(path);
+            if ( i instanceof UIPropertiesTimeSeries) {
+                i.putAllProperties(series.getSummaryStatsProperties());
+                ((UIPropertiesTimeSeries)i).setStatsRefreshTime(new Date());
             }
         } catch (Throwable t) {
             logMethods.logError("Error adding series from server " + path + " in context " + destinationRootContext, t);
         }
+    }
+
+    private void createNewSeries(ReadTimeSeriesIndexQuery.RemoteTimeSeries series, String path, UiTimeSeriesConfig config) {
+        //we don't know what type of UIPropertiesTimeSeries the destination context should contain
+        //defer construction to the context's factories by using the generic create method on context
+        destinationRootContext.create(
+            path,
+            series.getDescription(),
+            UIPropertiesTimeSeries.class,
+            config
+        );
     }
 
 }

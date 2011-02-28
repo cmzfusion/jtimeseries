@@ -75,6 +75,7 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         addEventPropagatingListeners(LAST_REFRESH_TIME_PROPERTY);
         addEventPropagatingListeners(REFRESH_FREQUENCY_PROPERTY);
         addEventPropagatingListeners(STALE_PROPERTY);
+        addEventPropagatingListeners(STATS_REFRESH_TIME_PROPERTY);
 
         wrappedSeriesTreeListener = new WrappedSeriesTreeListener();
         WeakReferenceListener l = new WeakReferenceListener(wrappedSeriesTreeListener);

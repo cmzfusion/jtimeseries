@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.selector.shared;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -55,7 +54,10 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
     private List<JMenuItem> getMenuItems(MouseEvent e) {
         List<JMenuItem> menuItems = new ArrayList<JMenuItem>();
         List<Identifiable> selectedIdentifiable = getSelectedIdentifiable(e);
-        List<Action> actions = selectorComponent.getSelectorActionFactory().getActions(getSelectorComponent(), selectedIdentifiable);
+        List<Action> actions = selectorComponent.getSelectorActionFactory().getActions(
+            getSelectorComponent(),
+            selectedIdentifiable
+        );
         for ( Action a : actions) {
             menuItems.add(new JMenuItem(a));
         }

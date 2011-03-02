@@ -20,10 +20,7 @@ package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
-import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
@@ -45,7 +42,6 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -101,13 +97,8 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
-        final ReconnectSeriesAction reconnectSeriesAction = new ReconnectSeriesAction(seriesSelectionPanel, seriesSelectionPanel.getSelectionActionModel());
-        final RemoveSeriesAction removeSeriesAction = new RemoveSeriesAction(seriesSelectionPanel.getSelectionActionModel());
-        SelectorActionFactory actionFactory = new SelectorActionFactory() {
-            public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-                return Arrays.asList((Action)removeSeriesAction, reconnectSeriesAction);
-            }
-        };
+
+        SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(seriesSelectionPanel.getSelectionActionModel());
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
         seriesSelectionPanel.setTransferHandler(new SelectorTransferHandler(
             seriesSelectionPanel.getSelectionActionModel()) {
@@ -284,4 +275,5 @@ public class TimeSeriesVisualizer extends JPanel {
         rootContext.dispose();
         super.finalize();
     }
+
 }

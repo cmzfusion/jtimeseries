@@ -42,7 +42,7 @@ public class TableModelCreator {
         }
 
         BeanPerRowModel<E> modelWrapper = new BeanPerRowModel.JideBeanModelWrapper<E>(beanTableModel);
-        StatsRefreshingTableModel<E> statsRefreshingModel = new StatsRefreshingTableModel<E>(modelWrapper);
+        RowRefreshingTableModel<E> statsRefreshingModel = new RowRefreshingTableModel<E>(modelWrapper);
         PathTokenizingTableModel<E> pathTokenizingTableModel = new PathTokenizingTableModel<E>(statsRefreshingModel);
         SummaryStatsTableModel<E> summaryStatsTableModel = new SummaryStatsTableModel<E>(pathTokenizingTableModel);
         return new EditableColumnsTableModel<E>(summaryStatsTableModel);

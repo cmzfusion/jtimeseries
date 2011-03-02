@@ -13,7 +13,7 @@ import java.util.List;
  * Date: 25/02/11
  * Time: 17:42
  */
-public class StatsRefreshingTableModel<E> extends AbstractRowLookupTableModel<E> {
+public class RowRefreshingTableModel<E> extends AbstractRowLookupTableModel<E> {
 
     private PropertyChangeListener tableUpdatingStatsPropertyListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -27,7 +27,13 @@ public class StatsRefreshingTableModel<E> extends AbstractRowLookupTableModel<E>
         tableUpdatingStatsPropertyListener
     );
 
-    public StatsRefreshingTableModel(BeanPerRowModel wrappedModel) {
+    //row rendering is driven from stale property
+    private WeakReferenceListener staleWeakListener = new WeakReferenceListener(
+        UIPropertiesTimeSeries.STALE_PROPERTY,
+        tableUpdatingStatsPropertyListener
+    );
+
+    public RowRefreshingTableModel(BeanPerRowModel wrappedModel) {
         super(wrappedModel);
     }
 
@@ -54,9 +60,11 @@ public class StatsRefreshingTableModel<E> extends AbstractRowLookupTableModel<E>
 
     private void removePropertyListeners(Object bean) {
         statsWeakListener.removeListenerFrom(bean);
+        staleWeakListener.removeListenerFrom(bean);
     }
 
     private void addPropertyListeners(Object bean) {
         statsWeakListener.addListenerTo(bean);
+        staleWeakListener.addListenerTo(bean);
     }
 }

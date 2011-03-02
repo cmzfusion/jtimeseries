@@ -204,7 +204,9 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
                 protected void doInEventThread() throws Exception {
                     errorCount = 0;
-                    setLastRefreshTime(new Date());
+                    if ( ! isStale()) {
+                        setLastRefreshTime(new Date());
+                    }
                 }
             };
         }

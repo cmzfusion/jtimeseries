@@ -17,11 +17,8 @@ import java.util.List;
 */
 public class ReconnectSeriesAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
-    private JComponent componentToRepaint;
-
-    public ReconnectSeriesAction(JComponent componentToRepaint, IdentifiableListActionModel selectionModel) {
+    public ReconnectSeriesAction(IdentifiableListActionModel selectionModel) {
         super(selectionModel, "Reconnect Time Series to Server", ImageUtils.CONNECT_ICON_16x16);
-        this.componentToRepaint = componentToRepaint;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -33,7 +30,6 @@ public class ReconnectSeriesAction extends ModelDrivenAction<IdentifiableListAct
                }
            }
         }
-        componentToRepaint.repaint();
     }
 
     protected boolean isModelStateActionable() {

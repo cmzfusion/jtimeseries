@@ -103,7 +103,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         private Action removeServerAction = new RemoveServerAction(selectionPanel.getSelectionActionModel());
         private Action renameServerAction = new RenameServerAction(selectionPanel.getSelectionActionModel());
 
-        public java.util.List<Action> getActions(SelectorComponent s, java.util.List<Identifiable> selectedIdentifiable) {
+        public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
             return Arrays.asList(
                     addSeriesAction,
                     refreshServerAction,

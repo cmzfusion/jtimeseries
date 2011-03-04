@@ -73,7 +73,8 @@ public class ContextProperties {
         while(st.hasMoreTokens()) {
             property = st.nextToken();
             nameAndValue = property.split("=");
-            p.setProperty(nameAndValue[0], nameAndValue[1]);
+            //we have many instances of each summary stats property, so interning saves a lot of memory
+            p.setProperty(nameAndValue[0].intern(), nameAndValue[1]);
         }
         return p;
     }

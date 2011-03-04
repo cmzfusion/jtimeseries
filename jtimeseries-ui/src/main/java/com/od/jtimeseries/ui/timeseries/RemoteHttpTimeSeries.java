@@ -75,7 +75,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()));
-        this.displayName = config.getDisplayName();
+        setDisplayName(config.getDisplayName());
     }
 
     private RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
@@ -123,7 +123,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     private int calculateRefreshTime() {
-        return ticking ? refreshTimeSeconds : NOT_TICKING_REFRESH_TIME;
+        return ticking ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME;
     }
 
     private boolean setTickingFlag() {
@@ -193,7 +193,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
                 private URL getUrlWithTimestamp() throws MalformedURLException {
                     return new URL(
-                        timeSeriesUrl + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch() + "&" + HttpParameterName.statsOnly + "=" + (displayedChartCount == 0)
+                        getTimeSeriesURL() + "?" + HttpParameterName.moreRecentThanTimestamp.name() + "=" + getEarliestItemToFetch() + "&" + HttpParameterName.statsOnly + "=" + (displayedChartCount == 0)
                     );
                 }
 

@@ -1,5 +1,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.ui.util.InternStringFieldOptimiser;
+
 import java.awt.*;
 import java.net.URL;
 import java.util.Date;
@@ -12,21 +14,25 @@ import java.util.Date;
  */
 public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIPropertiesTimeSeries {
 
+    private static InternStringFieldOptimiser<URL> urlOptimiser = new InternStringFieldOptimiser<URL>(URL.class, "host", "protocol", "authority");
     private static final ColorRotator colorRotator = new ColorRotator();
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
-    private static final int DEFAULT_REFRESH_TIME_SECONDS = 60;
+    private static final int DEFAULT_REFRESH_FREQUENCY_SECONDS = 300;
 
-    protected volatile int refreshTimeSeconds = DEFAULT_REFRESH_TIME_SECONDS;
+    private volatile int refreshFrequencySeconds = DEFAULT_REFRESH_FREQUENCY_SECONDS;
     private volatile boolean selected;
     private volatile boolean stale;
-    protected String displayName;
+    private String displayName;
     private Date lastRefreshTime;
-    protected URL timeSeriesUrl;
+    private URL timeSeriesUrl;
     private Color color = colorRotator.getNextColor();
     private Date statsRefreshTime;
 
     public DefaultUITimeSeries(String id, String description) {
-        super(id, description);
+        //intern the id and descriptions since there is generally massive duplication with these
+        //we'll accept the risk the out of permgen space error which could result from too many differing long descriptions
+        //in exchange for the big reduction in overall memory usage
+        super(id.intern(), description.intern());
     }
 
     public boolean isStale() {
@@ -83,17 +89,18 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     public void setTimeSeriesURL(URL url) {
         URL oldValue = this.timeSeriesUrl;
         timeSeriesUrl = url;
+        urlOptimiser.optimise(timeSeriesUrl);
         firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
     }
 
     public int getRefreshFrequencySeconds() {
-        return refreshTimeSeconds;
+        return refreshFrequencySeconds;
     }
 
     public void setRefreshFrequencySeconds(int refreshTimeSeconds) {
-        long oldValue = this.refreshTimeSeconds;
-        this.refreshTimeSeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
-        firePropertyChange(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, oldValue, this.refreshTimeSeconds);
+        long oldValue = this.refreshFrequencySeconds;
+        this.refreshFrequencySeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
+        firePropertyChange(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, oldValue, this.refreshFrequencySeconds);
         fireNodeChanged(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY);
     }
 

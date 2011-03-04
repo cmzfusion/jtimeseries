@@ -41,7 +41,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
     private static final ScheduledExecutorService loadSeriesFromServerExecutor = NamedExecutors.newSingleThreadScheduledExecutor("LoadSeriesFromServer");
-    private static final int SERVER_REFRESH_RATE_MINS = 1;
+    private static final int SERVER_REFRESH_RATE_MINS = 20;
 
     private final ConcurrentMap<TimeSeriesServer, ScheduledFuture> loadTasksByServer = new ConcurrentHashMap<TimeSeriesServer, ScheduledFuture>();
 

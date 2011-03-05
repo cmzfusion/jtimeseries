@@ -58,6 +58,9 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         this.selectorActionFactory = selectorActionFactory;
     }
 
+    public void showSelections(List<Identifiable> selected) {
+    }
+
     protected IdentifiableListActionModel getSelectionsActionModel() {
         return selectionsActionModel;
     }

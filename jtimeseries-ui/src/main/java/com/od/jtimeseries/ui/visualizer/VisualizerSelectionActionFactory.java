@@ -9,6 +9,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,6 +29,6 @@ public class VisualizerSelectionActionFactory implements SelectorActionFactory {
     }
 
     public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-        return Arrays.asList((Action) removeSeriesAction, reconnectSeriesAction);
+        return new LinkedList(Arrays.asList((Action) removeSeriesAction, reconnectSeriesAction));
     }
 }

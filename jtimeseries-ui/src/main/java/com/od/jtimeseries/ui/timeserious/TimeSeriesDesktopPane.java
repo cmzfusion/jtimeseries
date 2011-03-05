@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.timeserious.action.TimeSeriousSelectorActionFactory;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -19,10 +21,12 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private DisplayNameCalculator displayNameCalculator;
+    private SeriesSelectionPanel mainSelectionPanel;
 
-    public TimeSeriesDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator) {
+    public TimeSeriesDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel) {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
+        this.mainSelectionPanel = mainSelectionPanel;
     }
 
     public void createAndAddVisualizer(String title) {
@@ -32,6 +36,10 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
 
     public void createAndAddVisualizer(VisualizerConfiguration c) {
         TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
+        visualizer.setSelectorActionFactory(new TimeSeriousSelectorActionFactory(
+            visualizer.getSelectionActionModel(),
+            mainSelectionPanel
+        ));
         configureAndShowVisualizerFrame(c, visualizer);
     }
 

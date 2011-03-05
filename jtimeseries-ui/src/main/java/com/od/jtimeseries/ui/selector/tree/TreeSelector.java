@@ -223,6 +223,29 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         treeModel.setRoot(rootNode);
     }
 
+    public void showSelections(List<Identifiable> selected) {
+        tree.clearSelection();
+        List<TreePath> selectionPaths = new LinkedList<TreePath>();
+        for ( Identifiable i : selected) {
+            String path = i.getPath();
+            Identifiable idInThisContext = rootContext.get(path);
+            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.get(idInThisContext);
+            if ( n != null) {
+                selectionPaths.add(new TreePath(n.getPath()));
+            }
+        }
+
+        for (TreePath p : selectionPaths) {
+            tree.expandPath(p);
+            tree.addSelectionPath(p);
+        }
+
+        if ( selectionPaths.size() > 0) {
+            tree.scrollPathToVisible(selectionPaths.get(0));
+        }
+
+    }
+
     private static interface ExpansionRule {
         public boolean shouldExpand(AbstractSeriesSelectionTreeNode n);
     }

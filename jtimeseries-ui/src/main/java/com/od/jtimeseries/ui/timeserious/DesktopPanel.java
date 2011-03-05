@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -23,10 +24,12 @@ import java.util.List;
 public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAware {
 
     private TimeSeriesDesktopPane desktopPane;
+    private SeriesSelectionPanel seriesSelectionPanel;
 
-    public DesktopPanel(UiTimeSeriesServerDictionary dictionary, DisplayNameCalculator displayNameCalculator) {
+    public DesktopPanel(UiTimeSeriesServerDictionary dictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel seriesSelectionPanel) {
         super(new BorderLayout());
-        desktopPane = new TimeSeriesDesktopPane(dictionary, displayNameCalculator);
+        this.seriesSelectionPanel = seriesSelectionPanel;
+        desktopPane = new TimeSeriesDesktopPane(dictionary, displayNameCalculator, seriesSelectionPanel);
         add(desktopPane, BorderLayout.CENTER);
     }
 

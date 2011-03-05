@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.*;
@@ -208,6 +209,14 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public void setColumns(List<ColumnSettings> columnSettings) {
         seriesSelectionPanel.setColumns(columnSettings);
+    }
+
+    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
+        seriesSelectionPanel.setSelectorActionFactory(selectorActionFactory);
+    }
+
+    public IdentifiableListActionModel getSelectionActionModel() {
+        return seriesSelectionPanel.getSelectionActionModel();
     }
 
     public void setToolbarVisible(boolean visible) {

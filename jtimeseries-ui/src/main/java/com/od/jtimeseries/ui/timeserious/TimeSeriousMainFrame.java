@@ -37,7 +37,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
     private DesktopPanel desktopPanel;
-    private MainSeriesSelector seriesSelector;
+    private MainSeriesSelector mainSeriesSelector;
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
@@ -52,13 +52,13 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
         this.serverDictionary = serverDictionary;
         this.rootContext = new TimeSeriousRootContext(serverDictionary, displayNameCalculator);
-        this.desktopPanel = new DesktopPanel(serverDictionary, displayNameCalculator);
-        this.seriesSelector = new MainSeriesSelector(
+        this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,
             displayNameCalculator,
             serverDictionary
         );
+        this.desktopPanel = new DesktopPanel(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel());
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -82,7 +82,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         addWindowFocusListener(new DesktopSelectionWindowFocusListener());
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( seriesSelector.isTableSelectorVisible()) {
+                if ( mainSeriesSelector.isTableSelectorVisible()) {
                     tableSplitPanePosition = (Integer)evt.getNewValue();
                 } else {
                     treeSplitPanePosition = (Integer)evt.getNewValue();
@@ -93,7 +93,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private void addSplitPaneListener() {
         //set the split pane position when we change between tree and table view
-        seriesSelector.addPropertyChangeListener(SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
+        mainSeriesSelector.addPropertyChangeListener(SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
         new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 splitPane.setDividerLocation(
@@ -105,7 +105,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
-        splitPane.setLeftComponent(seriesSelector);
+        splitPane.setLeftComponent(mainSeriesSelector);
         splitPane.setRightComponent(desktopPanel);
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
@@ -149,7 +149,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             setSize(800, 600);
             setLocationRelativeTo(null);
         }
-        splitPane.setDividerLocation(seriesSelector.isTableSelectorVisible() ?
+        splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());
         tableSplitPanePosition = config.getSplitPaneLocationWhenTableSelected();
@@ -158,7 +158,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(rootContext, seriesSelector, desktopPanel);
+        return Arrays.asList(rootContext, mainSeriesSelector, desktopPanel);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {

@@ -108,6 +108,11 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setTransferHandler(h);
     }
 
+    public void showSelections(List<Identifiable> selected) {
+        treeSelector.showSelections(selected);
+        tableSelector.showSelections(selected);
+    }
+
     public IdentifiableListActionModel getSelectionActionModel() {
         return selectionActionModel;
     }

@@ -25,6 +25,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 
 import javax.swing.*;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,5 +99,16 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         if ( seriesClass.isAssignableFrom(i.getClass())) {
             l.add((E)i);
         }
+    }
+
+    protected LinkedHashSet<Identifiable> convertToIdentifiableInThisContext(List<Identifiable> identifiables) {
+        LinkedHashSet<Identifiable> idInThisContext = new LinkedHashSet<Identifiable>();
+        for ( Identifiable i : identifiables) {
+            Identifiable inThisContext = rootContext.get(i.getPath());
+            if ( inThisContext != null) {
+                idInThisContext.add(inThisContext);
+            }
+        }
+        return idInThisContext;
     }
 }

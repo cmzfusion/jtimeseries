@@ -225,15 +225,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     public void showSelections(List<Identifiable> selected) {
         tree.clearSelection();
-        List<TreePath> selectionPaths = new LinkedList<TreePath>();
-        for ( Identifiable i : selected) {
-            String path = i.getPath();
-            Identifiable idInThisContext = rootContext.get(path);
-            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.get(idInThisContext);
-            if ( n != null) {
-                selectionPaths.add(new TreePath(n.getPath()));
-            }
-        }
+        List<TreePath> selectionPaths = findPaths(selected);
 
         for (TreePath p : selectionPaths) {
             tree.expandPath(p);
@@ -244,6 +236,18 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             tree.scrollPathToVisible(selectionPaths.get(0));
         }
 
+    }
+
+    private List<TreePath> findPaths(List<Identifiable> selected) {
+        Set<Identifiable> ids = convertToIdentifiableInThisContext(selected);
+        List<TreePath> selectionPaths = new LinkedList<TreePath>() ;
+        for ( Identifiable i : ids) {
+            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.get(i);
+            if ( n != null) {
+                selectionPaths.add(new TreePath(n.getPath()));
+            }
+        }
+        return selectionPaths;
     }
 
     private static interface ExpansionRule {

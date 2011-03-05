@@ -35,7 +35,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -52,7 +52,6 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private Class<E> seriesClass;
     private BeanPerRowModel<E> tableModel;
     private SortableTable table;
-    private JPopupMenu tablePopupMenu;
     private TableColumnManager<E> tableColumnManager;
     private JToolBar toolbar = new JToolBar();
 
@@ -182,6 +181,32 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     public void addAllDynamicColumns() {
         tableColumnManager.addAllDynamicColumns();    
+    }
+
+    public void showSelections(List<Identifiable> selected) {
+        Set<Identifiable> idInThisContext = convertToIdentifiableInThisContext(selected);
+        List<Integer> rows = findRows(idInThisContext);
+
+        int minRow = Integer.MAX_VALUE;
+        table.getSelectionModel().clearSelection();
+        for ( Integer r : rows) {
+            table.getSelectionModel().addSelectionInterval(r, r);
+            minRow = Math.min(minRow, r);
+        }
+
+        if ( rows.size() > 0) {
+            table.scrollRowToVisible(minRow);
+        }
+    }
+
+    private List<Integer> findRows(Set<Identifiable> idInThisContext) {
+        List<Integer> rows = new ArrayList<Integer>();
+        for ( int row = 0; row < tableModel.getRowCount(); row ++) {
+            if (idInThisContext.contains(tableModel.getObject(row))) {
+                rows.add(row);
+            }
+        }
+        return rows;
     }
 
     public void setSeriesSelectionEnabled(boolean selectable) {

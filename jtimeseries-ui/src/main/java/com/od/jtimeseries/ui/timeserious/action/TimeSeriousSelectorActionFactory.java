@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class TimeSeriousSelectorActionFactory extends VisualizerSelectionActionFactory {
 
-    private ShowInMainSelectorAction showInMainSelectorAction;
+    private FindInMainSelectorAction showInMainSelectorAction;
 
     public TimeSeriousSelectorActionFactory(IdentifiableListActionModel selectionActionModel, SeriesSelectionPanel seriesSelectionPanel) {
         super(selectionActionModel);
-        showInMainSelectorAction = new ShowInMainSelectorAction(seriesSelectionPanel, selectionActionModel);
+        showInMainSelectorAction = new FindInMainSelectorAction(seriesSelectionPanel, selectionActionModel);
     }
 
     public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {

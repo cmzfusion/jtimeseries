@@ -15,14 +15,14 @@ import java.util.List;
  * Date: 04/03/11
  * Time: 18:19
  */
-public class ShowInMainSelectorAction extends AbstractAction {
+public class FindInMainSelectorAction extends AbstractAction {
 
     private SeriesSelectionPanel mainSelectionPanel;
     private IdentifiableListActionModel selections;
 
-    public ShowInMainSelectorAction(SeriesSelectionPanel mainSelectionPanel, IdentifiableListActionModel selections) {
-        super("Show in Main Selector", ImageUtils.FRAME_ICON_16x16);                 super.putValue(SHORT_DESCRIPTION, "Show the selected series in the main series selector");
-
+    public FindInMainSelectorAction(SeriesSelectionPanel mainSelectionPanel, IdentifiableListActionModel selections) {
+        super("Find in Main Selector", ImageUtils.FIND_IN_MAIN_SELECTOR_16x16);
+        super.putValue(SHORT_DESCRIPTION, "Find the selected series in the main series selector");
         this.mainSelectionPanel = mainSelectionPanel;
         this.selections = selections;
     }

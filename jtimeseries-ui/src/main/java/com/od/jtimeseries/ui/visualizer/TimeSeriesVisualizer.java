@@ -126,7 +126,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private void createDisplayNameAction() {
-        editDisplayNameAction = new EditDisplayNamePatternsAction(rootContext, this, displayNameCalculator);
+        editDisplayNameAction = new EditDisplayNamePatternsAction(this, displayNameCalculator);
 
         editDisplayNameAction.addDisplayPatternListener(new DisplayPatternDialog.DisplayPatternListener() {
             public void displayPatternsChanged(List<DisplayNamePattern> newPatterns, boolean applyNow) {

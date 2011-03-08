@@ -45,12 +45,14 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
     private UiTimeSeriesServerDictionary serverDictionary;
+    private AbstractAction exitAction;
     private final JSplitPane splitPane = new JSplitPane();
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction) {
         this.serverDictionary = serverDictionary;
+        this.exitAction = exitAction;
         this.rootContext = new TimeSeriousRootContext(serverDictionary, displayNameCalculator);
         this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
@@ -72,7 +74,6 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         newVisualizerAction = new NewVisualizerAction(this, desktopSelectionActionModel);
         newServerAction = new NewServerAction(this, serverDictionary);
         editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
-            rootContext,
             TimeSeriousMainFrame.this,
             displayNameCalculator
         );
@@ -130,7 +131,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         JMenuItem newServerItem = new JMenuItem(newServerAction);
         fileMenu.add(newServerItem);
 
-        JMenuItem exitItem = new JMenuItem(new ExitAction());
+        JMenuItem exitItem = new JMenuItem(exitAction);
         fileMenu.add(exitItem);
 
         JMenu windowMenu = new JMenu("Window");
@@ -170,17 +171,6 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public DesktopPanel getSelectedDesktop() {
         return desktopPanel;
-    }
-
-    private class ExitAction extends AbstractAction {
-
-        private ExitAction() {
-            super("Exit");
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            System.exit(0);
-        }
     }
 
     //set the selected desktop in the desktopSelectionActionModel when this window is focused

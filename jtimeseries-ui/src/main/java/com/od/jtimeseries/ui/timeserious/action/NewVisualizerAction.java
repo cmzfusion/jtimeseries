@@ -18,7 +18,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     private JFrame mainFrame;
 
     public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m) {
-        super(m, "New Visualizer", ImageUtils.FRAME_ICON_16x16);
+        super(m, "New Visualizer", ImageUtils.NEW_VISUALIZER_16x16);
         this.mainFrame = mainFrame;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }

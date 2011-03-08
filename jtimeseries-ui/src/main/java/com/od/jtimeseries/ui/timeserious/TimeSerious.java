@@ -7,6 +7,7 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfigManager;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -14,6 +15,8 @@ import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -33,8 +36,7 @@ public class TimeSerious {
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary, applicationActionModels);
-    private TimeSeriousConfig config;
+    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction());    private TimeSeriousConfig config;
     private ConfigAwareTreeManager configTree = new ConfigAwareTreeManager(mainFrame);
 
     public TimeSerious() {
@@ -54,15 +56,51 @@ public class TimeSerious {
 
         mainFrame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                configTree.prepareConfigForSave(config);
-                try {
-                    configManager.saveConfig(mainFrame, config);
-                } catch (ConfigManagerException e1) {
-                    //todo, add handling
-                    e1.printStackTrace();
+                if ( ! confirmAndSaveConfig(e.getWindow()) ) {
+                    //there's no mechanism to cancel the close which I can find, barring throwing an exception
+                    //which is then handled by some dedicated logic in the Component class
+                    throw new RuntimeException("User cancelled exit");
                 }
             }
         });
+    }
+
+    private class ExitAction extends AbstractAction {
+
+        private ExitAction() {
+            super("Exit", ImageUtils.EXIT_16x16);
+            super.putValue(SHORT_DESCRIPTION, "Exit and save config");
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if ( confirmAndSaveConfig(mainFrame) ) {
+                System.exit(0);
+            }
+        }
+    }
+
+    private boolean confirmAndSaveConfig(Window w) {
+        int option = JOptionPane.showConfirmDialog(
+                w,
+                "Save Config?",
+                "Exit TimeSerious",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if ( option == JOptionPane.YES_OPTION) {
+            saveConfigOnShutdown();
+        }
+        return option != JOptionPane.CANCEL_OPTION;
+    }
+
+    private void saveConfigOnShutdown() {
+        configTree.prepareConfigForSave(config);
+        try {
+            configManager.saveConfig(mainFrame, config);
+        } catch (ConfigManagerException e1) {
+            //todo, add handling
+            e1.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -70,7 +108,7 @@ public class TimeSerious {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
 
-                JideInitialization.applyLicense();                
+                JideInitialization.applyLicense();
                 JideInitialization.setupJide();
                 JideInitialization.setupJideLookAndFeel();
 

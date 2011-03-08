@@ -153,6 +153,8 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerSize(splitPane.getDividerSize() + 4);
         tableSplitPanePosition = config.getSplitPaneLocationWhenTableSelected();
         treeSplitPanePosition = config.getSplitPaneLocationWhenTreeSelected();
         addSplitPaneListener();

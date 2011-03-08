@@ -22,7 +22,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     private volatile int refreshFrequencySeconds = DEFAULT_REFRESH_FREQUENCY_SECONDS;
     private volatile boolean selected;
     private volatile boolean stale;
-    private String displayName;
+    private volatile String displayName;
     private Date lastRefreshTime;
     private URL timeSeriesUrl;
     private Color color = colorRotator.getNextColor();
@@ -59,7 +59,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
 
     public String getDisplayName() {
         if ( displayName == null ) {
-            setDisplayName(getPath());
+            setDisplayName(getId());
         }
         return displayName;
     }

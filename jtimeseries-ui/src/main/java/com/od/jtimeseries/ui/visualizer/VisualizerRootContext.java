@@ -13,6 +13,9 @@ import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.swing.util.UIUtilities;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -26,8 +29,11 @@ import java.util.*;
  */
 public class VisualizerRootContext extends AbstractUIRootContext {
 
+    private DisplayNameCalculator displayNameCalculator;
+
     public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
+        this.displayNameCalculator = displayNameCalculator;
         initializeFactoriesAndBusListener();
     }
 
@@ -102,5 +108,4 @@ public class VisualizerRootContext extends AbstractUIRootContext {
             return new ChartingTimeSeries(httpSeries, config);
         }
     }
-
 }

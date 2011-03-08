@@ -36,11 +36,9 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     protected static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
     protected TimeSeriesServerDictionary serverDictionary;
-    private DisplayNameCalculator displayNameCalculator;
 
     public AbstractUIRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         this.serverDictionary = serverDictionary;
-        this.displayNameCalculator = displayNameCalculator;
         displayNameCalculator.addRootContext(this);
     }
 
@@ -105,10 +103,6 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
                 }
             } catch (Exception e) {
                 logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
-            }
-
-            if ( result != null) {
-                displayNameCalculator.setDisplayName(result);
             }
             return (E)result;
         }

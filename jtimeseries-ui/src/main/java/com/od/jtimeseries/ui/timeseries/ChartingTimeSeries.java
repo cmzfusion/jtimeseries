@@ -50,12 +50,6 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
     public WrappedSeriesTreeListener wrappedSeriesTreeListener;
     public PropertyChangeListener proxyingPropertyListener;
 
-    public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries) {
-        super(wrappedSeries);
-        this.wrappedSeries = wrappedSeries;
-        addListenersToWrappedSeries();
-    }
-
     public ChartingTimeSeries(RemoteHttpTimeSeries wrappedSeries, UiTimeSeriesConfig c) {
         super(wrappedSeries);
         this.wrappedSeries = wrappedSeries;
@@ -90,7 +84,7 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     public String getDisplayName() {
         if ( displayName == null ) {
-            setDisplayName(getPath());
+            setDisplayName(getId());
         }
         return displayName;
     }

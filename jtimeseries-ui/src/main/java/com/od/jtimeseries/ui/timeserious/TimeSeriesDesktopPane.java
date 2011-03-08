@@ -36,14 +36,15 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
 
     public void createAndAddVisualizer(VisualizerConfiguration c) {
         TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
-        visualizer.setSelectorActionFactory(new TimeSeriousSelectorActionFactory(
-            visualizer.getSelectionActionModel(),
-            mainSelectionPanel
-        ));
         configureAndShowVisualizerFrame(c, visualizer);
     }
 
     private void configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
+        visualizer.setSelectorActionFactory(new TimeSeriousSelectorActionFactory(
+            visualizer.getSelectionActionModel(),
+            mainSelectionPanel
+        ));
+
         VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer);
         if ( c != null) {
             VisualizerConfiguration.setVisualizerConfiguration(visualizer, c);

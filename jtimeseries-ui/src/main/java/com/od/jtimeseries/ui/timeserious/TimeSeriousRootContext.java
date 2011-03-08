@@ -19,8 +19,11 @@ import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.swing.util.UIUtilities;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -50,6 +53,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
         this.displayNameCalculator = displayNameCalculator;
+        addTreeListener(new DisplayNameTreeListener());
         initializeFactoriesAndBusListener();
     }
 
@@ -142,6 +146,26 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
         protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
             return new ServerTimeSeries(config);
+        }
+    }
+
+    /**
+     * Auto apply display name rules to series in the main selector
+     */
+    private class DisplayNameTreeListener extends IdentifiableTreeListenerAdapter {
+
+        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+            for ( Identifiable i : contextTreeEvent.getNodes()) {
+                final List<UIPropertiesTimeSeries> l = i.findAll(UIPropertiesTimeSeries.class).getAllMatches();
+                UIUtilities.runInDispatchThread(new Runnable() {
+                    public void run() {
+                        for (UIPropertiesTimeSeries series : l) {
+                            displayNameCalculator.setDisplayName(series);
+                        }
+                    }
+                });
+
+            }
         }
     }
 }

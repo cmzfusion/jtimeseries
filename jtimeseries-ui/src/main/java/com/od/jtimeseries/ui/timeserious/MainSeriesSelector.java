@@ -190,7 +190,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
         public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
-            super(actionModel, "Add to Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
+            super(actionModel, "Add to Selected Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
             this.visualizerSelectionActionModel = visualizerSelectionActionModel;
             visualizerSelectionActionModel.addActionModelListener(new ActionModelListener() {
                 public void actionStateUpdated() {
@@ -201,7 +201,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         }
 
         private void setName() {
-            String name = "Add to Visualizer";
+            String name = "Add to Selected Visualizer";
             if ( visualizerSelectionActionModel.isModelValid()) {
                 name += " " + visualizerSelectionActionModel.getSelectedVisualizer().getTitle();
             }

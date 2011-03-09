@@ -31,12 +31,20 @@ public class VisualizerInternalFrame extends JInternalFrame {
         setSize(800,600);
 
         addInternalFrameListener(new InternalFrameAdapter() {
-            @Override
             public void internalFrameActivated(InternalFrameEvent e) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
                         listener.visualizerSelected(VisualizerInternalFrame.this);
+                    }
+                } );
+            }
+
+            public void internalFrameClosed(InternalFrameEvent e) {
+                UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
+                new EventSender<TimeSeriousBusListener>() {
+                    public void sendEvent(TimeSeriousBusListener listener) {
+                        listener.visualizerDisposed(VisualizerInternalFrame.this);
                     }
                 } );
             }

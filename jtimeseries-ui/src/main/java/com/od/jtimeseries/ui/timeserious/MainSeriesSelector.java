@@ -14,6 +14,7 @@ import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
 import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
@@ -191,6 +192,20 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
             super(actionModel, "Add to Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
             this.visualizerSelectionActionModel = visualizerSelectionActionModel;
+            visualizerSelectionActionModel.addActionModelListener(new ActionModelListener() {
+                public void actionStateUpdated() {
+                   AddSeriesToActiveVisualizerAction.this.actionStateUpdated();
+                   setName();
+                }
+            });
+        }
+
+        private void setName() {
+            String name = "Add to Visualizer";
+            if ( visualizerSelectionActionModel.isModelValid()) {
+                name += " " + visualizerSelectionActionModel.getSelectedVisualizer().getTitle();
+            }
+            putValue(NAME, name);
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -203,7 +218,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         }
 
         public boolean isModelStateActionable() {
-            return getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class);
+            return getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class) && visualizerSelectionActionModel.isModelValid();
         }
     }
 }

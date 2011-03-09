@@ -22,6 +22,9 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {
     }
 
+    public void visualizerDisposed(VisualizerInternalFrame visualizerFrame) {
+    }
+
     public void desktopSelected(DesktopPanel desktopPane) {
     }
 

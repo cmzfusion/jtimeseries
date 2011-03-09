@@ -24,6 +24,10 @@ public class VisualizerSelectionActionModel extends AbstractActionModel {
                  public void visualizerSelected(VisualizerInternalFrame v) {
                      setSelectedVisualizer(v);
                  }
+
+                 public void visualizerDisposed(VisualizerInternalFrame v) {
+                     clearActionModelState();
+                 }
             }
         );
     }

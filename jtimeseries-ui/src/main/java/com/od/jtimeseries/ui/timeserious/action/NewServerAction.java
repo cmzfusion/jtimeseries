@@ -78,7 +78,7 @@ public class NewServerAction extends AbstractAction {
 
             private JTextField hostField = new JTextField(20);
             private JTextField portField = new JTextField(20);
-            private JTextField descriptionField = new JTextField(20);
+            private JTextField nameField = new JTextField(20);
             JPanel serverFormPanel = new JPanel();
 
             public ServerDetailsPage(String title, String description) {
@@ -90,12 +90,12 @@ public class NewServerAction extends AbstractAction {
                 return hostField.getText();
             }
 
-            public String getServerDescription() {
-                return descriptionField.getText();
+            public String getServerName() {
+                return nameField.getText();
             }
 
             public void setServerDescription(String s) {
-                descriptionField.setText(s);
+                nameField.setText(s);
             }
 
             public int getPort() {
@@ -121,8 +121,8 @@ public class NewServerAction extends AbstractAction {
                 serverFormPanel.add(hostField, cc.xy(4, 4));
                 serverFormPanel.add(new JLabel("Port"), cc.xy(2, 6));
                 serverFormPanel.add(portField, cc.xy(4, 6));
-                serverFormPanel.add(new JLabel("Description"), cc.xy(2, 8));
-                serverFormPanel.add(descriptionField, cc.xy(4, 8));
+                serverFormPanel.add(new JLabel("Name"), cc.xy(2, 8));
+                serverFormPanel.add(nameField, cc.xy(4, 8));
 
                 addComponent(serverFormPanel);
             }
@@ -146,7 +146,7 @@ public class NewServerAction extends AbstractAction {
                 addProgressPane(0.8f, 24, 15);
 
                 //create a default description if not set
-                if ( serverDetailsPage.getServerDescription().trim().length() == 0) {
+                if ( serverDetailsPage.getServerName().trim().length() == 0) {
                     serverDetailsPage.setServerDescription(serverDetailsPage.getHostName() + ":" + serverDetailsPage.getPort());
                 }
 
@@ -215,7 +215,7 @@ public class NewServerAction extends AbstractAction {
                                 serverDictionary.getOrCreateServer(
                                     serverDetailsPage.getHostName(),
                                     serverDetailsPage.getPort(),
-                                    serverDetailsPage.getServerDescription()
+                                    serverDetailsPage.getServerName()
                                 );
                             }
                         }

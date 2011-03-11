@@ -142,6 +142,10 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
                 }
             }
         }
+
+        public boolean isModelStateActionable() {
+            return getActionModel().isSelectionLimitedToType(TimeSeriesServerContext.class);
+        }
     }
 
     private class RemoveServerAction extends ModelDrivenAction<IdentifiableListActionModel> {

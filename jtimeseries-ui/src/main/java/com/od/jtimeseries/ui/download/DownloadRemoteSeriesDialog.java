@@ -18,10 +18,8 @@
  */
 package com.od.jtimeseries.ui.download;
 
-import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -33,14 +31,10 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
 import java.net.MalformedURLException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -126,7 +120,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
 
         public SelectionRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
             super(serverDictionary, displayNameCalculator);
-            initializeFactoriesAndBusListener();
+            initializeFactoriesAndContextBusListener();
         }
 
         protected ContextFactory createContextFactory() {

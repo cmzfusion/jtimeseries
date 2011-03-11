@@ -9,6 +9,8 @@ import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
@@ -22,6 +24,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.UIUtilities;
 
 import java.net.MalformedURLException;
@@ -54,7 +57,13 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         super(serverDictionary, displayNameCalculator);
         this.displayNameCalculator = displayNameCalculator;
         addTreeListener(new DisplayNameTreeListener());
-        initializeFactoriesAndBusListener();
+        initializeFactoriesAndContextBusListener();
+
+        //add a bus listener to create visualizer tree nodes locally, for the main tree selector
+        UIEventBus.getInstance().addEventListener(
+            TimeSeriousBusListener.class,
+            new VisualizerTreeNodeBusListener()
+        );
     }
 
     public void addVisualizerContext(VisualizerContext visualizerContext) {
@@ -104,20 +113,36 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         return Collections.emptyList();
     }
 
+    public boolean containsVisualizerWithName(String name) {
+        return visualizerContext.contains(name);
+    }
+
+    private class VisualizerTreeNodeBusListener extends TimeSeriousBusListenerAdapter {
+
+        public void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame) {
+            VisualizerNode v = visualizerContext.get(visualizerFrame.getTitle(), VisualizerNode.class);
+            if ( v == null ) {
+                v = new VisualizerNode(visualizerFrame.getTitle(), visualizerFrame.getTitle(), visualizerFrame);
+                v.shown(visualizerFrame);
+                visualizerContext.addChild(v);
+            } else {
+                v.shown(visualizerFrame);
+            }
+        }
+
+        public void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame) {
+            VisualizerNode v = visualizerContext.get(visualizerFrame.getTitle(), VisualizerNode.class);
+            if ( v != null) {
+                v.hidden();
+            }
+        }
+
+    }
+
     private class ServerSeriesLoadingBusListener extends ContextUpdatingBusListener {
 
         public ServerSeriesLoadingBusListener(TimeSeriesContext rootContext) {
             super(rootContext);
-        }
-
-        public void visualizerCreated(VisualizerInternalFrame visualizerFrame) {
-            visualizerContext.addChild(
-                new VisualizerNode(visualizerFrame.getTitle(), visualizerFrame.getTitle(), visualizerFrame)
-            );
-        }
-
-        public void visualizerDisposed(VisualizerInternalFrame visualizerFrame) {
-            visualizerContext.remove(visualizerFrame.getTitle());
         }
 
         //add a time series server context when a new server is created, and load its series

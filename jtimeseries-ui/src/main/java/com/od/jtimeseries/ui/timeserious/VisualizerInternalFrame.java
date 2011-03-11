@@ -9,8 +9,6 @@ import com.od.swing.eventbus.UIEventBus;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +34,7 @@ public class VisualizerInternalFrame extends JInternalFrame {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.visualizerCreated(VisualizerInternalFrame.this);
+                        listener.visualizerFrameDisplayed(VisualizerInternalFrame.this);
                     }
                 } );
             }
@@ -54,7 +52,7 @@ public class VisualizerInternalFrame extends JInternalFrame {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.visualizerDisposed(VisualizerInternalFrame.this);
+                        listener.visualizerFrameDisposed(VisualizerInternalFrame.this);
                     }
                 } );
             }

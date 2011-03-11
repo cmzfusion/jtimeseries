@@ -19,13 +19,13 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
-    public void visualizerCreated(VisualizerInternalFrame visualizerFrame) {
+    public void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame) {
     }
 
     public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {
     }
 
-    public void visualizerDisposed(VisualizerInternalFrame visualizerFrame) {
+    public void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame) {
     }
 
     public void desktopSelected(DesktopPanel desktopPane) {

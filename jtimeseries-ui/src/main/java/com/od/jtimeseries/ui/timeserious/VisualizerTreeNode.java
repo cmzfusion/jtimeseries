@@ -31,7 +31,7 @@ public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
     }
 
     protected Icon getIcon() {
-        return ImageUtils.NEW_VISUALIZER_16x16;
+        return ImageUtils.ADD_TO_VISUALIZER_16x16;
     }
 
     @Override

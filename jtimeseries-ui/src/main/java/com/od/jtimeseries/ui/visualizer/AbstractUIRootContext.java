@@ -42,7 +42,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         displayNameCalculator.addRootContext(this);
     }
 
-    protected void initializeFactoriesAndBusListener() {
+    protected void initializeFactoriesAndContextBusListener() {
         setTimeSeriesFactory(createTimeSeriesFactory());
         setContextFactory(createContextFactory());
 

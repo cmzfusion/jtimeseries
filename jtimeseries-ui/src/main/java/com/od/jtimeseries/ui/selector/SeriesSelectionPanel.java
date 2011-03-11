@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
+import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -91,6 +92,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         addComponents();
         addListeners();
         showTree();
+    }
+
+    public void setTreeNodeFactory(SelectorTreeNodeFactory<E> treeNodeFactory) {
+        treeSelector.setTreeNodeFactory(treeNodeFactory);
     }
 
     public void setSeriesSelectionEnabled(boolean selectable) {
@@ -265,6 +270,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
             }
         }
         selectionListForCharting.setSelectedTimeSeries(selections);
+    }
+
+    public JTree getJTree() {
+        return treeSelector.getJTree();
     }
 
     private class RadioButtonSelectionListener implements ActionListener {

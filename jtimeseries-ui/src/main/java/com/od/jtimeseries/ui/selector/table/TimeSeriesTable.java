@@ -22,10 +22,18 @@ import com.jidesoft.grid.AutoFilterTableHeader;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.util.NamedExecutors;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +46,9 @@ class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
 
     private static final Color STALE_SERIES_COLOR = new Color(248,165,169);
     private BeanPerRowModel<E> tableModel;
+
+    private static final ScheduledExecutorService resortExecutor = NamedExecutors.newSingleThreadScheduledExecutor("TableResort");
+    private ScheduledFuture resortFuture;
 
     public TimeSeriesTable(BeanPerRowModel<E> tableModel, TableColumnManager<E> columnManager) {
         super(tableModel);
@@ -58,6 +69,34 @@ class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
         setAutoCreateColumnsFromModel(false);
         setTableHeader(header);
         setModel(tableModel);
+
+        //this has to be done after setting the model
+        //it seems these values are reset otherwise:
+        setOptimized(true);
+        setAutoResort(false);
+        //////
+        addResortListener(tableModel);
+    }
+
+    //if we resort on every update performance is terrible for multiple cell change/row change events
+    //Here we queue a delayed resort when the table model changes affect sorted columns
+    private void addResortListener(TableModel m) {
+        m.addTableModelListener(new TableModelListener() {
+            public void tableChanged(TableModelEvent e) {
+                if ( e.getColumn() == TableModelEvent.ALL_COLUMNS
+                || getSortableTableModel().isColumnSorted(e.getColumn())) {
+                    queueForResort();
+                }
+            }
+        });
+    }
+
+    private void queueForResort() {
+        if( resortFuture == null) {
+            resortFuture = resortExecutor.schedule(
+                new ResortRunnable(), 3000, TimeUnit.MILLISECONDS
+            );
+        }
     }
 
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -79,5 +118,18 @@ class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
 
     //stop the creation of initial columns
     public void createDefaultColumnsFromModel() {
+    }
+
+    private class ResortRunnable implements Runnable {
+        public void run() {
+            SwingUtilities.invokeLater(
+                new Runnable() {
+                    public void run() {
+                        resort();
+                        resortFuture = null;
+                    }
+                }
+            );
+        }
     }
 }

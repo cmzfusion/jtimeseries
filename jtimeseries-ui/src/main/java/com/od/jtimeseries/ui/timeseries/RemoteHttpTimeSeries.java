@@ -204,6 +204,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
                 protected void doInEventThread() throws Exception {
                     errorCount = 0;
+                    //presently the command still runs even if we are stale, but
+                    //if stale the remote call won't take place, so an exception is not thrown
+                    //and the doInEventThread will get called
+                    //this doesn't count as a proper refresh
                     if ( ! isStale()) {
                         setLastRefreshTime(new Date());
                     }

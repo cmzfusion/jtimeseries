@@ -23,4 +23,6 @@ public interface TimeSeriousBusListener {
     void desktopSelected(DesktopPanel desktopPanel);
 
     void visualizerDisposed(VisualizerInternalFrame visualizerFrame);
+
+    void visualizerCreated(VisualizerInternalFrame visualizerFrame);
 }

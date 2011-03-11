@@ -9,7 +9,6 @@ import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
@@ -26,7 +25,6 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.util.UIUtilities;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -49,12 +47,19 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     private final ConcurrentMap<TimeSeriesServer, ScheduledFuture> loadTasksByServer = new ConcurrentHashMap<TimeSeriesServer, ScheduledFuture>();
 
     private DisplayNameCalculator displayNameCalculator;
+    private VisualizerContext visualizerContext;
+
 
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
         this.displayNameCalculator = displayNameCalculator;
         addTreeListener(new DisplayNameTreeListener());
         initializeFactoriesAndBusListener();
+    }
+
+    public void addVisualizerContext(VisualizerContext visualizerContext) {
+        addChild(visualizerContext);
+        this.visualizerContext = visualizerContext;
     }
 
     protected ContextFactory createContextFactory() {
@@ -103,6 +108,16 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
         public ServerSeriesLoadingBusListener(TimeSeriesContext rootContext) {
             super(rootContext);
+        }
+
+        public void visualizerCreated(VisualizerInternalFrame visualizerFrame) {
+            visualizerContext.addChild(
+                new VisualizerNode(visualizerFrame.getTitle(), visualizerFrame.getTitle(), visualizerFrame)
+            );
+        }
+
+        public void visualizerDisposed(VisualizerInternalFrame visualizerFrame) {
+            visualizerContext.remove(visualizerFrame.getTitle());
         }
 
         //add a time series server context when a new server is created, and load its series

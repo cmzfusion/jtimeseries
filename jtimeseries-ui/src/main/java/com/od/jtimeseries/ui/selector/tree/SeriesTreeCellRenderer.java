@@ -46,7 +46,7 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
                 }
                 add(delegateRenderer, BorderLayout.CENTER);
             } else {
-                delegateRenderer.setText(getDisplayName(((ContextTreeNode) value).getContext()));
+                delegateRenderer.setText(getDisplayName(((AbstractSeriesSelectionTreeNode)value).getIdentifiable()));
                 add(delegateRenderer, BorderLayout.CENTER);
             }
             return this;

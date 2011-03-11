@@ -29,11 +29,9 @@ import java.util.*;
  */
 public class VisualizerRootContext extends AbstractUIRootContext {
 
-    private DisplayNameCalculator displayNameCalculator;
 
     public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
-        this.displayNameCalculator = displayNameCalculator;
         initializeFactoriesAndBusListener();
     }
 

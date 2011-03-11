@@ -15,7 +15,7 @@ import javax.swing.*;
  * Time: 21:21
  * To change this template use File | Settings | File Templates.
  */
-public class ContextNodeFactory<E extends UIPropertiesTimeSeries> {
+public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
 
     private JTree tree;
     private Class seriesClass;
@@ -28,7 +28,7 @@ public class ContextNodeFactory<E extends UIPropertiesTimeSeries> {
        16
     );
 
-    public ContextNodeFactory(JTree tree, Class seriesClass) {
+    public SelectorTreeNodeFactory(JTree tree, Class seriesClass) {
         this.tree = tree;
         this.seriesClass = seriesClass;
         serverNodeAnimator.setBackgroundImage("/images/server_client2_16x16.png", 0.9f);

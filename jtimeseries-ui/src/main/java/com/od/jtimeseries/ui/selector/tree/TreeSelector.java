@@ -61,7 +61,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private TimeSeriesContext rootContext;
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
-    private ContextNodeFactory<E> nodeFactory;
+    private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
 
     public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, Class seriesClass) {
@@ -71,7 +71,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
 
         tree = new AnimatedIconTree();
-        nodeFactory = new ContextNodeFactory<E>(tree, seriesClass);
+        nodeFactory = new SelectorTreeNodeFactory<E>(tree, seriesClass);
 
         setupSeries();
 
@@ -91,6 +91,10 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
         setupDragAndDrop();
+    }
+
+    public void setTreeNodeFactory(SelectorTreeNodeFactory<E> nodeFactory) {
+        this.nodeFactory = nodeFactory;
     }
 
     private void setupDragAndDrop() {
@@ -122,6 +126,10 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
                 IdentifiableTreeListener.class
             )
         );
+    }
+
+    public JTree getJTree() {
+        return tree;
     }
 
     private class ContextTreeUpdaterListener implements IdentifiableTreeListener {

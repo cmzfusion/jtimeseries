@@ -12,7 +12,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-abstract class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode {
+public abstract class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode {
     protected abstract Identifiable getIdentifiable();
 
     protected abstract Icon getIcon();

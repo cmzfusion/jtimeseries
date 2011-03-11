@@ -23,7 +23,7 @@ public class TimeSeriousConfig {
     private Integer splitPaneLocationWhenTreeSelected = 300;
     private boolean mainSeriesSelectorTableVisible;
 
-        private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
+    private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
 
     public Rectangle getFrameLocation(String frameName) {
         return frameLocations.get(frameName);

@@ -33,15 +33,11 @@ class ServerTreeNode extends ContextTreeNode implements AnimatedIconTree.Progres
         this.animator = animator;
     }
 
-    public TimeSeriesContext getContext() {
-        return context;
-    }
-
     public String toString() {
         return context.toString();
     }
 
-    protected Identifiable getIdentifiable() {
+    protected TimeSeriesContext getIdentifiable() {
         return context;
     }
 

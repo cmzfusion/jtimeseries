@@ -19,6 +19,9 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
+    public void visualizerCreated(VisualizerInternalFrame visualizerFrame) {
+    }
+
     public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {
     }
 

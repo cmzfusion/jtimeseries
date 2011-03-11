@@ -7,6 +7,8 @@ import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.shared.*;
+import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
+import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
@@ -35,13 +37,13 @@ import java.util.List;
 public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
-    private TimeSeriesContext rootContext;
+    private TimeSeriousRootContext rootContext;
     private ApplicationActionModels applicationActionModels;
     private DisplayNameCalculator displayNameCalculator;
     private TimeSeriesServerDictionary dictionary;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public MainSeriesSelector(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator, TimeSeriesServerDictionary dictionary) {
+    public MainSeriesSelector(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator, TimeSeriesServerDictionary dictionary) {
         this.rootContext = rootContext;
         this.applicationActionModels = applicationActionModels;
         this.displayNameCalculator = displayNameCalculator;
@@ -52,6 +54,9 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         );
         selectionPanel.setSeriesSelectionEnabled(false);
         selectionPanel.setSelectorActionFactory(new MainSelectorActionFactory());
+        MainSelectorTreeNodeFactory mainSelectorTreeNodeFactory = new MainSelectorTreeNodeFactory(selectionPanel.getJTree(), UIPropertiesTimeSeries.class);
+        selectionPanel.setTreeNodeFactory(mainSelectorTreeNodeFactory);
+        rootContext.addVisualizerContext(new VisualizerContext()); //must be dne after the tree node factory is added
 
         addProxyingPropertyListeners();
 
@@ -219,6 +224,25 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
         public boolean isModelStateActionable() {
             return getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class) && visualizerSelectionActionModel.isModelValid();
+        }
+    }
+
+    private class MainSelectorTreeNodeFactory extends SelectorTreeNodeFactory<UIPropertiesTimeSeries> {
+
+        public MainSelectorTreeNodeFactory(JTree tree, Class seriesClass) {
+            super(tree, seriesClass);
+        }
+
+        public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
+            AbstractSeriesSelectionTreeNode result;
+            if ( identifiable instanceof VisualizerContext ) {
+                result = new VisualizerContextTreeNode((VisualizerContext)identifiable);
+            } else if ( identifiable instanceof  VisualizerNode ) {
+                result = new VisualizerTreeNode((VisualizerNode)identifiable);
+            } else {
+                result = super.buildNode(identifiable);
+            }
+            return result;
         }
     }
 }

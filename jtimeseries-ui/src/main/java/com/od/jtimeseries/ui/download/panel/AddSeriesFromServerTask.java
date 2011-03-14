@@ -21,11 +21,10 @@ package com.od.jtimeseries.ui.download.panel;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -90,9 +89,9 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
 
         String path =
             serverContext.getId() +
-            JTimeSeriesConstants.NAMESPACE_SEPARATOR +
+            IdentifiablePathUtils.NAMESPACE_SEPARATOR +
             series.getParentPath() +
-            JTimeSeriesConstants.NAMESPACE_SEPARATOR +
+            IdentifiablePathUtils.NAMESPACE_SEPARATOR +
             series.getId();
 
         try {

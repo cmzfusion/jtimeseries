@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
-import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -102,7 +102,7 @@ public class TimeSeriesServer implements Comparable {
     }
 
     public String getServerContextIdentifier() {
-        return getHostAndPort().replaceAll(JTimeSeriesConstants.NAMESPACE_SEPARATOR_REGEX_TOKEN, "_");
+        return getHostAndPort().replaceAll(IdentifiablePathUtils.NAMESPACE_SEPARATOR_REGEX_TOKEN, "_");
     }
 
     @Override

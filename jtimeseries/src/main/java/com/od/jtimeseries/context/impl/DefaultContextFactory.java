@@ -18,14 +18,8 @@
  */
 package com.od.jtimeseries.context.impl;
 
-import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.context.ContextFactory;
-import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
-import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 

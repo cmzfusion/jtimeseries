@@ -19,8 +19,6 @@
 package com.od.jtimeseries.util.identifiable;
 
 import com.od.jtimeseries.context.*;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
-import com.od.jtimeseries.util.PathParser;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 
 import java.util.*;
@@ -192,12 +190,9 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected void checkId(String id) {
-        if ( id == null ) {
-            throw new IdentifierException("id cannot be null");
-        }else if ( id.contains(JTimeSeriesConstants.NAMESPACE_SEPARATOR)) {
-            throw new IdentifierException("id cannot contain a '" + JTimeSeriesConstants.NAMESPACE_SEPARATOR + "', this is the path separator symbol");
-        } else if ( id.equals("")) {
-            throw new IdentifierException("id cannot be an empty string");
+        String problem = IdentifiablePathUtils.checkId(id);
+        if ( problem != null) {
+            throw new IdentifierException(problem);
         }
     }
 
@@ -344,7 +339,7 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected String getPathForChild(String id) {
-        return getPath() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + id;
+        return getPath() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + id;
     }
 
 
@@ -390,7 +385,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         //add the path to the child node from which we received the event
         private String getNewPathForEvent(IdentifiableTreeEvent contextTreeEvent) {
             return contextTreeEvent.getSource().getId() +
-                (contextTreeEvent.getPath().length() > 0 ? JTimeSeriesConstants.NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
+                (contextTreeEvent.getPath().length() > 0 ? IdentifiablePathUtils.NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
         }
     }
 }

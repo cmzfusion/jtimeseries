@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.util.PathParser;
+import com.od.jtimeseries.util.identifiable.PathParser;
 
 import java.util.List;
 

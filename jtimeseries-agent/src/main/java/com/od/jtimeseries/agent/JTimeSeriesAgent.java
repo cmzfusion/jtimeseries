@@ -3,7 +3,7 @@ package com.od.jtimeseries.agent;
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
-import com.od.jtimeseries.util.PathParser;
+import com.od.jtimeseries.util.identifiable.PathParser;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.UdpClient;
@@ -16,12 +16,7 @@ import com.sun.jdmk.comm.HtmlAdaptorServer;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
-import javax.management.remote.JMXServiceURL;
-import javax.management.remote.JMXConnectorServer;
-import javax.management.remote.JMXConnectorServerFactory;
 import java.io.IOException;
-import java.rmi.registry.LocateRegistry;
-import java.lang.management.ManagementFactory;
 
 /**
  * Created by IntelliJ IDEA.

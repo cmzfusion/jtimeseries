@@ -10,8 +10,8 @@ import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
-import com.od.jtimeseries.util.PathParser;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.util.identifiable.PathParser;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.net.MalformedURLException;
@@ -81,7 +81,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
                 TimeSeriesServer s = getTimeSeriesServer(c, serverDescription);
 
                 //TODO - handle case where we already have a series with this path?
-                String newLocalPath = s.getServerContextIdentifier() + JTimeSeriesConstants.NAMESPACE_SEPARATOR + p.getRemainingPath();
+                String newLocalPath = s.getServerContextIdentifier() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + p.getRemainingPath();
                 if ( ! contains(newLocalPath)) {
                     create(newLocalPath, c.getDescription(), UIPropertiesTimeSeries.class, c);
                 }

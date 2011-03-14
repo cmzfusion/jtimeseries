@@ -32,7 +32,7 @@ import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.QueryResult;
 
@@ -55,7 +55,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
      * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
      */
     public DefaultTimeSeriesContext() {
-        this(null, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID, JTimeSeriesConstants.DEFAULT_ROOT_CONTEXT_ID);
+        this(null, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID);
     }
 
     /**

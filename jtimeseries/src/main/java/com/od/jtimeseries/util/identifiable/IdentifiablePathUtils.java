@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.util;
+package com.od.jtimeseries.util.identifiable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,10 +24,25 @@ package com.od.jtimeseries.util;
  * Date: 17-Feb-2009
  * Time: 14:06:19
  */
-public class JTimeSeriesConstants {
+public class IdentifiablePathUtils {
 
     public static final String DEFAULT_ROOT_CONTEXT_ID = "Root Context";
     public static final String NAMESPACE_SEPARATOR = ".";
     public static final String NAMESPACE_SEPARATOR_REGEX_TOKEN = "\\.";
+
+    /**
+     * @return a String value describing the problem, if the id is not valid, or null if the id is valid
+     */
+    public static String checkId(String id) {
+        String problemDescription = null;
+        if ( id == null ) {
+            problemDescription = "id cannot be null";
+        }else if ( id.contains(IdentifiablePathUtils.NAMESPACE_SEPARATOR)) {
+            problemDescription = "id cannot contain a '" + IdentifiablePathUtils.NAMESPACE_SEPARATOR + "', this is the path separator symbol";
+        } else if ( id.equals("")) {
+            problemDescription = "id cannot be an empty string";
+        }
+        return problemDescription;
+    }
 }
 

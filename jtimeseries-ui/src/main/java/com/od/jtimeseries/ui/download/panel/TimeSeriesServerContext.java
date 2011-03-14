@@ -4,7 +4,6 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.util.Displayable;
-import com.od.jtimeseries.util.JTimeSeriesConstants;
 import com.od.swing.util.UIUtilities;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 

@@ -4,6 +4,7 @@ import com.jidesoft.dialog.JideOptionPane;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
@@ -33,14 +34,23 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
             if ( name != null) {
                 name = name.trim();
                 name = name.length() == 0 ? "Visualizer" : name;
-                if ( ! rootContext.containsVisualizerWithName(name) ) {
-                    getActionModel().getDesktop().createAndAddVisualizer(name);
-                } else {
+                String nameProblem = IdentifiablePathUtils.checkId(name);
+                if ( nameProblem != null) {
+                    JOptionPane.showMessageDialog(
+                        mainFrame,
+                        nameProblem,
+                        "Invalid name for Visualizer",
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                } else if ( rootContext.containsVisualizerWithName(name) ) {
                     JOptionPane.showMessageDialog(
                         mainFrame,
                         "There is already a Visualizer with this name, please choose another",
                         "Visualizer Already Exists",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.WARNING_MESSAGE
+                    );
+                } else {
+                    getActionModel().getDesktop().createAndAddVisualizer(name);
                 }
             }
         }

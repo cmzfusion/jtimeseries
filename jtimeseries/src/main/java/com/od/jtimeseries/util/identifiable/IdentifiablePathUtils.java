@@ -36,11 +36,11 @@ public class IdentifiablePathUtils {
     public static String checkId(String id) {
         String problemDescription = null;
         if ( id == null ) {
-            problemDescription = "id cannot be null";
+            problemDescription = "The id cannot be null";
         }else if ( id.contains(IdentifiablePathUtils.NAMESPACE_SEPARATOR)) {
-            problemDescription = "id cannot contain a '" + IdentifiablePathUtils.NAMESPACE_SEPARATOR + "', this is the path separator symbol";
+            problemDescription = "The id cannot contain a '" + IdentifiablePathUtils.NAMESPACE_SEPARATOR + "', this is the path separator symbol";
         } else if ( id.equals("")) {
-            problemDescription = "id cannot be an empty string";
+            problemDescription = "The id cannot be an empty string";
         }
         return problemDescription;
     }

@@ -1,10 +1,9 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
@@ -18,6 +17,7 @@ import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import javax.swing.*;
@@ -39,24 +39,26 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private TimeSeriousRootContext rootContext;
     private ApplicationActionModels applicationActionModels;
-    private DisplayNameCalculator displayNameCalculator;
     private TimeSeriesServerDictionary dictionary;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public MainSeriesSelector(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator, TimeSeriesServerDictionary dictionary) {
+    public MainSeriesSelector(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, TimeSeriesServerDictionary dictionary) {
         this.rootContext = rootContext;
         this.applicationActionModels = applicationActionModels;
-        this.displayNameCalculator = displayNameCalculator;
         this.dictionary = dictionary;
         selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
-            UIPropertiesTimeSeries.class
+            UIPropertiesTimeSeries.class,
+            new MainSelectorTreeNodeFactory(UIPropertiesTimeSeries.class)
         );
         selectionPanel.setSeriesSelectionEnabled(false);
         selectionPanel.setSelectorActionFactory(new MainSelectorActionFactory());
-        MainSelectorTreeNodeFactory mainSelectorTreeNodeFactory = new MainSelectorTreeNodeFactory(selectionPanel.getJTree(), UIPropertiesTimeSeries.class);
-        selectionPanel.setTreeNodeFactory(mainSelectorTreeNodeFactory);
-        rootContext.addVisualizerContext(new VisualizerContext()); //must be dne after the tree node factory is added
+
+        //add a bus listener to create visualizer tree nodes locally, for the main tree selector
+        UIEventBus.getInstance().addEventListener(
+            TimeSeriousBusListener.class,
+            new VisualizerTreeNodeBusListener(rootContext.getVisualizerContext())
+        );
 
         addProxyingPropertyListeners();
 
@@ -233,18 +235,18 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     private class MainSelectorTreeNodeFactory extends SelectorTreeNodeFactory<UIPropertiesTimeSeries> {
 
-        public MainSelectorTreeNodeFactory(JTree tree, Class seriesClass) {
-            super(tree, seriesClass);
+        public MainSelectorTreeNodeFactory(Class seriesClass) {
+            super(seriesClass);
         }
 
-        public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
+        public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {
             AbstractSeriesSelectionTreeNode result;
             if ( identifiable instanceof VisualizerContext ) {
                 result = new VisualizerContextTreeNode((VisualizerContext)identifiable);
             } else if ( identifiable instanceof  VisualizerNode ) {
                 result = new VisualizerTreeNode((VisualizerNode)identifiable);
             } else {
-                result = super.buildNode(identifiable);
+                result = super.buildNode(identifiable, tree);
             }
             return result;
         }

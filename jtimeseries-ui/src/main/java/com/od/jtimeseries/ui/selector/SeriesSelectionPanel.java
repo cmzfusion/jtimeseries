@@ -26,7 +26,9 @@ import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -70,7 +72,15 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
-        this(context, "Selected", seriesClass);
+        this(context, "Selected", new SelectorTreeNodeFactory<E>(seriesClass), seriesClass);
+    }
+
+    public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass, SelectorTreeNodeFactory<E> treeNodeFactory) {
+        this(context, "Selected", treeNodeFactory, seriesClass);
+    }
+
+    public SeriesSelectionPanel(VisualizerRootContext rootContext, String chart, Class<E> seriesClass) {
+        this(rootContext, chart, new SelectorTreeNodeFactory<E>(seriesClass), seriesClass);
     }
 
     /**
@@ -79,13 +89,13 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
      *
      * @param selectionText, text name for boolean 'selected' column (e.g. if the selected series will be charted, this might be 'Chart')
      */
-    public SeriesSelectionPanel(TimeSeriesContext context, String selectionText, Class<E> seriesClass) {
+    public SeriesSelectionPanel(TimeSeriesContext context, String selectionText, SelectorTreeNodeFactory treeNodeFactory, Class<E> seriesClass) {
         this.context = context;
         this.seriesClass = seriesClass;
         this.selectionListForCharting = new SeriesSelectionList<E>();
         setupTimeseries();
         selectionActionModel = new IdentifiableListActionModel();
-        treeSelector = new TreeSelector<E>(selectionActionModel, context, seriesClass);
+        treeSelector = new TreeSelector<E>(selectionActionModel, context, treeNodeFactory);
         tableSelector = new TableSelector<E>(selectionActionModel, context, selectionText, seriesClass);
         createSelectorPanel();
         createTitlePanel();
@@ -94,9 +104,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         showTree();
     }
 
-    public void setTreeNodeFactory(SelectorTreeNodeFactory<E> treeNodeFactory) {
-        treeSelector.setTreeNodeFactory(treeNodeFactory);
-    }
 
     public void setSeriesSelectionEnabled(boolean selectable) {
         treeSelector.setSeriesSelectionEnabled(selectable);
@@ -270,10 +277,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
             }
         }
         selectionListForCharting.setSelectedTimeSeries(selections);
-    }
-
-    public JTree getJTree() {
-        return treeSelector.getJTree();
     }
 
     private class RadioButtonSelectionListener implements ActionListener {

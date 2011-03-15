@@ -17,7 +17,6 @@ import javax.swing.*;
  */
 public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
 
-    private JTree tree;
     private Class seriesClass;
 
     private IconComponentAnimator serverNodeAnimator = new IconComponentAnimator(
@@ -28,16 +27,15 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
        16
     );
 
-    public SelectorTreeNodeFactory(JTree tree, Class seriesClass) {
-        this.tree = tree;
+    public SelectorTreeNodeFactory(Class seriesClass) {
         this.seriesClass = seriesClass;
         serverNodeAnimator.setBackgroundImage("/images/server_client2_16x16.png", 0.9f);
     }
 
-    public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
+    public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {
         AbstractSeriesSelectionTreeNode result = null;
         if ( identifiable instanceof TimeSeriesServerContext) {
-            result = buildServerNode((TimeSeriesServerContext) identifiable);
+            result = buildServerNode((TimeSeriesServerContext) identifiable, tree);
         } else if ( identifiable instanceof TimeSeriesContext) {
             result = buildContextNode((TimeSeriesContext)identifiable);
         } else if ( seriesClass.isAssignableFrom(identifiable.getClass())) {
@@ -46,7 +44,7 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
         return result;
     }
 
-    private ServerTreeNode buildServerNode(TimeSeriesServerContext serverContext) {
+    private ServerTreeNode buildServerNode(TimeSeriesServerContext serverContext, JTree tree) {
         return new ServerTreeNode(tree, serverContext, serverNodeAnimator);
     }
 

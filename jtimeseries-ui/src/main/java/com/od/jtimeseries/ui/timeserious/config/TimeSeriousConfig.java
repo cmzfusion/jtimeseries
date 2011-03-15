@@ -16,6 +16,8 @@ import java.util.List;
 public class TimeSeriousConfig {
 
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
+    private java.util.List<VisualizerConfiguration> hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();
+
     private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
     private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
@@ -39,6 +41,14 @@ public class TimeSeriousConfig {
 
     public void setVisualizerConfigurations(List<VisualizerConfiguration> visualizerConfigurations) {
         this.visualizerConfigurations = visualizerConfigurations;
+    }
+
+    public List<VisualizerConfiguration> getHiddenVisualizerConfigurations() {
+        return hiddenVisualizerConfigurations;
+    }
+
+    public void setHiddenVisualizerConfigurations(List<VisualizerConfiguration> hiddenVisualizerConfigurations) {
+        this.hiddenVisualizerConfigurations = hiddenVisualizerConfigurations;
     }
 
     public void setFrameExtendedState(String frameName, int extendedState) {
@@ -104,6 +114,9 @@ public class TimeSeriousConfig {
         }
         if ( splitPaneLocationWhenTreeSelected == null ) {
             splitPaneLocationWhenTreeSelected = 300;
+        }
+        if ( hiddenVisualizerConfigurations == null ) {
+            hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();
         }
         return this;
     }

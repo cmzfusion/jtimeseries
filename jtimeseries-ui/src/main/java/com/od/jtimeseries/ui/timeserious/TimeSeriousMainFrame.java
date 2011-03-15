@@ -57,7 +57,6 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,
-            displayNameCalculator,
             serverDictionary
         );
         this.desktopPanel = new DesktopPanel(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel());

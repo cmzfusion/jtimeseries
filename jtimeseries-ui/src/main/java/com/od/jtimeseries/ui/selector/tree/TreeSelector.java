@@ -64,14 +64,13 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
 
-    public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, Class seriesClass) {
+    public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, SelectorTreeNodeFactory nodeFactory) {
         super(rootContext, selectionsActionModel);
         this.rootContext = rootContext;
+        this.nodeFactory = nodeFactory;
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
-
         tree = new AnimatedIconTree();
-        nodeFactory = new SelectorTreeNodeFactory<E>(tree, seriesClass);
 
         setupSeries();
 
@@ -91,10 +90,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
         setupDragAndDrop();
-    }
-
-    public void setTreeNodeFactory(SelectorTreeNodeFactory<E> nodeFactory) {
-        this.nodeFactory = nodeFactory;
     }
 
     private void setupDragAndDrop() {
@@ -126,10 +121,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
                 IdentifiableTreeListener.class
             )
         );
-    }
-
-    public JTree getJTree() {
-        return tree;
     }
 
     private class ContextTreeUpdaterListener implements IdentifiableTreeListener {
@@ -322,7 +313,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
-        AbstractSeriesSelectionTreeNode result = nodeFactory.buildNode(identifiable);
+        AbstractSeriesSelectionTreeNode result = nodeFactory.buildNode(identifiable, tree);
         if ( result != null ) {
             identifiableToNodeMap.put(identifiable, result);
         }

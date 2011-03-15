@@ -12,12 +12,17 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
  */
 public class VisualizerNode extends IdentifiableBase {
 
-    private VisualizerInternalFrame internalFrame;
-    private VisualizerConfiguration visualizerConfiguration;
+    private VisualizerInternalFrame internalFrame;              //will be null if visualizer frame is hidden
+    private VisualizerConfiguration visualizerConfiguration;    //will be null if visualizer frame is shown
 
-    public VisualizerNode(String id, String description, VisualizerInternalFrame internalFrame) {
-        super(id, description);
+    public VisualizerNode(String visualizerName, VisualizerInternalFrame internalFrame) {
+        super(visualizerName, visualizerName);
         this.internalFrame = internalFrame;
+    }
+
+    public VisualizerNode(String visualizerName, VisualizerConfiguration visualizerConfiguration) {
+        super(visualizerName, visualizerName);
+        this.visualizerConfiguration = visualizerConfiguration;
     }
 
     public void hidden() {
@@ -30,5 +35,13 @@ public class VisualizerNode extends IdentifiableBase {
     public void shown(VisualizerInternalFrame v) {
         visualizerConfiguration = null;
         internalFrame = v;
+    }
+
+    public boolean isVisualizerHidden() {
+        return internalFrame == null;
+    }
+
+    public VisualizerConfiguration getVisualizerConfiguration() {
+        return visualizerConfiguration;
     }
 }

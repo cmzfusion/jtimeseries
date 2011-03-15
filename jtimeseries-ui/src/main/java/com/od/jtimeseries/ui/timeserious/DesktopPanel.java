@@ -1,7 +1,5 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
@@ -24,11 +22,9 @@ import java.util.List;
 public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAware {
 
     private TimeSeriesDesktopPane desktopPane;
-    private SeriesSelectionPanel seriesSelectionPanel;
 
     public DesktopPanel(UiTimeSeriesServerDictionary dictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel seriesSelectionPanel) {
         super(new BorderLayout());
-        this.seriesSelectionPanel = seriesSelectionPanel;
         desktopPane = new TimeSeriesDesktopPane(dictionary, displayNameCalculator, seriesSelectionPanel);
         add(desktopPane, BorderLayout.CENTER);
     }
@@ -37,12 +33,8 @@ public class DesktopPanel extends JPanel implements TimeSeriousDesktop, ConfigAw
         desktopPane.createAndAddVisualizer(title);
     }
 
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        return desktopPane.getVisualizerConfigurations();
-    }
-
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        config.setVisualizerConfigurations(getVisualizerConfigurations());
+        config.setVisualizerConfigurations(desktopPane.getVisualizerConfigurations());
     }
 
     public void restoreConfig(TimeSeriousConfig config) {

@@ -170,10 +170,6 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }
 
-    public DesktopPanel getSelectedDesktop() {
-        return desktopPanel;
-    }
-
     //set the selected desktop in the desktopSelectionActionModel when this window is focused
     private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
 

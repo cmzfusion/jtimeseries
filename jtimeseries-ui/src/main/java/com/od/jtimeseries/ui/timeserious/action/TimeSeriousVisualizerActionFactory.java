@@ -15,11 +15,11 @@ import java.util.List;
  * Date: 02/03/11
  * Time: 06:45
  */
-public class TimeSeriousSelectorActionFactory extends VisualizerSelectionActionFactory {
+public class TimeSeriousVisualizerActionFactory extends VisualizerSelectionActionFactory {
 
     private FindInMainSelectorAction showInMainSelectorAction;
 
-    public TimeSeriousSelectorActionFactory(IdentifiableListActionModel selectionActionModel, SeriesSelectionPanel seriesSelectionPanel) {
+    public TimeSeriousVisualizerActionFactory(IdentifiableListActionModel selectionActionModel, SeriesSelectionPanel seriesSelectionPanel) {
         super(selectionActionModel);
         showInMainSelectorAction = new FindInMainSelectorAction(seriesSelectionPanel, selectionActionModel);
     }

@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.timeserious.action.TimeSeriousSelectorActionFactory;
+import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -40,7 +40,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
     }
 
     private void configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
-        visualizer.setSelectorActionFactory(new TimeSeriousSelectorActionFactory(
+        visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel
         ));

@@ -1,11 +1,14 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
+import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.beans.PropertyVetoException;
@@ -27,6 +30,18 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
+        addUiBusEventListener();
+    }
+
+    private void addUiBusEventListener() {
+        UIEventBus.getInstance().addEventListener(
+            TimeSeriousBusListener.class,
+            new TimeSeriousBusListenerAdapter() {
+                public void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration) {
+                    createAndAddVisualizer(visualizerConfiguration);
+                }
+            }
+        );
     }
 
     public void createAndAddVisualizer(String title) {
@@ -48,7 +63,9 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer);
         if ( c != null) {
             VisualizerConfiguration.setVisualizerConfiguration(visualizer, c);
-            visualizerFrame.setBounds(c.getFrameBounds());
+            if ( c.getFrameBounds() != null) {
+                visualizerFrame.setBounds(c.getFrameBounds());
+            }
         }
         add(visualizerFrame);
         visualizerFrame.setVisible(true);

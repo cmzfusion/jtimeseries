@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.timeserious.DesktopPanel;
 import com.od.jtimeseries.ui.timeserious.TimeSeriesDesktopPane;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
+import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 /**
 * Created by IntelliJ IDEA.
@@ -25,4 +26,6 @@ public interface TimeSeriousBusListener {
     void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame);
 
     void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame);
+
+    void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration);
 }

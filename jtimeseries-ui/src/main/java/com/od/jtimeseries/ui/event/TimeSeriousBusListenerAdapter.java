@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.event;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.timeserious.DesktopPanel;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
+import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +21,10 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     }
 
     public void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame) {
+    }
+
+    //also used to 'show' a hidden visualizer from the main selector tree
+    public void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration) {
     }
 
     public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {

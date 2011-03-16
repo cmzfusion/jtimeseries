@@ -22,9 +22,9 @@ import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
-import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -101,7 +101,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private void setupDragAndDrop() {
         table.setDragEnabled(true);
         table.setDropMode(DropMode.ON);
-        table.setTransferHandler(new SelectorTransferHandler(getSelectionsActionModel()));
+        table.setTransferHandler(new NoImportsSelectorTransferHandler(getSelectionsActionModel()));
     }
 
     private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {

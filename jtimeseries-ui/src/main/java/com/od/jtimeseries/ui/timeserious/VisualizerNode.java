@@ -29,6 +29,7 @@ public class VisualizerNode extends IdentifiableBase {
         visualizerConfiguration = VisualizerConfiguration.createVisualizerConfiguration(
             internalFrame.getVisualizer()
         );
+        visualizerConfiguration.setFrameBounds(internalFrame.getBounds());
         internalFrame = null;
     }
 

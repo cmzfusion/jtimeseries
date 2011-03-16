@@ -22,7 +22,8 @@ import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
-import com.od.jtimeseries.ui.selector.shared.SelectorTransferHandler;
+import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
+import com.od.jtimeseries.ui.selector.shared.SeriesTransferable;
 import com.od.jtimeseries.ui.timeseries.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
@@ -42,6 +43,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,13 +103,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
         SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(seriesSelectionPanel.getSelectionActionModel());
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
-        seriesSelectionPanel.setTransferHandler(new SelectorTransferHandler(
-            seriesSelectionPanel.getSelectionActionModel()) {
-
-            protected void doImport(List<Identifiable> data) {
-                rootContext.addIdentifiables(data);
-            }
-        });
+        seriesSelectionPanel.setTransferHandler(new ImportAndExportSelectorTransferHandler());
     }
 
     private void layoutVisualizer() {
@@ -285,4 +281,36 @@ public class TimeSeriesVisualizer extends JPanel {
         super.finalize();
     }
 
+    private class ImportAndExportSelectorTransferHandler extends NoImportsSelectorTransferHandler {
+
+        public ImportAndExportSelectorTransferHandler() {
+            super(TimeSeriesVisualizer.this.seriesSelectionPanel.getSelectionActionModel());
+        }
+
+        public boolean canImport(TransferSupport supp) {
+            return supp.isDataFlavorSupported(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+        }
+
+        public boolean importData(TransferSupport supp) {
+            if (!canImport(supp)) {
+                return false;
+            }
+
+            // Fetch the Transferable and its data
+            Transferable t = supp.getTransferable();
+            List<Identifiable> data = null;
+            try {
+                data = (List<Identifiable>)t.getTransferData(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            doImport(data);
+            return true;
+        }
+
+        protected void doImport(List<Identifiable> data) {
+            rootContext.addIdentifiables(data);
+        }
+    }
 }

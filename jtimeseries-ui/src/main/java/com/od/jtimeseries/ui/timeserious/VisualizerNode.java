@@ -45,4 +45,8 @@ public class VisualizerNode extends IdentifiableBase {
     public VisualizerConfiguration getVisualizerConfiguration() {
         return visualizerConfiguration;
     }
+
+    public VisualizerInternalFrame getInternalFrame() {
+        return internalFrame;
+    }
 }

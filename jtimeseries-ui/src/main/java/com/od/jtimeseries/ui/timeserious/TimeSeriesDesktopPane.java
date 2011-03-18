@@ -37,8 +37,16 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         UIEventBus.getInstance().addEventListener(
             TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
+
                 public void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration) {
                     createAndAddVisualizer(visualizerConfiguration);
+                }
+
+                public void visualizerRemoved(VisualizerConfiguration c, VisualizerInternalFrame f) {
+                    if ( f != null ) {
+                        f.setVisible(false);
+                        remove(f);
+                    }
                 }
             }
         );

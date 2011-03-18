@@ -1,7 +1,8 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.timeserious.VisualizerNode;
 import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
@@ -21,6 +22,7 @@ public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableLi
 
     public ShowHiddenVisualizerAction(IdentifiableListActionModel actionModel) {
         super(actionModel, "Show Visualizer", ImageUtils.SERIES_ICON_16x16);
+        super.putValue(SHORT_DESCRIPTION, "Restore the selected visualizer to the desktop pane");
     }
 
     public boolean isModelStateActionable() {

@@ -1,8 +1,8 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
+import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;
@@ -21,6 +21,7 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
 
     public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
         super(actionModel, "Add to Selected Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
+        super.putValue(SHORT_DESCRIPTION, "Add series to the selected visualizer");
         this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         visualizerSelectionActionModel.addActionModelListener(new ActionModelListener() {
             public void actionStateUpdated() {

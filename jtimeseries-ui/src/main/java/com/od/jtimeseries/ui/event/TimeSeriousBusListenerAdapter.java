@@ -20,17 +20,19 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
-    public void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame) {
+    public void visualizerFrameDisplayed(VisualizerInternalFrame f) {
     }
 
-    //also used to 'show' a hidden visualizer from the main selector tree
-    public void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration) {
+    public void visualizerImportedFromConfig(VisualizerConfiguration c) {
     }
 
-    public void visualizerSelected(VisualizerInternalFrame visualizerFrame) {
+    public void visualizerRemoved(VisualizerConfiguration c, VisualizerInternalFrame f) {
     }
 
-    public void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame) {
+    public void visualizerSelected(VisualizerInternalFrame f) {
+    }
+
+    public void visualizerFrameDisposed(VisualizerInternalFrame f) {
     }
 
     public void desktopSelected(DesktopPanel desktopPane) {

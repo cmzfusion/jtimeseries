@@ -27,5 +27,16 @@ public interface TimeSeriousBusListener {
 
     void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame);
 
+    /**
+     * A visualizer is imported from a saved config
+     * Also used to 'show' a hidden visualizer from the main selector tree
+     */
     void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration);
+
+    /**
+     * A visualizer is removed from the application
+     * @param visualizerConfiguration, null if the visualizer is currently shown
+     * @param internalFrame, null if the visualizer is currently hidden
+     */
+    void visualizerRemoved(VisualizerConfiguration visualizerConfiguration, VisualizerInternalFrame internalFrame);
 }

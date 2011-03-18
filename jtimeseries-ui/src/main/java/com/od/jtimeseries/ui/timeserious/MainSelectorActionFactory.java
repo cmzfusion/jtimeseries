@@ -8,7 +8,10 @@ import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.timeserious.action.AddSeriesToActiveVisualizerAction;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.RemoveVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.ShowHiddenVisualizerAction;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -30,15 +33,17 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action removeServerAction;
     private Action renameServerAction;
     private Action showHiddenVisualizerAction;
+    private Action removeVisualizerAction;
 
 
-    public MainSelectorActionFactory(TimeSeriesContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentSelector) {
+    public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentSelector) {
         this.selectionModel = selectionPanel.getSelectionActionModel();
         addSeriesAction = new AddSeriesToActiveVisualizerAction(applicationActionModels.getVisualizerSelectionActionModel(), selectionModel);
         refreshServerAction = new RefreshServerSeriesAction(rootContext, selectionModel);
         removeServerAction = new RemoveServerAction(parentSelector, timeSeriesServerDictionary, selectionModel);
         renameServerAction = new RenameServerAction(parentSelector, selectionModel);
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
+        removeVisualizerAction = new RemoveVisualizerAction(selectionModel, rootContext.getVisualizerContext());
     }
 
     public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
@@ -49,7 +54,8 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
             );
         } else if ( selectionModel.isSelectionLimitedToType(VisualizerNode.class)) {
             result = Arrays.asList(
-                showHiddenVisualizerAction
+                showHiddenVisualizerAction,
+                removeVisualizerAction
             );
         } else if ( selectionModel.isSelectionLimitedToType(TimeSeriesServerContext.class)) {
             result = Arrays.asList(

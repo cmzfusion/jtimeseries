@@ -17,7 +17,6 @@ import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.beans.PropertyChangeEvent;
@@ -36,7 +35,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
-    private DesktopPanel desktopPanel;
+    private TimeSeriesDesktopPane mainDesktopPane;
     private MainSeriesSelector mainSeriesSelector;
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
@@ -59,7 +58,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             actionModels,
             serverDictionary
         );
-        this.desktopPanel = new DesktopPanel(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel());
+        this.mainDesktopPane = new TimeSeriesDesktopPane(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel());
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -106,7 +105,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
         splitPane.setLeftComponent(mainSeriesSelector);
-        splitPane.setRightComponent(desktopPanel);
+        splitPane.setRightComponent(mainDesktopPane);
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
     }
@@ -160,7 +159,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(rootContext, mainSeriesSelector, desktopPanel);
+        return Arrays.asList(rootContext, mainSeriesSelector, mainDesktopPane);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -177,7 +176,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.desktopSelected(desktopPanel);
+                        listener.desktopSelected(mainDesktopPane);
                     }
                 }
             );

@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.timeserious.DesktopPanel;
+import com.od.jtimeseries.ui.timeserious.TimeSeriesDesktopPane;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
@@ -35,7 +36,7 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void visualizerFrameDisposed(VisualizerInternalFrame f) {
     }
 
-    public void desktopSelected(DesktopPanel desktopPane) {
+    public void desktopSelected(TimeSeriesDesktopPane desktopPane) {
     }
 
 }

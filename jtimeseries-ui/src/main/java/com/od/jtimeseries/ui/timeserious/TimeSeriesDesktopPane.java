@@ -5,6 +5,8 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
+import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
+import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
@@ -20,7 +22,7 @@ import java.util.*;
  * Date: 26-Mar-2010
  * Time: 17:49:07
  */
-public class TimeSeriesDesktopPane extends JDesktopPane {
+public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private DisplayNameCalculator displayNameCalculator;
@@ -31,6 +33,46 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         addUiBusEventListener();
+    }
+
+    public void createAndAddVisualizer(String title) {
+        TimeSeriesVisualizer v = createVisualizer(title);
+        configureAndShowVisualizerFrame(null, v);
+    }
+
+    public void createAndAddVisualizer(VisualizerConfiguration c) {
+        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
+        configureAndShowVisualizerFrame(c, visualizer);
+    }
+
+    public void prepareConfigForSave(TimeSeriousConfig config) {
+        config.setVisualizerConfigurations(getVisualizerConfigurations());
+    }
+
+    public void restoreConfig(TimeSeriousConfig config) {
+        addVisualizers(config.getVisualizerConfigurations());
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
+    }
+
+    public List<VisualizerConfiguration> getVisualizerConfigurations() {
+        List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
+        for ( JInternalFrame v : getVisualizerFramesByPosition()) {
+            VisualizerInternalFrame vf = (VisualizerInternalFrame) v;
+            VisualizerConfiguration c = VisualizerConfiguration.createVisualizerConfiguration(vf.getVisualizer());
+            c.setIsIcon(v.isIcon());
+            c.setFrameBounds(v.getBounds());
+            l.add(c);
+        }
+        return l;
+    }
+
+    public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
+        for (VisualizerConfiguration c : visualizerConfigurations) {
+            createAndAddVisualizer(c);
+        }
     }
 
     private void addUiBusEventListener() {
@@ -50,16 +92,6 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
                 }
             }
         );
-    }
-
-    public void createAndAddVisualizer(String title) {
-        TimeSeriesVisualizer v = createVisualizer(title);
-        configureAndShowVisualizerFrame(null, v);
-    }
-
-    public void createAndAddVisualizer(VisualizerConfiguration c) {
-        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
-        configureAndShowVisualizerFrame(c, visualizer);
     }
 
     private void configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
@@ -83,24 +115,6 @@ public class TimeSeriesDesktopPane extends JDesktopPane {
             } catch (PropertyVetoException e) {
                 e.printStackTrace();
             }
-        }
-    }
-
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
-        for ( JInternalFrame v : getVisualizerFramesByPosition()) {
-            VisualizerInternalFrame vf = (VisualizerInternalFrame) v;
-            VisualizerConfiguration c = VisualizerConfiguration.createVisualizerConfiguration(vf.getVisualizer());
-            c.setIsIcon(v.isIcon());
-            c.setFrameBounds(v.getBounds());
-            l.add(c);
-        }
-        return l;
-    }
-
-    public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
-        for (VisualizerConfiguration c : visualizerConfigurations) {
-            createAndAddVisualizer(c);
         }
     }
 

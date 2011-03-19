@@ -47,7 +47,9 @@ public class SeriesTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] { LIST_OF_IDENTIFIABLE_FLAVOR, DataFlavor.javaFileListFlavor };
+        return ( selectionsModel.isSelectionLimitedToType(VisualizerNode.class)) ?
+         new DataFlavor[] { DataFlavor.javaFileListFlavor } :
+         new DataFlavor[] { LIST_OF_IDENTIFIABLE_FLAVOR };
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
@@ -73,7 +75,8 @@ public class SeriesTransferable implements Transferable {
                 VisualizerConfiguration c = n.getVisualizerConfiguration();
 
                 File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-                File tmpFile = new File(tmpDir, "visualizer_" + c.getChartsTitle() + ".xml");
+                File tmpFile = new File(tmpDir, "visualizer_" + c.getChartsTitle() + ".xml");       tmpFile.deleteOnExit();
+
                 PrintWriter p = new PrintWriter(tmpFile);
                 String xml = x.toXML(c);
                 p.write(xml);
@@ -86,14 +89,5 @@ public class SeriesTransferable implements Transferable {
             result = files;
         }
         return result;
-    }
-
-    public void cleanUpAfterExport() {
-        System.out.println("Deleting file list");
-        if ( files != null ) {
-            for (File f : files) {
-                f.delete();
-            }
-        }
     }
 }

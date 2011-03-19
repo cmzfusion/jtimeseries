@@ -10,12 +10,13 @@ import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.PathParser;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

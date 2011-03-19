@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.ui.util;
 
-import javax.swing.table.TableModel;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import java.util.HashSet;
 
 

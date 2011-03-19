@@ -1,8 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 

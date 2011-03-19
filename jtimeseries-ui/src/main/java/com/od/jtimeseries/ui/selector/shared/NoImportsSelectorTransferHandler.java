@@ -1,7 +1,5 @@
 package com.od.jtimeseries.ui.selector.shared;
 
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.SeriesTransferable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;

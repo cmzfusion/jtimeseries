@@ -1,7 +1,5 @@
 package com.od.jtimeseries.ui.visualizer.chart;
 
-import com.jidesoft.filter.TodayFilter;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt

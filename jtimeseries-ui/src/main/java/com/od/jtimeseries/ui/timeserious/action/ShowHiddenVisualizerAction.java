@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeserious.VisualizerNode;
-import com.od.jtimeseries.ui.timeserious.action.VisualizerSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
 import com.od.swing.eventbus.EventSender;

@@ -25,10 +25,10 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.Date;
-import java.awt.*;
 import java.util.Properties;
 
 /**

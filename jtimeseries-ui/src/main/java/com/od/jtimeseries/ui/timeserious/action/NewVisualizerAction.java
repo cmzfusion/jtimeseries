@@ -1,8 +1,6 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.jidesoft.dialog.JideOptionPane;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
-import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.swing.action.ModelDrivenAction;

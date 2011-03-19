@@ -19,14 +19,14 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
+import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
-import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

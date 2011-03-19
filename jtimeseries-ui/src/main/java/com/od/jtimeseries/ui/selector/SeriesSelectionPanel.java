@@ -26,7 +26,6 @@ import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -34,7 +33,6 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.util.AwtSafeListener;
-
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

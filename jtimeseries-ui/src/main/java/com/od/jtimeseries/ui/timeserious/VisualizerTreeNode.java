@@ -1,9 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
 

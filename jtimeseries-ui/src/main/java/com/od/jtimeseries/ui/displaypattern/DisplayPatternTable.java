@@ -31,9 +31,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.List;
-import java.beans.IntrospectionException;
 
 /**
  * Created by IntelliJ IDEA.

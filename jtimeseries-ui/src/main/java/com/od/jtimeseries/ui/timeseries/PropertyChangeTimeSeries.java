@@ -1,6 +1,5 @@
 package com.od.jtimeseries.ui.timeseries;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;

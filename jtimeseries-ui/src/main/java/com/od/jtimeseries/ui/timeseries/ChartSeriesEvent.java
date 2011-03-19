@@ -1,7 +1,5 @@
 package com.od.jtimeseries.ui.timeseries;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-
 /**
  * Created by IntelliJ IDEA.
  * User: nick

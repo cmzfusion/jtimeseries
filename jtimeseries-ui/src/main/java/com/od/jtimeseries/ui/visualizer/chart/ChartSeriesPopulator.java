@@ -18,14 +18,14 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYDataset;
 import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
 import com.od.jtimeseries.chart.TimeSeriesXYDataset;
+import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
 import java.util.HashMap;

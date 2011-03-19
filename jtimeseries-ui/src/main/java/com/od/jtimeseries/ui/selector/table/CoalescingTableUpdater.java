@@ -8,7 +8,9 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

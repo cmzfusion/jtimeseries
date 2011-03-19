@@ -6,8 +6,6 @@ import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
-import java.awt.*;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt

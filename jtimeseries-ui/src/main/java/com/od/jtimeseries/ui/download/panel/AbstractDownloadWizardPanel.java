@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.download.panel;
 
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.*;

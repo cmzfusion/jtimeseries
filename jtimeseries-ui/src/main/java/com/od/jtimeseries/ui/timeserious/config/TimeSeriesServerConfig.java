@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.timeserious.config;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**

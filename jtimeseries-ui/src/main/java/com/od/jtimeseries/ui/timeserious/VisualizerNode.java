@@ -1,7 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 /**

@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.displaypattern;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;

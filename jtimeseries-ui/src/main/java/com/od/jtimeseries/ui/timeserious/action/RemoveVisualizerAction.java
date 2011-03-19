@@ -1,6 +1,5 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeserious.VisualizerNode;

@@ -56,7 +56,7 @@ import java.util.List;
  * The TimeSeriesVisualizer is designed to be a standalone component that can be integrated
  * into third party applications, as well as used in TimeSerious standalone application.
  * It has a feature which allows time series to be selected and downloaded/synchronized
- * from time series server(s), and charts plotted of selected series. (This feature is diabled
+ * from time series server(s), and charts plotted of selected series. (This feature is disabled
  * in TimeSerious, which has alternative way of adding servers/timeseries).
  * The time series server(s) provide access to time series data via http, and may be remote or
  * local applications, or even a time series service provided by the client application itself.

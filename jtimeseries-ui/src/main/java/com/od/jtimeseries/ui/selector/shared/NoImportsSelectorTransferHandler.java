@@ -26,7 +26,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     }
 
     public Transferable createTransferable(JComponent c) {
-        return new SeriesTransferable(selectionsModel.getSelected());
+        return new SeriesTransferable(selectionsModel);
     }
 
     public void exportDone(JComponent c, Transferable t, int action) {

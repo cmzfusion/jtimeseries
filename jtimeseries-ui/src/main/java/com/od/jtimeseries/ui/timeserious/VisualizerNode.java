@@ -42,7 +42,8 @@ public class VisualizerNode extends IdentifiableBase {
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {
-        return visualizerConfiguration;
+        return visualizerConfiguration == null ? VisualizerConfiguration.createVisualizerConfiguration(
+            internalFrame.getVisualizer()) : visualizerConfiguration;
     }
 
     public VisualizerInternalFrame getInternalFrame() {

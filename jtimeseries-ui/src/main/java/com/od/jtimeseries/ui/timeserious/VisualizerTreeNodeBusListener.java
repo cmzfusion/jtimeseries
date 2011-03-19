@@ -23,11 +23,9 @@ class VisualizerTreeNodeBusListener extends TimeSeriousBusListenerAdapter {
         VisualizerNode v = visualizerContext.get(visualizerFrame.getTitle(), VisualizerNode.class);
         if ( v == null ) {
             v = new VisualizerNode(visualizerFrame.getTitle(), visualizerFrame);
-            v.shown(visualizerFrame);
             visualizerContext.addChild(v);
-        } else {
-            v.shown(visualizerFrame);
         }
+        v.shown(visualizerFrame);
     }
 
     public void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame) {

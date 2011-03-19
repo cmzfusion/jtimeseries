@@ -34,7 +34,7 @@ public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableLi
             if ( n.isVisualizerHidden() ) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.visualizerImportedFromConfig(n.getVisualizerConfiguration());
+                        listener.visualizerShown(n.getVisualizerConfiguration());
                     }
                 } );
             }

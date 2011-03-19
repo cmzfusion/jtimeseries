@@ -35,9 +35,9 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
         addUiBusEventListener();
     }
 
-    public void createAndAddVisualizer(String title) {
+    public VisualizerInternalFrame createAndAddVisualizer(String title) {
         TimeSeriesVisualizer v = createVisualizer(title);
-        configureAndShowVisualizerFrame(null, v);
+        return configureAndShowVisualizerFrame(null, v);
     }
 
     public void createAndAddVisualizer(VisualizerConfiguration c) {
@@ -80,7 +80,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
             TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
 
-                public void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration) {
+                public void visualizerShown(VisualizerConfiguration visualizerConfiguration) {
                     createAndAddVisualizer(visualizerConfiguration);
                 }
 
@@ -94,7 +94,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
         );
     }
 
-    private void configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
+    private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
         visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel
@@ -116,6 +116,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
                 e.printStackTrace();
             }
         }
+        return visualizerFrame;
     }
 
     //a list of frames by z position, so that when we load the config and add them they reappear with the

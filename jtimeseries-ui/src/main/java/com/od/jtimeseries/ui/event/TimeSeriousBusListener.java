@@ -30,7 +30,7 @@ public interface TimeSeriousBusListener {
      * A visualizer is imported from a saved config
      * Also used to 'show' a hidden visualizer from the main selector tree
      */
-    void visualizerImportedFromConfig(VisualizerConfiguration visualizerConfiguration);
+    void visualizerShown(VisualizerConfiguration visualizerConfiguration);
 
     /**
      * A visualizer is removed from the application

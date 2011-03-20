@@ -40,7 +40,7 @@ public class TimeSeriousConfigManager {
         if ( preferenceSettings.isConfigDirectorySet()) {
             configManager = createConfigManager(preferenceSettings.getMainConfigDirectory());
             try {
-                result = configManager.loadConfig(MAIN_CONFIG_NAME);
+                result = configManager.loadConfig(MAIN_CONFIG_NAME, TimeSeriousConfig.class);
             } catch (NoConfigFoundException nfe) {
                 logMethods.logWarning("Could not find a config " + MAIN_CONFIG_NAME + " config, will use default config");
             } catch (ConfigManagerException n) {

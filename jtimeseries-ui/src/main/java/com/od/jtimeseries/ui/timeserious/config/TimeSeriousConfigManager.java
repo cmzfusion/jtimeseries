@@ -115,7 +115,7 @@ public class TimeSeriousConfigManager {
     //the config directory is saved using Preferences mechanism
     //this gives us the ability to find the main config file again on startup
     private void saveConfigManagerPreferences(ConfigManager m) {
-        FileSourceAndSink fileSink = (FileSourceAndSink)m.getConfigSink();
+        ConfigDirectorySourceAndSink fileSink = (ConfigDirectorySourceAndSink)m.getConfigSink();
         preferenceSettings.setMainConfigDirectory(fileSink.getConfigDirectory());
         preferenceSettings.store();
     }

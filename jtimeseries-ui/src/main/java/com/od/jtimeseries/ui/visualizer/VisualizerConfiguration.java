@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.selector.table.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * A bean to represent all visualizer configuration information
  */
-public class VisualizerConfiguration {
+public class VisualizerConfiguration implements JTimeSeriesUIConfig {
 
     private String chartsTitle;
     private List<DisplayNamePattern> displayNamePatterns;

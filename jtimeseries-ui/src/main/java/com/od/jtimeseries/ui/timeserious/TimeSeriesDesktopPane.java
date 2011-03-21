@@ -33,6 +33,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         addUiBusEventListener();
+        setTransferHandler(new DesktopPaneTransferHandler());
     }
 
     public VisualizerInternalFrame createAndAddVisualizer(String title) {

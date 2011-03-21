@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.config;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
+import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import java.awt.*;
@@ -15,7 +16,7 @@ import java.util.Map;
  * Date: 29-Apr-2010
  * Time: 08:13:11
  */
-public class TimeSeriousConfig {
+public class TimeSeriousConfig implements JTimeSeriesUIConfig {
 
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
     private java.util.List<VisualizerConfiguration> hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();

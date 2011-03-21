@@ -36,7 +36,8 @@ public class TimeSerious {
     private TimeSeriousConfigManager configManager = new TimeSeriousConfigManager();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction());    private TimeSeriousConfig config;
+    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction());
+    private TimeSeriousConfig config;
     private ConfigAwareTreeManager configTree = new ConfigAwareTreeManager(mainFrame);
 
     public TimeSerious() {

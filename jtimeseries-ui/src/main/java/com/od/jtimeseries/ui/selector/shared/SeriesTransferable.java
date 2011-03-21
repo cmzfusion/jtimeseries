@@ -4,8 +4,13 @@ import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerNode;
 import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import od.configutil.ConfigManager;
+import od.configutil.ConfigManagerException;
+import od.configutil.FileSink;
 import org.omg.CORBA.PUBLIC_MEMBER;
 import org.omg.PortableInterceptor.ObjectReferenceFactory;
 
@@ -15,6 +20,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +32,8 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class SeriesTransferable implements Transferable {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(SeriesTransferable.class);
 
     private static final String listType = DataFlavor.javaJVMLocalObjectMimeType +
                        ";class=java.util.List";
@@ -40,7 +48,6 @@ public class SeriesTransferable implements Transferable {
     }
 
     private IdentifiableListActionModel selectionsModel;
-    private List<File> files;
 
     public SeriesTransferable(IdentifiableListActionModel selectionsModel) {
         this.selectionsModel = selectionsModel;
@@ -67,24 +74,24 @@ public class SeriesTransferable implements Transferable {
         if ( flavor == LIST_OF_IDENTIFIABLE_FLAVOR) {
             result = selectionsModel.getSelected();
         } else if ( flavor == DataFlavor.javaFileListFlavor ) {
-            System.out.println("Creating file list");
+            //System.out.println("Creating file list");
             List<VisualizerNode> visualizerContexts = selectionsModel.getSelected(VisualizerNode.class);
-            XStream x = new XStream(new DomDriver());
-            files = new LinkedList<File>();
+            ConfigManager m = new ConfigManager();
+            List<File> files = new LinkedList<File>();
             for (VisualizerNode n : visualizerContexts) {
                 VisualizerConfiguration c = n.getVisualizerConfiguration();
+                String encodedTitle = URLEncoder.encode(c.getChartsTitle(), "UTF-8");
 
                 File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-                File tmpFile = new File(tmpDir, "visualizer_" + c.getChartsTitle() + ".xml");       tmpFile.deleteOnExit();
+                File tmpFile = new File(tmpDir, "timeSeriousVisualizer_" + encodedTitle + ".xml");
 
-                PrintWriter p = new PrintWriter(tmpFile);
-                String xml = x.toXML(c);
-                p.write(xml);
-                if ( p.checkError() ) {
-                    throw new IOException("Failed to write file for data transfer");
+                try {
+                    m.saveConfig("visualizer", c, new FileSink(tmpFile));
+                    files.add(tmpFile);
+                    tmpFile.deleteOnExit();
+                } catch (ConfigManagerException e) {
+                    logMethods.logError("Failed to write temporary visualizer config", e);
                 }
-                p.close();
-                files.add(tmpFile);
             }
             result = files;
         }

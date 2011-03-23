@@ -1,8 +1,7 @@
-package com.od.jtimeseries.ui.timeserious.config;
+package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 import java.awt.*;
 import java.util.HashMap;

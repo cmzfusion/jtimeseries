@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 /**
@@ -25,8 +26,8 @@ public class VisualizerNode extends IdentifiableBase {
     }
 
     public void hidden() {
-        visualizerConfiguration = VisualizerConfiguration.createVisualizerConfiguration(
-            internalFrame.getVisualizer()
+        visualizerConfiguration = TimeSeriesVisualizer.createVisualizerConfiguration(
+                internalFrame.getVisualizer()
         );
         visualizerConfiguration.setFrameBounds(internalFrame.getBounds());
         internalFrame = null;
@@ -42,8 +43,8 @@ public class VisualizerNode extends IdentifiableBase {
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {
-        return visualizerConfiguration == null ? VisualizerConfiguration.createVisualizerConfiguration(
-            internalFrame.getVisualizer()) : visualizerConfiguration;
+        return visualizerConfiguration == null ? TimeSeriesVisualizer.createVisualizerConfiguration(
+                internalFrame.getVisualizer()) : visualizerConfiguration;
     }
 
     public VisualizerInternalFrame getInternalFrame() {

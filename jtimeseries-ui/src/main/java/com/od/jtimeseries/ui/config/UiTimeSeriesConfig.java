@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.timeseries;
+package com.od.jtimeseries.ui.config;
 
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 
 import java.awt.*;

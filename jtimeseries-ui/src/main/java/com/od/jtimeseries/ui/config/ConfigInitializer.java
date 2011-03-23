@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious.config;
+package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -13,18 +13,20 @@ import java.io.File;
  * Date: 18-Nov-2010
  * Time: 21:24:48
  * To change this template use File | Settings | File Templates.
+ *
+ * Manage the user preferences which define the main config directory
  */
-public class TimeSeriousConfigManager {
+public class ConfigInitializer {
 
-    private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousConfigManager.class);
+    private static LogMethods logMethods = LogUtils.getLogMethods(ConfigInitializer.class);
 
     private final String MAIN_CONFIG_NAME = "timeSerious";
 
     //the user preference settings, which store the location of the config file directory in an os safe manner
     private PreferenceSettings preferenceSettings = new PreferenceSettings("jtimeseries/timeserious/ui/configs", "configProperties");
-    private od.configutil.ConfigManager configManager;
+    private ConfigManager configManager;
 
-    public TimeSeriousConfigManager() {
+    public ConfigInitializer() {
         preferenceSettings.load();
     }
 
@@ -143,7 +145,7 @@ public class TimeSeriousConfigManager {
     }
 
     private ConfigManager createConfigManager(File configDirectory) {
-        ConfigManager configManager = new ConfigManager();
+        ConfigManager configManager = new ConfigManagerForTimeSerious();
         configManager.setConfigDirectory(configDirectory);
         return configManager;
     }

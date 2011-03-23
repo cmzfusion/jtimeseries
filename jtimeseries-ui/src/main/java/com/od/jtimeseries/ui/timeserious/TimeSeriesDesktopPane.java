@@ -1,15 +1,15 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
-import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
-import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
@@ -62,7 +62,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
         List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
         for ( JInternalFrame v : getVisualizerFramesByPosition()) {
             VisualizerInternalFrame vf = (VisualizerInternalFrame) v;
-            VisualizerConfiguration c = VisualizerConfiguration.createVisualizerConfiguration(vf.getVisualizer());
+            VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(vf.getVisualizer());
             c.setIsIcon(v.isIcon());
             c.setFrameBounds(v.getBounds());
             l.add(c);
@@ -103,7 +103,7 @@ public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
 
         VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer);
         if ( c != null) {
-            VisualizerConfiguration.setVisualizerConfiguration(visualizer, c);
+            TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
             if ( c.getFrameBounds() != null) {
                 visualizerFrame.setBounds(c.getFrameBounds());
             }

@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious.config;
+package com.od.jtimeseries.ui.config;
 
 import java.util.List;
 

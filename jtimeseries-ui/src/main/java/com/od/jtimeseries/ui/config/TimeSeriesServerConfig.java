@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious.config;
+package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;

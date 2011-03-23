@@ -5,8 +5,8 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.config.ConfigAware;
-import com.od.jtimeseries.ui.timeserious.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 

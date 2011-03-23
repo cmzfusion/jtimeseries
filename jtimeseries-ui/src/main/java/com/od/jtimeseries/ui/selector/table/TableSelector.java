@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.selector.table;
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;

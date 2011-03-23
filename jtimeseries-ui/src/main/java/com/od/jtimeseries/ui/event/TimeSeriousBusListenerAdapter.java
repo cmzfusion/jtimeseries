@@ -1,9 +1,9 @@
 package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeserious.TimeSeriesDesktopPane;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
 
 /**
  * Created by IntelliJ IDEA.

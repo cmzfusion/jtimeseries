@@ -22,7 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;

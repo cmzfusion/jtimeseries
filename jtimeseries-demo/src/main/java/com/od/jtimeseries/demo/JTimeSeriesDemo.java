@@ -28,14 +28,12 @@ import com.od.jtimeseries.timeseries.aggregation.AggregatedIdentifiableTimeSerie
 import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
-import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.util.BenchmarkingRepaintManager;
 import com.od.jtimeseries.util.time.Time;
 
 import javax.swing.*;
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -204,11 +202,11 @@ public class JTimeSeriesDemo {
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {
-        return VisualizerConfiguration.createVisualizerConfiguration(visualizer);
+        return TimeSeriesVisualizer.createVisualizerConfiguration(visualizer);
     }
 
     private void configureVisualizer(VisualizerConfiguration config) {
-        VisualizerConfiguration.setVisualizerConfiguration(visualizer, config);
+        TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, config);
     }
 
     public class DemoMainFrame extends JFrame {

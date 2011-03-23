@@ -16,12 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
-import com.od.jtimeseries.ui.selector.table.ColumnSettings;
-import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 
@@ -37,7 +34,7 @@ import java.util.List;
  *
  * A bean to represent all visualizer configuration information
  */
-public class VisualizerConfiguration implements JTimeSeriesUIConfig {
+public class VisualizerConfiguration  {
 
     private String chartsTitle;
     private List<DisplayNamePattern> displayNamePatterns;
@@ -163,38 +160,6 @@ public class VisualizerConfiguration implements JTimeSeriesUIConfig {
 
     public void setIsIcon(boolean frameExtendedState) {
         this.isIcon = frameExtendedState;
-    }
-
-    public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
-        return new VisualizerConfiguration(
-            visualizer.getChartsTitle(),
-            visualizer.getDisplayNamePatterns(),
-            visualizer.isTableSelectorVisible(),
-            visualizer.getChartConfigs(),
-            visualizer.getChartRangeMode(),
-            visualizer.getDomainStartTimeSelection(),
-            visualizer.getDividerLocation(),
-            visualizer.isShowLegendOnChart(),
-            visualizer.getChartBackgroundColor(),
-            visualizer.getColumns()
-        );
-    }
-
-    public static void setVisualizerConfiguration(TimeSeriesVisualizer visualizer, VisualizerConfiguration c) {
-        visualizer.setChartsTitle(c.getChartsTitle());
-        visualizer.setDisplayNamePatterns(c.getDisplayNamePatterns());
-        visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
-        visualizer.addChartConfigs(c.getChartConfigs());
-        visualizer.setChartRangeMode(ChartRangeMode.valueOf(c.getChartRangeMode()));
-        visualizer.setDomainStartTimeSelection(c.getDomainStartTimeSelection());
-        visualizer.setDividerLocation(c.getDividorLocation());
-        visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
-        visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
-
-        //if there are no columns, assume we will use the default column set
-        if ( c.getTableColumns().size() > 0) {
-            visualizer.setColumns(c.getTableColumns());
-        }
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to

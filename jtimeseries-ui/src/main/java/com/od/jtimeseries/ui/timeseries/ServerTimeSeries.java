@@ -1,5 +1,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 

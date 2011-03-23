@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.net.httpd.HttpParameterName;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.ExecuteWeakReferencedCommandTask;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;

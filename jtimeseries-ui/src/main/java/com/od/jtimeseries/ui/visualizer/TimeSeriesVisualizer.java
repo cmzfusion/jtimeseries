@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
@@ -30,10 +31,10 @@ import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SeriesTransferable;
-import com.od.jtimeseries.ui.selector.table.ColumnSettings;
+import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.timeseries.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
@@ -98,6 +99,38 @@ public class TimeSeriesVisualizer extends JPanel {
         createSplitPane(chartPanel);
         layoutVisualizer();
         addSeriesSelectionListener();
+    }
+
+    public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
+        return new VisualizerConfiguration(
+            visualizer.getChartsTitle(),
+            visualizer.getDisplayNamePatterns(),
+            visualizer.isTableSelectorVisible(),
+            visualizer.getChartConfigs(),
+            visualizer.getChartRangeMode(),
+            visualizer.getDomainStartTimeSelection(),
+            visualizer.getDividerLocation(),
+            visualizer.isShowLegendOnChart(),
+            visualizer.getChartBackgroundColor(),
+            visualizer.getColumns()
+        );
+    }
+
+    public static void setVisualizerConfiguration(TimeSeriesVisualizer visualizer, VisualizerConfiguration c) {
+        visualizer.setChartsTitle(c.getChartsTitle());
+        visualizer.setDisplayNamePatterns(c.getDisplayNamePatterns());
+        visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
+        visualizer.addChartConfigs(c.getChartConfigs());
+        visualizer.setChartRangeMode(ChartRangeMode.valueOf(c.getChartRangeMode()));
+        visualizer.setDomainStartTimeSelection(c.getDomainStartTimeSelection());
+        visualizer.setDividerLocation(c.getDividorLocation());
+        visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
+        visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
+
+        //if there are no columns, assume we will use the default column set
+        if ( c.getTableColumns().size() > 0) {
+            visualizer.setColumns(c.getTableColumns());
+        }
     }
 
     private void createSeriesSelectionPanel() {

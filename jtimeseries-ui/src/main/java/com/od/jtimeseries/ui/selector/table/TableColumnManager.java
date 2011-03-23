@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import javax.swing.table.DefaultTableColumnModel;

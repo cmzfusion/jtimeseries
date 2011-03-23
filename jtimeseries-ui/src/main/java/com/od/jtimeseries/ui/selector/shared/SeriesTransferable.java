@@ -2,24 +2,19 @@ package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerNode;
-import com.od.jtimeseries.ui.visualizer.VisualizerConfiguration;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import od.configutil.ConfigManager;
 import od.configutil.ConfigManagerException;
 import od.configutil.FileSink;
-import org.omg.CORBA.PUBLIC_MEMBER;
-import org.omg.PortableInterceptor.ObjectReferenceFactory;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.LinkedList;
 import java.util.List;
@@ -76,7 +71,7 @@ public class SeriesTransferable implements Transferable {
         } else if ( flavor == DataFlavor.javaFileListFlavor ) {
             //System.out.println("Creating file list");
             List<VisualizerNode> visualizerContexts = selectionsModel.getSelected(VisualizerNode.class);
-            ConfigManager m = new ConfigManager();
+            ConfigManager m = new ConfigManagerForTimeSerious();
             List<File> files = new LinkedList<File>();
             for (VisualizerNode n : visualizerContexts) {
                 VisualizerConfiguration c = n.getVisualizerConfiguration();

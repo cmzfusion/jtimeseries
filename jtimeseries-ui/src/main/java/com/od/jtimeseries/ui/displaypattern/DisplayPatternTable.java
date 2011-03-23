@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.displaypattern;
 
 import com.jidesoft.grid.BeanTableModel;
 import com.jidesoft.grid.SortableTable;
+import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.action.ListSelectionActionModel;

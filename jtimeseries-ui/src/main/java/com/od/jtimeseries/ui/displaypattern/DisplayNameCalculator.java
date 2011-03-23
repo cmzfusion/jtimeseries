@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.displaypattern;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import java.lang.ref.WeakReference;

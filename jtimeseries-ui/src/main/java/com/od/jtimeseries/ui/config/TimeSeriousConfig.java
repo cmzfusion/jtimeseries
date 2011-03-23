@@ -1,6 +1,5 @@
 package com.od.jtimeseries.ui.config;
 
-import com.od.jtimeseries.ui.displaypattern.DisplayNamePattern;
 import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
 
 import java.awt.*;

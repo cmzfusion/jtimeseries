@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.selector.shared;
 
-import com.od.jtimeseries.ui.timeserious.VisualizerContext;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerNode;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
@@ -59,7 +59,7 @@ public class SeriesTransferable implements Transferable {
         if (flavor.equals(LIST_OF_IDENTIFIABLE_FLAVOR)) {
             result = true;
         } else if ( flavor.equals(DataFlavor.javaFileListFlavor )) {
-            result = selectionsModel.isSelectionLimitedToType(VisualizerContext.class);
+            result = selectionsModel.isSelectionLimitedToType(DesktopContext.class);
         }
         return result;
     }

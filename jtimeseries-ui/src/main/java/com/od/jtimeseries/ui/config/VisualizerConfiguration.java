@@ -33,7 +33,7 @@ import java.util.List;
  *
  * A bean to represent all visualizer configuration information
  */
-public class VisualizerConfiguration  {
+public class VisualizerConfiguration implements JTimeSeriesUIConfig  {
 
     private String chartsTitle;
     private List<DisplayNamePattern> displayNamePatterns;
@@ -47,6 +47,7 @@ public class VisualizerConfiguration  {
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameBounds;
     private boolean isIcon;
+    private boolean isShown;
 
     public VisualizerConfiguration() {
     }
@@ -159,6 +160,14 @@ public class VisualizerConfiguration  {
 
     public void setIsIcon(boolean frameExtendedState) {
         this.isIcon = frameExtendedState;
+    }
+
+    public boolean isShown() {
+        return isShown;
+    }
+
+    public void setShown(boolean shown) {
+        isShown = shown;
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to

@@ -11,11 +11,11 @@ import javax.swing.*;
  * Date: 11/03/11
  * Time: 12:15
  */
-public class VisualizerContextTreeNode extends AbstractSeriesSelectionTreeNode {
+public class DesktopContextTreeNode extends AbstractSeriesSelectionTreeNode {
 
-    private VisualizerContext context;
+    private DesktopContext context;
 
-    public VisualizerContextTreeNode(VisualizerContext context) {
+    public DesktopContextTreeNode(DesktopContext context) {
         this.context = context;
     }
 
@@ -23,7 +23,7 @@ public class VisualizerContextTreeNode extends AbstractSeriesSelectionTreeNode {
         return context.toString();
     }
 
-    protected VisualizerContext getIdentifiable() {
+    protected DesktopContext getIdentifiable() {
         return context;
     }
 

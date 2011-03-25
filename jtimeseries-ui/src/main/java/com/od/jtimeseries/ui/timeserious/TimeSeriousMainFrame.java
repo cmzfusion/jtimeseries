@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
@@ -31,11 +32,9 @@ import java.util.Arrays;
  */
 public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
-    public static final String MAIN_FRAME_NAME = "mainFrame";
-
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
-    private TimeSeriesDesktopPane mainDesktopPane;
+    private TimeSeriousDesktopPane mainDesktopPane;
     private MainSeriesSelector mainSeriesSelector;
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
@@ -58,7 +57,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             actionModels,
             serverDictionary
         );
-        this.mainDesktopPane = new TimeSeriesDesktopPane(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel());
+        this.mainDesktopPane = new TimeSeriousDesktopPane(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel(), rootContext.getMainDesktopContext());
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -140,10 +139,11 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        Rectangle frameLocation = config.getFrameLocation(MAIN_FRAME_NAME);
+        DesktopConfiguration c = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
+        Rectangle frameLocation = c.getFrameLocation();
         if ( frameLocation != null) {
             setBounds(frameLocation);
-            setExtendedState(config.getFrameExtendedState(MAIN_FRAME_NAME));
+            setExtendedState(c.getFrameExtendedState());
         } else {
             setSize(800, 600);
             setLocationRelativeTo(null);
@@ -163,8 +163,9 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        config.setFrameLocation(MAIN_FRAME_NAME, getBounds());
-        config.setFrameExtendedState(MAIN_FRAME_NAME, getExtendedState());
+        DesktopConfiguration c = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
+        c.setFrameLocation(getBounds());
+        c.setFrameExtendedState(getExtendedState());
         config.setSplitPaneLocationWhenTreeSelected(treeSplitPanePosition);
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }

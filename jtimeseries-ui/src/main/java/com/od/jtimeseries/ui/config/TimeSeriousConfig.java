@@ -1,8 +1,5 @@
 package com.od.jtimeseries.ui.config;
 
-import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
-
-import java.awt.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,22 +16,13 @@ public class TimeSeriousConfig implements JTimeSeriesUIConfig {
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
     private java.util.List<VisualizerConfiguration> hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();
 
-    private Map<String, Rectangle> frameLocations = new HashMap<String, Rectangle>();
-    private Map<String, Integer> frameExtendedStates = new HashMap<String, Integer>();
+    private Map<String, DesktopConfiguration> desktopConfigs = new HashMap<String, DesktopConfiguration>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
     private Integer splitPaneLocationWhenTableSelected = 400;
     private Integer splitPaneLocationWhenTreeSelected = 300;
     private boolean mainSeriesSelectorTableVisible;
 
     private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
-
-    public Rectangle getFrameLocation(String frameName) {
-        return frameLocations.get(frameName);
-    }
-
-    public void setFrameLocation(String frameName, Rectangle location) {
-        frameLocations.put(frameName, location);
-    }
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
         return visualizerConfigurations;
@@ -52,12 +40,17 @@ public class TimeSeriousConfig implements JTimeSeriesUIConfig {
         this.hiddenVisualizerConfigurations = hiddenVisualizerConfigurations;
     }
 
-    public void setFrameExtendedState(String frameName, int extendedState) {
-        frameExtendedStates.put(frameName, extendedState);
+    public DesktopConfiguration getOrCreateDesktopConfiguration(String desktopName) {
+        DesktopConfiguration c = this.desktopConfigs.get(desktopName);
+        if ( c == null) {
+            c = new DesktopConfiguration(desktopName);
+            this.desktopConfigs.put(desktopName, c);
+        }
+        return c;
     }
 
-    public Integer getFrameExtendedState(String frameName) {
-        return frameExtendedStates.get(frameName);
+    public void setDesktopConfigration(String desktopName, DesktopConfiguration c) {
+        this.desktopConfigs.put(desktopName, c);
     }
 
     public List<TimeSeriesServerConfig> getServerConfigs() {

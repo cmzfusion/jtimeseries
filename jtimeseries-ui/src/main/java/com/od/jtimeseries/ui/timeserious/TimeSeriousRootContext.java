@@ -4,15 +4,11 @@ import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.config.ConfigAware;
-import com.od.jtimeseries.ui.config.TimeSeriesServerConfig;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -35,18 +31,18 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
     private DisplayNameCalculator displayNameCalculator;
-    private VisualizerContext visualizerContext = new VisualizerContext();
+    private DesktopContext mainDesktopContext = new DesktopContext(DesktopConfiguration.MAIN_DESKTOP_NAME);
 
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
         this.displayNameCalculator = displayNameCalculator;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
         initializeFactoriesAndContextBusListener();
-        addChild(visualizerContext);
+        addChild(mainDesktopContext);
     }
 
-    public VisualizerContext getVisualizerContext() {
-        return visualizerContext;
+    public DesktopContext getMainDesktopContext() {
+        return mainDesktopContext;
     }
 
     protected ContextFactory createContextFactory() {
@@ -76,7 +72,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private void addHiddenVisualizerConfigurations(TimeSeriousConfig config) {
         List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
-        for (VisualizerNode v : visualizerContext.findAll(VisualizerNode.class).getAllMatches()) {
+        for (VisualizerNode v : mainDesktopContext.findAll(VisualizerNode.class).getAllMatches()) {
             if ( v.isVisualizerHidden() ) {
                 l.add(v.getVisualizerConfiguration());
             }
@@ -103,7 +99,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     private void restoreHiddenVisualizers(TimeSeriousConfig config) {
         for (VisualizerConfiguration c : config.getHiddenVisualizerConfigurations()) {
             VisualizerNode v = new VisualizerNode(c.getChartsTitle(), c);
-            visualizerContext.addChild(v);
+            mainDesktopContext.addChild(v);
         }
     }
 
@@ -112,7 +108,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     }
 
     public boolean containsVisualizerWithName(String name) {
-        return visualizerContext.contains(name);
+        return mainDesktopContext.contains(name);
     }
 
     //create ServerTimeSeries, which are lighter weight and not backed by an HttpTimeSeries

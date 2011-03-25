@@ -3,7 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
-import com.od.jtimeseries.ui.util.JTimeSeriesUIConfig;
+import com.od.jtimeseries.ui.config.JTimeSeriesUIConfig;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import od.configutil.ConfigManager;

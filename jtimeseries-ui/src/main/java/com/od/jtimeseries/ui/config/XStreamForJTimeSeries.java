@@ -17,5 +17,6 @@ public class XStreamForJTimeSeries extends XStream {
         alias("columnSettings", ColumnSettings.class);
         alias("timeSeriesServerConfig", TimeSeriesServerConfig.class);
         alias("displayNamePattern", DisplayNamePattern.class);
+        alias("desktopConfiguration", DesktopConfiguration.class);
     }
 }

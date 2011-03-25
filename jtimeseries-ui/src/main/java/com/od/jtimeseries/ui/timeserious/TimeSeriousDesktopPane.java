@@ -22,16 +22,18 @@ import java.util.*;
  * Date: 26-Mar-2010
  * Time: 17:49:07
  */
-public class TimeSeriesDesktopPane extends JDesktopPane implements ConfigAware {
+public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware {
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
+    private DesktopContext desktopContext;
 
-    public TimeSeriesDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel) {
+    public TimeSeriousDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
+        this.desktopContext = desktopContext;
         addUiBusEventListener();
         setTransferHandler(new DesktopPaneTransferHandler());
     }

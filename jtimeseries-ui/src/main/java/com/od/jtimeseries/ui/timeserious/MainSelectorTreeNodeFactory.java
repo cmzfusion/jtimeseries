@@ -21,8 +21,8 @@ public class MainSelectorTreeNodeFactory extends SelectorTreeNodeFactory<UIPrope
 
     public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {
         AbstractSeriesSelectionTreeNode result;
-        if ( identifiable instanceof VisualizerContext ) {
-            result = new VisualizerContextTreeNode((VisualizerContext)identifiable);
+        if ( identifiable instanceof DesktopContext) {
+            result = new DesktopContextTreeNode((DesktopContext)identifiable);
         } else if ( identifiable instanceof  VisualizerNode ) {
             result = new VisualizerTreeNode((VisualizerNode)identifiable);
         } else {

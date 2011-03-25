@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.util;
+package com.od.jtimeseries.ui.config;
 
 /**
  * Created by IntelliJ IDEA.

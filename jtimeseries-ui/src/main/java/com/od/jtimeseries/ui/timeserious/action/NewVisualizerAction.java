@@ -1,8 +1,8 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
+import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
@@ -28,29 +28,10 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
 
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isDesktopSelected()) {
-            String name = JOptionPane.showInputDialog(mainFrame, "Name for visualizer?", "Choose Name", JOptionPane.QUESTION_MESSAGE);
-            if ( name != null) {
-                name = name.trim();
-                name = name.length() == 0 ? "Visualizer" : name;
-                String nameProblem = IdentifiablePathUtils.checkId(name);
-                if ( nameProblem != null) {
-                    JOptionPane.showMessageDialog(
-                        mainFrame,
-                        nameProblem,
-                        "Invalid name for Visualizer",
-                        JOptionPane.WARNING_MESSAGE
-                    );
-                } else if ( rootContext.containsVisualizerWithName(name) ) {
-                    JOptionPane.showMessageDialog(
-                        mainFrame,
-                        "There is already a Visualizer with this name, please choose another",
-                        "Visualizer Already Exists",
-                        JOptionPane.WARNING_MESSAGE
-                    );
-                } else {
-                    getActionModel().getDesktop().createAndAddVisualizer(name);
-                }
-            }
+            String name = TimeSeriousDesktopPane.getVisualizerNameFromUser(
+                mainFrame, "Name for visualizer?", "Choose Name", ""
+            );
+            getActionModel().getDesktop().createAndAddVisualizer(name);
         }
     }
 }

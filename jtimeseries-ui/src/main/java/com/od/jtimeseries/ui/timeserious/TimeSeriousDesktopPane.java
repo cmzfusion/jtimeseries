@@ -10,11 +10,14 @@ import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFacto
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
+import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
+import java.awt.*;
 import java.beans.PropertyVetoException;
 import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,8 +42,21 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     public VisualizerInternalFrame createAndAddVisualizer(String title) {
+        title = checkVisualizerName(title);
         TimeSeriesVisualizer v = createVisualizer(title);
         return configureAndShowVisualizerFrame(null, v);
+    }
+
+    private String checkVisualizerName(String name) {
+        String nameProblem = IdentifiablePathUtils.checkId(name);
+        if ( nameProblem != null) {
+            name = getVisualizerNameFromUser(this, nameProblem + ", please correct the name", "Invalid Name", name);
+            name = checkVisualizerName(name);
+        } else if ( desktopContext.contains(name) ) {
+            name = getVisualizerNameFromUser(this, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
+            name = checkVisualizerName(name);
+        }
+        return name;
     }
 
     public void createAndAddVisualizer(VisualizerConfiguration c) {
@@ -141,6 +157,15 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
             timeSeriesServerDictionary,
             displayNameCalculator
         );
+    }
+
+    public static String getVisualizerNameFromUser(Component parent, String text, String title,  String defaultName) {
+        String name = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName).toString();
+        if ( name != null) {
+            name = name.trim();
+            name = name.length() == 0 ? "Visualizer" : name;
+        }
+        return name;
     }
 
 }

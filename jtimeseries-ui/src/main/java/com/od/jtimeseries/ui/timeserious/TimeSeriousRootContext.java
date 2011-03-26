@@ -107,10 +107,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         return Collections.emptyList();
     }
 
-    public boolean containsVisualizerWithName(String name) {
-        return mainDesktopContext.contains(name);
-    }
-
     //create ServerTimeSeries, which are lighter weight and not backed by an HttpTimeSeries
     //we don't want to create a RemoteHttpTimeSeries for every series in the main selector tree
     private class RootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {

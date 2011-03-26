@@ -82,11 +82,16 @@ public class DisplayPatternDialog extends JDialog {
 
     private JComponent createDescriptionPanel() {
         JPanel p = new JPanel();
-        JLabel label = new JLabel("<html><font color='blue'>This dialog allows you to set up regular expressions to calculate the display name " +
-                "for your timeseries from the series 'path'.<br><br>The expressions are automatically applied when downloading new series. " +
-                "The apply button will apply the expressions to the existing series in your view.</font></html>");
-        label.setPreferredSize(new Dimension(DIALOG_WIDTH - 15, 95));
-        p.add(label);
+        p.setLayout(new BorderLayout());
+        JEditorPane e = new JEditorPane();
+        e.setContentType("text/html");
+        e.setText("<html><font color='blue' size='-1'>" +
+            "Here you can set up regular expressions to calculate display names " +
+            "for your timeseries. The expressions are applied to the tree path for " +
+            "the series, so you can use capturing groups to include elements of the " +
+            "tree path in the display name.</font></html>");
+        //label.setPreferredSize(new Dimension(DIALOG_WIDTH - 15, 95));
+        p.add(e, BorderLayout.CENTER);
         return p;
     }
 

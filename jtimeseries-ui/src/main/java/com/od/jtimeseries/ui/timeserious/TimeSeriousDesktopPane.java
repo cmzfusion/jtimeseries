@@ -53,11 +53,9 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        config.setVisualizerConfigurations(getVisualizerConfigurations());
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        addVisualizers(config.getVisualizerConfigurations());
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

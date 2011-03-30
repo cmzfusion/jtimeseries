@@ -13,9 +13,6 @@ import java.util.Map;
  */
 public class TimeSeriousConfig implements JTimeSeriesUIConfig {
 
-    private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
-    private java.util.List<VisualizerConfiguration> hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();
-
     private Map<String, DesktopConfiguration> desktopConfigs = new HashMap<String, DesktopConfiguration>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
     private Integer splitPaneLocationWhenTableSelected = 400;
@@ -23,22 +20,6 @@ public class TimeSeriousConfig implements JTimeSeriesUIConfig {
     private boolean mainSeriesSelectorTableVisible;
 
     private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
-
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        return visualizerConfigurations;
-    }
-
-    public void setVisualizerConfigurations(List<VisualizerConfiguration> visualizerConfigurations) {
-        this.visualizerConfigurations = visualizerConfigurations;
-    }
-
-    public List<VisualizerConfiguration> getHiddenVisualizerConfigurations() {
-        return hiddenVisualizerConfigurations;
-    }
-
-    public void setHiddenVisualizerConfigurations(List<VisualizerConfiguration> hiddenVisualizerConfigurations) {
-        this.hiddenVisualizerConfigurations = hiddenVisualizerConfigurations;
-    }
 
     public DesktopConfiguration getOrCreateDesktopConfiguration(String desktopName) {
         DesktopConfiguration c = this.desktopConfigs.get(desktopName);
@@ -108,9 +89,6 @@ public class TimeSeriousConfig implements JTimeSeriesUIConfig {
         }
         if ( splitPaneLocationWhenTreeSelected == null ) {
             splitPaneLocationWhenTreeSelected = 300;
-        }
-        if ( hiddenVisualizerConfigurations == null ) {
-            hiddenVisualizerConfigurations = new LinkedList<VisualizerConfiguration>();
         }
         return this;
     }

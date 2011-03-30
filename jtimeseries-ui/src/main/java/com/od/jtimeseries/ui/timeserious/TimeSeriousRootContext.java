@@ -67,17 +67,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         config.setTimeSeriesServerConfigs(serverConfigs);
         config.setDisplayNamePatterns(displayNameCalculator.getDisplayNamePatterns());
 
-        addHiddenVisualizerConfigurations(config);
-    }
-
-    private void addHiddenVisualizerConfigurations(TimeSeriousConfig config) {
-        List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
-        for (VisualizerNode v : mainDesktopContext.findAll(VisualizerNode.class).getAllMatches()) {
-            if ( v.isVisualizerHidden() ) {
-                l.add(v.getVisualizerConfiguration());
-            }
-        }
-        config.setHiddenVisualizerConfigurations(l);
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
@@ -93,14 +82,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
             }
         }
         displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
-        restoreHiddenVisualizers(config);
-    }
-
-    private void restoreHiddenVisualizers(TimeSeriousConfig config) {
-        for (VisualizerConfiguration c : config.getHiddenVisualizerConfigurations()) {
-            VisualizerNode v = new VisualizerNode(c.getChartsTitle(), c);
-            mainDesktopContext.addChild(v);
-        }
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

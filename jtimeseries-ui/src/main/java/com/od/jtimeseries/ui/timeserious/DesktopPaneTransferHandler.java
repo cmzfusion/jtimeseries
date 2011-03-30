@@ -26,21 +26,12 @@ import java.io.IOException;
 public class DesktopPaneTransferHandler extends TransferHandler {
 
         public boolean canImport(TransferHandler.TransferSupport support) {
+            //System.out.println(support.getSourceDropActions());
             if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 return false;
             }
-
-            if ( support.getSourceDropActions() == MOVE) {
-                support.setDropAction(MOVE);
-                return true;
-            } else if ( support.getSourceDropActions() == COPY){
-                support.setDropAction(COPY);
-                return true;
-            } else if ( support.getSourceDropActions() == COPY_OR_MOVE){
-                support.setDropAction(COPY_OR_MOVE);
-                return true;
-            }
-            return false;
+            support.setDropAction(COPY);
+            return true;
         }
 
         public boolean importData(TransferHandler.TransferSupport support) {

@@ -47,7 +47,7 @@ public class VisualizerConfiguration implements JTimeSeriesUIConfig  {
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameBounds;
     private boolean isIcon;
-    private boolean isShown;
+    private boolean isShown = true;
     private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     public VisualizerConfiguration() {

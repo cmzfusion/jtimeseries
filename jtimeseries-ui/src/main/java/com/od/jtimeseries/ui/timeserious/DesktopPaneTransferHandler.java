@@ -29,8 +29,18 @@ public class DesktopPaneTransferHandler extends TransferHandler {
             if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 return false;
             }
-            support.setDropAction(COPY);
-            return true;
+
+            if ( support.getSourceDropActions() == MOVE) {
+                support.setDropAction(MOVE);
+                return true;
+            } else if ( support.getSourceDropActions() == COPY){
+                support.setDropAction(COPY);
+                return true;
+            } else if ( support.getSourceDropActions() == COPY_OR_MOVE){
+                support.setDropAction(COPY_OR_MOVE);
+                return true;
+            }
+            return false;
         }
 
         public boolean importData(TransferHandler.TransferSupport support) {
@@ -51,7 +61,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                             final VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
                             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
                                 public void sendEvent(TimeSeriousBusListener listener) {
-                                    listener.visualizerShown(c);
+                                    listener.visualizerImported(c);
                                 }
                             } );
                         }

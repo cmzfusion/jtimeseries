@@ -23,6 +23,9 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void visualizerFrameDisplayed(VisualizerInternalFrame f) {
     }
 
+    public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
+    }
+
     public void visualizerShown(VisualizerConfiguration c) {
     }
 

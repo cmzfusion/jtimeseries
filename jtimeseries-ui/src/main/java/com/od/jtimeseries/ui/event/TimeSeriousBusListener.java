@@ -38,4 +38,9 @@ public interface TimeSeriousBusListener {
      * @param internalFrame, null if the visualizer is currently hidden
      */
     void visualizerRemoved(VisualizerConfiguration visualizerConfiguration, VisualizerInternalFrame internalFrame);
+
+    /**
+     * A visualizer config was imported to timeserious from a config fle
+     */
+    void visualizerImported(VisualizerConfiguration visualizerConfiguration);
 }

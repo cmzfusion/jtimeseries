@@ -47,18 +47,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         return configureAndShowVisualizerFrame(null, v);
     }
 
-    private String checkVisualizerName(String name) {
-        String nameProblem = IdentifiablePathUtils.checkId(name);
-        if ( nameProblem != null) {
-            name = getVisualizerNameFromUser(this, nameProblem + ", please correct the name", "Invalid Name", name);
-            name = checkVisualizerName(name);
-        } else if ( desktopContext.contains(name) ) {
-            name = getVisualizerNameFromUser(this, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
-            name = checkVisualizerName(name);
-        }
-        return name;
-    }
-
     public void createAndAddVisualizer(VisualizerConfiguration c) {
         TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
         configureAndShowVisualizerFrame(c, visualizer);
@@ -98,6 +86,13 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         UIEventBus.getInstance().addEventListener(
             TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
+
+                public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
+                    String title = visualizerConfiguration.getChartsTitle();
+                    title = checkVisualizerName(title);
+                    visualizerConfiguration.setChartsTitle(title);
+                    createAndAddVisualizer(visualizerConfiguration);
+                }
 
                 public void visualizerShown(VisualizerConfiguration visualizerConfiguration) {
                     createAndAddVisualizer(visualizerConfiguration);
@@ -158,6 +153,19 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
             displayNameCalculator
         );
     }
+
+    private String checkVisualizerName(String name) {
+        String nameProblem = IdentifiablePathUtils.checkId(name);
+        if ( nameProblem != null) {
+            name = getVisualizerNameFromUser(this, nameProblem + ", please correct the name", "Invalid Name", name);
+            name = checkVisualizerName(name);
+        } else if ( desktopContext.contains(name) ) {
+            name = getVisualizerNameFromUser(this, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
+            name = checkVisualizerName(name);
+        }
+        return name;
+    }
+
 
     public static String getVisualizerNameFromUser(Component parent, String text, String title,  String defaultName) {
         String name = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName).toString();

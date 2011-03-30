@@ -57,7 +57,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
             actionModels,
             serverDictionary
         );
-        this.mainDesktopPane = new TimeSeriousDesktopPane(serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel(), rootContext.getMainDesktopContext());
+        this.mainDesktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel(), rootContext.getMainDesktopContext());
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -163,9 +163,6 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        DesktopConfiguration c = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
-        c.setFrameLocation(getBounds());
-        c.setFrameExtendedState(getExtendedState());
         config.setSplitPaneLocationWhenTreeSelected(treeSplitPanePosition);
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }

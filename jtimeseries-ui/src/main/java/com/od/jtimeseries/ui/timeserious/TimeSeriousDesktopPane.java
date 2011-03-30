@@ -10,11 +10,13 @@ import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFacto
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.List;
@@ -27,57 +29,105 @@ import java.util.List;
  */
 public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware {
 
-    private TimeSeriesServerDictionary timeSeriesServerDictionary;
-    private DisplayNameCalculator displayNameCalculator;
+    private JFrame parentFrame;
     private SeriesSelectionPanel mainSelectionPanel;
     private DesktopContext desktopContext;
+    private DesktopVisualizerFactory desktopVisualizerFactory;
 
-    public TimeSeriousDesktopPane(TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
-        this.timeSeriesServerDictionary = timeSeriesServerDictionary;
-        this.displayNameCalculator = displayNameCalculator;
+    public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
+        this.parentFrame = parentFrame;
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
         addUiBusEventListener();
+        addFrameListener();
+        addDesktopListener();
         setTransferHandler(new DesktopPaneTransferHandler());
+        desktopVisualizerFactory = new DesktopVisualizerFactory(this, desktopContext, timeSeriesServerDictionary, displayNameCalculator);
     }
 
-    public VisualizerInternalFrame createAndAddVisualizer(String title) {
-        title = checkVisualizerName(title);
-        TimeSeriesVisualizer v = createVisualizer(title);
-        return configureAndShowVisualizerFrame(null, v);
+    private void addDesktopListener() {
+        desktopContext.addTreeListener(new IdentifiableTreeListenerAdapter() {
+            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                for ( Identifiable c : contextTreeEvent.getNodes()) {
+                    if ( c instanceof VisualizerNode ) {
+                        VisualizerNode n = (VisualizerNode)c;
+                        if ( n.isShown()) {
+                            showVisualizerForNode(n);
+                        }
+                    }
+                }
+            }
+        });
     }
 
-    public void createAndAddVisualizer(VisualizerConfiguration c) {
-        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
-        configureAndShowVisualizerFrame(c, visualizer);
+    private void addFrameListener() {
+        parentFrame.addWindowStateListener(new WindowStateListener() {
+            public void windowStateChanged(WindowEvent e) {
+                desktopContext.setFrameExtendedState(parentFrame.getExtendedState());
+            }
+        });
+
+        parentFrame.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                desktopContext.setFrameLocation(parentFrame.getBounds());
+            }
+
+            public void componentMoved(ComponentEvent e) {
+                desktopContext.setFrameLocation(parentFrame.getBounds());
+            }
+        });
+    }
+
+    public VisualizerInternalFrame createNewVisualizer(String title) {
+        title = desktopVisualizerFactory.checkVisualizerName(title);
+        TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(title);
+        VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(v);
+        VisualizerNode node = createAndAddVisualizerNode(c, v);
+        return configureAndShowVisualizerFrame(null, v, node);
+    }
+
+    public void importVisualizer(VisualizerConfiguration c) {
+        TimeSeriesVisualizer visualizer = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
+        VisualizerNode node = createAndAddVisualizerNode(c, visualizer);
+        configureAndShowVisualizerFrame(c, visualizer, node);
+    }
+
+    private VisualizerNode createAndAddVisualizerNode(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
+        VisualizerNode n = new VisualizerNode(visualizer.getChartsTitle(), c);
+        desktopContext.addChild(n);
+        return n;
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        List<VisualizerNode> nodes = desktopContext.findAll(VisualizerNode.class).getAllMatches();
+        sortNodesByZPosition(nodes);
+        for ( VisualizerNode n : nodes) {
+            if ( ! n.isHidden() ) {
+                showVisualizerForNode(n);
+            }
+        }
+    }
+
+    private void showVisualizerForNode(VisualizerNode n) {
+        VisualizerConfiguration c = n.getVisualizerConfiguration();
+        TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
+        configureAndShowVisualizerFrame(c, v, n);
+    }
+
+    public void sortNodesByZPosition(List<VisualizerNode> nodes) {
+        //sort by z index, so we display them in the right order
+        Collections.sort(nodes, new Comparator<VisualizerNode>() {
+            public int compare(VisualizerNode o1, VisualizerNode o2) {
+                return ((Integer)o2.getZPosition()).compareTo(o1.getZPosition());
+            }
+        });
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
-    }
-
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
-        List<VisualizerConfiguration> l = new LinkedList<VisualizerConfiguration>();
-        for ( JInternalFrame v : getVisualizerFramesByPosition()) {
-            VisualizerInternalFrame vf = (VisualizerInternalFrame) v;
-            VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(vf.getVisualizer());
-            c.setIsIcon(v.isIcon());
-            c.setFrameBounds(v.getBounds());
-            l.add(c);
-        }
-        return l;
-    }
-
-    public void addVisualizers(List<VisualizerConfiguration> visualizerConfigurations) {
-        for (VisualizerConfiguration c : visualizerConfigurations) {
-            createAndAddVisualizer(c);
-        }
     }
 
     private void addUiBusEventListener() {
@@ -87,32 +137,21 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
 
                 public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
                     String title = visualizerConfiguration.getChartsTitle();
-                    title = checkVisualizerName(title);
+                    title = desktopVisualizerFactory.checkVisualizerName(title);
                     visualizerConfiguration.setChartsTitle(title);
-                    createAndAddVisualizer(visualizerConfiguration);
-                }
-
-                public void visualizerShown(VisualizerConfiguration visualizerConfiguration) {
-                    createAndAddVisualizer(visualizerConfiguration);
-                }
-
-                public void visualizerRemoved(VisualizerConfiguration c, VisualizerInternalFrame f) {
-                    if ( f != null ) {
-                        f.setVisible(false);
-                        remove(f);
-                    }
+                    importVisualizer(visualizerConfiguration);
                 }
             }
         );
     }
 
-    private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
+    private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerNode visualizerNode) {
         visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel
         ));
 
-        VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer);
+        VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer, this, visualizerNode);
         if ( c != null) {
             TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
             if ( c.getFrameBounds() != null) {
@@ -131,47 +170,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         return visualizerFrame;
     }
 
-    //a list of frames by z position, so that when we load the config and add them they reappear with the
-    //same z order
-    private JInternalFrame[] getVisualizerFramesByPosition() {
-        JInternalFrame[] jInternalFrames = getAllFrames();
-        Arrays.sort(jInternalFrames, new Comparator<JInternalFrame>() {
-                public int compare(JInternalFrame o1, JInternalFrame o2) {
-                    return Integer.valueOf(getPosition(o2)).compareTo(getPosition(o1));
-                }
-            }
-        );
-        return jInternalFrames;
-    }
 
-    private TimeSeriesVisualizer createVisualizer(String title) {
-        return new TimeSeriesVisualizer(
-            title,
-            timeSeriesServerDictionary,
-            displayNameCalculator
-        );
-    }
-
-    private String checkVisualizerName(String name) {
-        String nameProblem = IdentifiablePathUtils.checkId(name);
-        if ( nameProblem != null) {
-            name = getVisualizerNameFromUser(this, nameProblem + ", please correct the name", "Invalid Name", name);
-            name = checkVisualizerName(name);
-        } else if ( desktopContext.contains(name) ) {
-            name = getVisualizerNameFromUser(this, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
-            name = checkVisualizerName(name);
-        }
-        return name;
-    }
-
-
-    public static String getVisualizerNameFromUser(Component parent, String text, String title,  String defaultName) {
-        String name = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName).toString();
-        if ( name != null) {
-            name = name.trim();
-            name = name.length() == 0 ? "Visualizer" : name;
-        }
-        return name;
-    }
 
 }

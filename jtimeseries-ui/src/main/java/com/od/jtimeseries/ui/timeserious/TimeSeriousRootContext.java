@@ -66,7 +66,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
         config.setDisplayNamePatterns(displayNameCalculator.getDisplayNamePatterns());
-
+        config.setDesktopConfigration(DesktopConfiguration.MAIN_DESKTOP_NAME, mainDesktopContext.getDesktopConfiguration());
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
@@ -82,6 +82,8 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
             }
         }
         displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
+        DesktopConfiguration mainDesktopConfig = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
+        mainDesktopContext.setDesktopConfiguration(mainDesktopConfig);
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

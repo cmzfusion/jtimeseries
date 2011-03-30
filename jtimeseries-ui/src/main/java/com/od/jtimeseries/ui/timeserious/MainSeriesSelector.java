@@ -45,13 +45,6 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         );
 
         selectionPanel.setSelectorActionFactory(selectorActionFactory);
-
-        //add a bus listener to create visualizer tree nodes locally, for the main tree selector
-        UIEventBus.getInstance().addEventListener(
-                TimeSeriousBusListener.class,
-                new VisualizerTreeNodeBusListener(rootContext.getMainDesktopContext())
-        );
-
         addProxyingPropertyListeners();
 
         setLayout(new BorderLayout());

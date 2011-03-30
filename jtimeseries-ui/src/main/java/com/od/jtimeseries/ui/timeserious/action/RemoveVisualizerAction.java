@@ -35,11 +35,7 @@ public class RemoveVisualizerAction extends ModelDrivenAction<IdentifiableListAc
     public void actionPerformed(ActionEvent e) {
         List<VisualizerNode> nodes = getActionModel().getSelected(VisualizerNode.class);
         for ( final VisualizerNode n : nodes ) {
-            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-                public void sendEvent(TimeSeriousBusListener listener) {
-                    listener.visualizerRemoved(n.getVisualizerConfiguration(), n.getInternalFrame());
-                }
-            } );
+            n.setShown(false);
             visualizerContext.removeChild(n);
         }
     }

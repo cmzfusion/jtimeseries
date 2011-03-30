@@ -1,6 +1,14 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.ui.config.DesktopConfiguration;
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +18,53 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  */
 public class DesktopContext extends DefaultTimeSeriesContext {
 
-    public DesktopContext(String desktopName) {
-        super(desktopName, desktopName);
+    private int frameExtendedState;
+    private Rectangle frameLocation;
+
+    public DesktopContext(String name) {
+        super(name, name);
+    }
+
+    public List<VisualizerConfiguration> getVisualizerConfigurations() {
+        List<VisualizerConfiguration> result = new LinkedList<VisualizerConfiguration>();
+        for ( VisualizerNode n : findAll(VisualizerNode.class).getAllMatches()) {
+            VisualizerConfiguration c = n.getVisualizerConfiguration();
+            result.add(c);
+        }
+        return result;
+    }
+
+    public DesktopConfiguration getDesktopConfiguration() {
+        DesktopConfiguration d = new DesktopConfiguration(getId());
+        d.setVisualizerConfigurations(getVisualizerConfigurations());
+        d.setFrameExtendedState(frameExtendedState);
+        d.setFrameLocation(frameLocation);
+        return d;
+    }
+
+    public void setDesktopConfiguration(DesktopConfiguration c) {
+        Integer state = c.getFrameExtendedState();
+        frameExtendedState = state == null ? JFrame.NORMAL : state;
+        frameLocation = c.getFrameLocation();
+        for ( VisualizerConfiguration v : c.getVisualizerConfigurations()) {
+            VisualizerNode n = new VisualizerNode(v.getChartsTitle(), v);
+            addChild(n);
+        }
+    }
+
+    public int getFrameExtendedState() {
+        return frameExtendedState;
+    }
+
+    public void setFrameExtendedState(int frameExtendedState) {
+        this.frameExtendedState = frameExtendedState;
+    }
+
+    public Rectangle getFrameLocation() {
+        return frameLocation;
+    }
+
+    public void setFrameLocation(Rectangle frameLocation) {
+        this.frameLocation = frameLocation;
     }
 }

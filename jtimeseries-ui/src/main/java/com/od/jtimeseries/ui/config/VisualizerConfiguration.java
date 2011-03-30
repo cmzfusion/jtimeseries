@@ -48,6 +48,7 @@ public class VisualizerConfiguration implements JTimeSeriesUIConfig  {
     private Rectangle frameBounds;
     private boolean isIcon;
     private boolean isShown;
+    private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     public VisualizerConfiguration() {
     }
@@ -168,6 +169,14 @@ public class VisualizerConfiguration implements JTimeSeriesUIConfig  {
 
     public void setShown(boolean shown) {
         isShown = shown;
+    }
+
+    public int getZPosition() {
+        return zPosition;
+    }
+
+    public void setZPosition(int zPosition) {
+        this.zPosition = zPosition;
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to

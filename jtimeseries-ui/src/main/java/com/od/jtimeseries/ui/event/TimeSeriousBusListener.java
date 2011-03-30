@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
+import com.od.jtimeseries.ui.timeserious.VInternalFrame;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 
@@ -18,26 +19,11 @@ public interface TimeSeriousBusListener {
 
     void serverRemoved(TimeSeriesServer s);
 
-    void visualizerSelected(VisualizerInternalFrame visualizerFrame);
-
     void desktopSelected(TimeSeriousDesktopPane desktopPanel);
 
+    void visualizerSelected(VisualizerInternalFrame visualizerFrame);
+
     void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame);
-
-    void visualizerFrameDisplayed(VisualizerInternalFrame visualizerFrame);
-
-    /**
-     * A visualizer is imported from a saved config
-     * Also used to 'show' a hidden visualizer from the main selector tree
-     */
-    void visualizerShown(VisualizerConfiguration visualizerConfiguration);
-
-    /**
-     * A visualizer is removed from the application
-     * @param visualizerConfiguration, null if the visualizer is currently shown
-     * @param internalFrame, null if the visualizer is currently hidden
-     */
-    void visualizerRemoved(VisualizerConfiguration visualizerConfiguration, VisualizerInternalFrame internalFrame);
 
     /**
      * A visualizer config was imported to timeserious from a config fle

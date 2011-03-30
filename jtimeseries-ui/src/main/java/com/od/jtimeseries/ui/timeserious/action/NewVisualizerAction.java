@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
+import com.od.jtimeseries.ui.timeserious.DesktopVisualizerFactory;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
@@ -28,10 +28,10 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
 
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isDesktopSelected()) {
-            String name = TimeSeriousDesktopPane.getVisualizerNameFromUser(
-                mainFrame, "Name for visualizer?", "Choose Name", ""
+            String name = DesktopVisualizerFactory.getVisualizerNameFromUser(
+                    mainFrame, "Name for visualizer?", "Choose Name", ""
             );
-            getActionModel().getDesktop().createAndAddVisualizer(name);
+            getActionModel().getDesktop().createNewVisualizer(name);
         }
     }
 }

@@ -31,12 +31,8 @@ public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableLi
     public void actionPerformed(ActionEvent e) {
         List<VisualizerNode> nodes = getActionModel().getSelected(VisualizerNode.class);
         for ( final VisualizerNode n : nodes ) {
-            if ( n.isVisualizerHidden() ) {
-                UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-                    public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.visualizerShown(n.getVisualizerConfiguration());
-                    }
-                } );
+            if ( n.isHidden() ) {
+                n.setShown(true);
             }
         }
     }

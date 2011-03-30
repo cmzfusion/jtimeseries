@@ -4,6 +4,8 @@ import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
+import java.awt.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -12,42 +14,60 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
  */
 public class VisualizerNode extends IdentifiableBase {
 
-    private VisualizerInternalFrame internalFrame;              //will be null if visualizer frame is hidden
-    private VisualizerConfiguration visualizerConfiguration;    //will be null if visualizer frame is shown
-
-    public VisualizerNode(String visualizerName, VisualizerInternalFrame internalFrame) {
-        super(visualizerName, visualizerName);
-        this.internalFrame = internalFrame;
-    }
+    private VisualizerConfiguration visualizerConfiguration;
+    private VInternalFrame visualizerInternalFrame;
+    private boolean shown;
 
     public VisualizerNode(String visualizerName, VisualizerConfiguration visualizerConfiguration) {
         super(visualizerName, visualizerName);
         this.visualizerConfiguration = visualizerConfiguration;
-    }
-
-    public void hidden() {
-        visualizerConfiguration = TimeSeriesVisualizer.createVisualizerConfiguration(
-                internalFrame.getVisualizer()
-        );
-        visualizerConfiguration.setFrameBounds(internalFrame.getBounds());
-        internalFrame = null;
-    }
-
-    public void shown(VisualizerInternalFrame v) {
-        visualizerConfiguration = null;
-        internalFrame = v;
-    }
-
-    public boolean isVisualizerHidden() {
-        return internalFrame == null;
+        shown = visualizerConfiguration.isShown();
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {
-        return visualizerConfiguration == null ? TimeSeriesVisualizer.createVisualizerConfiguration(
-                internalFrame.getVisualizer()) : visualizerConfiguration;
+        return isShown() && visualizerInternalFrame != null ?
+            createVisualizerConfig() :
+            visualizerConfiguration;
     }
 
-    public VisualizerInternalFrame getInternalFrame() {
-        return internalFrame;
+    private VisualizerConfiguration createVisualizerConfig() {
+        VisualizerConfiguration c =  TimeSeriesVisualizer.createVisualizerConfiguration(
+            visualizerInternalFrame.getVisualizer()
+        );
+        c.setFrameBounds(visualizerInternalFrame.getBounds());
+        c.setZPosition(visualizerInternalFrame.getZPosition());
+        c.setIsIcon(visualizerInternalFrame.isIcon());
+        c.setShown(true);
+        return c;
+    }
+
+    public boolean isShown() {
+        return shown;
+    }
+
+    public boolean isHidden() {
+        return ! isShown();
+    }
+
+    public void setShown(boolean shown) {
+        if ( this.shown != shown) {
+            this.shown = shown;
+            if ( ! shown) {
+                visualizerConfiguration = createVisualizerConfig();
+                visualizerConfiguration.setShown(false);
+                visualizerInternalFrame = null;
+            }
+            fireNodeChanged("shown");
+        }
+    }
+
+    public void setVisualizerFrame(VInternalFrame frame) {
+        this.visualizerInternalFrame = frame;
+    }
+
+    public int getZPosition() {
+        return visualizerInternalFrame != null ?
+            visualizerInternalFrame.getZPosition() :
+            visualizerConfiguration.getZPosition();
     }
 }

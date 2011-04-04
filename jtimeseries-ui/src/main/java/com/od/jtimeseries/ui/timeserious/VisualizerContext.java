@@ -1,5 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
@@ -12,13 +15,13 @@ import java.awt.*;
  * Date: 10/03/11
  * Time: 08:34
  */
-public class VisualizerNode extends IdentifiableBase {
+public class VisualizerContext extends DefaultTimeSeriesContext implements ExportableConfigHolder {
 
     private VisualizerConfiguration visualizerConfiguration;
     private VInternalFrame visualizerInternalFrame;
     private boolean shown;
 
-    public VisualizerNode(String visualizerName, VisualizerConfiguration visualizerConfiguration) {
+    public VisualizerContext(String visualizerName, VisualizerConfiguration visualizerConfiguration) {
         super(visualizerName, visualizerName);
         this.visualizerConfiguration = visualizerConfiguration;
         shown = visualizerConfiguration.isShown();
@@ -69,5 +72,9 @@ public class VisualizerNode extends IdentifiableBase {
         return visualizerInternalFrame != null ?
             visualizerInternalFrame.getZPosition() :
             visualizerConfiguration.getZPosition();
+    }
+
+    public ExportableConfig getExportableConfig() {
+        return getVisualizerConfiguration();
     }
 }

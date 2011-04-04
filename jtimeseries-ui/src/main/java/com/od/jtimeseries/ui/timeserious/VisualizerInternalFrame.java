@@ -4,9 +4,11 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -23,7 +25,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
     private TimeSeriesVisualizer visualizer;
     private JDesktopPane desktopPane;
 
-    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerNode visualizerNode) {
+    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerNode) {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
         this.desktopPane = desktopPane;
@@ -61,15 +63,20 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
         //the visualizerNode is essentially the model for this frame view
         //although the user can hide the visualizer by closing the frame, we also have to monitor the shown state
         //of the node, and close the frame if it changes
-        visualizerNode.addTreeListener(new IdentifiableTreeListenerAdapter() {
-             public void nodeChanged(Identifiable node, Object changeDescription) {
-                if ( "shown".equals(changeDescription)) {
-                    if ( ! visualizerNode.isShown()) {
-                        dispose();
+        visualizerNode.addTreeListener(
+            AwtSafeListener.getAwtSafeListener(
+                new IdentifiableTreeListenerAdapter() {
+                    public void nodeChanged(Identifiable node, Object changeDescription) {
+                        if ("shown".equals(changeDescription)) {
+                            if (!visualizerNode.isShown()) {
+                                dispose();
+                            }
+                        }
                     }
-                }
-             }
-        });
+                },
+                IdentifiableTreeListener.class
+            )
+        );
     }
 
     public TimeSeriesVisualizer getVisualizer() {

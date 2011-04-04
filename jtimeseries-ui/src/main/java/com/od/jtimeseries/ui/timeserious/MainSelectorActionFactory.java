@@ -51,7 +51,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
             result = Arrays.asList(
                 addSeriesAction
             );
-        } else if ( selectionModel.isSelectionLimitedToType(VisualizerNode.class)) {
+        } else if ( selectionModel.isSelectionLimitedToType(VisualizerContext.class)) {
             result = Arrays.asList(
                 showHiddenVisualizerAction,
                 removeVisualizerAction

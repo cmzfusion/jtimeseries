@@ -1,12 +1,9 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.timeserious.VisualizerNode;
+import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -25,12 +22,12 @@ public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableLi
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(VisualizerNode.class);
+        return getActionModel().isSelectionLimitedToType(VisualizerContext.class);
     }
 
     public void actionPerformed(ActionEvent e) {
-        List<VisualizerNode> nodes = getActionModel().getSelected(VisualizerNode.class);
-        for ( final VisualizerNode n : nodes ) {
+        List<VisualizerContext> nodes = getActionModel().getSelected(VisualizerContext.class);
+        for ( final VisualizerContext n : nodes ) {
             if ( n.isHidden() ) {
                 n.setShown(true);
             }

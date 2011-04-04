@@ -1,9 +1,9 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
-import com.od.jtimeseries.ui.config.JTimeSeriesUIConfig;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import od.configutil.ConfigManager;
@@ -48,7 +48,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                 ConfigManager cm = new ConfigManagerForTimeSerious();
                 for (Object f : l) {
                     try {
-                        JTimeSeriesUIConfig uiConfig = cm.loadConfig("fromFile", JTimeSeriesUIConfig.class, new FileSource((File)f));  if ( uiConfig instanceof VisualizerConfiguration) {
+                        ExportableConfig uiConfig = cm.loadConfig("fromFile", ExportableConfig.class, new FileSource((File)f));  if ( uiConfig instanceof VisualizerConfiguration) {
                             final VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
                             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
                                 public void sendEvent(TimeSeriousBusListener listener) {

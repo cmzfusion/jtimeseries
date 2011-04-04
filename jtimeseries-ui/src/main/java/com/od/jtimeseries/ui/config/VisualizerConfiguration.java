@@ -33,7 +33,7 @@ import java.util.List;
  *
  * A bean to represent all visualizer configuration information
  */
-public class VisualizerConfiguration implements JTimeSeriesUIConfig  {
+public class VisualizerConfiguration implements ExportableConfig {
 
     private String chartsTitle;
     private List<DisplayNamePattern> displayNamePatterns;

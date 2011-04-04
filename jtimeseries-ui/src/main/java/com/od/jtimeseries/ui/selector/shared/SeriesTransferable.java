@@ -1,7 +1,8 @@
 package com.od.jtimeseries.ui.selector.shared;
 
+import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.VisualizerNode;
+import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -49,7 +50,7 @@ public class SeriesTransferable implements Transferable {
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return ( selectionsModel.isSelectionLimitedToType(VisualizerNode.class)) ?
+        return ( selectionsModel.isSelectionLimitedToType(ExportableConfigHolder.class)) ?
          new DataFlavor[] { DataFlavor.javaFileListFlavor } :
          new DataFlavor[] { LIST_OF_IDENTIFIABLE_FLAVOR };
     }
@@ -70,10 +71,10 @@ public class SeriesTransferable implements Transferable {
             result = selectionsModel.getSelected();
         } else if ( flavor == DataFlavor.javaFileListFlavor ) {
             //System.out.println("Creating file list");
-            List<VisualizerNode> visualizerContexts = selectionsModel.getSelected(VisualizerNode.class);
+            List<VisualizerContext> visualizerContexts = selectionsModel.getSelected(VisualizerContext.class);
             ConfigManager m = new ConfigManagerForTimeSerious();
             List<File> files = new LinkedList<File>();
-            for (VisualizerNode n : visualizerContexts) {
+            for (VisualizerContext n : visualizerContexts) {
                 VisualizerConfiguration c = n.getVisualizerConfiguration();
                 String encodedTitle = URLEncoder.encode(c.getChartsTitle(), "UTF-8");
 

@@ -12,8 +12,10 @@ import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.UIEventBus;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -46,18 +48,21 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     private void addDesktopListener() {
-        desktopContext.addTreeListener(new IdentifiableTreeListenerAdapter() {
-            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                for ( Identifiable c : contextTreeEvent.getNodes()) {
-                    if ( c instanceof VisualizerNode ) {
-                        VisualizerNode n = (VisualizerNode)c;
-                        if ( n.isShown()) {
-                            showVisualizerForNode(n);
+        desktopContext.addTreeListener(
+            AwtSafeListener.getAwtSafeListener(new IdentifiableTreeListenerAdapter() {
+                public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+                    for ( Identifiable c : contextTreeEvent.getNodes()) {
+                        if ( c instanceof VisualizerContext) {
+                            VisualizerContext n = (VisualizerContext)c;
+                            if ( n.isShown()) {
+                                showVisualizerForNode(n);
+                            }
                         }
                     }
                 }
-            }
-        });
+            },
+            IdentifiableTreeListener.class)
+        );
     }
 
     private void addFrameListener() {
@@ -82,18 +87,18 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         title = desktopVisualizerFactory.checkVisualizerName(title);
         TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(title);
         VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(v);
-        VisualizerNode node = createAndAddVisualizerNode(c, v);
+        VisualizerContext node = createAndAddVisualizerNode(c, v);
         return configureAndShowVisualizerFrame(null, v, node);
     }
 
     public void importVisualizer(VisualizerConfiguration c) {
         TimeSeriesVisualizer visualizer = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
-        VisualizerNode node = createAndAddVisualizerNode(c, visualizer);
+        VisualizerContext node = createAndAddVisualizerNode(c, visualizer);
         configureAndShowVisualizerFrame(c, visualizer, node);
     }
 
-    private VisualizerNode createAndAddVisualizerNode(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
-        VisualizerNode n = new VisualizerNode(visualizer.getChartsTitle(), c);
+    private VisualizerContext createAndAddVisualizerNode(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
+        VisualizerContext n = new VisualizerContext(visualizer.getChartsTitle(), c);
         desktopContext.addChild(n);
         return n;
     }
@@ -102,25 +107,25 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        List<VisualizerNode> nodes = desktopContext.findAll(VisualizerNode.class).getAllMatches();
+        List<VisualizerContext> nodes = desktopContext.findAll(VisualizerContext.class).getAllMatches();
         sortNodesByZPosition(nodes);
-        for ( VisualizerNode n : nodes) {
+        for ( VisualizerContext n : nodes) {
             if ( ! n.isHidden() ) {
                 showVisualizerForNode(n);
             }
         }
     }
 
-    private void showVisualizerForNode(VisualizerNode n) {
+    private void showVisualizerForNode(VisualizerContext n) {
         VisualizerConfiguration c = n.getVisualizerConfiguration();
         TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
         configureAndShowVisualizerFrame(c, v, n);
     }
 
-    public void sortNodesByZPosition(List<VisualizerNode> nodes) {
+    public void sortNodesByZPosition(List<VisualizerContext> nodes) {
         //sort by z index, so we display them in the right order
-        Collections.sort(nodes, new Comparator<VisualizerNode>() {
-            public int compare(VisualizerNode o1, VisualizerNode o2) {
+        Collections.sort(nodes, new Comparator<VisualizerContext>() {
+            public int compare(VisualizerContext o1, VisualizerContext o2) {
                 return ((Integer)o2.getZPosition()).compareTo(o1.getZPosition());
             }
         });
@@ -145,7 +150,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         );
     }
 
-    private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerNode visualizerNode) {
+    private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerContext visualizerNode) {
         visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel

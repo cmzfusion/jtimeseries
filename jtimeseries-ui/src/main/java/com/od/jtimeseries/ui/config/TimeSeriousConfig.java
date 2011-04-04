@@ -11,7 +11,7 @@ import java.util.Map;
  * Date: 29-Apr-2010
  * Time: 08:13:11
  */
-public class TimeSeriousConfig implements JTimeSeriesUIConfig {
+public class TimeSeriousConfig implements ExportableConfig {
 
     private Map<String, DesktopConfiguration> desktopConfigs = new HashMap<String, DesktopConfiguration>();
     private List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();

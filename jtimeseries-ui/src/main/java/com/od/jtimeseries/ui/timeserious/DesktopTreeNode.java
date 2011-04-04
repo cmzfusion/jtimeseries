@@ -11,11 +11,11 @@ import javax.swing.*;
  * Date: 11/03/11
  * Time: 12:15
  */
-public class DesktopContextTreeNode extends AbstractSeriesSelectionTreeNode {
+public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
 
     private DesktopContext context;
 
-    public DesktopContextTreeNode(DesktopContext context) {
+    public DesktopTreeNode(DesktopContext context) {
         this.context = context;
     }
 

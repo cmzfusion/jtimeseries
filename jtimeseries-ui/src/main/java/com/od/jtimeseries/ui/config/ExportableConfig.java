@@ -6,6 +6,6 @@ package com.od.jtimeseries.ui.config;
  * Date: 21/03/11
  * Time: 17:12
  */
-public interface JTimeSeriesUIConfig {
+public interface ExportableConfig {
 
 }

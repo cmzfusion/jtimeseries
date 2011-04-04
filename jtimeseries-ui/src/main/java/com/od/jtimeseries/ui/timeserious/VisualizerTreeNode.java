@@ -13,9 +13,9 @@ import javax.swing.*;
  */
 public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
 
-    private VisualizerNode identifiable;
+    private VisualizerContext identifiable;
 
-    public VisualizerTreeNode(VisualizerNode identifiable) {
+    public VisualizerTreeNode(VisualizerContext identifiable) {
         this.identifiable = identifiable;
     }
 
@@ -24,7 +24,7 @@ public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
     }
 
     @Override
-    protected VisualizerNode getIdentifiable() {
+    protected VisualizerContext getIdentifiable() {
         return identifiable;
     }
 

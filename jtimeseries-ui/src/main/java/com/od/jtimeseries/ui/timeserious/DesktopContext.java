@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
-import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +26,7 @@ public class DesktopContext extends DefaultTimeSeriesContext {
 
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
         List<VisualizerConfiguration> result = new LinkedList<VisualizerConfiguration>();
-        for ( VisualizerNode n : findAll(VisualizerNode.class).getAllMatches()) {
+        for ( VisualizerContext n : findAll(VisualizerContext.class).getAllMatches()) {
             VisualizerConfiguration c = n.getVisualizerConfiguration();
             result.add(c);
         }
@@ -47,7 +46,7 @@ public class DesktopContext extends DefaultTimeSeriesContext {
         frameExtendedState = state == null ? JFrame.NORMAL : state;
         frameLocation = c.getFrameLocation();
         for ( VisualizerConfiguration v : c.getVisualizerConfigurations()) {
-            VisualizerNode n = new VisualizerNode(v.getChartsTitle(), v);
+            VisualizerContext n = new VisualizerContext(v.getChartsTitle(), v);
             addChild(n);
         }
     }

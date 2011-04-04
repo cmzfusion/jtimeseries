@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.selector.shared;
 
-import com.od.jtimeseries.ui.timeserious.VisualizerNode;
+import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -23,7 +23,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     }
 
     public int getSourceActions(JComponent c) {
-        return selectionsModel.isSelectionLimitedToType(VisualizerNode.class) ?
+        return selectionsModel.isSelectionLimitedToType(VisualizerContext.class) ?
             MOVE : COPY;
         //visualizers can be copied to desktop, but the action is a move,
         //to move the temp file created to the chosen filesystem location

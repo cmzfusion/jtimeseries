@@ -2,6 +2,8 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
+import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 
 import javax.swing.*;
@@ -15,7 +17,7 @@ import java.util.List;
  * Date: 10/03/11
  * Time: 08:37
  */
-public class DesktopContext extends DefaultTimeSeriesContext {
+public class DesktopContext extends DefaultTimeSeriesContext implements ExportableConfigHolder {
 
     private int frameExtendedState;
     private Rectangle frameLocation;
@@ -65,5 +67,13 @@ public class DesktopContext extends DefaultTimeSeriesContext {
 
     public void setFrameLocation(Rectangle frameLocation) {
         this.frameLocation = frameLocation;
+    }
+
+    public ExportableConfig getExportableConfig() {
+        return getDesktopConfiguration();
+    }
+
+    public String getDefaultFileName() {
+        return "timeSeriousDesktop_" + getId();
     }
 }

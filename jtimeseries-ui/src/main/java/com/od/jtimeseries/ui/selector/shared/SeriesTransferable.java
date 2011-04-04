@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.selector.shared;
 
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
@@ -71,22 +72,22 @@ public class SeriesTransferable implements Transferable {
             result = selectionsModel.getSelected();
         } else if ( flavor == DataFlavor.javaFileListFlavor ) {
             //System.out.println("Creating file list");
-            List<VisualizerContext> visualizerContexts = selectionsModel.getSelected(VisualizerContext.class);
+            List<ExportableConfigHolder> visualizerContexts = selectionsModel.getSelected(ExportableConfigHolder.class);
             ConfigManager m = new ConfigManagerForTimeSerious();
             List<File> files = new LinkedList<File>();
-            for (VisualizerContext n : visualizerContexts) {
-                VisualizerConfiguration c = n.getVisualizerConfiguration();
-                String encodedTitle = URLEncoder.encode(c.getChartsTitle(), "UTF-8");
+            for (ExportableConfigHolder n : visualizerContexts) {
+                ExportableConfig c = n.getExportableConfig();
+                String encodedTitle = URLEncoder.encode(n.getDefaultFileName(), "UTF-8");
 
                 File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-                File tmpFile = new File(tmpDir, "timeSeriousVisualizer_" + encodedTitle + ".xml");
+                File tmpFile = new File(tmpDir, encodedTitle + ".xml");
 
                 try {
-                    m.saveConfig("visualizer", c, new FileSink(tmpFile));
+                    m.saveConfig("exportableConfig", c, new FileSink(tmpFile));
                     files.add(tmpFile);
                     tmpFile.deleteOnExit();
                 } catch (ConfigManagerException e) {
-                    logMethods.logError("Failed to write temporary visualizer config", e);
+                    logMethods.logError("Failed to write temporary exportable config", e);
                 }
             }
             result = files;

@@ -104,7 +104,6 @@ public class TimeSeriesVisualizer extends JPanel {
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
         return new VisualizerConfiguration(
             visualizer.getChartsTitle(),
-            visualizer.getDisplayNamePatterns(),
             visualizer.isTableSelectorVisible(),
             visualizer.getChartConfigs(),
             visualizer.getChartRangeMode(),
@@ -118,7 +117,6 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public static void setVisualizerConfiguration(TimeSeriesVisualizer visualizer, VisualizerConfiguration c) {
         visualizer.setChartsTitle(c.getChartsTitle());
-        visualizer.setDisplayNamePatterns(c.getDisplayNamePatterns());
         visualizer.setTableSelectorVisible(c.isTableSelectorVisible());
         visualizer.addChartConfigs(c.getChartConfigs());
         visualizer.setChartRangeMode(ChartRangeMode.valueOf(c.getChartRangeMode()));

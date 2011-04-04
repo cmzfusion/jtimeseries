@@ -10,7 +10,7 @@ import java.util.List;
  * Date: 25/03/11
  * Time: 06:56
  */
-public class DesktopConfiguration {
+public class DesktopConfiguration implements ExportableConfig {
 
     public static final String MAIN_DESKTOP_NAME = "Main Desktop";
 

@@ -77,4 +77,8 @@ public class VisualizerContext extends DefaultTimeSeriesContext implements Expor
     public ExportableConfig getExportableConfig() {
         return getVisualizerConfiguration();
     }
+
+    public String getDefaultFileName() {
+        return "timeSeriousVisualizer_" + getId();
+    }
 }

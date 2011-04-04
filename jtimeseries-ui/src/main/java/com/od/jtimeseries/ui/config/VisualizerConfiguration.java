@@ -36,7 +36,6 @@ import java.util.List;
 public class VisualizerConfiguration implements ExportableConfig {
 
     private String chartsTitle;
-    private List<DisplayNamePattern> displayNamePatterns;
     private boolean tableSelectorVisible;
     private List<UiTimeSeriesConfig> chartConfigs;
     private int dividorLocation;
@@ -53,10 +52,9 @@ public class VisualizerConfiguration implements ExportableConfig {
     public VisualizerConfiguration() {
     }
 
-    public VisualizerConfiguration(String chartsTitle, List<DisplayNamePattern> displayNamePatterns, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
+    public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
                                    ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
         this.chartsTitle = chartsTitle;
-        this.displayNamePatterns = displayNamePatterns;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
         this.domainStartTimeSelection = domainStartTimeSelection;
@@ -73,14 +71,6 @@ public class VisualizerConfiguration implements ExportableConfig {
 
     public void setChartsTitle(String chartsTitle) {
         this.chartsTitle = chartsTitle;
-    }
-
-    public List<DisplayNamePattern> getDisplayNamePatterns() {
-        return displayNamePatterns;
-    }
-
-    public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
-        this.displayNamePatterns = displayNamePatterns;
     }
 
     public DomainTimeSelection getDomainStartTimeSelection() {

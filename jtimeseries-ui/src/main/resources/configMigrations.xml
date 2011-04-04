@@ -22,5 +22,13 @@
         <string>Refresh Frequency\(s\)</string>
       </arguments>
     </migration>
+     <migration> <!-- remove old display name patterns -->
+      <targetVersion>201104041710</targetVersion>
+      <migrationClass>od.configutil.XPathMigrationStrategy</migrationClass>
+      <arguments>
+        <string>descendant-or-self::displayNamePatterns</string>
+        <string>REMOVE NODE</string>
+      </arguments>
+    </migration>
   </migrationList>
 </configManager>

@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.timeserious.DesktopVisualizerFactory;
+import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
@@ -28,7 +28,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
 
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isDesktopSelected()) {
-            String name = DesktopVisualizerFactory.getVisualizerNameFromUser(
+            String name = ContextNameCheckUtility.getNameFromUser(
                     mainFrame, "Name for visualizer?", "Choose Name", ""
             );
             getActionModel().getDesktop().createNewVisualizer(name);

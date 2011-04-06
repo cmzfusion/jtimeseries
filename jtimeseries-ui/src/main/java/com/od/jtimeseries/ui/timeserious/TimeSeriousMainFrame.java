@@ -41,17 +41,18 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private NewVisualizerAction newVisualizerAction;
     private NewServerAction newServerAction;
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
-    private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
+    private DisplayNameCalculator displayNameCalculator;
     private UiTimeSeriesServerDictionary serverDictionary;
     private AbstractAction exitAction;
     private final JSplitPane splitPane = new JSplitPane();
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext) {
         this.serverDictionary = serverDictionary;
         this.exitAction = exitAction;
-        this.rootContext = new TimeSeriousRootContext(serverDictionary, displayNameCalculator);
+        this.displayNameCalculator = displayNameCalculator;
+        this.rootContext = rootContext;
         this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             actionModels,
@@ -159,7 +160,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(rootContext, mainSeriesSelector, mainDesktopPane);
+        return Arrays.asList((ConfigAware)mainSeriesSelector, mainDesktopPane);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {

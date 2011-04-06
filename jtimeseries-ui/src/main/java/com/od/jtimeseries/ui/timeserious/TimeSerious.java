@@ -2,6 +2,8 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpServer;
+import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
@@ -20,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,18 +32,21 @@ import java.io.IOException;
  *
  * Standalone UI for time series exploration
  */
-public class TimeSerious {
+public class TimeSerious implements ConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSerious.class);
 
     private ConfigInitializer configManager = new ConfigInitializer();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction());
+    private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
+    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator);
+    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction(), displayNameCalculator, rootContext);
     private TimeSeriousConfig config;
-    private ConfigAwareTreeManager configTree = new ConfigAwareTreeManager(mainFrame);
+    private ConfigAwareTreeManager configTree;
 
-    public TimeSerious() {
+    public void start() {
+        configTree = new ConfigAwareTreeManager(this);
 
         startJmxAndLocalHttpd();
         setupServerDictionary();
@@ -64,6 +70,18 @@ public class TimeSerious {
                 }
             }
         });
+    }
+
+    public void prepareConfigForSave(TimeSeriousConfig config) {
+        config.setDisplayNamePatterns(displayNameCalculator.getDisplayNamePatterns());
+    }
+
+    public void restoreConfig(TimeSeriousConfig config) {
+        displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
+    }
+
+    public java.util.List<ConfigAware> getConfigAwareChildren() {
+        return Arrays.asList(rootContext, mainFrame);
     }
 
     private class ExitAction extends AbstractAction {
@@ -119,7 +137,7 @@ public class TimeSerious {
                     e.printStackTrace();
                 }
 
-                new TimeSerious();
+                new TimeSerious().start();
             }
         });
 

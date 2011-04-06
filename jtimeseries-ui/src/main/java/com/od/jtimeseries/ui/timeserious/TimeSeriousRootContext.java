@@ -65,7 +65,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
             serverConfigs.add(new TimeSeriesServerConfig(c));
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
-        config.setDisplayNamePatterns(displayNameCalculator.getDisplayNamePatterns());
         config.setDesktopConfigration(DesktopConfiguration.MAIN_DESKTOP_NAME, mainDesktopContext.getDesktopConfiguration());
     }
 
@@ -81,7 +80,6 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
                 logMethods.logError("Could not create server " + serverDictionary, e);
             }
         }
-        displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
         DesktopConfiguration mainDesktopConfig = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
         mainDesktopContext.setDesktopConfiguration(mainDesktopConfig);
     }

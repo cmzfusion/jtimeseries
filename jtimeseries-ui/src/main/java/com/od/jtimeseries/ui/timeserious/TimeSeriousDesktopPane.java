@@ -32,19 +32,23 @@ import java.util.List;
 public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware {
 
     private JFrame parentFrame;
+    private TimeSeriesServerDictionary timeSeriesServerDictionary;
+    private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
     private DesktopContext desktopContext;
-    private DesktopVisualizerFactory desktopVisualizerFactory;
+    private ContextNameCheckUtility nameCheckUtility;
 
     public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
         this.parentFrame = parentFrame;
+        this.timeSeriesServerDictionary = timeSeriesServerDictionary;
+        this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
+        this.nameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
         addUiBusEventListener();
         addFrameListener();
         addDesktopListener();
         setTransferHandler(new DesktopPaneTransferHandler());
-        desktopVisualizerFactory = new DesktopVisualizerFactory(this, desktopContext, timeSeriesServerDictionary, displayNameCalculator);
     }
 
     private void addDesktopListener() {
@@ -84,17 +88,26 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     public VisualizerInternalFrame createNewVisualizer(String title) {
-        title = desktopVisualizerFactory.checkVisualizerName(title);
-        TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(title);
+        title = nameCheckUtility.checkName(title);
+        TimeSeriesVisualizer v = createVisualizer(title);
         VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(v);
         VisualizerContext node = createAndAddVisualizerNode(c, v);
         return configureAndShowVisualizerFrame(null, v, node);
     }
 
     public void importVisualizer(VisualizerConfiguration c) {
-        TimeSeriesVisualizer visualizer = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
+        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
         VisualizerContext node = createAndAddVisualizerNode(c, visualizer);
         configureAndShowVisualizerFrame(c, visualizer, node);
+    }
+
+
+    private TimeSeriesVisualizer createVisualizer(String title) {
+        return new TimeSeriesVisualizer(
+            title,
+            timeSeriesServerDictionary,
+            displayNameCalculator
+        );
     }
 
     private VisualizerContext createAndAddVisualizerNode(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
@@ -107,6 +120,8 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        //visualizer nodes should already have been created within the desktopContext
+        //find those that should be shown, and show them
         List<VisualizerContext> nodes = desktopContext.findAll(VisualizerContext.class).getAllMatches();
         sortNodesByZPosition(nodes);
         for ( VisualizerContext n : nodes) {
@@ -118,11 +133,13 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
 
     private void showVisualizerForNode(VisualizerContext n) {
         VisualizerConfiguration c = n.getVisualizerConfiguration();
-        TimeSeriesVisualizer v = desktopVisualizerFactory.createVisualizer(c.getChartsTitle());
+        //here we are showing the visualizer for an existing visualizerNode rather
+        //than creating a new visualizer, so no need to check the name
+        TimeSeriesVisualizer v = createVisualizer(c.getChartsTitle());
         configureAndShowVisualizerFrame(c, v, n);
     }
 
-    public void sortNodesByZPosition(List<VisualizerContext> nodes) {
+    private void sortNodesByZPosition(List<VisualizerContext> nodes) {
         //sort by z index, so we display them in the right order
         Collections.sort(nodes, new Comparator<VisualizerContext>() {
             public int compare(VisualizerContext o1, VisualizerContext o2) {
@@ -142,7 +159,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
 
                 public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
                     String title = visualizerConfiguration.getChartsTitle();
-                    title = desktopVisualizerFactory.checkVisualizerName(title);
+                    title = nameCheckUtility.checkName(title);
                     visualizerConfiguration.setChartsTitle(title);
                     importVisualizer(visualizerConfiguration);
                 }
@@ -174,7 +191,4 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         }
         return visualizerFrame;
     }
-
-
-
 }

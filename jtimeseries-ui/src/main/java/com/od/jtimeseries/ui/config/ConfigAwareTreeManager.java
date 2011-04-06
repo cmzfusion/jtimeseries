@@ -20,7 +20,6 @@ public class ConfigAwareTreeManager {
         this.rootNode = rootNode;
     }
 
-
     public void prepareConfigForSave(TimeSeriousConfig config) {
         List<ConfigAware> flattenedTree = getFlattenedTree();
         for ( ConfigAware c : flattenedTree) {
@@ -44,10 +43,10 @@ public class ConfigAwareTreeManager {
 
 
     private void addFromNode(ConfigAware node, List<ConfigAware> flattenedTree) {
+        flattenedTree.add(node);
         for (ConfigAware c : node.getConfigAwareChildren()) {
             addFromNode(c, flattenedTree);
         }
-        flattenedTree.add(node);
     }
 
 }

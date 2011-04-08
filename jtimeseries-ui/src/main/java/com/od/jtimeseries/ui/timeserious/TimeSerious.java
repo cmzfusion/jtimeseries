@@ -9,7 +9,6 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
-import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -17,10 +16,6 @@ import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.*;
 
@@ -36,40 +31,35 @@ public class TimeSerious implements ConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSerious.class);
 
-    private ConfigInitializer configManager = new ConfigInitializer();
+    private ConfigInitializer configInitializer = new ConfigInitializer();
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
     private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator);
-    private TimeSeriousMainFrame mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, new ExitAction(), displayNameCalculator, rootContext);
+    private ConfigAwareTreeManager configTree  = new ConfigAwareTreeManager(this);
+    private ExitAction exitAction = new ExitAction(configTree, configInitializer);
+    private FrameManager frameManager = new FrameManager(
+        udpPingHttpServerDictionary,
+        applicationActionModels,
+        displayNameCalculator,
+        rootContext,
+        exitAction
+    );
     private TimeSeriousConfig config;
-    private ConfigAwareTreeManager configTree;
 
     public void start() {
-        configTree = new ConfigAwareTreeManager(this);
-
+        exitAction.setMainFrame(frameManager.getMainFrame());
         startJmxAndLocalHttpd();
         setupServerDictionary();
 
         try {
-            config = configManager.loadConfig();
+            config = configInitializer.loadConfig();
         } catch (ConfigManagerException e) {
             //todo, add handling
             e.printStackTrace();
         }
 
         configTree.restoreConfig(config);
-        mainFrame.setVisible(true);
-
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                if ( ! confirmAndSaveConfig(e.getWindow()) ) {
-                    //there's no mechanism to cancel the close which I can find, barring throwing an exception
-                    //which is then handled by some dedicated logic in the Component class
-                    throw new RuntimeException("User cancelled exit");
-                }
-            }
-        });
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -81,46 +71,9 @@ public class TimeSerious implements ConfigAware {
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(rootContext, mainFrame);
+        return Arrays.asList(rootContext, frameManager);
     }
 
-    private class ExitAction extends AbstractAction {
-
-        private ExitAction() {
-            super("Exit", ImageUtils.EXIT_16x16);
-            super.putValue(SHORT_DESCRIPTION, "Exit and save config");
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            if ( confirmAndSaveConfig(mainFrame) ) {
-                System.exit(0);
-            }
-        }
-    }
-
-    private boolean confirmAndSaveConfig(Window w) {
-        int option = JOptionPane.showConfirmDialog(
-                w,
-                "Save Config?",
-                "Exit TimeSerious",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        if ( option == JOptionPane.YES_OPTION) {
-            saveConfigOnShutdown();
-        }
-        return option != JOptionPane.CANCEL_OPTION;
-    }
-
-    private void saveConfigOnShutdown() {
-        configTree.prepareConfigForSave(config);
-        try {
-            configManager.saveConfig(mainFrame, config);
-        } catch (ConfigManagerException e1) {
-            //todo, add handling
-            e1.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) {
 

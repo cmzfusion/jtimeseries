@@ -21,6 +21,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
 
     private int frameExtendedState;
     private Rectangle frameLocation;
+    private boolean shown;
 
     public DesktopContext(String name) {
         super(name, name);
@@ -40,6 +41,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
         d.setVisualizerConfigurations(getVisualizerConfigurations());
         d.setFrameExtendedState(frameExtendedState);
         d.setFrameLocation(frameLocation);
+        d.setShown(shown);
         return d;
     }
 
@@ -47,6 +49,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
         Integer state = c.getFrameExtendedState();
         frameExtendedState = state == null ? JFrame.NORMAL : state;
         frameLocation = c.getFrameLocation();
+        shown = c.isShown();
         for ( VisualizerConfiguration v : c.getVisualizerConfigurations()) {
             VisualizerContext n = new VisualizerContext(v.getChartsTitle(), v);
             addChild(n);
@@ -75,5 +78,9 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
 
     public String getDefaultFileName() {
         return "timeSeriousDesktop_" + getId();
+    }
+
+    public boolean isShown() {
+        return shown;
     }
 }

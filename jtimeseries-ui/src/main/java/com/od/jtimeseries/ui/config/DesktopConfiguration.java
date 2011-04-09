@@ -18,6 +18,7 @@ public class DesktopConfiguration implements ExportableConfig {
     private Rectangle frameLocation;
     private Integer frameExtendedState;
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
+    private boolean isShown = true;
 
     public DesktopConfiguration(String desktopName) {
         this.desktopName = desktopName;
@@ -53,5 +54,13 @@ public class DesktopConfiguration implements ExportableConfig {
 
     public void setDesktopName(String desktopName) {
         this.desktopName = desktopName;
+    }
+
+    public boolean isShown() {
+        return isShown;
+    }
+
+    public void setShown(boolean shown) {
+        isShown = shown;
     }
 }

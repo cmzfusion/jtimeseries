@@ -30,12 +30,10 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
-    private DisplayNameCalculator displayNameCalculator;
     private DesktopContext mainDesktopContext = new DesktopContext(DesktopConfiguration.MAIN_DESKTOP_NAME);
 
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
-        this.displayNameCalculator = displayNameCalculator;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
         initializeFactoriesAndContextBusListener();
         addChild(mainDesktopContext);

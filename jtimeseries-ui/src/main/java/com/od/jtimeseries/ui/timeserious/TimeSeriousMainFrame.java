@@ -30,11 +30,10 @@ import java.util.Arrays;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
+public class TimeSeriousMainFrame extends TimeSeriousDesktopFrame implements ConfigAware {
 
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
-    private TimeSeriousDesktopPane mainDesktopPane;
     private MainSeriesSelector mainSeriesSelector;
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
@@ -48,17 +47,13 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector) {
+        super(serverDictionary, displayNameCalculator, rootContext.getMainDesktopContext(), mainSeriesSelector.getSelectionPanel());
         this.serverDictionary = serverDictionary;
         this.exitAction = exitAction;
         this.displayNameCalculator = displayNameCalculator;
         this.rootContext = rootContext;
-        this.mainSeriesSelector = new MainSeriesSelector(
-            rootContext,
-            actionModels,
-            serverDictionary
-        );
-        this.mainDesktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, mainSeriesSelector.getSelectionPanel(), rootContext.getMainDesktopContext());
+        this.mainSeriesSelector = mainSeriesSelector;
         createActions(actionModels);
         initializeFrame();
         createMenuBar();
@@ -105,7 +100,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     private void layoutFrame() {
         setJMenuBar(mainMenuBar);
         splitPane.setLeftComponent(mainSeriesSelector);
-        splitPane.setRightComponent(mainDesktopPane);
+        splitPane.setRightComponent(getDesktopPane());
         getContentPane().add(splitPane, BorderLayout.CENTER);
         add(mainToolBar, BorderLayout.NORTH);
     }
@@ -141,14 +136,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
 
     public void restoreConfig(TimeSeriousConfig config) {
         DesktopConfiguration c = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
-        Rectangle frameLocation = c.getFrameLocation();
-        if ( frameLocation != null) {
-            setBounds(frameLocation);
-            setExtendedState(c.getFrameExtendedState());
-        } else {
-            setSize(800, 600);
-            setLocationRelativeTo(null);
-        }
+        configureFrame(c);
         splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());
@@ -160,7 +148,7 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
     }
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList((ConfigAware)mainSeriesSelector, mainDesktopPane);
+        return Arrays.asList((ConfigAware)mainSeriesSelector);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -168,20 +156,4 @@ public class TimeSeriousMainFrame extends JFrame implements ConfigAware {
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }
 
-    //set the selected desktop in the desktopSelectionActionModel when this window is focused
-    private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
-
-        public void windowGainedFocus(WindowEvent e) {
-            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
-                new EventSender<TimeSeriousBusListener>() {
-                    public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.desktopSelected(mainDesktopPane);
-                    }
-                }
-            );
-        }
-
-        public void windowLostFocus(WindowEvent e) {
-        }
-    }
 }

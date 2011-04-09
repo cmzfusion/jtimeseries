@@ -53,18 +53,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
 
     private void addDesktopListener() {
         desktopContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(new IdentifiableTreeListenerAdapter() {
-                public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                    for ( Identifiable c : contextTreeEvent.getNodes()) {
-                        if ( c instanceof VisualizerContext) {
-                            VisualizerContext n = (VisualizerContext)c;
-                            if ( n.isShown()) {
-                                showVisualizerForNode(n);
-                            }
-                        }
-                    }
-                }
-            },
+            AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
             IdentifiableTreeListener.class)
         );
     }
@@ -190,5 +179,19 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
             }
         }
         return visualizerFrame;
+    }
+
+    private class ShowVisualizerTreeListener extends IdentifiableTreeListenerAdapter {
+
+        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+            for ( Identifiable c : contextTreeEvent.getNodes()) {
+                if ( c instanceof VisualizerContext) {
+                    VisualizerContext n = (VisualizerContext)c;
+                    if ( n.isShown()) {
+                        showVisualizerForNode(n);
+                    }
+                }
+            }
+        }
     }
 }

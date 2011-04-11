@@ -11,9 +11,6 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
 
-import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,32 +23,42 @@ import java.util.List;
 public class FrameManager implements ConfigAware {
 
     private TimeSeriousMainFrame mainFrame;
+    private UiTimeSeriesServerDictionary udpPingHttpServerDictionary;
+    private ApplicationActionModels applicationActionModels;
+    private DisplayNameCalculator displayNameCalculator;
+    private TimeSeriousRootContext rootContext;
+    private ExitAction exitAction;
+    private MainSeriesSelector mainSeriesSelector;
 
-    public FrameManager(UiTimeSeriesServerDictionary udpPingHttpServerDictionary, ApplicationActionModels applicationActionModels, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, final ExitAction exitAction) {
-        rootContext.addTreeListener(AwtSafeListener.getAwtSafeListener(new ShowFrameTreeListener(), IdentifiableTreeListener.class));
-        MainSeriesSelector mainSeriesSelector = new MainSeriesSelector(
+    public FrameManager(UiTimeSeriesServerDictionary udpPingHttpServerDictionary,
+                        ApplicationActionModels applicationActionModels,
+                        DisplayNameCalculator displayNameCalculator,
+                        TimeSeriousRootContext rootContext,
+                        final ExitAction exitAction) {
+        this.udpPingHttpServerDictionary = udpPingHttpServerDictionary;
+        this.applicationActionModels = applicationActionModels;
+        this.displayNameCalculator = displayNameCalculator;
+        this.rootContext = rootContext;
+        this.exitAction = exitAction;
+        this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             applicationActionModels,
             udpPingHttpServerDictionary
         );
-        this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
-        mainFrame.setVisible(true);
-
-        mainFrame.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                if ( ! exitAction.confirmAndSaveConfig(e.getWindow()) ) {
-                    //there's no mechanism to cancel the close which I can find, barring throwing an exception
-                    //which is then handled by some dedicated logic in the Component class
-                    throw new RuntimeException("User cancelled exit");
-                }
-            }
-        });
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        //always show the main frame
+        this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
+        mainFrame.setVisible(true);
+        addShowFrameTreeListener();
+    }
+
+    private void addShowFrameTreeListener() {
+        rootContext.addTreeListener(AwtSafeListener.getAwtSafeListener(new ShowFrameTreeListener(), IdentifiableTreeListener.class));
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -88,5 +95,12 @@ public class FrameManager implements ConfigAware {
     }
 
     private void showDesktop(DesktopContext desktopContext) {
+        DefaultDesktopFrame frame = new DefaultDesktopFrame(
+            udpPingHttpServerDictionary,
+            displayNameCalculator,
+            desktopContext,
+            mainSeriesSelector.getSelectionPanel()
+        );
+        frame.setVisible(true);
     }
 }

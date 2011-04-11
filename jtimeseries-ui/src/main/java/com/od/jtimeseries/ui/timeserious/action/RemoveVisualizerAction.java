@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -17,11 +18,8 @@ import java.util.List;
  */
 public class RemoveVisualizerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
-    private Identifiable visualizerContext;
-
-    public RemoveVisualizerAction(IdentifiableListActionModel selectionModel, Identifiable visualizerContext) {
+    public RemoveVisualizerAction(IdentifiableListActionModel selectionModel) {
         super(selectionModel, "Remove Visualizer", ImageUtils.SERIES_ICON_16x16);
-        this.visualizerContext = visualizerContext;
         super.putValue(SHORT_DESCRIPTION, "Remove the selected visualizer");
     }
 
@@ -33,7 +31,7 @@ public class RemoveVisualizerAction extends ModelDrivenAction<IdentifiableListAc
         List<VisualizerContext> nodes = getActionModel().getSelected(VisualizerContext.class);
         for ( final VisualizerContext n : nodes ) {
             n.setShown(false);
-            visualizerContext.removeChild(n);
+            n.getParent().removeChild(n);
         }
     }
 }

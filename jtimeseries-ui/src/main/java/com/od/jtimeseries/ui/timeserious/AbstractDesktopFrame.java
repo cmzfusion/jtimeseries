@@ -20,13 +20,14 @@ import java.awt.event.WindowFocusListener;
  * Date: 08/04/11
  * Time: 17:02
  */
-public class TimeSeriousDesktopFrame extends JFrame {
+public class AbstractDesktopFrame extends JFrame {
 
     private TimeSeriousDesktopPane desktopPane;
 
-    public TimeSeriousDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
+    public AbstractDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         configureFrame(desktopContext.getDesktopConfiguration());
+        getContentPane().add(desktopPane, BorderLayout.CENTER);
     }
 
     protected void configureFrame(DesktopConfiguration c) {

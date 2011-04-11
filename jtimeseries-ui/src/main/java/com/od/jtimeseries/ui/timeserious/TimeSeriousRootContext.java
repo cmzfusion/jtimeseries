@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,7 +64,10 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
             serverConfigs.add(new TimeSeriesServerConfig(c));
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
-        config.setDesktopConfigration(DesktopConfiguration.MAIN_DESKTOP_NAME, mainDesktopContext.getDesktopConfiguration());
+
+        for ( DesktopContext desktopContext : findAll(DesktopContext.class).getAllMatches()) {
+            config.setDesktopConfigration(desktopContext.getId(), desktopContext.getDesktopConfiguration());
+        }
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
@@ -78,8 +82,19 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
                 logMethods.logError("Could not create server " + serverDictionary, e);
             }
         }
-        DesktopConfiguration mainDesktopConfig = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
-        mainDesktopContext.setDesktopConfiguration(mainDesktopConfig);
+
+        for ( Map.Entry<String, DesktopConfiguration> desktopConfiguration : config.getDesktopConfigs().entrySet()) {
+            DesktopContext desktopContext = getOrCreateDesktopContext(desktopConfiguration.getValue());
+            desktopContext.setDesktopConfiguration(desktopConfiguration.getValue());
+        }
+    }
+
+    private DesktopContext getOrCreateDesktopContext(DesktopConfiguration desktopConfiguration) {
+        DesktopContext context = new DesktopContext(desktopConfiguration.getDesktopName());
+        if ( context == null) {
+            context = new DesktopContext(desktopConfiguration.getDesktopName());
+        }
+        return context;
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

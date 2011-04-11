@@ -42,7 +42,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         removeServerAction = new RemoveServerAction(parentSelector, timeSeriesServerDictionary, selectionModel);
         renameServerAction = new RenameServerAction(parentSelector, selectionModel);
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
-        removeVisualizerAction = new RemoveVisualizerAction(selectionModel, rootContext.getMainDesktopContext());
+        removeVisualizerAction = new RemoveVisualizerAction(selectionModel);
     }
 
     public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {

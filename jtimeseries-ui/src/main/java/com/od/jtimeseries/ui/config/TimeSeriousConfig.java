@@ -30,6 +30,10 @@ public class TimeSeriousConfig implements ExportableConfig {
         return c;
     }
 
+    public Map<String, DesktopConfiguration> getDesktopConfigs() {
+        return desktopConfigs;
+    }
+
     public void setDesktopConfigration(String desktopName, DesktopConfiguration c) {
         this.desktopConfigs.put(desktopName, c);
     }
@@ -92,4 +96,5 @@ public class TimeSeriousConfig implements ExportableConfig {
         }
         return this;
     }
+
 }

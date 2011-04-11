@@ -1,9 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
@@ -13,13 +11,11 @@ import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -30,7 +26,7 @@ import java.util.Arrays;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends TimeSeriousDesktopFrame implements ConfigAware {
+public class TimeSeriousMainFrame extends AbstractDesktopFrame implements ConfigAware {
 
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
@@ -42,12 +38,12 @@ public class TimeSeriousMainFrame extends TimeSeriousDesktopFrame implements Con
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
     private DisplayNameCalculator displayNameCalculator;
     private UiTimeSeriesServerDictionary serverDictionary;
-    private AbstractAction exitAction;
+    private ExitAction exitAction;
     private final JSplitPane splitPane = new JSplitPane();
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, AbstractAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ExitAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector) {
         super(serverDictionary, displayNameCalculator, rootContext.getMainDesktopContext(), mainSeriesSelector.getSelectionPanel());
         this.serverDictionary = serverDictionary;
         this.exitAction = exitAction;
@@ -60,6 +56,19 @@ public class TimeSeriousMainFrame extends TimeSeriousDesktopFrame implements Con
         createToolBar();
         layoutFrame();
         addListeners();
+        addExitListener();
+    }
+
+    private void addExitListener() {
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if ( ! exitAction.confirmAndSaveConfig(e.getWindow()) ) {
+                    //there's no mechanism to cancel the close which I can find, barring throwing an exception
+                    //which is then handled by some dedicated logic in the Component class
+                    throw new RuntimeException("User cancelled exit");
+                }
+            }
+        });
     }
 
     private void createActions(ApplicationActionModels actionModels) {
@@ -135,8 +144,6 @@ public class TimeSeriousMainFrame extends TimeSeriousDesktopFrame implements Con
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        DesktopConfiguration c = config.getOrCreateDesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME);
-        configureFrame(c);
         splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());

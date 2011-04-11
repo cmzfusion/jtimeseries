@@ -50,6 +50,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                     try {
                         ExportableConfig uiConfig = cm.loadConfig("fromFile", ExportableConfig.class, new FileSource((File)f));  if ( uiConfig instanceof VisualizerConfiguration) {
                             final VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
+                            c.setShown(true); //always show on import
                             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
                                 public void sendEvent(TimeSeriousBusListener listener) {
                                     listener.visualizerImported(c);

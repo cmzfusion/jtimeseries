@@ -45,6 +45,7 @@ public class FrameManager implements ConfigAware {
             applicationActionModels,
             udpPingHttpServerDictionary
         );
+        this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -52,7 +53,7 @@ public class FrameManager implements ConfigAware {
 
     public void restoreConfig(TimeSeriousConfig config) {
         //always show the main frame
-        this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
+        mainFrame.configureFrame(rootContext.getMainDesktopContext().getDesktopConfiguration());
         mainFrame.setVisible(true);
         addShowFrameTreeListener();
     }

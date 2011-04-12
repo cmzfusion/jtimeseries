@@ -26,7 +26,6 @@ public class AbstractDesktopFrame extends JFrame {
 
     public AbstractDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
-        configureFrame(desktopContext.getDesktopConfiguration());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
     }
 

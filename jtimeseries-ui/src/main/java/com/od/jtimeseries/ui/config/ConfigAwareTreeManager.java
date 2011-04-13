@@ -21,32 +21,24 @@ public class ConfigAwareTreeManager {
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        List<ConfigAware> flattenedTree = getFlattenedTree();
-        for ( ConfigAware c : flattenedTree) {
-            c.prepareConfigForSave(config);
-        }
+        save(config, rootNode);
     }
-
 
     public void restoreConfig(TimeSeriousConfig config) {
-        List<ConfigAware> flattenedTree = getFlattenedTree();
-        for ( ConfigAware c : flattenedTree) {
-            c.restoreConfig(config);
+        restore(config, rootNode);
+    }
+
+    private void restore(TimeSeriousConfig config, ConfigAware node) {
+        node.restoreConfig(config);
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
+            restore(config, c);
         }
     }
 
-    private List<ConfigAware> getFlattenedTree() {
-        List<ConfigAware> flattenedTree = new LinkedList<ConfigAware>();
-        addFromNode(rootNode, flattenedTree);
-        return flattenedTree;
-    }
-
-
-    private void addFromNode(ConfigAware node, List<ConfigAware> flattenedTree) {
-        flattenedTree.add(node);
-        for (ConfigAware c : node.getConfigAwareChildren()) {
-            addFromNode(c, flattenedTree);
+    private void save(TimeSeriousConfig config, ConfigAware node) {
+        node.prepareConfigForSave(config);
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
+            save(config, c);
         }
     }
-
 }

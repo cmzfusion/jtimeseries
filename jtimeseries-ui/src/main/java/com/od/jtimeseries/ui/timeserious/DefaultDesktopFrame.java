@@ -17,7 +17,6 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
     public DefaultDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
         super(serverDictionary, displayNameCalculator, desktopContext, selectionPanel);
         layoutComponents();
-        configureFrame(desktopContext.getDesktopConfiguration());
     }
 
     private void layoutComponents() {

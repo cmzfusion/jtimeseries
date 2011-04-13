@@ -11,6 +11,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,25 +46,26 @@ public class FrameManager implements ConfigAware {
             applicationActionModels,
             udpPingHttpServerDictionary
         );
+        //always show the main frame
         this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
+        addShowFrameTreeListener();
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Arrays.asList((ConfigAware)mainSeriesSelector, mainFrame);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
+        mainFrame.prepareConfigForSave(config);
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        //always show the main frame
-        mainFrame.configureFrame(rootContext.getMainDesktopContext().getDesktopConfiguration());
+        mainFrame.restoreConfig(config);
         mainFrame.setVisible(true);
-        addShowFrameTreeListener();
     }
 
     private void addShowFrameTreeListener() {
         rootContext.addTreeListener(AwtSafeListener.getAwtSafeListener(new ShowFrameTreeListener(), IdentifiableTreeListener.class));
-    }
-
-    public List<ConfigAware> getConfigAwareChildren() {
-        return Collections.singletonList((ConfigAware)mainFrame);
     }
 
     public TimeSeriousMainFrame getMainFrame() {

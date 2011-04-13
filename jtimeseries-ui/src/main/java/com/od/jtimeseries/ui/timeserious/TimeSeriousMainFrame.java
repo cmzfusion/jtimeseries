@@ -18,7 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +26,7 @@ import java.util.Arrays;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends AbstractDesktopFrame implements ConfigAware {
+public class TimeSeriousMainFrame extends AbstractDesktopFrame {
 
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
@@ -62,7 +62,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private void addExitListener() {
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if ( ! exitAction.confirmAndSaveConfig(e.getWindow()) ) {
+                if (!exitAction.confirmAndSaveConfig(e.getWindow())) {
                     //there's no mechanism to cancel the close which I can find, barring throwing an exception
                     //which is then handled by some dedicated logic in the Component class
                     throw new RuntimeException("User cancelled exit");
@@ -92,9 +92,10 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
                 }
             }
         });
+        addSelectorListener();
     }
 
-    private void addSplitPaneListener() {
+    private void addSelectorListener() {
         //set the split pane position when we change between tree and table view
         mainSeriesSelector.addPropertyChangeListener(SeriesSelectionPanel.TREE_VIEW_SELECTED_PROPERTY,
         new PropertyChangeListener() {
@@ -124,6 +125,8 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         setTitle("TimeSerious");
         setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerSize(splitPane.getDividerSize() + 4);
     }
 
     private void createMenuBar() {
@@ -144,23 +147,17 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        super.restoreConfig(config);
         splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerSize(splitPane.getDividerSize() + 4);
         tableSplitPanePosition = config.getSplitPaneLocationWhenTableSelected();
         treeSplitPanePosition = config.getSplitPaneLocationWhenTreeSelected();
-        addSplitPaneListener();
-    }
-
-    public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList((ConfigAware)mainSeriesSelector);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
+        super.prepareConfigForSave(config);
         config.setSplitPaneLocationWhenTreeSelected(treeSplitPanePosition);
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }
-
 }

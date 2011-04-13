@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
@@ -13,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,11 +23,13 @@ import java.awt.event.WindowFocusListener;
  * Date: 08/04/11
  * Time: 17:02
  */
-public class AbstractDesktopFrame extends JFrame {
+public class AbstractDesktopFrame extends JFrame  implements ConfigAware {
 
     private TimeSeriousDesktopPane desktopPane;
+    private DesktopContext desktopContext;
 
     public AbstractDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
+        this.desktopContext = desktopContext;
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         getContentPane().add(desktopPane, BorderLayout.CENTER);
     }
@@ -60,4 +65,15 @@ public class AbstractDesktopFrame extends JFrame {
         public void windowLostFocus(WindowEvent e) {
         }
     }
+
+
+    public void restoreConfig(TimeSeriousConfig config) {
+        configureFrame(desktopContext.getDesktopConfiguration());
+    }
+
+    public java.util.List<ConfigAware> getConfigAwareChildren() {
+        return Collections.singletonList((ConfigAware) desktopPane);
+    }
+
+    public void prepareConfigForSave(TimeSeriousConfig config) {}
 }

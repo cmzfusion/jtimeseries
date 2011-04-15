@@ -12,7 +12,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -46,9 +46,6 @@ public class FrameManager implements ConfigAware {
             applicationActionModels,
             udpPingHttpServerDictionary
         );
-        //always show the main frame
-        this.mainFrame = new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector);
-        addShowFrameTreeListener();
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -56,12 +53,20 @@ public class FrameManager implements ConfigAware {
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        mainFrame.prepareConfigForSave(config);
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        mainFrame.restoreConfig(config);
-        mainFrame.setVisible(true);
+        showFrames();
+        addShowFrameTreeListener();
+    }
+
+    private void showFrames() {
+        List<DesktopContext> contexts = rootContext.findAll(DesktopContext.class).getAllMatches();
+        for ( DesktopContext context : contexts) {
+            if ( context.isShown()) {
+                showFrame(context);
+            }
+        }
     }
 
     private void addShowFrameTreeListener() {
@@ -79,7 +84,7 @@ public class FrameManager implements ConfigAware {
                 if ( c instanceof DesktopContext) {
                     DesktopContext n = (DesktopContext)c;
                     if ( n.isShown()) {
-                        showDesktop(n);
+                        showFrame(n);
                     }
                 }
             }
@@ -90,20 +95,30 @@ public class FrameManager implements ConfigAware {
                 if ( c instanceof DesktopContext) {
                     DesktopContext n = (DesktopContext)c;
                     if ( n.isShown()) {
-                        showDesktop(n);
+                        showFrame(n);
                     }
                 }
             }
         }
     }
 
-    private void showDesktop(DesktopContext desktopContext) {
-        DefaultDesktopFrame frame = new DefaultDesktopFrame(
-            udpPingHttpServerDictionary,
-            displayNameCalculator,
-            desktopContext,
-            mainSeriesSelector.getSelectionPanel()
-        );
+    private void showFrame(DesktopContext desktopContext) {
+        AbstractDesktopFrame frame;
+        if ( desktopContext.isMainDesktopContext()) {
+            mainFrame = createMainFrame(desktopContext);
+            frame = mainFrame;
+        } else {
+            frame = new DefaultDesktopFrame(
+                udpPingHttpServerDictionary,
+                displayNameCalculator,
+                desktopContext,
+                mainSeriesSelector.getSelectionPanel()
+            );
+        }
         frame.setVisible(true);
+    }
+
+    private TimeSeriousMainFrame createMainFrame(DesktopContext desktopContext) {
+        return new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector, desktopContext);
     }
 }

@@ -21,7 +21,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
 
     private int frameExtendedState;
     private Rectangle frameLocation;
-    private boolean shown;
+    private boolean shown = true;
 
     public DesktopContext(String name) {
         super(name, name);
@@ -45,7 +45,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
         return d;
     }
 
-    public void setDesktopConfiguration(DesktopConfiguration c) {
+    public void createDesktopConfiguration(DesktopConfiguration c) {
         Integer state = c.getFrameExtendedState();
         frameExtendedState = state == null ? JFrame.NORMAL : state;
         frameLocation = c.getFrameLocation();
@@ -82,5 +82,9 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
 
     public boolean isShown() {
         return shown;
+    }
+
+    public boolean isMainDesktopContext() {
+        return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
     }
 }

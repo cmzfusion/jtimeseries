@@ -29,7 +29,7 @@ import java.util.List;
  * Date: 26-Mar-2010
  * Time: 17:49:07
  */
-public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware {
+public class TimeSeriousDesktopPane extends JDesktopPane {
 
     private JFrame parentFrame;
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
@@ -49,6 +49,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         addFrameListener();
         addDesktopListener();
         setTransferHandler(new DesktopPaneTransferHandler());
+        setConfiguration(desktopContext);
     }
 
     private void addDesktopListener() {
@@ -105,16 +106,13 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         return n;
     }
 
-    public void prepareConfigForSave(TimeSeriousConfig config) {
-    }
-
-    public void restoreConfig(TimeSeriousConfig config) {
+    private void setConfiguration(DesktopContext desktopContext) {
         //visualizer nodes should already have been created within the desktopContext
         //find those that should be shown, and show them
         List<VisualizerContext> nodes = desktopContext.findAll(VisualizerContext.class).getAllMatches();
         sortNodesByZPosition(nodes);
         for ( VisualizerContext n : nodes) {
-            if ( ! n.isHidden() ) {
+            if ( n.isShown() ) {
                 showVisualizerForNode(n);
             }
         }
@@ -135,10 +133,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
                 return ((Integer)o2.getZPosition()).compareTo(o1.getZPosition());
             }
         });
-    }
-
-    public List<ConfigAware> getConfigAwareChildren() {
-        return Collections.emptyList();
     }
 
     private void addUiBusEventListener() {
@@ -163,12 +157,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane implements ConfigAware 
         ));
 
         VisualizerInternalFrame visualizerFrame = new VisualizerInternalFrame(visualizer, this, visualizerNode);
-        if ( c != null) {
-            TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
-            if ( c.getFrameBounds() != null) {
-                visualizerFrame.setBounds(c.getFrameBounds());
-            }
-        }
+        visualizerFrame.setConfiguration(c);
         add(visualizerFrame);
         visualizerFrame.setVisible(true);
         if ( c != null) {

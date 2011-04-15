@@ -85,7 +85,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
         for ( Map.Entry<String, DesktopConfiguration> configEntry : config.getDesktopConfigs().entrySet()) {
             DesktopContext desktopContext = getOrCreateDesktopContext(configEntry.getValue());
-            desktopContext.setDesktopConfiguration(configEntry.getValue());
+            desktopContext.createDesktopConfiguration(configEntry.getValue());
         }
     }
 

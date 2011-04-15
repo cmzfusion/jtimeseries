@@ -23,7 +23,7 @@ import java.util.Collections;
  * Date: 08/04/11
  * Time: 17:02
  */
-public class AbstractDesktopFrame extends JFrame  implements ConfigAware {
+public class AbstractDesktopFrame extends JFrame {
 
     private TimeSeriousDesktopPane desktopPane;
     private DesktopContext desktopContext;
@@ -32,17 +32,7 @@ public class AbstractDesktopFrame extends JFrame  implements ConfigAware {
         this.desktopContext = desktopContext;
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         getContentPane().add(desktopPane, BorderLayout.CENTER);
-    }
-
-    protected void configureFrame(DesktopConfiguration c) {
-        Rectangle frameLocation = c.getFrameLocation();
-        if ( frameLocation != null) {
-            setBounds(frameLocation);
-            setExtendedState(c.getFrameExtendedState());
-        } else {
-            setSize(800, 600);
-            setLocationRelativeTo(null);
-        }
+        setConfiguration(desktopContext.getDesktopConfiguration());
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -67,13 +57,15 @@ public class AbstractDesktopFrame extends JFrame  implements ConfigAware {
     }
 
 
-    public void restoreConfig(TimeSeriousConfig config) {
-        configureFrame(desktopContext.getDesktopConfiguration());
+    public void setConfiguration(DesktopConfiguration c) {
+        Rectangle frameLocation = c.getFrameLocation();
+        if ( frameLocation != null) {
+            setBounds(frameLocation);
+            setExtendedState(c.getFrameExtendedState());
+        } else {
+            setSize(800, 600);
+            setLocationRelativeTo(null);
+        }
+        setVisible(c.isShown());
     }
-
-    public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Collections.singletonList((ConfigAware) desktopPane);
-    }
-
-    public void prepareConfigForSave(TimeSeriousConfig config) {}
 }

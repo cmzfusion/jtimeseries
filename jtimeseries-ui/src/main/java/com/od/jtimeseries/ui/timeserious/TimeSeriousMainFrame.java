@@ -18,7 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +26,7 @@ import java.util.Collections;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends AbstractDesktopFrame {
+public class TimeSeriousMainFrame extends AbstractDesktopFrame implements ConfigAware {
 
     private TimeSeriousRootContext rootContext;
     private JMenuBar mainMenuBar = new JMenuBar();
@@ -43,8 +43,8 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame {
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ExitAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector) {
-        super(serverDictionary, displayNameCalculator, rootContext.getMainDesktopContext(), mainSeriesSelector.getSelectionPanel());
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ExitAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector, DesktopContext desktopContext) {
+        super(serverDictionary, displayNameCalculator, desktopContext, mainSeriesSelector.getSelectionPanel());
         this.serverDictionary = serverDictionary;
         this.exitAction = exitAction;
         this.displayNameCalculator = displayNameCalculator;
@@ -147,7 +147,6 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        super.restoreConfig(config);
         splitPane.setDividerLocation(mainSeriesSelector.isTableSelectorVisible() ?
             config.getSplitPaneLocationWhenTableSelected() :
             config.getSplitPaneLocationWhenTreeSelected());
@@ -155,8 +154,11 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame {
         treeSplitPanePosition = config.getSplitPaneLocationWhenTreeSelected();
     }
 
+    public java.util.List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
+    }
+
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        super.prepareConfigForSave(config);
         config.setSplitPaneLocationWhenTreeSelected(treeSplitPanePosition);
         config.setSplitPaneLocationWhenTableSelected(tableSplitPanePosition);
     }

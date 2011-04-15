@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
@@ -85,5 +86,14 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
 
     public int getZPosition() {
         return desktopPane.getPosition(this);
+    }
+
+    public void setConfiguration(VisualizerConfiguration c) {
+        if ( c != null) {
+            TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
+            if ( c.getFrameBounds() != null) {
+                setBounds(c.getFrameBounds());
+            }
+        }
     }
 }

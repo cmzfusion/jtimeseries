@@ -29,4 +29,6 @@ public interface TimeSeriousBusListener {
      * A visualizer config was imported to timeserious from a config fle
      */
     void visualizerImported(VisualizerConfiguration visualizerConfiguration);
+
+    void desktopCreated(String name);
 }

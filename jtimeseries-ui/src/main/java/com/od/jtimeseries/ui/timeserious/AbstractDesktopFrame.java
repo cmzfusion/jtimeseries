@@ -32,7 +32,6 @@ public class AbstractDesktopFrame extends JFrame {
         this.desktopContext = desktopContext;
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         getContentPane().add(desktopPane, BorderLayout.CENTER);
-        setConfiguration(desktopContext.getDesktopConfiguration());
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -57,7 +56,7 @@ public class AbstractDesktopFrame extends JFrame {
     }
 
 
-    public void setConfiguration(DesktopConfiguration c) {
+    public void setConfiguration(DesktopContext c) {
         Rectangle frameLocation = c.getFrameLocation();
         if ( frameLocation != null) {
             setBounds(frameLocation);
@@ -66,6 +65,7 @@ public class AbstractDesktopFrame extends JFrame {
             setSize(800, 600);
             setLocationRelativeTo(null);
         }
+        desktopPane.setConfiguration(c);
         setVisible(c.isShown());
     }
 }

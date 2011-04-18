@@ -49,7 +49,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         addFrameListener();
         addDesktopListener();
         setTransferHandler(new DesktopPaneTransferHandler());
-        setConfiguration(desktopContext);
     }
 
     private void addDesktopListener() {
@@ -91,7 +90,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         configureAndShowVisualizerFrame(c, visualizer, node);
     }
 
-
     private TimeSeriesVisualizer createVisualizer(String title) {
         return new TimeSeriesVisualizer(
             title,
@@ -106,7 +104,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         return n;
     }
 
-    private void setConfiguration(DesktopContext desktopContext) {
+    public void setConfiguration(DesktopContext desktopContext) {
         //visualizer nodes should already have been created within the desktopContext
         //find those that should be shown, and show them
         List<VisualizerContext> nodes = desktopContext.findAll(VisualizerContext.class).getAllMatches();

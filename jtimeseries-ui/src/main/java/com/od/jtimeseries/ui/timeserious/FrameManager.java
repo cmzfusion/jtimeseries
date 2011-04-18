@@ -3,12 +3,15 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import java.util.Arrays;
@@ -46,6 +49,19 @@ public class FrameManager implements ConfigAware {
             applicationActionModels,
             udpPingHttpServerDictionary
         );
+        this.mainFrame = createMainFrame(rootContext.getMainDesktopContext());
+        addEventBusListener();
+    }
+
+    private void addEventBusListener() {
+        UIEventBus.getInstance().addEventListener(TimeSeriousBusListener.class, AwtSafeListener.getAwtSafeListener(
+            new TimeSeriousBusListenerAdapter() {
+                public void desktopCreated(String name) {
+                    createNewFrame(name);
+                }
+            },
+            TimeSeriousBusListener.class
+        ));
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -77,6 +93,11 @@ public class FrameManager implements ConfigAware {
         return mainFrame;
     }
 
+    public void createNewFrame(String name) {
+        DesktopContext d = new DesktopContext(name);
+        rootContext.addChild(d);
+    }
+
     private class ShowFrameTreeListener extends IdentifiableTreeListenerAdapter {
 
         public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
@@ -105,7 +126,6 @@ public class FrameManager implements ConfigAware {
     private void showFrame(DesktopContext desktopContext) {
         AbstractDesktopFrame frame;
         if ( desktopContext.isMainDesktopContext()) {
-            mainFrame = createMainFrame(desktopContext);
             frame = mainFrame;
         } else {
             frame = new DefaultDesktopFrame(
@@ -115,6 +135,7 @@ public class FrameManager implements ConfigAware {
                 mainSeriesSelector.getSelectionPanel()
             );
         }
+        frame.setConfiguration(desktopContext);
         frame.setVisible(true);
     }
 

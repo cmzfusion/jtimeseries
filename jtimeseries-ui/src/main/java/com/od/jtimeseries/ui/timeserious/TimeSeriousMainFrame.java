@@ -4,10 +4,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.DesktopSelectionActionModel;
-import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
-import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -34,6 +31,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private JToolBar mainToolBar = new JToolBar();
     private DesktopSelectionActionModel desktopSelectionActionModel;
     private NewVisualizerAction newVisualizerAction;
+    private NewDesktopAction newDesktopAction;
     private NewServerAction newServerAction;
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
     private DisplayNameCalculator displayNameCalculator;
@@ -79,6 +77,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
             TimeSeriousMainFrame.this,
             displayNameCalculator
         );
+        newDesktopAction = new NewDesktopAction(this, rootContext);
     }
 
     private void addListeners() {
@@ -116,6 +115,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     private void createToolBar() {
+        mainToolBar.add(newDesktopAction);
         mainToolBar.add(newVisualizerAction);
         mainToolBar.add(newServerAction);
         mainToolBar.add(editDisplayNamePatternsAction);

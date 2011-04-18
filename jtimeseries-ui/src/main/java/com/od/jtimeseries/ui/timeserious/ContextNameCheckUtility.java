@@ -15,11 +15,11 @@ import java.awt.*;
 public class ContextNameCheckUtility {
 
     private Component desktopPane;
-    private TimeSeriesContext desktopContext;
+    private TimeSeriesContext context;
 
-    public ContextNameCheckUtility(Component desktopPane, TimeSeriesContext desktopContext) {
+    public ContextNameCheckUtility(Component desktopPane, TimeSeriesContext context) {
         this.desktopPane = desktopPane;
-        this.desktopContext = desktopContext;
+        this.context = context;
     }
 
     public static String getNameFromUser(Component parent, String text, String title, String defaultName) {
@@ -40,7 +40,7 @@ public class ContextNameCheckUtility {
         if ( nameProblem != null) {
             name = getNameFromUser(desktopPane, nameProblem + ", please correct the name", "Invalid Name", name);
             name = checkName(name);
-        } else if ( desktopContext.contains(name) ) {
+        } else if ( context.contains(name) ) {
             name = getNameFromUser(desktopPane, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
             name = checkName(name);
         }

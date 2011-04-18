@@ -23,23 +23,53 @@ import java.util.Collections;
  * Date: 08/04/11
  * Time: 17:02
  */
-public class AbstractDesktopFrame extends JFrame {
+public abstract class AbstractDesktopFrame extends JFrame {
 
     private TimeSeriousDesktopPane desktopPane;
     private DesktopContext desktopContext;
+    private TimeSeriousRootContext rootContext;
+    private ApplicationActionModels actionModels;
+    private JToolBar mainToolBar = new JToolBar();
 
-    public AbstractDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel) {
+    public AbstractDesktopFrame(UiTimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel, TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
         this.desktopContext = desktopContext;
+        this.rootContext = rootContext;
+        this.actionModels = actionModels;
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         getContentPane().add(desktopPane, BorderLayout.CENTER);
+        addWindowListener();
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
         return desktopPane;
     }
 
+    protected void layoutFrame() {
+        Component c = getMainComponent();
+        getContentPane().add(c, BorderLayout.CENTER);
+        getContentPane().add(mainToolBar, BorderLayout.NORTH);
+    }
+
+    protected JToolBar getToolBar() {
+        return mainToolBar;
+    }
+
+    protected abstract Component getMainComponent();
+
+    protected TimeSeriousRootContext getRootContext() {
+        return rootContext;
+    }
+
+    protected ApplicationActionModels getActionModels() {
+        return actionModels;
+    }
+
+    private void addWindowListener() {
+        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
+    }
+
     //set the selected desktop in the desktopSelectionActionModel when this window is focused
-    protected class DesktopSelectionWindowFocusListener implements WindowFocusListener {
+    private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
 
         public void windowGainedFocus(WindowEvent e) {
             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
@@ -54,7 +84,6 @@ public class AbstractDesktopFrame extends JFrame {
         public void windowLostFocus(WindowEvent e) {
         }
     }
-
 
     public void setConfiguration(DesktopContext c) {
         Rectangle frameLocation = c.getFrameLocation();

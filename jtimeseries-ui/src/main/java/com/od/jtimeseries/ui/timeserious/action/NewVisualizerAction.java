@@ -17,12 +17,10 @@ import java.awt.event.ActionEvent;
 public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActionModel> {
 
     private JFrame mainFrame;
-    private TimeSeriousRootContext rootContext;
 
-    public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m, TimeSeriousRootContext rootContext) {
+    public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m) {
         super(m, "New Visualizer", ImageUtils.NEW_VISUALIZER_16x16);
         this.mainFrame = mainFrame;
-        this.rootContext = rootContext;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }
 

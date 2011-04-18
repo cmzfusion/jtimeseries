@@ -30,12 +30,12 @@ public class NewDesktopAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        final String name = ContextNameCheckUtility.getNameFromUser(frame, "Name for Desktop", "Choose Name", "");
-        nameCheckUtility.checkName(name);
+        String name = ContextNameCheckUtility.getNameFromUser(frame, "Name for Desktop", "Choose Name", "");
+        final String finalName = nameCheckUtility.checkName(name);
         UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
         new EventSender<TimeSeriousBusListener>() {
             public void sendEvent(TimeSeriousBusListener listener) {
-                listener.desktopCreated(name);
+                listener.desktopCreated(finalName);
             }
         });
     }

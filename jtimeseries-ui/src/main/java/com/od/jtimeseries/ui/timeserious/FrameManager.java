@@ -132,7 +132,9 @@ public class FrameManager implements ConfigAware {
                 udpPingHttpServerDictionary,
                 displayNameCalculator,
                 desktopContext,
-                mainSeriesSelector.getSelectionPanel()
+                mainSeriesSelector.getSelectionPanel(),
+                rootContext,
+                applicationActionModels
             );
         }
         frame.setConfiguration(desktopContext);

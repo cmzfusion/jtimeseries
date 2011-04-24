@@ -151,7 +151,7 @@ public class TimeSeriesVisualizer extends JPanel {
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.5d);
         splitPane.setDividerSize(splitPane.getDividerSize() + 4);
-        setDividerLocation(300);
+        setDividerLocation(VisualizerConfiguration.DEFAULT_DIVIDER_LOCATION);
     }
 
     private void createDisplayNameAction() {

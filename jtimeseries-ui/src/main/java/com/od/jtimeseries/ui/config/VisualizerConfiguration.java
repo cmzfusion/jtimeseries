@@ -35,10 +35,12 @@ import java.util.List;
  */
 public class VisualizerConfiguration implements ExportableConfig {
 
-    private String chartsTitle;
+    public static final int DEFAULT_DIVIDER_LOCATION = 300;
+
+    private String chartsTitle = "Visualizer";
     private boolean tableSelectorVisible;
-    private List<UiTimeSeriesConfig> chartConfigs;
-    private int dividorLocation;
+    private List<UiTimeSeriesConfig> chartConfigs = new ArrayList<UiTimeSeriesConfig>();
+    private int dividorLocation = DEFAULT_DIVIDER_LOCATION;
     private boolean showLegendOnChart = true;
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
@@ -50,6 +52,10 @@ public class VisualizerConfiguration implements ExportableConfig {
     private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     public VisualizerConfiguration() {
+    }
+
+    public VisualizerConfiguration(String title) {
+        this.chartsTitle = title;
     }
 
     public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,

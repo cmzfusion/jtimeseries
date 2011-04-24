@@ -2,9 +2,8 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
-import com.od.jtimeseries.ui.timeserious.FrameManager;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
@@ -23,7 +22,7 @@ public class NewDesktopAction extends AbstractAction {
     private ContextNameCheckUtility nameCheckUtility;
 
     public NewDesktopAction(JFrame frame, TimeSeriesContext desktopContainer) {
-        super("New Desktop");
+        super("New Desktop", ImageUtils.ADD_DESKTOP_16x16);
         this.frame = frame;
         super.putValue(SHORT_DESCRIPTION, "Create a new desktop frame");
         nameCheckUtility = new ContextNameCheckUtility(frame, desktopContainer);

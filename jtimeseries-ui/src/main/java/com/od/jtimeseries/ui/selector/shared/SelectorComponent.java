@@ -111,4 +111,11 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         }
         return idInThisContext;
     }
+
+    public void refreshActions() {
+        //make sure all actions are updated to reflect the latest state of
+        //any selected items, e.g. the selection has not changed, but since then
+        //a visualizer has been hidden
+        selectionsActionModel.fireActionStateUpdated();
+    }
 }

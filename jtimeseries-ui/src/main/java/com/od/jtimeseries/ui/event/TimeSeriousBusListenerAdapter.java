@@ -21,9 +21,6 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
-    public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
-    }
-
     public void desktopCreated(String name) {
     }
 

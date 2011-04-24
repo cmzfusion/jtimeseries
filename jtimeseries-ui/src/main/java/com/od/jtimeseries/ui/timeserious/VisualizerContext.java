@@ -21,8 +21,8 @@ public class VisualizerContext extends DefaultTimeSeriesContext implements Expor
     private VInternalFrame visualizerInternalFrame;
     private boolean shown;
 
-    public VisualizerContext(String visualizerName, VisualizerConfiguration visualizerConfiguration) {
-        super(visualizerName, visualizerName);
+    public VisualizerContext(VisualizerConfiguration visualizerConfiguration) {
+        super(visualizerConfiguration.getChartsTitle(), visualizerConfiguration.getChartsTitle());
         this.visualizerConfiguration = visualizerConfiguration;
         shown = visualizerConfiguration.isShown();
     }

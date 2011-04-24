@@ -8,6 +8,7 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
@@ -38,6 +39,11 @@ public abstract class AbstractDesktopFrame extends JFrame {
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         getContentPane().add(desktopPane, BorderLayout.CENTER);
         addWindowListener();
+        configureFrame();
+    }
+
+    private void configureFrame() {
+        setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -58,6 +64,10 @@ public abstract class AbstractDesktopFrame extends JFrame {
 
     protected TimeSeriousRootContext getRootContext() {
         return rootContext;
+    }
+
+    protected DesktopContext getDesktopContext() {
+        return desktopContext;
     }
 
     protected ApplicationActionModels getActionModels() {

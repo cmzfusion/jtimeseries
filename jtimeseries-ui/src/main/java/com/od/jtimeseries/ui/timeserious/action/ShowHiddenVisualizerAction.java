@@ -22,7 +22,14 @@ public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableLi
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(VisualizerContext.class);
+        boolean result = getActionModel().isSelectionLimitedToType(VisualizerContext.class);
+        if ( result ) {
+            List<VisualizerContext> nodes = getActionModel().getSelected(VisualizerContext.class);
+            for ( final VisualizerContext n : nodes ) {
+                result &= n.isHidden();
+            }
+        }
+        return result;
     }
 
     public void actionPerformed(ActionEvent e) {

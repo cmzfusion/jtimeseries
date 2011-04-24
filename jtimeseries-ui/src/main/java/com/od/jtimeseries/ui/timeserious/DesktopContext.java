@@ -51,7 +51,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
         frameLocation = c.getFrameLocation();
         shown = c.isShown();
         for ( VisualizerConfiguration v : c.getVisualizerConfigurations()) {
-            VisualizerContext n = new VisualizerContext(v.getChartsTitle(), v);
+            VisualizerContext n = new VisualizerContext(v);
             addChild(n);
         }
     }

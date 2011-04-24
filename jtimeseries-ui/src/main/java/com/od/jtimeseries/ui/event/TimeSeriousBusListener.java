@@ -25,10 +25,5 @@ public interface TimeSeriousBusListener {
 
     void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame);
 
-    /**
-     * A visualizer config was imported to timeserious from a config fle
-     */
-    void visualizerImported(VisualizerConfiguration visualizerConfiguration);
-
     void desktopCreated(String name);
 }

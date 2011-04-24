@@ -45,10 +45,9 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
         this.nameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
-        addUiBusEventListener();
         addFrameListener();
         addDesktopListener();
-        setTransferHandler(new DesktopPaneTransferHandler());
+        setTransferHandler(new DesktopPaneTransferHandler(desktopContext, nameCheckUtility));
     }
 
     private void addDesktopListener() {
@@ -76,32 +75,12 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         });
     }
 
-    public VisualizerInternalFrame createNewVisualizer(String title) {
-        title = nameCheckUtility.checkName(title);
-        TimeSeriesVisualizer v = createVisualizer(title);
-        VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(v);
-        VisualizerContext node = createAndAddVisualizerNode(c, v);
-        return configureAndShowVisualizerFrame(null, v, node);
-    }
-
-    public void importVisualizer(VisualizerConfiguration c) {
-        TimeSeriesVisualizer visualizer = createVisualizer(c.getChartsTitle());
-        VisualizerContext node = createAndAddVisualizerNode(c, visualizer);
-        configureAndShowVisualizerFrame(c, visualizer, node);
-    }
-
     private TimeSeriesVisualizer createVisualizer(String title) {
         return new TimeSeriesVisualizer(
             title,
             timeSeriesServerDictionary,
             displayNameCalculator
         );
-    }
-
-    private VisualizerContext createAndAddVisualizerNode(VisualizerConfiguration c, TimeSeriesVisualizer visualizer) {
-        VisualizerContext n = new VisualizerContext(visualizer.getChartsTitle(), c);
-        desktopContext.addChild(n);
-        return n;
     }
 
     public void setConfiguration(DesktopContext desktopContext) {
@@ -114,6 +93,10 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
                 showVisualizerForNode(n);
             }
         }
+    }
+
+    public ContextNameCheckUtility getNameCheckUtility() {
+        return nameCheckUtility;
     }
 
     private void showVisualizerForNode(VisualizerContext n) {
@@ -131,21 +114,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
                 return ((Integer)o2.getZPosition()).compareTo(o1.getZPosition());
             }
         });
-    }
-
-    private void addUiBusEventListener() {
-        UIEventBus.getInstance().addEventListener(
-            TimeSeriousBusListener.class,
-            new TimeSeriousBusListenerAdapter() {
-
-                public void visualizerImported(VisualizerConfiguration visualizerConfiguration) {
-                    String title = visualizerConfiguration.getChartsTitle();
-                    title = nameCheckUtility.checkName(title);
-                    visualizerConfiguration.setChartsTitle(title);
-                    importVisualizer(visualizerConfiguration);
-                }
-            }
-        );
     }
 
     private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerContext visualizerNode) {
@@ -168,9 +136,24 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         return visualizerFrame;
     }
 
+    public DesktopContext getDesktopContext() {
+        return desktopContext;
+    }
+
     private class ShowVisualizerTreeListener extends IdentifiableTreeListenerAdapter {
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+            for ( Identifiable c : contextTreeEvent.getNodes()) {
+                if ( c instanceof VisualizerContext) {
+                    VisualizerContext n = (VisualizerContext)c;
+                    if ( n.isShown()) {
+                        showVisualizerForNode(n);
+                    }
+                }
+            }
+        }
+
+        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
             for ( Identifiable c : contextTreeEvent.getNodes()) {
                 if ( c instanceof VisualizerContext) {
                     VisualizerContext n = (VisualizerContext)c;

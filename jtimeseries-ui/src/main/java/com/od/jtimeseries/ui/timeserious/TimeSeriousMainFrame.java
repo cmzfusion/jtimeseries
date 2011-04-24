@@ -123,7 +123,6 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
 
     private void initializeFrame() {
         setTitle("TimeSerious");
-        setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         splitPane.setOneTouchExpandable(true);
         splitPane.setDividerSize(splitPane.getDividerSize() + 4);

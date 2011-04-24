@@ -40,6 +40,7 @@ public abstract class SelectorPopupMouseListener extends MouseAdapter {
 
     private void showMenuIfPopupTrigger(MouseEvent e) {
         if (e.isPopupTrigger()) {
+            selectorComponent.refreshActions();
             List<JMenuItem> menuItems = getMenuItems(e);
             if ( menuItems != null) {
                 JPopupMenu menu = new JPopupMenu();

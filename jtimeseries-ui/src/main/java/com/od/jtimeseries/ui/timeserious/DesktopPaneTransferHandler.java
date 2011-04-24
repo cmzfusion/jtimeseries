@@ -25,7 +25,15 @@ import java.io.IOException;
  */
 public class DesktopPaneTransferHandler extends TransferHandler {
 
-        public boolean canImport(TransferHandler.TransferSupport support) {
+    private DesktopContext desktopContext;
+    private ContextNameCheckUtility nameCheckUtility;
+
+    public DesktopPaneTransferHandler(DesktopContext desktopContext, ContextNameCheckUtility nameCheckUtility) {
+        this.desktopContext = desktopContext;
+        this.nameCheckUtility = nameCheckUtility;
+    }
+
+    public boolean canImport(TransferHandler.TransferSupport support) {
             //System.out.println(support.getSourceDropActions());
             if (!support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 return false;
@@ -51,11 +59,10 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                         ExportableConfig uiConfig = cm.loadConfig("fromFile", ExportableConfig.class, new FileSource((File)f));  if ( uiConfig instanceof VisualizerConfiguration) {
                             final VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
                             c.setShown(true); //always show on import
-                            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class, new EventSender<TimeSeriousBusListener>() {
-                                public void sendEvent(TimeSeriousBusListener listener) {
-                                    listener.visualizerImported(c);
-                                }
-                            } );
+                            String title = c.getChartsTitle();
+                            title = nameCheckUtility.checkName(title);
+                            c.setChartsTitle(title); //update the config to reflect the checked name
+                            desktopContext.addChild(new VisualizerContext(c));
                         }
                     } catch (ConfigManagerException e) {
                         e.printStackTrace();

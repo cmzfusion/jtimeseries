@@ -25,6 +25,11 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         createActions();
         createToolBar();
         layoutFrame();
+        initializeFrame();
+    }
+
+    private void initializeFrame() {
+        setTitle("TimeSerious " + getDesktopContext().getId());
     }
 
     private void createActions() {

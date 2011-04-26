@@ -19,7 +19,7 @@ import java.util.List;
 public class RemoveVisualizerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
     public RemoveVisualizerAction(IdentifiableListActionModel selectionModel) {
-        super(selectionModel, "Remove Visualizer", ImageUtils.SERIES_ICON_16x16);
+        super(selectionModel, "Remove Visualizer", ImageUtils.VISUALIZER_DELETE_16x16);
         super.putValue(SHORT_DESCRIPTION, "Remove the selected visualizer");
     }
 

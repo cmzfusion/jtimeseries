@@ -38,7 +38,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
         addInternalFrameListener(new InternalFrameAdapter() {
 
             public void internalFrameOpened(InternalFrameEvent e) {
-                visualizerNode.setVisualizerFrame(VisualizerInternalFrame.this);
+                visualizerNode.setPeerResource(VisualizerInternalFrame.this);
             }
 
             public void internalFrameActivated(InternalFrameEvent e) {

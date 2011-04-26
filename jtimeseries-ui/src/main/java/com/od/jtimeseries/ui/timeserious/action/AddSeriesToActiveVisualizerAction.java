@@ -20,7 +20,7 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
     private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
     public AddSeriesToActiveVisualizerAction(VisualizerSelectionActionModel visualizerSelectionActionModel, IdentifiableListActionModel actionModel) {
-        super(actionModel, "Add to Selected Visualizer", ImageUtils.ADD_TO_VISUALIZER_16x16);
+        super(actionModel, "Add to Selected Visualizer", ImageUtils.VISUALIZER_ADD_TO_16x16);
         super.putValue(SHORT_DESCRIPTION, "Add series to the selected visualizer");
         this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         visualizerSelectionActionModel.addActionModelListener(new ActionModelListener() {

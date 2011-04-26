@@ -1,12 +1,16 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
@@ -34,7 +38,11 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
             UIPropertiesTimeSeries.class,
             new MainSelectorTreeNodeFactory(UIPropertiesTimeSeries.class)
         );
+
+        //don't enable selection of series for charting, that's not the purpose of the main selector
         selectionPanel.setSeriesSelectionEnabled(false);
+
+        selectionPanel.setTreeComparator(new MainSelectorTreeComparator());
 
         MainSelectorActionFactory selectorActionFactory = new MainSelectorActionFactory(
             rootContext,
@@ -90,4 +98,15 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
+    private static class MainSelectorTreeComparator extends IdentifiableTreeComparator {
+        public int compare(Identifiable o1, Identifiable o2) {
+            //sort server context first
+            boolean o1IsServerContext = o1 instanceof TimeSeriesServerContext;
+            boolean o2IsServerContext = o2 instanceof TimeSeriesServerContext;
+            if ( o1IsServerContext != o2IsServerContext) {
+                return o1IsServerContext ? -1 : 1;
+            }
+            return super.compare(o1, o2);
+        }
+    }
 }

@@ -24,8 +24,8 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
+import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -133,7 +133,15 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
 
     private void createPopupMenu() {
         table.addMouseListener(
-            new SelectorPopupMouseListener(this, table) {
+            new RightClickSelectionPopupListener(this, table) {
+
+                protected void setSelectedItemsOnPopupTrigger(MouseEvent e) {
+                    int row = table.rowAtPoint(e.getPoint());
+                    boolean selected = table.getSelectionModel().isSelectedIndex(row);
+                    if ( ! selected ) {
+                        table.getSelectionModel().setSelectionInterval(row, row);
+                    }
+                }
 
                 protected List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent) {
                     return new LinkedList<Identifiable>(getSelectionsActionModel().getSelected());

@@ -3,10 +3,8 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
-import com.od.jtimeseries.ui.timeserious.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
@@ -23,7 +21,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     private JFrame mainFrame;
 
     public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m) {
-        super(m, "New Visualizer", ImageUtils.NEW_VISUALIZER_16x16);
+        super(m, "New Visualizer", ImageUtils.VISUALIZER_NEW_16x16);
         this.mainFrame = mainFrame;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }

@@ -17,7 +17,7 @@ import java.util.List;
 public class ShowHiddenVisualizerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
     public ShowHiddenVisualizerAction(IdentifiableListActionModel actionModel) {
-        super(actionModel, "Show Visualizer", ImageUtils.SERIES_ICON_16x16);
+        super(actionModel, "Show Visualizer", ImageUtils.VISUALIZER_SHOW_16x16);
         super.putValue(SHORT_DESCRIPTION, "Restore the selected visualizer to the desktop pane");
     }
 

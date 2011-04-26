@@ -28,10 +28,11 @@ import javax.swing.*;
  */
 public class ImageUtils {
 
+    public static final String PROGRESS_SERVER_IMAGE = "/images/server_client2_16x16.png";
+
     public static ImageIcon CONTEXT_ICON_16x16 = getImageIcon("/images/folder_cubes16x16.gif");
     public static ImageIcon SERIES_ICON_16x16 = getImageIcon("/images/document_chart16x16.png");
     public static ImageIcon FRAME_ICON_16x16 = getImageIcon("/images/chart16x16.png");
-    public static ImageIcon NEW_VISUALIZER_16x16 = getImageIcon("/images/new_visualizer_16x16.png");
     public static ImageIcon ADD_ICON_16x16 = getImageIcon("/images/add16x16.png");
     public static ImageIcon REMOVE_ICON_16x16 = getImageIcon("/images/selection_delete16x16.png");
     public static ImageIcon CONNECT_ICON_16x16 = getImageIcon("/images/connect16x16.png");
@@ -42,7 +43,6 @@ public class ImageUtils {
     public static ImageIcon TIMESERIES_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_16x16.png");
     public static ImageIcon TIMESERIES_SERVER_ICON_24x24 = getImageIcon("/images/server_client2_24x24.png");
     public static ImageIcon ADD_SERVER_ICON_16x16 = getImageIcon("/images/server_client2_add_16x16.png");
-    public static ImageIcon ADD_TO_VISUALIZER_16x16 = getImageIcon("/images/remoteChart.gif");
     public static ImageIcon DOWNLOAD_16x16 = getImageIcon("/images/download16x16.png");
     public static ImageIcon CANCEL_16x16 = getImageIcon("/images/cancel16x16.png");
     public static ImageIcon DISPLAY_NAME_16x16 = getImageIcon("/images/displayName16x16.png");
@@ -50,7 +50,16 @@ public class ImageUtils {
     public static ImageIcon TABLE_COLUMN_ADD_16x16 = getImageIcon("/images/table_column_add_16x16.png");
     public static ImageIcon FIND_IN_MAIN_SELECTOR_16x16 = getImageIcon("/images/find_in_main_selector_16x16.png");
     public static ImageIcon EXIT_16x16 = getImageIcon("/images/exit_16x16.png");
-    public static ImageIcon ADD_DESKTOP_16x16 = getImageIcon("/images/window_new_16x16.png");
+    public static ImageIcon DESKTOP_NEW_16x16 = getImageIcon("/images/window_new_16x16.png");
+    public static ImageIcon DESKTOP_DELETE_16x16 = getImageIcon("/images/window_delete_16x16.png");
+    public static ImageIcon DESKTOP_SHOW_16x16 = getImageIcon("/images/window_show_16x16.png");
+    public static ImageIcon DESKTOP_16x16 = getImageIcon("/images/window_16x16.png");
+    public static ImageIcon VISUALIZER_16x16 = getImageIcon("/images/visualizer_16x16.png");
+    public static ImageIcon VISUALIZER_NEW_16x16 = getImageIcon("/images/visualizer_new_16x16.png");
+    public static ImageIcon VISUALIZER_DELETE_16x16 = getImageIcon("/images/visualizer_delete_16x16.png");
+    public static ImageIcon VISUALIZER_SHOW_16x16 = getImageIcon("/images/visualizer_show_16x16.png");
+    public static ImageIcon VISUALIZER_ADD_TO_16x16 = getImageIcon("/images/visualizer_add_to_16x16.png");
+
 
     public static ImageIcon getImageIcon(String name) {
         ImageIcon imageIcon = null;

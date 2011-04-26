@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
+import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -42,6 +43,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -49,6 +51,15 @@ import java.util.List;
  * User: Nick Ebbutt
  * Date: 06-Jan-2009
  * Time: 17:25:36
+ *
+ * A component which allows selection of timeseries / identifiables via a tree or table
+ *
+ * Two forms of 'selection' are supported:
+ *
+ * 1. A basic ability to select/highlight items in the tree or table and right click to perform actions is always
+ * active.
+ * 2. Additionally, checkboxes may be rendered which allow timeseries to be selected (for charting, for example) into
+ * a separate selectionListForCharting - this feature may be enabled or disabled according to the purpose of the selector
  */
 public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPanel implements SelectionManager<E> {
 
@@ -113,6 +124,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setSelectorActionFactory(selectorActionFactory);
     }
 
+    public void setTreeComparator(Comparator<Identifiable> treeComparator) {
+        treeSelector.setTreeComparator(treeComparator);
+    }
+
     public void setTransferHandler(TransferHandler h) {
         treeSelector.setTransferHandler(h);
         tableSelector.setTransferHandler(h);
@@ -164,48 +179,10 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         getSelectionActionModel().addActionModelListener(descriptionSettingSelectorListener);
 
         context.addTreeListener(
-                AwtSafeListener.getAwtSafeListener(
-                        new IdentifiableTreeListener() {
-
-                            public void nodeChanged(Identifiable node, Object changeDescription) {
-                            }
-
-                            public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, false);
-                                modifySelectedForCharting(seriesAffected);
-                            }
-
-                            public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-                                modifySelectedForCharting(seriesAffected);
-                            }
-
-                            private void modifySelectedForCharting(List<E> seriesAffected) {
-                                for (E series : seriesAffected) {
-                                    if (series.isSelected()) {
-                                        selectionListForCharting.addSelection(series);
-                                    } else {
-                                        selectionListForCharting.removeSelection(series);
-                                    }
-                                }
-                            }
-
-                            public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-                                //remove those series selected for charting
-                                List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-                                for (E series : seriesAffected) {
-                                    selectionListForCharting.removeSelection(series);
-                                }
-
-                                //remove those identifiable selected/highlighted in tree/table
-//                                List<Identifiable> allIdentifiable = SelectorComponent.getAffectedSeries(Identifiable.class, contextTreeEvent, true);
-//                                for ( Identifiable i : allIdentifiable) {
-//                                    selectionActionModel.removeSelected(i);
-//                                }
-                            }
-                        },
-                        IdentifiableTreeListener.class
-                )
+            AwtSafeListener.getAwtSafeListener(
+                new UpdateSelectedForChartingTreeListener(),
+                IdentifiableTreeListener.class
+            )
         );
     }
 
@@ -322,4 +299,47 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
     }
 
+    /**
+     * When items are removed from the identifiable tree, we need to adjust
+     * the charting selections if items are removed or added with their selected status set true
+     */
+    private class UpdateSelectedForChartingTreeListener implements IdentifiableTreeListener {
+
+        public void nodeChanged(Identifiable node, Object changeDescription) {
+        }
+
+        public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, false);
+            modifySelectedForCharting(seriesAffected);
+        }
+
+        public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
+            modifySelectedForCharting(seriesAffected);
+        }
+
+        private void modifySelectedForCharting(List<E> seriesAffected) {
+            for (E series : seriesAffected) {
+                if (series.isSelected()) {
+                    selectionListForCharting.addSelection(series);
+                } else {
+                    selectionListForCharting.removeSelection(series);
+                }
+            }
+        }
+
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+            //remove those series selected for charting
+            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
+            for (E series : seriesAffected) {
+                selectionListForCharting.removeSelection(series);
+            }
+
+            //remove those identifiable selected/highlighted in tree/table
+//                                List<Identifiable> allIdentifiable = SelectorComponent.getAffectedSeries(Identifiable.class, contextTreeEvent, true);
+//                                for ( Identifiable i : allIdentifiable) {
+//                                    selectionActionModel.removeSelected(i);
+//                                }
+        }
+    }
 }

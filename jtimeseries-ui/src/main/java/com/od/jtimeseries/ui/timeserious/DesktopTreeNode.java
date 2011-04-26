@@ -28,10 +28,9 @@ public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
     }
 
     protected Icon getIcon() {
-        return ImageUtils.ADD_TO_VISUALIZER_16x16;
+        return ImageUtils.DESKTOP_16x16;
     }
 
-    @Override
     public boolean isSelected() {
         return false;
     }

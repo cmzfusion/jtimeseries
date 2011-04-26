@@ -30,7 +30,7 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
     public List<VisualizerConfiguration> getVisualizerConfigurations() {
         List<VisualizerConfiguration> result = new LinkedList<VisualizerConfiguration>();
         for ( VisualizerContext n : findAll(VisualizerContext.class).getAllMatches()) {
-            VisualizerConfiguration c = n.getVisualizerConfiguration();
+            VisualizerConfiguration c = n.getConfiguration();
             result.add(c);
         }
         return result;
@@ -82,6 +82,10 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
 
     public boolean isShown() {
         return shown;
+    }
+
+    public void setShown(boolean shown) {
+        this.shown = shown;
     }
 
     public boolean isMainDesktopContext() {

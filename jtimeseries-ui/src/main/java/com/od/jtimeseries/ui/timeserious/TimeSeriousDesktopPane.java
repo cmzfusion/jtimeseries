@@ -3,18 +3,13 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
-import com.od.jtimeseries.ui.config.ConfigAware;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
-import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
@@ -100,7 +95,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     }
 
     private void showVisualizerForNode(VisualizerContext n) {
-        VisualizerConfiguration c = n.getVisualizerConfiguration();
+        VisualizerConfiguration c = n.getConfiguration();
         //here we are showing the visualizer for an existing visualizerNode rather
         //than creating a new visualizer, so no need to check the name
         TimeSeriesVisualizer v = createVisualizer(c.getChartsTitle());

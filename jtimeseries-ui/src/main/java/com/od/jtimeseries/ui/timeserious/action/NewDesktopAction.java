@@ -22,7 +22,7 @@ public class NewDesktopAction extends AbstractAction {
     private ContextNameCheckUtility nameCheckUtility;
 
     public NewDesktopAction(JFrame frame, TimeSeriesContext desktopContainer) {
-        super("New Desktop", ImageUtils.ADD_DESKTOP_16x16);
+        super("New Desktop", ImageUtils.DESKTOP_NEW_16x16);
         this.frame = frame;
         super.putValue(SHORT_DESCRIPTION, "Create a new desktop frame");
         nameCheckUtility = new ContextNameCheckUtility(frame, desktopContainer);

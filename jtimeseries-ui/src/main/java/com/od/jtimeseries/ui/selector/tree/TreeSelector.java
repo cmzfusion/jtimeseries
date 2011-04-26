@@ -21,8 +21,8 @@ package com.od.jtimeseries.ui.selector.tree;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
+import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMouseListener;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -33,6 +33,7 @@ import com.od.swing.util.AwtSafeListener;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -66,6 +67,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
+    private Comparator<Identifiable> treeComparator = new IdentifiableTreeComparator();
 
     public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, SelectorTreeNodeFactory nodeFactory) {
         super(rootContext, selectionsActionModel);
@@ -74,7 +76,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
         tree = new AnimatedIconTree();
-
         setupSeries();
 
         tree.setModel(treeModel);
@@ -89,7 +90,6 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         setLayout(new BorderLayout());
         JScrollPane scrollPane = new JScrollPane(tree);
-        //add(toolbar, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         addMouseListeners();
         setupDragAndDrop();
@@ -105,15 +105,19 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         tree.setTransferHandler(newHandler);
     }
 
+    public void setTreeComparator(Comparator<Identifiable> treeComparator) {
+        this.treeComparator = treeComparator;
+    }
+
     public void setSeriesSelectionEnabled(boolean enabled) {
         cellRenderer.setSeriesSelectionEnabled(enabled);
     }
 
     private void autoExpandTree() {
         expandNodesFrom(
-                (AbstractSeriesSelectionTreeNode) treeModel.getRoot(),
-                AUTO_EXPAND_RULE,
-                true
+            (AbstractSeriesSelectionTreeNode) treeModel.getRoot(),
+            AUTO_EXPAND_RULE,
+            true
         );
     }
 
@@ -196,22 +200,23 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private void addMouseListeners() {
+        //add a listener which lets us set the selected flag on each timeseries item
         tree.addMouseListener(new SeriesSelectionMouseListener(tree));
 
-        //add a listener for mouse clicks on the tree, to populate the fileSelectionModel
-        //this is done as a mouse listener rather than a tree selection listener so that we still get an event even if the selection is not changed
-        tree.addMouseListener(new SelectorPopupMouseListener(this, tree) {
-            protected List<Identifiable> getSelectedIdentifiable(MouseEvent e) {
-                //only support single selection at present
-                List<Identifiable> result = Collections.emptyList();
-                TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (selPath != null) {
-                    Object selectedNode = selPath.getLastPathComponent();
-                    if (selectedNode instanceof AbstractSeriesSelectionTreeNode) {
-                        result = Collections.singletonList(((AbstractSeriesSelectionTreeNode)selectedNode).getIdentifiable());
-                    }
+        //add popup menu listener
+        tree.addMouseListener(new RightClickSelectionPopupListener(this, tree) {
+
+            protected void setSelectedItemsOnPopupTrigger(MouseEvent e) {
+                TreePath p = tree.getPathForLocation(e.getX(), e.getY());
+                //if node under right click not already a selection,
+                //clear selections and set as selected item
+                if ( ! tree.getSelectionModel().isPathSelected(p)) {
+                    tree.getSelectionModel().setSelectionPath(p);
                 }
-                return result;
+            }
+
+            protected List<Identifiable> getSelectedIdentifiable(MouseEvent e) {
+                return getSelectionsActionModel().getSelected();
             }
 
             protected SelectorComponent getSelectorComponent() {
@@ -297,12 +302,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private int addChild(AbstractSeriesSelectionTreeNode parent, AbstractSeriesSelectionTreeNode child) {
         Enumeration<DefaultMutableTreeNode> e = parent.children();
         int index = 0;
-        IdentifiableTreeComparator c = new IdentifiableTreeComparator();
         boolean inserted = false;
         while(e.hasMoreElements()) {
             AbstractSeriesSelectionTreeNode node = (AbstractSeriesSelectionTreeNode)e.nextElement();
-            int comparison = c.compare(node.getIdentifiable(), child.getIdentifiable());
-            if ( comparison < 0) {
+            int comparison = treeComparator.compare(node.getIdentifiable(), child.getIdentifiable());
+            if ( comparison > 0) {
                 parent.insert(child, index);
                 inserted = true;
                 break;

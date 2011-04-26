@@ -7,10 +7,7 @@ import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.timeserious.action.AddSeriesToActiveVisualizerAction;
-import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.RemoveVisualizerAction;
-import com.od.jtimeseries.ui.timeserious.action.ShowHiddenVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -33,6 +30,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action renameServerAction;
     private Action showHiddenVisualizerAction;
     private Action removeVisualizerAction;
+    private Action removeDesktopAction;
 
 
     public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentSelector) {
@@ -43,6 +41,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         renameServerAction = new RenameServerAction(parentSelector, selectionModel);
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel);
+        removeDesktopAction = new RemoveDesktopAction(selectionModel);
     }
 
     public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
@@ -61,6 +60,10 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
                 refreshServerAction,
                 removeServerAction,
                 renameServerAction
+            );
+        } else if ( selectionModel.isSelectionLimitedToType(DesktopContext.class)) {
+            result = Arrays.asList(
+                removeDesktopAction
             );
         }
         return result;

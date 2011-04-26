@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.selector.tree;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.IconComponentAnimator;
 
@@ -29,7 +30,7 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
 
     public SelectorTreeNodeFactory(Class seriesClass) {
         this.seriesClass = seriesClass;
-        serverNodeAnimator.setBackgroundImage("/images/server_client2_16x16.png", 0.9f);
+        serverNodeAnimator.setBackgroundImage(ImageUtils.PROGRESS_SERVER_IMAGE, 0.9f);
     }
 
     public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {

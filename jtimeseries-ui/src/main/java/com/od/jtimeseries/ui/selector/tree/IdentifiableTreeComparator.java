@@ -9,10 +9,11 @@ import java.util.Comparator;
 * Created by IntelliJ IDEA.
 * User: nick
 * Date: 20/12/10
-* <p/>
-* To change this template use File | Settings | File Templates.
+*
+* Compare the identifiable nodes in a selector tree
+* The Displayable interface is used to get the name for comparison where possible
 */
-class IdentifiableTreeComparator implements Comparator<Identifiable> {
+public class IdentifiableTreeComparator implements Comparator<Identifiable> {
     public int compare(Identifiable o1, Identifiable o2) {
         //sort context folders before series, then by display name
         boolean o1IsContext = o1 instanceof TimeSeriesContext;

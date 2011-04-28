@@ -82,7 +82,6 @@ public class TimeSerious implements ConfigAware {
 
                 JideInitialization.applyLicense();
                 JideInitialization.setupJide();
-                JideInitialization.setupJideLookAndFeel();
 
                 try {
                     UIManager.setLookAndFeel(WindowsLookAndFeel.class.getName());

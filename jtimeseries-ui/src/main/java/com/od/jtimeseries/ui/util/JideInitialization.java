@@ -55,6 +55,7 @@ public class JideInitialization {
         setupCellEditorManager();
     }
 
+    //not currently used, think the latest swing windows l&f may look better
     public static void setupJideLookAndFeel() {
         LookAndFeelFactory.installJideExtension(LookAndFeelFactory.OFFICE2007_STYLE);
         LookAndFeelFactory.setDefaultStyle(LookAndFeelFactory.OFFICE2007_STYLE);

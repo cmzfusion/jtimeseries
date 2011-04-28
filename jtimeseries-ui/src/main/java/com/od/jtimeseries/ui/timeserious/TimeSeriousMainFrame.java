@@ -130,6 +130,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
 
     private void createMenuBar() {
         JMenu fileMenu = new JMenu("File");
+        fileMenu.setOpaque(false);
         mainMenuBar.add(fileMenu);
 
         JMenuItem newServerItem = new JMenuItem(newServerAction);
@@ -142,6 +143,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         JMenuItem newVisualizerItem = new JMenuItem(newVisualizerAction);
         windowMenu.add(newVisualizerItem);
 
+        windowMenu.setOpaque(false);
         mainMenuBar.add(windowMenu);
         setJMenuBar(mainMenuBar);
     }

@@ -2,9 +2,7 @@ package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
-import com.od.jtimeseries.ui.timeserious.VInternalFrame;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 
 /**
 * Created by IntelliJ IDEA.
@@ -19,11 +17,11 @@ public interface TimeSeriousBusListener {
 
     void serverRemoved(TimeSeriesServer s);
 
-    void desktopSelected(TimeSeriousDesktopPane desktopPanel);
+    void desktopSelected(TimeSeriousDesktopPane desktopPane);
+
+    void desktopDisposed(TimeSeriousDesktopPane desktopPane);
 
     void visualizerSelected(VisualizerInternalFrame visualizerFrame);
 
     void visualizerFrameDisposed(VisualizerInternalFrame visualizerFrame);
-
-    void desktopCreated(String name);
 }

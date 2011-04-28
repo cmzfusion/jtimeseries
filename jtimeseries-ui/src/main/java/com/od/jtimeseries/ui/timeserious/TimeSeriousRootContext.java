@@ -31,17 +31,14 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
 
-    private DesktopContext mainDesktopContext = new DesktopContext(DesktopConfiguration.MAIN_DESKTOP_NAME);
-
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(serverDictionary, displayNameCalculator);
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
         initializeFactoriesAndContextBusListener();
-        addChild(mainDesktopContext);
     }
 
     public DesktopContext getMainDesktopContext() {
-        return mainDesktopContext;
+        return get(DesktopConfiguration.MAIN_DESKTOP_NAME, DesktopContext.class);
     }
 
     protected ContextFactory createContextFactory() {
@@ -57,20 +54,32 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
-        List<TimeSeriesServerContext> serverContexts = findAll(TimeSeriesServerContext.class).getAllMatches();
+        saveServers(config);
+        saveDesktops(config);
+    }
 
+    private void saveServers(TimeSeriousConfig config) {
+        List<TimeSeriesServerContext> serverContexts = findAll(TimeSeriesServerContext.class).getAllMatches();
         List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
         for ( TimeSeriesServerContext c : serverContexts) {
             serverConfigs.add(new TimeSeriesServerConfig(c));
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
+    }
 
+
+    private void saveDesktops(TimeSeriousConfig config) {
         for ( DesktopContext desktopContext : findAll(DesktopContext.class).getAllMatches()) {
-            config.setDesktopConfigration(desktopContext.getId(), desktopContext.getDesktopConfiguration());
+            config.setDesktopConfigration(desktopContext.getId(), desktopContext.getConfiguration());
         }
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        restoreSevers(config);
+        restoreDesktops(config);
+    }
+
+    private void restoreSevers(TimeSeriousConfig config) {
         for (TimeSeriesServerConfig c : config.getServerConfigs()) {
             try {
                 serverDictionary.getOrCreateServer(
@@ -82,17 +91,19 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
                 logMethods.logError("Could not create server " + serverDictionary, e);
             }
         }
+    }
 
+    private void restoreDesktops(TimeSeriousConfig config) {
         for ( Map.Entry<String, DesktopConfiguration> configEntry : config.getDesktopConfigs().entrySet()) {
-            DesktopContext desktopContext = getOrCreateDesktopContext(configEntry.getValue());
-            desktopContext.createDesktopConfiguration(configEntry.getValue());
+            createDesktopContext(configEntry.getValue());
         }
     }
 
-    private DesktopContext getOrCreateDesktopContext(DesktopConfiguration desktopConfiguration) {
+
+    private DesktopContext createDesktopContext(DesktopConfiguration desktopConfiguration) {
         DesktopContext context = (DesktopContext)get(desktopConfiguration.getDesktopName());
         if ( context == null) {
-            context = new DesktopContext(desktopConfiguration.getDesktopName());
+            context = new DesktopContext(desktopConfiguration);
             addChild(context);
         }
         return context;

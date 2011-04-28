@@ -1,9 +1,7 @@
 package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
-import com.od.jtimeseries.ui.timeserious.VInternalFrame;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 
 /**
@@ -11,7 +9,7 @@ import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
  * User: Nick
  * Date: 12-Dec-2010
  * Time: 16:21:47
- * To change this template use File | Settings | File Templates.
+ *
  */
 public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
 
@@ -21,9 +19,6 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
-    public void desktopCreated(String name) {
-    }
-
     public void visualizerSelected(VisualizerInternalFrame f) {
     }
 
@@ -31,6 +26,9 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     }
 
     public void desktopSelected(TimeSeriousDesktopPane desktopPane) {
+    }
+
+    public void desktopDisposed(TimeSeriousDesktopPane desktopPane) {
     }
 
 }

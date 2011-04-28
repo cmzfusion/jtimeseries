@@ -21,15 +21,17 @@ import javax.swing.event.InternalFrameEvent;
 * Date: 26-Mar-2010
 * Time: 17:59:22
 */
-public class VisualizerInternalFrame extends JInternalFrame implements VInternalFrame {
+public class VisualizerInternalFrame extends JInternalFrame implements PeerVisualizerFrame {
 
     private TimeSeriesVisualizer visualizer;
     private JDesktopPane desktopPane;
+    private VisualizerContext visualizerNode;
 
     public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerNode) {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
         this.desktopPane = desktopPane;
+        this.visualizerNode = visualizerNode;
         visualizer.setToolbarVisible(false);
         setFrameIcon(ImageUtils.FRAME_ICON_16x16);
         getContentPane().add(visualizer);
@@ -43,11 +45,12 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
 
             public void internalFrameActivated(InternalFrameEvent e) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
-                        new EventSender<TimeSeriousBusListener>() {
-                            public void sendEvent(TimeSeriousBusListener listener) {
-                                listener.visualizerSelected(VisualizerInternalFrame.this);
-                            }
-                        });
+                    new EventSender<TimeSeriousBusListener>() {
+                        public void sendEvent(TimeSeriousBusListener listener) {
+                            listener.visualizerSelected(VisualizerInternalFrame.this);
+                        }
+                    }
+                );
             }
 
             public void internalFrameClosed(InternalFrameEvent e) {
@@ -56,7 +59,8 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
                         public void sendEvent(TimeSeriousBusListener listener) {
                             listener.visualizerFrameDisposed(VisualizerInternalFrame.this);
                         }
-                    });
+                    }
+                );
                 visualizerNode.setShown(false);
             }
         });
@@ -66,15 +70,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
         //of the node, and close the frame if it changes
         visualizerNode.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
-                new IdentifiableTreeListenerAdapter() {
-                    public void nodeChanged(Identifiable node, Object changeDescription) {
-                        if ("shown".equals(changeDescription)) {
-                            if (!visualizerNode.isShown()) {
-                                dispose();
-                            }
-                        }
-                    }
-                },
+                new FrameDisposingContextListener(),
                 IdentifiableTreeListener.class
             )
         );
@@ -93,6 +89,17 @@ public class VisualizerInternalFrame extends JInternalFrame implements VInternal
             TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
             if ( c.getFrameBounds() != null) {
                 setBounds(c.getFrameBounds());
+            }
+        }
+    }
+
+    private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
+
+        public void nodeChanged(Identifiable node, Object changeDescription) {
+            if ("shown".equals(changeDescription)) {
+                if (! visualizerNode.isShown()) {
+                    dispose();
+                }
             }
         }
     }

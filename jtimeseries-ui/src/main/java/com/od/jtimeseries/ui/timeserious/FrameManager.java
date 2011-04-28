@@ -49,19 +49,6 @@ public class FrameManager implements ConfigAware {
             applicationActionModels,
             udpPingHttpServerDictionary
         );
-        this.mainFrame = createMainFrame(rootContext.getMainDesktopContext());
-        addEventBusListener();
-    }
-
-    private void addEventBusListener() {
-        UIEventBus.getInstance().addEventListener(TimeSeriousBusListener.class, AwtSafeListener.getAwtSafeListener(
-            new TimeSeriousBusListenerAdapter() {
-                public void desktopCreated(String name) {
-                    createNewFrame(name);
-                }
-            },
-            TimeSeriousBusListener.class
-        ));
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -72,6 +59,7 @@ public class FrameManager implements ConfigAware {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
+        this.mainFrame = createMainFrame(rootContext.getMainDesktopContext());
         showFrames();
         addShowFrameTreeListener();
     }
@@ -91,11 +79,6 @@ public class FrameManager implements ConfigAware {
 
     public TimeSeriousMainFrame getMainFrame() {
         return mainFrame;
-    }
-
-    public void createNewFrame(String name) {
-        DesktopContext d = new DesktopContext(name);
-        rootContext.addChild(d);
     }
 
     private class ShowFrameTreeListener extends IdentifiableTreeListenerAdapter {
@@ -137,7 +120,6 @@ public class FrameManager implements ConfigAware {
                 applicationActionModels
             );
         }
-        frame.setConfiguration(desktopContext);
         frame.setVisible(true);
     }
 

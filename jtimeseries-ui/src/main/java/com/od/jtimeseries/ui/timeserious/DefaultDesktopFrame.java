@@ -5,6 +5,10 @@ import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +30,16 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         createToolBar();
         layoutFrame();
         initializeFrame();
+        addListeners();
+    }
+
+    private void addListeners() {
+         getDesktopContext().addTreeListener(
+                 AwtSafeListener.getAwtSafeListener(
+                         new FrameDisposingContextListener(),
+                         IdentifiableTreeListener.class
+                 )
+         );
     }
 
     private void initializeFrame() {
@@ -42,5 +56,18 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
 
     protected Component getMainComponent() {
         return getDesktopPane();
+    }
+
+    //monitor the shown status to dispose the frame if this changes to false
+    //this is only done for default frame, since it should never be possible for the user to
+    //close the main frame
+    private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
+        public void nodeChanged(Identifiable node, Object changeDescription) {
+            if ("shown".equals(changeDescription)) {
+                if (!getDesktopContext().isShown()) {
+                    dispose();
+                }
+            }
+        }
     }
 }

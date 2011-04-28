@@ -26,7 +26,6 @@ import java.util.List;
  */
 public class TimeSeriousDesktopPane extends JDesktopPane {
 
-    private JFrame parentFrame;
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
@@ -34,13 +33,11 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     private ContextNameCheckUtility nameCheckUtility;
 
     public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
-        this.parentFrame = parentFrame;
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
         this.nameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
-        addFrameListener();
         addDesktopListener();
         setTransferHandler(new DesktopPaneTransferHandler(desktopContext, nameCheckUtility));
     }
@@ -50,24 +47,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
             AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
             IdentifiableTreeListener.class)
         );
-    }
-
-    private void addFrameListener() {
-        parentFrame.addWindowStateListener(new WindowStateListener() {
-            public void windowStateChanged(WindowEvent e) {
-                desktopContext.setFrameExtendedState(parentFrame.getExtendedState());
-            }
-        });
-
-        parentFrame.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                desktopContext.setFrameLocation(parentFrame.getBounds());
-            }
-
-            public void componentMoved(ComponentEvent e) {
-                desktopContext.setFrameLocation(parentFrame.getBounds());
-            }
-        });
     }
 
     private TimeSeriesVisualizer createVisualizer(String title) {

@@ -25,6 +25,10 @@ public class DesktopSelectionActionModel extends AbstractActionModel {
                  public void desktopSelected(TimeSeriousDesktopPane desktopPane) {
                      setDesktop(desktopPane);
                  }
+
+                 public void desktopDisposed(TimeSeriousDesktopPane desktopPane) {
+                     clearActionModelState();
+                 }
             }
         );
     }

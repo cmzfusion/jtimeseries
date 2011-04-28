@@ -9,15 +9,16 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  * Time: 10:49
  * To change this template use File | Settings | File Templates.
  *
- * A context which relates to a ui element that can be hidden
+ * A context which relates to a peer ui element that can be hidden
  * e.g. a visualizer window
  *
- * When the peer is hidden, it's config is stored so that it can be re-shown in the same state
+ * When the peer component is hidden, it's config is stored so that it can be shown again
  */
-public abstract class HideablePeerContext<E> extends DefaultTimeSeriesContext {
+public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext {
 
-    protected E peerConfig;
-    protected boolean shown;
+    private E peerConfig;
+    private P peerResource;
+    private boolean shown;
 
     public HideablePeerContext(String id, String description, E peerConfig, boolean shown) {
         super(id, description);
@@ -27,7 +28,7 @@ public abstract class HideablePeerContext<E> extends DefaultTimeSeriesContext {
 
     public E getConfiguration() {
         return isPeerCreatedAndShown() ?
-            createVisualizerConfig(true) :
+            createPeerConfig(true) :
             peerConfig;
     }
 
@@ -39,7 +40,7 @@ public abstract class HideablePeerContext<E> extends DefaultTimeSeriesContext {
         return isShown() && isPeerCreated();
     }
 
-    protected abstract E createVisualizerConfig(boolean shown);
+    protected abstract E createPeerConfig(boolean shown);
 
     public boolean isShown() {
         return shown;
@@ -49,20 +50,30 @@ public abstract class HideablePeerContext<E> extends DefaultTimeSeriesContext {
         return ! isShown();
     }
 
-    protected abstract boolean isPeerCreated();
+    protected boolean isPeerCreated() {
+        return peerResource != null;
+    }
 
-    protected abstract void disposePeerResource();
+    protected void disposePeerResource() {
+        peerResource = null;
+    }
 
     public void setShown(boolean shown) {
         if (this.shown != shown) {
             this.shown = shown;
             if (!shown) {
-                peerConfig = createVisualizerConfig(false);
+                peerConfig = createPeerConfig(false);
                 disposePeerResource();
             }
             fireNodeChanged("shown");
         }
     }
 
-    public abstract void setPeerResource(VInternalFrame frame);
+    protected void setPeerResource(P peerResource) {
+        this.peerResource = peerResource;
+    }
+
+    protected P getPeerResource() {
+        return peerResource;
+    }
 }

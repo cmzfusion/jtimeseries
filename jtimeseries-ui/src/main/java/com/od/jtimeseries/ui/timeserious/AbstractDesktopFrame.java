@@ -1,8 +1,5 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.ConfigAware;
-import com.od.jtimeseries.ui.config.DesktopConfiguration;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
@@ -14,9 +11,9 @@ import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +21,7 @@ import java.util.Collections;
  * Date: 08/04/11
  * Time: 17:02
  */
-public abstract class AbstractDesktopFrame extends JFrame {
+public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop {
 
     private TimeSeriousDesktopPane desktopPane;
     private DesktopContext desktopContext;
@@ -37,13 +34,11 @@ public abstract class AbstractDesktopFrame extends JFrame {
         this.rootContext = rootContext;
         this.actionModels = actionModels;
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
+        setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
         addWindowListener();
-        configureFrame();
-    }
-
-    private void configureFrame() {
-        setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
+        setConfiguration(desktopContext);
+        desktopContext.setPeerResource(this);
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -76,6 +71,7 @@ public abstract class AbstractDesktopFrame extends JFrame {
 
     private void addWindowListener() {
         addWindowFocusListener(new DesktopSelectionWindowFocusListener());
+        addWindowListener(new DesktopWindowListener());
     }
 
     //set the selected desktop in the desktopSelectionActionModel when this window is focused
@@ -95,7 +91,21 @@ public abstract class AbstractDesktopFrame extends JFrame {
         }
     }
 
-    public void setConfiguration(DesktopContext c) {
+     private class DesktopWindowListener extends WindowAdapter {
+
+        public void windowClosed(WindowEvent e) {
+            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
+                new EventSender<TimeSeriousBusListener>() {
+                    public void sendEvent(TimeSeriousBusListener listener) {
+                        listener.desktopDisposed(desktopPane);
+                    }
+                }
+            );
+            desktopContext.setShown(false);
+        }
+    }
+
+    private void setConfiguration(DesktopContext c) {
         Rectangle frameLocation = c.getFrameLocation();
         if ( frameLocation != null) {
             setBounds(frameLocation);

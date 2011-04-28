@@ -31,7 +31,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action showHiddenVisualizerAction;
     private Action removeVisualizerAction;
     private Action removeDesktopAction;
-
+    private Action showHiddenDesktopAction;
 
     public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentSelector) {
         this.selectionModel = selectionPanel.getSelectionActionModel();
@@ -42,6 +42,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel);
         removeDesktopAction = new RemoveDesktopAction(selectionModel);
+        showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
     }
 
     public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
@@ -63,7 +64,8 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
             );
         } else if ( selectionModel.isSelectionLimitedToType(DesktopContext.class)) {
             result = Arrays.asList(
-                removeDesktopAction
+                removeDesktopAction,
+                showHiddenDesktopAction
             );
         }
         return result;

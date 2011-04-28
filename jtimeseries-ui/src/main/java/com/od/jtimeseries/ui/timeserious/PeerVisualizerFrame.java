@@ -10,7 +10,7 @@ import java.awt.*;
  * Date: 30/03/11
  * Time: 06:48
  */
-public interface VInternalFrame {
+public interface PeerVisualizerFrame {
 
     TimeSeriesVisualizer getVisualizer();
 

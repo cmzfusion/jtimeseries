@@ -1,12 +1,10 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -17,17 +15,18 @@ import java.util.List;
  * Date: 10/03/11
  * Time: 08:37
  */
-public class DesktopContext extends DefaultTimeSeriesContext implements ExportableConfigHolder {
+public class DesktopContext extends HideablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
-    private int frameExtendedState;
-    private Rectangle frameLocation;
-    private boolean shown = true;
+    public DesktopContext(DesktopConfiguration config) {
+        super(config.getDesktopName(), config.getDesktopName(), config, config.isShown());
 
-    public DesktopContext(String name) {
-        super(name, name);
+        for ( VisualizerConfiguration v : config.getVisualizerConfigurations()) {
+            VisualizerContext n = new VisualizerContext(v);
+            addChild(n);
+        }
     }
 
-    public List<VisualizerConfiguration> getVisualizerConfigurations() {
+    private List<VisualizerConfiguration> getVisualizerConfigurations() {
         List<VisualizerConfiguration> result = new LinkedList<VisualizerConfiguration>();
         for ( VisualizerContext n : findAll(VisualizerContext.class).getAllMatches()) {
             VisualizerConfiguration c = n.getConfiguration();
@@ -36,56 +35,30 @@ public class DesktopContext extends DefaultTimeSeriesContext implements Exportab
         return result;
     }
 
-    public DesktopConfiguration getDesktopConfiguration() {
+    public DesktopConfiguration createPeerConfig(boolean isShown) {
+        PeerDesktop peerFrame = getPeerResource();
         DesktopConfiguration d = new DesktopConfiguration(getId());
         d.setVisualizerConfigurations(getVisualizerConfigurations());
-        d.setFrameExtendedState(frameExtendedState);
-        d.setFrameLocation(frameLocation);
-        d.setShown(shown);
+        d.setFrameExtendedState(peerFrame.getExtendedState());
+        d.setFrameLocation(peerFrame.getBounds());
+        d.setShown(isShown);
         return d;
     }
 
-    public void createDesktopConfiguration(DesktopConfiguration c) {
-        Integer state = c.getFrameExtendedState();
-        frameExtendedState = state == null ? JFrame.NORMAL : state;
-        frameLocation = c.getFrameLocation();
-        shown = c.isShown();
-        for ( VisualizerConfiguration v : c.getVisualizerConfigurations()) {
-            VisualizerContext n = new VisualizerContext(v);
-            addChild(n);
-        }
-    }
-
     public int getFrameExtendedState() {
-        return frameExtendedState;
-    }
-
-    public void setFrameExtendedState(int frameExtendedState) {
-        this.frameExtendedState = frameExtendedState;
+        return getConfiguration().getFrameExtendedState();
     }
 
     public Rectangle getFrameLocation() {
-        return frameLocation;
-    }
-
-    public void setFrameLocation(Rectangle frameLocation) {
-        this.frameLocation = frameLocation;
+        return getConfiguration().getFrameLocation();
     }
 
     public ExportableConfig getExportableConfig() {
-        return getDesktopConfiguration();
+        return getConfiguration();
     }
 
     public String getDefaultFileName() {
         return "timeSeriousDesktop_" + getId();
-    }
-
-    public boolean isShown() {
-        return shown;
-    }
-
-    public void setShown(boolean shown) {
-        this.shown = shown;
     }
 
     public boolean isMainDesktopContext() {

@@ -10,7 +10,7 @@ import com.od.jtimeseries.ui.util.ImageUtils;
  * Date: 18/03/11
  * Time: 06:44
  */
-public class RemoveVisualizerAction extends AbstractRemoveHideablePeerAction {
+public class RemoveVisualizerAction extends AbstractRemoveHideablePeerAction<VisualizerContext> {
 
     public RemoveVisualizerAction(IdentifiableListActionModel selectionModel) {
         super(selectionModel, "Remove Visualizer", ImageUtils.VISUALIZER_DELETE_16x16, VisualizerContext.class);

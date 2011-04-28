@@ -11,7 +11,6 @@ import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
@@ -36,7 +35,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
-        addWindowListener();
+        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
         setConfiguration(desktopContext);
         desktopContext.setPeerResource(this);
     }
@@ -69,11 +68,6 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         return actionModels;
     }
 
-    private void addWindowListener() {
-        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
-        addWindowListener(new DesktopWindowListener());
-    }
-
     //set the selected desktop in the desktopSelectionActionModel when this window is focused
     private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
 
@@ -88,20 +82,6 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         }
 
         public void windowLostFocus(WindowEvent e) {
-        }
-    }
-
-     private class DesktopWindowListener extends WindowAdapter {
-
-        public void windowClosed(WindowEvent e) {
-            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
-                new EventSender<TimeSeriousBusListener>() {
-                    public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.desktopDisposed(desktopPane);
-                    }
-                }
-            );
-            desktopContext.setShown(false);
         }
     }
 

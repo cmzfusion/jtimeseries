@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
@@ -8,10 +9,14 @@ import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.swing.eventbus.EventSender;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,12 +39,27 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
     }
 
     private void addListeners() {
-         getDesktopContext().addTreeListener(
-                 AwtSafeListener.getAwtSafeListener(
-                         new FrameDisposingContextListener(),
-                         IdentifiableTreeListener.class
-                 )
-         );
+        getDesktopContext().addTreeListener(
+            AwtSafeListener.getAwtSafeListener(
+                new FrameDisposingContextListener(),
+                IdentifiableTreeListener.class
+            )
+        );
+        addWindowListener(new DesktopWindowListener());
+    }
+
+    private class DesktopWindowListener extends WindowAdapter {
+
+        public void windowClosing(WindowEvent e) {
+            UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
+                new EventSender<TimeSeriousBusListener>() {
+                    public void sendEvent(TimeSeriousBusListener listener) {
+                        listener.desktopDisposed(getDesktopPane());
+                    }
+                }
+            );
+            getDesktopContext().setShown(false);
+        }
     }
 
     private void initializeFrame() {
@@ -50,7 +70,7 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         newVisualizerAction = new NewVisualizerAction(this, getActionModels().getDesktopSelectionActionModel());
     }
 
-     private void createToolBar() {
+    private void createToolBar() {
         getToolBar().add(newVisualizerAction);
     }
 

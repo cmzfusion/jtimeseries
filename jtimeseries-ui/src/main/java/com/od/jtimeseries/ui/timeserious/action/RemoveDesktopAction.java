@@ -6,6 +6,7 @@ import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.HideablePeerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -15,10 +16,13 @@ import java.util.List;
  * Time: 10:19
  * To change this template use File | Settings | File Templates.
  */
-public class RemoveDesktopAction extends AbstractRemoveHideablePeerAction {
+public class RemoveDesktopAction extends AbstractRemoveHideablePeerAction<DesktopContext> {
 
-    public RemoveDesktopAction(IdentifiableListActionModel selectionModel) {
+    private JComponent parentComponent;
+
+    public RemoveDesktopAction(IdentifiableListActionModel selectionModel, JComponent parentComponent) {
         super(selectionModel, "Remove Desktop", ImageUtils.DESKTOP_DELETE_16x16, DesktopContext.class);
+        this.parentComponent = parentComponent;
         super.putValue(SHORT_DESCRIPTION, "Remove the selected desktop");
     }
 
@@ -38,5 +42,13 @@ public class RemoveDesktopAction extends AbstractRemoveHideablePeerAction {
             }
         }
         return result;
+    }
+
+    protected boolean confirmRemove(DesktopContext peerContext) {
+        return JOptionPane.showConfirmDialog(
+                SwingUtilities.getRoot(parentComponent),
+                "Remove desktop and all associated visualizers?",
+                "Remove Desktop?",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 }

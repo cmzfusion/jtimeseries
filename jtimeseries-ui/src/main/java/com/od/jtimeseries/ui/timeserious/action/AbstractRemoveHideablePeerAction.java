@@ -16,11 +16,11 @@ import java.util.List;
  * Time: 16:03
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractRemoveHideablePeerAction extends ModelDrivenAction<IdentifiableListActionModel> {
+public abstract class AbstractRemoveHideablePeerAction<E extends HideablePeerContext> extends ModelDrivenAction<IdentifiableListActionModel> {
 
-    private Class<? extends HideablePeerContext> hideablePeerClass;
+    private Class<E> hideablePeerClass;
 
-    public AbstractRemoveHideablePeerAction(IdentifiableListActionModel actionModel, String name, ImageIcon imageIcon, Class<? extends HideablePeerContext> hideablePeerClass) {
+    public AbstractRemoveHideablePeerAction(IdentifiableListActionModel actionModel, String name, ImageIcon imageIcon, Class<E> hideablePeerClass) {
         super(actionModel, name, imageIcon);
         this.hideablePeerClass = hideablePeerClass;
     }
@@ -30,12 +30,17 @@ public abstract class AbstractRemoveHideablePeerAction extends ModelDrivenAction
     }
 
     public void actionPerformed(ActionEvent e) {
-        List<? extends HideablePeerContext> nodes = getActionModel().getSelected(hideablePeerClass);
-        for ( final HideablePeerContext n : nodes ) {
-            n.setShown(false);
-            n.getParent().removeChild(n);
+        List<E> nodes = getActionModel().getSelected(hideablePeerClass);
+        for ( final E n : nodes ) {
+            if ( confirmRemove(n) ) {
+                n.setShown(false);
+                n.getParent().removeChild(n);
+            }
         }
     }
 
+    protected boolean confirmRemove(E peerContext) {
+        return true;
+    }
 
 }

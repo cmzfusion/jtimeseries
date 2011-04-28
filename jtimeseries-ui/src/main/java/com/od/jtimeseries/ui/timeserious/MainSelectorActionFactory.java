@@ -41,7 +41,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         renameServerAction = new RenameServerAction(parentSelector, selectionModel);
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel);
-        removeDesktopAction = new RemoveDesktopAction(selectionModel);
+        removeDesktopAction = new RemoveDesktopAction(selectionModel, parentSelector);
         showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
     }
 

@@ -35,9 +35,9 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
         setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
-        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
         setConfiguration(desktopContext);
         desktopContext.setPeerResource(this);
+        addWindowFocusListener(new DesktopSelectionWindowFocusListener());
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -68,6 +68,10 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         return actionModels;
     }
 
+    public ContextNameCheckUtility getNameCheckUtility() {
+        return desktopPane.getNameCheckUtility();
+    }
+
     //set the selected desktop in the desktopSelectionActionModel when this window is focused
     private class DesktopSelectionWindowFocusListener implements WindowFocusListener {
 
@@ -75,7 +79,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.desktopSelected(desktopPane);
+                        listener.desktopSelected(getDesktopContext());
                     }
                 }
             );

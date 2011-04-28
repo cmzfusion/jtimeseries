@@ -33,15 +33,15 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action removeDesktopAction;
     private Action showHiddenDesktopAction;
 
-    public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentSelector) {
+    public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentComponent) {
         this.selectionModel = selectionPanel.getSelectionActionModel();
         addSeriesAction = new AddSeriesToActiveVisualizerAction(applicationActionModels.getVisualizerSelectionActionModel(), selectionModel);
         refreshServerAction = new RefreshServerSeriesAction(rootContext, selectionModel);
-        removeServerAction = new RemoveServerAction(parentSelector, timeSeriesServerDictionary, selectionModel);
-        renameServerAction = new RenameServerAction(parentSelector, selectionModel);
+        removeServerAction = new RemoveServerAction(parentComponent, timeSeriesServerDictionary, selectionModel);
+        renameServerAction = new RenameServerAction(parentComponent, selectionModel);
         showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
-        removeVisualizerAction = new RemoveVisualizerAction(selectionModel);
-        removeDesktopAction = new RemoveDesktopAction(selectionModel, parentSelector);
+        removeVisualizerAction = new RemoveVisualizerAction(selectionModel, parentComponent);
+        removeDesktopAction = new RemoveDesktopAction(selectionModel, parentComponent);
         showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
     }
 

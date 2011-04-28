@@ -64,4 +64,8 @@ public class DesktopContext extends HideablePeerContext<DesktopConfiguration, Pe
     public boolean isMainDesktopContext() {
         return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
     }
+
+    public ContextNameCheckUtility getNameCheckUtility() {
+        return getPeerResource().getNameCheckUtility();
+    }
 }

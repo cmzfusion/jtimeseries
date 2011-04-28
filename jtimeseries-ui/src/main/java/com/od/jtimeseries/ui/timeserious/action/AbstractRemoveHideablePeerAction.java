@@ -31,15 +31,15 @@ public abstract class AbstractRemoveHideablePeerAction<E extends HideablePeerCon
 
     public void actionPerformed(ActionEvent e) {
         List<E> nodes = getActionModel().getSelected(hideablePeerClass);
-        for ( final E n : nodes ) {
-            if ( confirmRemove(n) ) {
-                n.setShown(false);
-                n.getParent().removeChild(n);
+        if ( confirmRemove(nodes) ) {
+            for ( final E n : nodes ) {
+                    n.setShown(false);
+                    n.getParent().removeChild(n);
             }
         }
     }
 
-    protected boolean confirmRemove(E peerContext) {
+    protected boolean confirmRemove(List<E> nodes) {
         return true;
     }
 

@@ -1,9 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -11,7 +9,6 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import javax.swing.*;
@@ -54,6 +51,8 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
         selectionPanel.setSelectorActionFactory(selectorActionFactory);
         addProxyingPropertyListeners();
+
+        selectionPanel.getSelectionActionModel().addActionModelListener(new MainSelectorTreeSelectionListener(selectionPanel));
 
         setLayout(new BorderLayout());
         add(selectionPanel, BorderLayout.CENTER);

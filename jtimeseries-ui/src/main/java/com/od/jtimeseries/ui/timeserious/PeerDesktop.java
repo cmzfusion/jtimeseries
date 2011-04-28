@@ -14,4 +14,6 @@ public interface PeerDesktop {
     int getExtendedState();
 
     Rectangle getBounds();
+
+    ContextNameCheckUtility getNameCheckUtility();
 }

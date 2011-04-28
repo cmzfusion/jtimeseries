@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -14,6 +15,11 @@ import com.od.swing.util.AwtSafeListener;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,29 +31,35 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
 
     private TimeSeriesVisualizer visualizer;
     private JDesktopPane desktopPane;
-    private VisualizerContext visualizerNode;
+    private VisualizerContext visualizerContext;
 
-    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerNode) {
+    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerContext) {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
         this.desktopPane = desktopPane;
-        this.visualizerNode = visualizerNode;
+        this.visualizerContext = visualizerContext;
         visualizer.setToolbarVisible(false);
         setFrameIcon(ImageUtils.FRAME_ICON_16x16);
         getContentPane().add(visualizer);
         setSize(800, 600);
 
+        addMouseListener(new MouseAdapter() {
+             public void mouseClicked(MouseEvent e) {
+
+            }
+        });
+
         addInternalFrameListener(new InternalFrameAdapter() {
 
             public void internalFrameOpened(InternalFrameEvent e) {
-                visualizerNode.setPeerResource(VisualizerInternalFrame.this);
+                visualizerContext.setPeerResource(VisualizerInternalFrame.this);
             }
 
             public void internalFrameActivated(InternalFrameEvent e) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                     new EventSender<TimeSeriousBusListener>() {
                         public void sendEvent(TimeSeriousBusListener listener) {
-                            listener.visualizerSelected(VisualizerInternalFrame.this);
+                            listener.visualizerSelected(visualizerContext);
                         }
                     }
                 );
@@ -57,18 +69,18 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                     new EventSender<TimeSeriousBusListener>() {
                         public void sendEvent(TimeSeriousBusListener listener) {
-                            listener.visualizerFrameDisposed(VisualizerInternalFrame.this);
+                            listener.visualizerFrameDisposed(visualizerContext);
                         }
                     }
                 );
-                visualizerNode.setShown(false);
+                visualizerContext.setShown(false);
             }
         });
 
-        //the visualizerNode is essentially the model for this frame view
+        //the visualizerContext is essentially the model for this frame view
         //although the user can hide the visualizer by closing the frame, we also have to monitor the shown state
         //of the node, and close the frame if it changes
-        visualizerNode.addTreeListener(
+        visualizerContext.addTreeListener(
             AwtSafeListener.getAwtSafeListener(
                 new FrameDisposingContextListener(),
                 IdentifiableTreeListener.class
@@ -93,11 +105,19 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         }
     }
 
+    public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
+        visualizer.addTimeSeries(selectedSeries);
+    }
+
+    public VisualizerContext getVisualizerContext() {
+        return visualizerContext;
+    }
+
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
             if ("shown".equals(changeDescription)) {
-                if (! visualizerNode.isShown()) {
+                if (! visualizerContext.isShown()) {
                     dispose();
                 }
             }

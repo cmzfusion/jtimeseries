@@ -61,8 +61,10 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                             c.setShown(true); //always show on import
                             String title = c.getChartsTitle();
                             title = nameCheckUtility.checkName(title);
-                            c.setChartsTitle(title); //update the config to reflect the checked name
-                            desktopContext.addChild(new VisualizerContext(c));
+                            if ( title != null) {  //check user cancelled
+                                c.setChartsTitle(title); //update the config to reflect the checked name
+                                desktopContext.addChild(new VisualizerContext(c));
+                            }
                         }
                     } catch (ConfigManagerException e) {
                         e.printStackTrace();

@@ -1,8 +1,10 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,4 +21,6 @@ public interface PeerVisualizerFrame {
     int getZPosition();
 
     boolean isIcon();
+
+    void addTimeSeries(java.util.List<UIPropertiesTimeSeries> selectedSeries);
 }

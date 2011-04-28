@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
@@ -10,10 +11,15 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.swing.eventbus.EventSender;
+import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
-import java.awt.event.*;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.List;
@@ -38,11 +44,11 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
         this.nameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
-        addDesktopListener();
+        addListeners();
         setTransferHandler(new DesktopPaneTransferHandler(desktopContext, nameCheckUtility));
     }
 
-    private void addDesktopListener() {
+    private void addListeners() {
         desktopContext.addTreeListener(
             AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
             IdentifiableTreeListener.class)
@@ -108,10 +114,6 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
             }
         }
         return visualizerFrame;
-    }
-
-    public DesktopContext getDesktopContext() {
-        return desktopContext;
     }
 
     private class ShowVisualizerTreeListener extends IdentifiableTreeListenerAdapter {

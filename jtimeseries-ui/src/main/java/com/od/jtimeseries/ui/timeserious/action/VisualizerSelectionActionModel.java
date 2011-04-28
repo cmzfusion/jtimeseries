@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 import com.od.swing.action.AbstractActionModel;
 import com.od.swing.eventbus.UIEventBus;
@@ -15,28 +16,28 @@ import com.od.swing.eventbus.UIEventBus;
  */
 public class VisualizerSelectionActionModel extends AbstractActionModel {
 
-    private VisualizerInternalFrame selectedVisualizer;
+    private VisualizerContext selectedVisualizer;
 
     public VisualizerSelectionActionModel() {
          //change the selected desktop when the bus event is sent
         UIEventBus.getInstance().addEventListener(TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
-                 public void visualizerSelected(VisualizerInternalFrame v) {
+                 public void visualizerSelected(VisualizerContext v) {
                      setSelectedVisualizer(v);
                  }
 
-                 public void visualizerFrameDisposed(VisualizerInternalFrame v) {
+                 public void visualizerFrameDisposed(VisualizerContext v) {
                      clearActionModelState();
                  }
             }
         );
     }
 
-    public VisualizerInternalFrame getSelectedVisualizer() {
+    public VisualizerContext getSelectedVisualizer() {
         return selectedVisualizer;
     }
 
-    public void setSelectedVisualizer(VisualizerInternalFrame selectedVisualizer) {
+    public void setSelectedVisualizer(VisualizerContext selectedVisualizer) {
         this.selectedVisualizer = selectedVisualizer;
         setModelValid(selectedVisualizer != null);
     }

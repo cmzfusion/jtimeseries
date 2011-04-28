@@ -1,7 +1,9 @@
 package com.od.jtimeseries.ui.event;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
+import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 
 /**
@@ -19,16 +21,16 @@ public class TimeSeriousBusListenerAdapter implements TimeSeriousBusListener {
     public void serverRemoved(TimeSeriesServer s) {
     }
 
-    public void visualizerSelected(VisualizerInternalFrame f) {
+    public void visualizerSelected(VisualizerContext f) {
     }
 
-    public void visualizerFrameDisposed(VisualizerInternalFrame f) {
+    public void visualizerFrameDisposed(VisualizerContext f) {
     }
 
-    public void desktopSelected(TimeSeriousDesktopPane desktopPane) {
+    public void desktopSelected(DesktopContext desktopPane) {
     }
 
-    public void desktopDisposed(TimeSeriousDesktopPane desktopPane) {
+    public void desktopDisposed(DesktopContext desktopPane) {
     }
 
 }

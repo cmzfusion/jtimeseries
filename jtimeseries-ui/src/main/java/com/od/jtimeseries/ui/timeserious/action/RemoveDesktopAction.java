@@ -44,11 +44,11 @@ public class RemoveDesktopAction extends AbstractRemoveHideablePeerAction<Deskto
         return result;
     }
 
-    protected boolean confirmRemove(DesktopContext peerContext) {
+    protected boolean confirmRemove(List<DesktopContext> desktops) {
         return JOptionPane.showConfirmDialog(
-                SwingUtilities.getRoot(parentComponent),
-                "Remove desktop and all associated visualizers?",
-                "Remove Desktop?",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+            SwingUtilities.getRoot(parentComponent),
+            "Remove desktop" + (desktops.size() > 1 ? "s" : "") + " and all associated visualizers?",
+            "Remove Desktop" + (desktops.size() > 1 ? "s" : "") + "?",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 }

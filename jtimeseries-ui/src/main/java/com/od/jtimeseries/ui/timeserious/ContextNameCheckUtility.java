@@ -22,27 +22,32 @@ public class ContextNameCheckUtility {
         this.context = context;
     }
 
-    public static String getNameFromUser(Component parent, String text, String title, String defaultName) {
-        String name = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName).toString();
-        if ( name != null) {
-            name = name.trim();
-            name = name.length() == 0 ? "Visualizer" : name;
+    /**
+     * @return String valid name, or null if User cancelled request for new name
+     */
+    public String getNameFromUser(Component parent, String text, String title, String defaultName) {
+        Object userInput = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
+        String result = null;
+        if ( userInput != null) {
+            result = userInput.toString();
+            result = result.trim();
+            result = result.length() == 0 ? defaultName : result;
+            result = checkName(result);
         }
-        return name;
+        return result;
     }
 
     /**
      * Check the suggested name is valid, and not a duplicate of an existing identifiable within this context
      * If required, prompt the user for an alternative name
+     * @return String valid name, or null if User cancelled request for new name
      */
     public String checkName(String name) {
         String nameProblem = IdentifiablePathUtils.checkId(name);
         if ( nameProblem != null) {
             name = getNameFromUser(desktopPane, nameProblem + ", please correct the name", "Invalid Name", name);
-            name = checkName(name);
         } else if ( context.contains(name) ) {
             name = getNameFromUser(desktopPane, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
-            name = checkName(name);
         }
         return name;
     }

@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
 import com.od.swing.action.AbstractActionModel;
 import com.od.swing.eventbus.UIEventBus;
@@ -15,34 +16,33 @@ import com.od.swing.eventbus.UIEventBus;
  */
 public class DesktopSelectionActionModel extends AbstractActionModel {
 
-    private TimeSeriousDesktopPane desktop;
+    private DesktopContext desktop;
 
     public DesktopSelectionActionModel() {
 
         //change the selected desktop when the bus event is sent
         UIEventBus.getInstance().addEventListener(TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
-                 public void desktopSelected(TimeSeriousDesktopPane desktopPane) {
+                 public void desktopSelected(DesktopContext desktopPane) {
                      setDesktop(desktopPane);
                  }
 
-                 public void desktopDisposed(TimeSeriousDesktopPane desktopPane) {
+                 public void desktopDisposed(DesktopContext desktopPane) {
                      clearActionModelState();
                  }
             }
         );
     }
 
-    public TimeSeriousDesktopPane getDesktop() {
+    public DesktopContext getDesktop() {
         return desktop;
     }
 
-    public void setDesktop(TimeSeriousDesktopPane desktop) {
+    public void setDesktop(DesktopContext desktop) {
         this.desktop = desktop;
         setModelValid(desktop != null);
     }
 
-    @Override
     protected void doClearActionModelState() {
         desktop = null;
     }

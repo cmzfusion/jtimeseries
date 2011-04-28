@@ -33,11 +33,12 @@ public class NewDesktopAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        String name = ContextNameCheckUtility.getNameFromUser(frame, "Name for Desktop", "Choose Name", "");
-        final String finalName = nameCheckUtility.checkName(name);
-        DesktopConfiguration config = new DesktopConfiguration(finalName);
-        DesktopContext desktopContext = new DesktopContext(config);
-        desktopContext.setShown(true);
-        desktopContainer.addChild(desktopContext);
+        String name = nameCheckUtility.getNameFromUser(frame, "Name for Desktop", "Choose Name", "");
+        if ( name != null) { //check if user cancelled
+            DesktopConfiguration config = new DesktopConfiguration(name);
+            DesktopContext desktopContext = new DesktopContext(config);
+            desktopContext.setShown(true);
+            desktopContainer.addChild(desktopContext);
+        }
     }
 }

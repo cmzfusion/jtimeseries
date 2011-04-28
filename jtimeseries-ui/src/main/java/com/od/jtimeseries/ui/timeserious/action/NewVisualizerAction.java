@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -27,16 +28,17 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ( getActionModel().isDesktopSelected()) {
-            TimeSeriousDesktopPane desktop = getActionModel().getDesktop();
-            String name = ContextNameCheckUtility.getNameFromUser(
+        if ( getActionModel().isDesktopSelected() ) {
+            DesktopContext desktop = getActionModel().getDesktop();
+            String name = desktop.getNameCheckUtility().getNameFromUser(
                 mainFrame, "Name for visualizer?", "Choose Name", ""
             );
-            name = desktop.getNameCheckUtility().checkName(name);
-            VisualizerConfiguration c = new VisualizerConfiguration(name);
-            VisualizerContext node = new VisualizerContext(c);
-            node.setShown(true);
-            desktop.getDesktopContext().addChild(node);
+            if ( name != null) { //check if user cancelled
+                VisualizerConfiguration c = new VisualizerConfiguration(name);
+                VisualizerContext node = new VisualizerContext(c);
+                node.setShown(true);
+                desktop.addChild(node);
+            }
         }
     }
 }

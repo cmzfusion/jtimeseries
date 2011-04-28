@@ -1,8 +1,12 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
+
+import javax.swing.*;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,8 +16,19 @@ import com.od.jtimeseries.ui.util.ImageUtils;
  */
 public class RemoveVisualizerAction extends AbstractRemoveHideablePeerAction<VisualizerContext> {
 
-    public RemoveVisualizerAction(IdentifiableListActionModel selectionModel) {
+    private JComponent parentComponent;
+
+    public RemoveVisualizerAction(IdentifiableListActionModel selectionModel, JComponent parentComponent) {
         super(selectionModel, "Remove Visualizer", ImageUtils.VISUALIZER_DELETE_16x16, VisualizerContext.class);
+        this.parentComponent = parentComponent;
         super.putValue(SHORT_DESCRIPTION, "Remove the selected visualizer");
+    }
+
+    protected boolean confirmRemove(List<VisualizerContext> desktops) {
+        return JOptionPane.showConfirmDialog(
+            SwingUtilities.getRoot(parentComponent),
+            "Remove visualizer" + (desktops.size() > 1 ? "s" : "") + "?",
+            "Remove Visualizer" + (desktops.size() > 1 ? "s" : "") + "?",
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 }

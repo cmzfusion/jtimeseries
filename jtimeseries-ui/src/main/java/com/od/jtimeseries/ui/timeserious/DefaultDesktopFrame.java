@@ -54,7 +54,7 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
             UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
-                        listener.desktopDisposed(getDesktopPane());
+                        listener.desktopDisposed(getDesktopContext());
                     }
                 }
             );

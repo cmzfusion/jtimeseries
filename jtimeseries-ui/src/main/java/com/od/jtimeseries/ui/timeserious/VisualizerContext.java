@@ -3,7 +3,10 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,5 +44,9 @@ public class VisualizerContext extends HideablePeerContext<VisualizerConfigurati
 
     public String getDefaultFileName() {
         return "timeSeriousVisualizer_" + getId();
+    }
+
+    public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
+        getPeerResource().addTimeSeries(selectedSeries);
     }
 }

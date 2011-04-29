@@ -3,8 +3,6 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
-import com.od.swing.action.AbstractActionModel;
 import com.od.swing.eventbus.UIEventBus;
 
 /**
@@ -14,9 +12,7 @@ import com.od.swing.eventbus.UIEventBus;
  * Time: 13:07:47
  * To change this template use File | Settings | File Templates.
  */
-public class DesktopSelectionActionModel extends AbstractActionModel {
-
-    private DesktopContext desktop;
+public class DesktopSelectionActionModel extends ContextSelectionActionModel<DesktopContext> {
 
     public DesktopSelectionActionModel() {
 
@@ -24,7 +20,7 @@ public class DesktopSelectionActionModel extends AbstractActionModel {
         UIEventBus.getInstance().addEventListener(TimeSeriousBusListener.class,
             new TimeSeriousBusListenerAdapter() {
                  public void desktopSelected(DesktopContext desktopPane) {
-                     setDesktop(desktopPane);
+                     setSelectedContext(desktopPane);
                  }
 
                  public void desktopDisposed(DesktopContext desktopPane) {
@@ -34,20 +30,4 @@ public class DesktopSelectionActionModel extends AbstractActionModel {
         );
     }
 
-    public DesktopContext getDesktop() {
-        return desktop;
-    }
-
-    public void setDesktop(DesktopContext desktop) {
-        this.desktop = desktop;
-        setModelValid(desktop != null);
-    }
-
-    protected void doClearActionModelState() {
-        desktop = null;
-    }
-
-    public boolean isDesktopSelected() {
-        return desktop != null;
-    }
 }

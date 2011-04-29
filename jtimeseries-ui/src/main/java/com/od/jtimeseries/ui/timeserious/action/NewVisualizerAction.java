@@ -20,24 +20,27 @@ import java.awt.event.ActionEvent;
 public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActionModel> {
 
     private JFrame mainFrame;
+    private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
-    public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m) {
+    public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
         super(m, "New Visualizer", ImageUtils.VISUALIZER_NEW_16x16);
         this.mainFrame = mainFrame;
+        this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ( getActionModel().isDesktopSelected() ) {
-            DesktopContext desktop = getActionModel().getDesktop();
+        if ( getActionModel().isContextSelected() ) {
+            DesktopContext desktop = getActionModel().getSelectedContext();
             String name = desktop.getNameCheckUtility().getNameFromUser(
-                mainFrame, "Name for visualizer?", "Choose Name", ""
+                    mainFrame, "Name for visualizer?", "Choose Name", ""
             );
             if ( name != null) { //check if user cancelled
                 VisualizerConfiguration c = new VisualizerConfiguration(name);
-                VisualizerContext node = new VisualizerContext(c);
-                node.setShown(true);
-                desktop.addChild(node);
+                VisualizerContext visualizerContext = new VisualizerContext(c);
+                visualizerContext.setShown(true);
+                desktop.addChild(visualizerContext);
+                visualizerSelectionActionModel.setSelectedContext(visualizerContext);
             }
         }
     }

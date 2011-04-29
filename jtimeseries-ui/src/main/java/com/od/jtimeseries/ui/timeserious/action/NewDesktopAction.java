@@ -22,12 +22,14 @@ public class NewDesktopAction extends AbstractAction {
 
     private JFrame frame;
     private TimeSeriesContext desktopContainer;
+    private DesktopSelectionActionModel desktopSelectionActionModel;
     private ContextNameCheckUtility nameCheckUtility;
 
-    public NewDesktopAction(JFrame frame, TimeSeriesContext desktopContainer) {
+    public NewDesktopAction(JFrame frame, TimeSeriesContext desktopContainer, DesktopSelectionActionModel desktopSelectionActionModel) {
         super("New Desktop", ImageUtils.DESKTOP_NEW_16x16);
         this.frame = frame;
         this.desktopContainer = desktopContainer;
+        this.desktopSelectionActionModel = desktopSelectionActionModel;
         super.putValue(SHORT_DESCRIPTION, "Create a new desktop frame");
         nameCheckUtility = new ContextNameCheckUtility(frame, desktopContainer);
     }
@@ -39,6 +41,7 @@ public class NewDesktopAction extends AbstractAction {
             DesktopContext desktopContext = new DesktopContext(config);
             desktopContext.setShown(true);
             desktopContainer.addChild(desktopContext);
+            desktopSelectionActionModel.setSelectedContext(desktopContext);
         }
     }
 }

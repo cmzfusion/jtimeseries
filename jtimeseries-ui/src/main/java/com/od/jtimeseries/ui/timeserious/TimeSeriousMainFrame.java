@@ -69,13 +69,17 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     private void createActions() {
-        newVisualizerAction = new NewVisualizerAction(this, getActionModels().getDesktopSelectionActionModel());
+        newVisualizerAction = new NewVisualizerAction(
+            this,
+            getActionModels().getDesktopSelectionActionModel(),
+            getActionModels().getVisualizerSelectionActionModel()
+        );
         newServerAction = new NewServerAction(this, serverDictionary);
         editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(
             TimeSeriousMainFrame.this,
             displayNameCalculator
         );
-        newDesktopAction = new NewDesktopAction(this, getRootContext());
+        newDesktopAction = new NewDesktopAction(this, getRootContext(), getActionModels().getDesktopSelectionActionModel());
     }
 
     private void addListeners() {

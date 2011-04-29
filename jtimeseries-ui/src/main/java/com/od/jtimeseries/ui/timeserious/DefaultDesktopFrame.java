@@ -67,7 +67,11 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
     }
 
     private void createActions() {
-        newVisualizerAction = new NewVisualizerAction(this, getActionModels().getDesktopSelectionActionModel());
+        newVisualizerAction = new NewVisualizerAction(
+            this,
+            getActionModels().getDesktopSelectionActionModel(),
+            getActionModels().getVisualizerSelectionActionModel()
+        );
     }
 
     private void createToolBar() {

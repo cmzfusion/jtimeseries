@@ -32,6 +32,7 @@ import java.util.List;
  */
 public class TimeSeriousDesktopPane extends JDesktopPane {
 
+    private JFrame parentFrame;
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
@@ -39,6 +40,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     private ContextNameCheckUtility nameCheckUtility;
 
     public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
+        this.parentFrame = parentFrame;
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
@@ -53,6 +55,18 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
             AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
             IdentifiableTreeListener.class)
         );
+
+        parentFrame.addWindowListener(new InternalFrameDeactivatingWindowListener());
+    }
+
+    private void deactivateAllFrames() {
+        for (JInternalFrame f : this.getAllFrames()) {
+            try {
+                f.setSelected(false);
+            } catch (PropertyVetoException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
     private TimeSeriesVisualizer createVisualizer(String title) {
@@ -138,6 +152,18 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     *  deactivating the activated internal frame when this desktop JFrame is deactivated
+     *  will allow us to receive an activation event for the internal frame if the user clicks
+     *  back to this desktop. otherwise we don't get an internal frame event -
+     *  we need this event to update the global active visualizer action model
+     */
+    private class InternalFrameDeactivatingWindowListener extends WindowAdapter {
+        public void windowDeactivated(WindowEvent e) {
+             deactivateAllFrames();
         }
     }
 }

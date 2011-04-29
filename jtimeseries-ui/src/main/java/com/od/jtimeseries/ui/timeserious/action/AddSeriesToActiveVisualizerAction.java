@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
-import com.od.jtimeseries.ui.timeserious.VisualizerInternalFrame;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;
@@ -35,7 +34,7 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
     private void setName() {
         String name = "Add to Selected Visualizer";
         if ( visualizerSelectionActionModel.isModelValid()) {
-            name += " " + visualizerSelectionActionModel.getSelectedVisualizer().getId();
+            name += " " + visualizerSelectionActionModel.getSelectedContext().getId();
         }
         putValue(NAME, name);
     }
@@ -43,7 +42,7 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
     public void actionPerformed(ActionEvent e) {
         java.util.List<UIPropertiesTimeSeries> selectedSeries = getActionModel().getSelected(UIPropertiesTimeSeries.class);
 
-        VisualizerContext v = visualizerSelectionActionModel.getSelectedVisualizer();
+        VisualizerContext v = visualizerSelectionActionModel.getSelectedContext();
         if ( v != null) {
             v.addTimeSeries(selectedSeries);
         }

@@ -14,14 +14,14 @@ public class DesktopConfiguration implements ExportableConfig {
 
     public static final String MAIN_DESKTOP_NAME = "Main Desktop";
 
-    private String desktopName;
+    private String title;
     private Rectangle frameLocation;
     private Integer frameExtendedState;
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
     private boolean isShown = true;
 
-    public DesktopConfiguration(String desktopName) {
-        this.desktopName = desktopName;
+    public DesktopConfiguration(String desktopTitle) {
+        this.title = desktopTitle;
     }
 
     public Rectangle getFrameLocation() {
@@ -48,12 +48,12 @@ public class DesktopConfiguration implements ExportableConfig {
         this.visualizerConfigurations = visualizerConfigurations;
     }
 
-    public String getDesktopName() {
-        return desktopName;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDesktopName(String desktopName) {
-        this.desktopName = desktopName;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean isShown() {

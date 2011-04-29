@@ -32,7 +32,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         this.desktopContext = desktopContext;
         this.rootContext = rootContext;
         this.actionModels = actionModels;
-        this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext);
+        this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext, rootContext);
         setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
         setConfiguration(desktopContext);
@@ -66,10 +66,6 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
 
     protected ApplicationActionModels getActionModels() {
         return actionModels;
-    }
-
-    public ContextNameCheckUtility getNameCheckUtility() {
-        return desktopPane.getNameCheckUtility();
     }
 
     //set the selected desktop in the desktopSelectionActionModel when this window is focused

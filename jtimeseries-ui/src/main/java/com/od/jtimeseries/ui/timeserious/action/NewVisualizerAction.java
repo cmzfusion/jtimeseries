@@ -32,7 +32,8 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isContextSelected() ) {
             DesktopContext desktop = getActionModel().getSelectedContext();
-            String name = desktop.getNameCheckUtility().getNameFromUser(
+            ContextNameCheckUtility nameCheckUtility = new ContextNameCheckUtility(mainFrame, desktop);
+            String name = nameCheckUtility.getNameFromUser(
                     mainFrame, "Name for visualizer?", "Choose Name", ""
             );
             if ( name != null) { //check if user cancelled

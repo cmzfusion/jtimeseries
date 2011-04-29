@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
@@ -11,13 +10,9 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import javax.swing.*;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyVetoException;
@@ -37,17 +32,15 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
     private DesktopContext desktopContext;
-    private ContextNameCheckUtility nameCheckUtility;
 
-    public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext) {
+    public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext, TimeSeriousRootContext rootContext) {
         this.parentFrame = parentFrame;
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
-        this.nameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
         addListeners();
-        setTransferHandler(new DesktopPaneTransferHandler(desktopContext, nameCheckUtility));
+        setTransferHandler(new DesktopPaneTransferHandler(rootContext, desktopContext, parentFrame));
     }
 
     private void addListeners() {
@@ -89,15 +82,11 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         }
     }
 
-    public ContextNameCheckUtility getNameCheckUtility() {
-        return nameCheckUtility;
-    }
-
     private void showVisualizerForNode(VisualizerContext n) {
         VisualizerConfiguration c = n.getConfiguration();
         //here we are showing the visualizer for an existing visualizerNode rather
         //than creating a new visualizer, so no need to check the name
-        TimeSeriesVisualizer v = createVisualizer(c.getChartsTitle());
+        TimeSeriesVisualizer v = createVisualizer(c.getTitle());
         configureAndShowVisualizerFrame(c, v, n);
     }
 

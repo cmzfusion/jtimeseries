@@ -8,4 +8,7 @@ package com.od.jtimeseries.ui.config;
  */
 public interface ExportableConfig {
 
+    String getTitle();
+
+    void setTitle(String title);
 }

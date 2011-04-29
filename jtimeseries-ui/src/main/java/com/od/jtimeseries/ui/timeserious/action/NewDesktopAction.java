@@ -2,12 +2,9 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

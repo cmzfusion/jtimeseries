@@ -101,7 +101,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
 
     private DesktopContext createDesktopContext(DesktopConfiguration desktopConfiguration) {
-        DesktopContext context = (DesktopContext)get(desktopConfiguration.getDesktopName());
+        DesktopContext context = (DesktopContext)get(desktopConfiguration.getTitle());
         if ( context == null) {
             context = new DesktopContext(desktopConfiguration);
             addChild(context);

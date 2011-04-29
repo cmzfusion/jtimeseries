@@ -17,7 +17,7 @@ import java.util.List;
 public class VisualizerContext extends HideablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> implements ExportableConfigHolder {
 
     public VisualizerContext(VisualizerConfiguration visualizerConfiguration) {
-        super(visualizerConfiguration.getChartsTitle(), visualizerConfiguration.getChartsTitle(), visualizerConfiguration, visualizerConfiguration.isShown());
+        super(visualizerConfiguration.getTitle(), visualizerConfiguration.getTitle(), visualizerConfiguration, visualizerConfiguration.isShown());
     }
 
     protected VisualizerConfiguration createPeerConfig(boolean isShown) {

@@ -18,7 +18,7 @@ import java.util.List;
 public class DesktopContext extends HideablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
     public DesktopContext(DesktopConfiguration config) {
-        super(config.getDesktopName(), config.getDesktopName(), config, config.isShown());
+        super(config.getTitle(), config.getTitle(), config, config.isShown());
 
         for ( VisualizerConfiguration v : config.getVisualizerConfigurations()) {
             VisualizerContext n = new VisualizerContext(v);
@@ -63,9 +63,5 @@ public class DesktopContext extends HideablePeerContext<DesktopConfiguration, Pe
 
     public boolean isMainDesktopContext() {
         return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
-    }
-
-    public ContextNameCheckUtility getNameCheckUtility() {
-        return getPeerResource().getNameCheckUtility();
     }
 }

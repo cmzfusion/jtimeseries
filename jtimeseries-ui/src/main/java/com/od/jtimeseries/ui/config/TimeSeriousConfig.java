@@ -18,6 +18,7 @@ public class TimeSeriousConfig implements ExportableConfig {
     private Integer splitPaneLocationWhenTableSelected = 400;
     private Integer splitPaneLocationWhenTreeSelected = 300;
     private boolean mainSeriesSelectorTableVisible;
+    private String title = "TimeSeriousConfig";
 
     private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
 
@@ -97,4 +98,11 @@ public class TimeSeriousConfig implements ExportableConfig {
         return this;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 }

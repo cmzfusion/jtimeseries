@@ -37,7 +37,7 @@ public class VisualizerConfiguration implements ExportableConfig {
 
     public static final int DEFAULT_DIVIDER_LOCATION = 300;
 
-    private String chartsTitle = "Visualizer";
+    private String title = "Visualizer";
     private boolean tableSelectorVisible;
     private List<UiTimeSeriesConfig> chartConfigs = new ArrayList<UiTimeSeriesConfig>();
     private int dividorLocation = DEFAULT_DIVIDER_LOCATION;
@@ -55,12 +55,12 @@ public class VisualizerConfiguration implements ExportableConfig {
     }
 
     public VisualizerConfiguration(String title) {
-        this.chartsTitle = title;
+        this.title = title;
     }
 
     public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
                                    ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
-        this.chartsTitle = chartsTitle;
+        this.title = chartsTitle;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
         this.domainStartTimeSelection = domainStartTimeSelection;
@@ -71,12 +71,12 @@ public class VisualizerConfiguration implements ExportableConfig {
         this.tableColumns = columnSettings;
     }
 
-    public String getChartsTitle() {
-        return chartsTitle;
+    public String getTitle() {
+        return title;
     }
 
-    public void setChartsTitle(String chartsTitle) {
-        this.chartsTitle = chartsTitle;
+    public void setTitle(String chartsTitle) {
+        this.title = chartsTitle;
     }
 
     public DomainTimeSelection getDomainStartTimeSelection() {

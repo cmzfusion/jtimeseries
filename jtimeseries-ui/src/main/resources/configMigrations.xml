@@ -30,5 +30,21 @@
         <string>REMOVE NODE</string>
       </arguments>
     </migration>
+     <migration>
+      <targetVersion>201104291000</targetVersion>
+      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <arguments>
+        <string>chartsTitle</string>
+        <string>title</string>
+      </arguments>
+    </migration>
+    <migration>
+      <targetVersion>201104291100</targetVersion>
+      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <arguments>
+        <string>desktopName</string>
+        <string>title</string>
+      </arguments>
+    </migration>
   </migrationList>
 </configManager>

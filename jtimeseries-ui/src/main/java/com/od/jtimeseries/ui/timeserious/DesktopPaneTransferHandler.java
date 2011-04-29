@@ -1,11 +1,10 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
-import com.od.swing.eventbus.EventSender;
-import com.od.swing.eventbus.UIEventBus;
 import od.configutil.ConfigManager;
 import od.configutil.ConfigManagerException;
 import od.configutil.FileSource;
@@ -25,12 +24,16 @@ import java.io.IOException;
  */
 public class DesktopPaneTransferHandler extends TransferHandler {
 
+    private TimeSeriesContext desktopContainingContext;
     private DesktopContext desktopContext;
-    private ContextNameCheckUtility nameCheckUtility;
+    private ContextNameCheckUtility desktopNameCheckUtility;
+    private ContextNameCheckUtility visualizerNameCheckUtility;
 
-    public DesktopPaneTransferHandler(DesktopContext desktopContext, ContextNameCheckUtility nameCheckUtility) {
+    public DesktopPaneTransferHandler(TimeSeriousRootContext desktopContainingContext, DesktopContext desktopContext, JFrame parentFrame) {
+        this.desktopContainingContext = desktopContainingContext;
         this.desktopContext = desktopContext;
-        this.nameCheckUtility = nameCheckUtility;
+        this.desktopNameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContainingContext);
+        this.visualizerNameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
     }
 
     public boolean canImport(TransferHandler.TransferSupport support) {
@@ -56,14 +59,24 @@ public class DesktopPaneTransferHandler extends TransferHandler {
                 ConfigManager cm = new ConfigManagerForTimeSerious();
                 for (Object f : l) {
                     try {
-                        ExportableConfig uiConfig = cm.loadConfig("fromFile", ExportableConfig.class, new FileSource((File)f));  if ( uiConfig instanceof VisualizerConfiguration) {
-                            final VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
-                            c.setShown(true); //always show on import
-                            String title = c.getChartsTitle();
-                            title = nameCheckUtility.checkName(title);
-                            if ( title != null) {  //check user cancelled
-                                c.setChartsTitle(title); //update the config to reflect the checked name
-                                desktopContext.addChild(new VisualizerContext(c));
+                        ExportableConfig uiConfig = cm.loadConfig("fromFile", ExportableConfig.class, new FileSource((File)f));
+
+                        if ( uiConfig instanceof VisualizerConfiguration || uiConfig instanceof DesktopConfiguration ) {
+                            String title = uiConfig.getTitle();
+                            ContextNameCheckUtility cu = uiConfig instanceof VisualizerConfiguration ? visualizerNameCheckUtility : desktopNameCheckUtility;
+                            title = cu.checkName(title);
+                            if ( title != null) {  //only if user did not cancel
+                                uiConfig.setTitle(title); //update the config to reflect the checked name
+
+                                if ( uiConfig instanceof VisualizerConfiguration) {
+                                    VisualizerConfiguration c = (VisualizerConfiguration)uiConfig;
+                                    c.setShown(true);
+                                    desktopContext.addChild(new VisualizerContext(c));
+                                } else if ( uiConfig instanceof DesktopConfiguration) {
+                                    DesktopConfiguration c = (DesktopConfiguration)uiConfig;
+                                    c.setShown(true); //always show on import
+                                    desktopContainingContext.addChild(new DesktopContext(c));
+                                }
                             }
                         }
                     } catch (ConfigManagerException e) {

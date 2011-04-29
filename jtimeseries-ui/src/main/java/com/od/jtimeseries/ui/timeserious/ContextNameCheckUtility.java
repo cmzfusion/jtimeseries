@@ -14,11 +14,11 @@ import java.awt.*;
  */
 public class ContextNameCheckUtility {
 
-    private Component desktopPane;
+    private Component parentComponent;
     private TimeSeriesContext context;
 
-    public ContextNameCheckUtility(Component desktopPane, TimeSeriesContext context) {
-        this.desktopPane = desktopPane;
+    public ContextNameCheckUtility(Component parent, TimeSeriesContext context) {
+        this.parentComponent = parent;
         this.context = context;
     }
 
@@ -45,9 +45,9 @@ public class ContextNameCheckUtility {
     public String checkName(String name) {
         String nameProblem = IdentifiablePathUtils.checkId(name);
         if ( nameProblem != null) {
-            name = getNameFromUser(desktopPane, nameProblem + ", please correct the name", "Invalid Name", name);
+            name = getNameFromUser(parentComponent, nameProblem + ", please correct the name", "Invalid Name", name);
         } else if ( context.contains(name) ) {
-            name = getNameFromUser(desktopPane, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
+            name = getNameFromUser(parentComponent, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
         }
         return name;
     }

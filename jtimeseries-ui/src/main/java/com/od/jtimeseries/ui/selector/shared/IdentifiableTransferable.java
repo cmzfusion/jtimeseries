@@ -3,9 +3,7 @@ package com.od.jtimeseries.ui.selector.shared;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import od.configutil.ConfigManager;
@@ -28,9 +26,9 @@ import java.util.List;
  * Time: 09:41
  * To change this template use File | Settings | File Templates.
  */
-public class SeriesTransferable implements Transferable {
+public class IdentifiableTransferable implements Transferable {
 
-    private static LogMethods logMethods = LogUtils.getLogMethods(SeriesTransferable.class);
+    private static LogMethods logMethods = LogUtils.getLogMethods(IdentifiableTransferable.class);
 
     private static final String listType = DataFlavor.javaJVMLocalObjectMimeType +
                        ";class=java.util.List";
@@ -46,7 +44,7 @@ public class SeriesTransferable implements Transferable {
 
     private IdentifiableListActionModel selectionsModel;
 
-    public SeriesTransferable(IdentifiableListActionModel selectionsModel) {
+    public IdentifiableTransferable(IdentifiableListActionModel selectionsModel) {
         this.selectionsModel = selectionsModel;
     }
 

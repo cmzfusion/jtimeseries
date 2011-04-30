@@ -28,9 +28,9 @@ import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableTransferable;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
-import com.od.jtimeseries.ui.selector.shared.SeriesTransferable;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -321,7 +321,7 @@ public class TimeSeriesVisualizer extends JPanel {
         }
 
         public boolean canImport(TransferSupport supp) {
-            return supp.isDataFlavorSupported(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            return supp.isDataFlavorSupported(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
         }
 
         public boolean importData(TransferSupport supp) {
@@ -333,7 +333,7 @@ public class TimeSeriesVisualizer extends JPanel {
             Transferable t = supp.getTransferable();
             List<Identifiable> data = null;
             try {
-                data = (List<Identifiable>)t.getTransferData(SeriesTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+                data = (List<Identifiable>)t.getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
             } catch (Exception e) {
                 e.printStackTrace();
             }

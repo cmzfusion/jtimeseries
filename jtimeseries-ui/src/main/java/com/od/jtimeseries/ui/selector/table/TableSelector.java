@@ -104,7 +104,12 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private void setupDragAndDrop() {
         table.setDragEnabled(true);
         table.setDropMode(DropMode.ON);
-        table.setTransferHandler(new NoImportsSelectorTransferHandler(getSelectionsActionModel()));
+        setTransferHandler(new NoImportsSelectorTransferHandler(getSelectionsActionModel()));
+    }
+
+    public void setTransferHandler(TransferHandler h) {
+        super.setTransferHandler(h); //if we drop beneath the table rows
+        table.setTransferHandler(h);
     }
 
     private Frame getFrameForComponent(Component parentComponent) throws HeadlessException {

@@ -5,7 +5,7 @@ import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.jtimeseries.ui.visualizer.ImportExportHandler;
+import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -32,7 +32,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         this.serverDictionary = serverDictionary;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
 
-        ImportExportHandler h = new TimeSeriousRootImportExportHandler(this);
+        ContextImportExportHandler h = new TimeSeriousRootImportExportHandler(this);
         initializeFactoriesAndContextBusListener(h);
     }
 

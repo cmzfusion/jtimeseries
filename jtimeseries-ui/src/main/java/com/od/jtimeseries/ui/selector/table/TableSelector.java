@@ -28,6 +28,7 @@ import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
@@ -50,7 +51,7 @@ import java.util.Set;
  */
 public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorComponent<E> {
 
-    private TimeSeriesContext rootContext;
+    private AbstractUIRootContext rootContext;
     private String selectionText;
     private Class<E> seriesClass;
     private BeanPerRowModel<E> tableModel;
@@ -59,7 +60,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private JToolBar toolbar = new JToolBar();
 
     public TableSelector(IdentifiableListActionModel selectionsActionModel,
-                         TimeSeriesContext rootContext,
+                         AbstractUIRootContext rootContext,
                          String selectionText,
                          Class<E> seriesClass) {
         super(rootContext, selectionsActionModel);
@@ -104,7 +105,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private void setupDragAndDrop() {
         table.setDragEnabled(true);
         table.setDropMode(DropMode.ON);
-        setTransferHandler(new NoImportsSelectorTransferHandler(getSelectionsActionModel()));
+        setTransferHandler(new NoImportsSelectorTransferHandler(rootContext, getSelectionsActionModel()));
     }
 
     public void setTransferHandler(TransferHandler h) {

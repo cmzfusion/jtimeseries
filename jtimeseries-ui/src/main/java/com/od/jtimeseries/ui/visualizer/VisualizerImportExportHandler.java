@@ -1,7 +1,6 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
@@ -9,7 +8,9 @@ import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
+import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,7 +19,7 @@ import java.net.MalformedURLException;
  * Time: 16:15
  * To change this template use File | Settings | File Templates.
  */
-public class VisualizerImportExportHandler extends ImportExportHandler {
+public class VisualizerImportExportHandler extends ContextImportExportHandler {
 
     public VisualizerImportExportHandler(TimeSeriesContext rootContext, TimeSeriesServerDictionary serverDictionary) {
         super(rootContext);
@@ -42,6 +43,18 @@ public class VisualizerImportExportHandler extends ImportExportHandler {
             UIPropertiesTimeSeries.class,
             new UiTimeSeriesConfig(s)
         );
+    }
+
+    public int getSourceActions(List<? extends Identifiable> selected) {
+        return DnDConstants.ACTION_COPY_OR_MOVE;
+    }
+
+    public void doExport(List<Identifiable> transferData, int action) {
+        if ( action == DnDConstants.ACTION_MOVE) {
+            for ( Identifiable i : transferData) {
+                getRootContext().remove(i.getPath());
+            }
+        }
     }
 
     private class VisualizerTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {

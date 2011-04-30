@@ -10,6 +10,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.UIEventBus;
 
+import java.awt.dnd.DnDConstants;
 import java.util.List;
 
 /**
@@ -21,13 +22,13 @@ import java.util.List;
 public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     protected static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
-    private ImportExportHandler importExportHandler = new DummyImportExportHandler();
+    private ContextImportExportHandler importExportHandler = new DummyImportExportHandler();
 
     public AbstractUIRootContext(DisplayNameCalculator displayNameCalculator) {
         displayNameCalculator.addRootContext(this);
     }
 
-    protected void initializeFactoriesAndContextBusListener(ImportExportHandler importExportHandler) {
+    protected void initializeFactoriesAndContextBusListener(ContextImportExportHandler importExportHandler) {
         this.importExportHandler = importExportHandler;
         setTimeSeriesFactory(importExportHandler.getTimeSeriesFactory());
         setContextFactory(importExportHandler.getContextFactory());
@@ -56,7 +57,15 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         }
     }
 
-    private class DummyImportExportHandler extends ImportExportHandler {
+    public int getSourceActions(List<Identifiable> selected) {
+        return importExportHandler.getSourceActions(selected);
+    }
+
+    public void doExport(List<Identifiable> transferData, int action) {
+        importExportHandler.doExport(transferData, action);
+    }
+
+    private class DummyImportExportHandler extends ContextImportExportHandler {
 
         public DummyImportExportHandler() {
             super(AbstractUIRootContext.this);
@@ -72,6 +81,13 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
         protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
             return null;
+        }
+
+        public int getSourceActions(List<? extends Identifiable> selected) {
+            return DnDConstants.ACTION_NONE;
+        }
+
+        public void doExport(List<Identifiable> transferData, int action) {
         }
     }
 }

@@ -28,8 +28,6 @@ import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableTransferable;
-import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
@@ -40,15 +38,11 @@ import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,9 +130,9 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
 
-        SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(seriesSelectionPanel.getSelectionActionModel());
+        SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(getSelectionActionModel());
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
-        seriesSelectionPanel.setTransferHandler(new ImportAndExportSelectorTransferHandler());
+        seriesSelectionPanel.setTransferHandler(new VisualizerTransferHandler(rootContext, getSelectionActionModel()));
     }
 
     private void layoutVisualizer() {
@@ -316,46 +310,4 @@ public class TimeSeriesVisualizer extends JPanel {
         super.finalize();
     }
 
-    private class ImportAndExportSelectorTransferHandler extends NoImportsSelectorTransferHandler {
-
-        public ImportAndExportSelectorTransferHandler() {
-            super(TimeSeriesVisualizer.this.seriesSelectionPanel.getSelectionActionModel());
-        }
-
-        public boolean canImport(TransferSupport supp) {
-            boolean result = supp.isDataFlavorSupported(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
-            if ( result  ) {
-                List<Identifiable> transferData = null;
-                try {
-                    transferData = (List<Identifiable>)supp.getTransferable().getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
-                    result = rootContext.canImport(transferData, rootContext);
-                 } catch (Exception e) {
-                   logMethods.logError("Failed during canImport", e);
-                }
-            }
-            return result;
-        }
-
-        public boolean importData(TransferSupport supp) {
-            if (!canImport(supp)) {
-                return false;
-            }
-
-            // Fetch the Transferable and its data
-            Transferable t = supp.getTransferable();
-            List<Identifiable> data = null;
-            try {
-                data = (List<Identifiable>)t.getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            doImport(data, rootContext);
-            return true;
-        }
-
-        protected void doImport(List<Identifiable> data, Identifiable target) {
-            rootContext.doImport(data, target);
-        }
-    }
 }

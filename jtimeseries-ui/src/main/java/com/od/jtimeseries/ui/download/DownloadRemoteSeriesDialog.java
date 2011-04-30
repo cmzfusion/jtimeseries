@@ -30,12 +30,13 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.jtimeseries.ui.visualizer.ImportExportHandler;
+import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
 import com.od.jtimeseries.ui.visualizer.ServerContextCreatingContextFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
+import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private ProgressLayeredPane progressLayeredPane;
     private AbstractDownloadWizardPanel.WizardPanelListener panelListener;
     private SelectServerPanel selectServerPanel;
-    private TimeSeriesContext contextToStoreRemoteSeries;
+    private AbstractUIRootContext contextToStoreRemoteSeries;
     private ChooseSeriesPanel chooseSeriesPanel;
     private TimeSeriesContext destinationRootContext;
 
@@ -137,7 +138,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         }
     }
 
-    private class DownloadSeriesImportExportHandler extends ImportExportHandler {
+    private class DownloadSeriesImportExportHandler extends ContextImportExportHandler {
 
         public DownloadSeriesImportExportHandler(TimeSeriesContext rootContext, TimeSeriesServerDictionary serverDictionary) {
             super(rootContext);
@@ -155,6 +156,13 @@ public class DownloadRemoteSeriesDialog extends JFrame {
 
         protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
             return null;
+        }
+
+        public int getSourceActions(List<? extends Identifiable> selected) {
+            return DnDConstants.ACTION_NONE;
+        }
+
+        public void doExport(List<Identifiable> transferData, int action) {
         }
 
     }

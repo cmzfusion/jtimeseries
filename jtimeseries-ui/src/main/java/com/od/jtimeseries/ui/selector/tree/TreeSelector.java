@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -62,14 +63,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     };
 
     private DefaultTreeModel treeModel;
-    private TimeSeriesContext rootContext;
+    private AbstractUIRootContext rootContext;
     private JTree tree;
     private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
     private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
     private Comparator<Identifiable> treeComparator = new IdentifiableTreeComparator();
 
-    public TreeSelector(IdentifiableListActionModel selectionsActionModel, TimeSeriesContext rootContext, SelectorTreeNodeFactory nodeFactory) {
+    public TreeSelector(IdentifiableListActionModel selectionsActionModel, AbstractUIRootContext rootContext, SelectorTreeNodeFactory nodeFactory) {
         super(rootContext, selectionsActionModel);
         this.rootContext = rootContext;
         this.nodeFactory = nodeFactory;
@@ -98,7 +99,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private void setupDragAndDrop() {
         tree.setDragEnabled(true);
         tree.setDropMode(DropMode.ON);
-        tree.setTransferHandler(new NoImportsSelectorTransferHandler(getSelectionsActionModel()));
+        tree.setTransferHandler(new NoImportsSelectorTransferHandler(rootContext, getSelectionsActionModel()));
     }
 
     public void setTransferHandler(TransferHandler newHandler) {

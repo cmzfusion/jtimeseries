@@ -6,11 +6,9 @@ import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.PathParser;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -27,7 +25,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
     public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
         super(displayNameCalculator);
         this.serverDictionary = serverDictionary;
-        ImportExportHandler h = new VisualizerImportExportHandler(this, serverDictionary);
+        ContextImportExportHandler h = new VisualizerImportExportHandler(this, serverDictionary);
         initializeFactoriesAndContextBusListener(h);
     }
 

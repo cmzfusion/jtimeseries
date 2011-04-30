@@ -18,15 +18,15 @@ import java.util.List;
  * Date: 30/04/11
  * Time: 15:36
  */
-public abstract class ImportExportHandler {
+public abstract class ContextImportExportHandler {
 
-    protected static final LogMethods logMethods = LogUtils.getLogMethods(ImportExportHandler.class);
+    protected static final LogMethods logMethods = LogUtils.getLogMethods(ContextImportExportHandler.class);
 
     private TimeSeriesContext rootContext;
     private ContextFactory contextFactory = new DefaultContextFactory();
     private TimeSeriesFactory timeSeriesFactory = new DefaultTimeSeriesFactory();
 
-    public ImportExportHandler(TimeSeriesContext rootContext) {
+    public ContextImportExportHandler(TimeSeriesContext rootContext) {
         this.rootContext = rootContext;
     }
 
@@ -46,6 +46,10 @@ public abstract class ImportExportHandler {
         this.timeSeriesFactory = timeSeriesFactory;
     }
 
+    /**
+     * @return true if all the identifiable (and associated children) can be imported, apart from any nodes
+     * which are specifically ignored.
+     */
     protected boolean canImport(List<? extends Identifiable> identifiables, Identifiable target) {
         boolean result = true;
         LinkedHashSet<Identifiable> all = getIdentifiablesAndAllDescendents(identifiables);
@@ -58,8 +62,15 @@ public abstract class ImportExportHandler {
         return result;
     }
 
+    /**
+     * @return true if the identifiable should be ignored during import, e.g it is a folder node of a type which does
+     * not need to be explicitly created. Ignored nodes in the selection will not prevent import taking place.
+     */
     protected abstract boolean shouldIgnoreForImport(Identifiable i, Identifiable target);
 
+    /*
+     * @return true, if the identifiable can be imported
+     */
     protected abstract boolean canImport(Identifiable i, Identifiable target);
 
 
@@ -77,8 +88,10 @@ public abstract class ImportExportHandler {
         }
     }
 
+    /**
+     * @return an ImportDetails, which contains everything necessary to import the target identifiable
+     */
     protected abstract ImportDetails getImportDetails(Identifiable identifiable, Identifiable target);
-
 
     private LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {
         LinkedHashSet<Identifiable> toAdd = new LinkedHashSet<Identifiable>();
@@ -93,6 +106,19 @@ public abstract class ImportExportHandler {
             }
         }
         return toAdd;
+    }
+
+    /**
+     * @return the source actions e.g. COPY/CUT supported by this handler, one of the DnDConstants
+     */
+    public abstract int getSourceActions(List<? extends Identifiable> selected);
+
+
+    public abstract void doExport(List<Identifiable> transferData, int action);
+
+
+    public TimeSeriesContext getRootContext() {
+        return rootContext;
     }
 
     /**

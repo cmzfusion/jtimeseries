@@ -1,9 +1,14 @@
 package com.od.jtimeseries.ui.selector.shared;
 
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,14 +20,18 @@ import java.util.List;
 */
 public class NoImportsSelectorTransferHandler extends TransferHandler {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(NoImportsSelectorTransferHandler.class);
+
+    private AbstractUIRootContext rootContext;
     private IdentifiableListActionModel selectionsModel;
 
-    public NoImportsSelectorTransferHandler(IdentifiableListActionModel selectionsModel) {
+    public NoImportsSelectorTransferHandler(AbstractUIRootContext rootContext, IdentifiableListActionModel selectionsModel) {
+        this.rootContext = rootContext;
         this.selectionsModel = selectionsModel;
     }
 
     public int getSourceActions(JComponent c) {
-        return MOVE | COPY;
+        return rootContext.getSourceActions(selectionsModel.getSelected());
     }
 
     public Transferable createTransferable(JComponent c) {
@@ -30,6 +39,14 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     }
 
     public void exportDone(JComponent c, Transferable t, int action) {
+        IdentifiableTransferable i = (IdentifiableTransferable)t;
+        List<Identifiable> transferData;
+        try {
+            transferData = (List<Identifiable>)i.getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            rootContext.doExport(transferData, action);
+        } catch (Exception e) {
+            logMethods.logError("Failed during exportDone", e);
+        }
     }
 
     public boolean canImport(TransferSupport supp) {
@@ -43,4 +60,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     protected void doImport(List<Identifiable> data, Identifiable target) {
     }
 
+    protected AbstractUIRootContext getRootContext() {
+        return rootContext;
+    }
 }

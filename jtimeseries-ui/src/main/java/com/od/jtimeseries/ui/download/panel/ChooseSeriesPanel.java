@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.table.FixedColumn;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +44,7 @@ public class ChooseSeriesPanel extends AbstractDownloadWizardPanel {
 
     private SeriesSelectionPanel<ServerTimeSeries> seriesSelectionPanel;
 
-    public ChooseSeriesPanel(WizardPanelListener panelListener, TimeSeriesContext timeSeriesContext) {
+    public ChooseSeriesPanel(WizardPanelListener panelListener, AbstractUIRootContext timeSeriesContext) {
         super(panelListener);
         Box titlePanel = createTitlePanel("Select series to import (" + timeSeriesContext.findAllTimeSeries().getNumberOfMatches() + " series found)");
         JComponent seriesSelector = createSeriesSelector(timeSeriesContext);
@@ -79,7 +80,7 @@ public class ChooseSeriesPanel extends AbstractDownloadWizardPanel {
         return buttonBox;
     }
 
-    private JComponent createSeriesSelector(TimeSeriesContext timeSeriesContext) {
+    private JComponent createSeriesSelector(AbstractUIRootContext timeSeriesContext) {
         seriesSelectionPanel = new SeriesSelectionPanel(timeSeriesContext, ServerTimeSeries.class);
         java.util.List<ColumnSettings> defaultColumnSettings = getDefaultColumnSettings();
         seriesSelectionPanel.setColumns(defaultColumnSettings);

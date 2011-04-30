@@ -24,7 +24,7 @@ public abstract class AbstractUIContextTimeSeriesFactory extends DefaultTimeSeri
                 }
             }
         } catch (Exception e) {
-            ImportExportHandler.logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
+            ContextImportExportHandler.logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
         }
         return (E)result;
     }

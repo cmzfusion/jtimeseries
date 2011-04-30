@@ -28,6 +28,7 @@ import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -65,7 +66,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
 
     public static final String TREE_VIEW_SELECTED_PROPERTY = "treeViewSelected";
     private static final int WIDTH = 250;
-    private TimeSeriesContext context;
+    private AbstractUIRootContext context;
     private Class<E> seriesClass;
     private SeriesSelectionList<E> selectionListForCharting;
     private SeriesDescriptionPanel seriesDescriptionPanel = new SeriesDescriptionPanel();
@@ -80,15 +81,15 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private IdentifiableListActionModel selectionActionModel;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass) {
+    public SeriesSelectionPanel(AbstractUIRootContext context, Class seriesClass) {
         this(context, "Selected", new SelectorTreeNodeFactory<E>(seriesClass), seriesClass);
     }
 
-    public SeriesSelectionPanel(TimeSeriesContext context, Class seriesClass, SelectorTreeNodeFactory<E> treeNodeFactory) {
+    public SeriesSelectionPanel(AbstractUIRootContext context, Class seriesClass, SelectorTreeNodeFactory<E> treeNodeFactory) {
         this(context, "Selected", treeNodeFactory, seriesClass);
     }
 
-    public SeriesSelectionPanel(VisualizerRootContext rootContext, String chart, Class<E> seriesClass) {
+    public SeriesSelectionPanel(AbstractUIRootContext rootContext, String chart, Class<E> seriesClass) {
         this(rootContext, chart, new SelectorTreeNodeFactory<E>(seriesClass), seriesClass);
     }
 
@@ -98,7 +99,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
      *
      * @param selectionText, text name for boolean 'selected' column (e.g. if the selected series will be charted, this might be 'Chart')
      */
-    public SeriesSelectionPanel(TimeSeriesContext context, String selectionText, SelectorTreeNodeFactory treeNodeFactory, Class<E> seriesClass) {
+    public SeriesSelectionPanel(AbstractUIRootContext context, String selectionText, SelectorTreeNodeFactory treeNodeFactory, Class<E> seriesClass) {
         this.context = context;
         this.seriesClass = seriesClass;
         this.selectionListForCharting = new SeriesSelectionList<E>();

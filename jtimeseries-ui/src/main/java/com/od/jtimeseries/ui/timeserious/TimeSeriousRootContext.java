@@ -46,7 +46,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     }
 
     protected TimeSeriesFactory createTimeSeriesFactory() {
-        return new RootContextTimeSeriesFactory();
+        return new TimeSeriousRootContextTimeSeriesFactory();
     }
 
     protected ContextUpdatingBusListener createContextBusListener() {
@@ -115,7 +115,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     //create ServerTimeSeries, which are lighter weight and not backed by an HttpTimeSeries
     //we don't want to create a RemoteHttpTimeSeries for every series in the main selector tree
-    private class RootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
+    private class TimeSeriousRootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
 
         protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
             return new ServerTimeSeries(config);

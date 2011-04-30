@@ -64,11 +64,15 @@ public class VisualizerRootContext extends AbstractUIRootContext {
         for ( UIPropertiesTimeSeries s : toAdd) {
             //TODO we may want to flag the conflict up to the user
             if ( ! contains(s.getPath())) {
-                create(s.getPath(), s.getDescription(), UIPropertiesTimeSeries.class, s.getRoot());
+                create(s.getPath(), s.getDescription(), UIPropertiesTimeSeries.class, s);
             }
         }
     }
 
+    /**
+     * Add chart configs to this visualizer, under the local server node with
+     * matching URL to the server specified in each config
+     */
     public void addChartConfigs(List<UiTimeSeriesConfig> chartConfigs) {
         for ( UiTimeSeriesConfig c : chartConfigs ) {
             try {

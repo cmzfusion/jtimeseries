@@ -50,7 +50,7 @@ public class IdentifiableTransferable implements Transferable {
 
     public DataFlavor[] getTransferDataFlavors() {
         return ( selectionsModel.isSelectionLimitedToType(ExportableConfigHolder.class)) ?
-         new DataFlavor[] { DataFlavor.javaFileListFlavor } :
+         new DataFlavor[] { DataFlavor.javaFileListFlavor,  LIST_OF_IDENTIFIABLE_FLAVOR } :
          new DataFlavor[] { LIST_OF_IDENTIFIABLE_FLAVOR };
     }
 

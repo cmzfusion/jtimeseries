@@ -75,25 +75,13 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         }
     }
 
-    private boolean parameterIsOtherRoot(Object parameter) {
-        return parameter instanceof TimeSeriesContext && ((TimeSeriesContext) parameter).isRoot();
-    }
-
     protected abstract class AbstractUIContextTimeSeriesFactory extends DefaultTimeSeriesFactory {
 
         public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters) {
             UIPropertiesTimeSeries result = null;
             try {
                 if (clazzType.isAssignableFrom(UIPropertiesTimeSeries.class) && parameters.length == 1) {
-                    //if the parameter is a root context - this means we are trying to recreate a series from
-                    //another context tree within this visualizer's context tree
-                    if (parameterIsOtherRoot(parameters[0])) {
-                        TimeSeriesContext otherRoot = (TimeSeriesContext) parameters[0];
-                        UIPropertiesTimeSeries otherSeries = otherRoot.get(path, UIPropertiesTimeSeries.class);
-                        UiTimeSeriesConfig config = new UiTimeSeriesConfig(otherSeries);
-                        result = createTimeSeriesForConfig(config);
-                    //the parameter may be a deserialized config
-                    } else if (parameters[0] instanceof UiTimeSeriesConfig) {
+                    if (parameters[0] instanceof UiTimeSeriesConfig) {
                         result = createTimeSeriesForConfig((UiTimeSeriesConfig) parameters[0]);
                     } else if (parameters[0] instanceof UIPropertiesTimeSeries) {
                         result = createTimeSeriesForConfig(new UiTimeSeriesConfig((UIPropertiesTimeSeries)parameters[0]));
@@ -110,8 +98,8 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     public class ServerContextCreatingContextFactory extends DefaultContextFactory {
 
-        //if we are creating a context in this tree and another root context is the parameter, we may be able to use
-        //the information from the parameter to help us create a more specific type of context locally -
+        //if we are creating a context in this tree we may be able to use the information from the parameter to
+        //help us create a more specific type of context locally -
         //in this case we can recreate the TimeSeriesServerContext from the original context
         public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
             E result = null;

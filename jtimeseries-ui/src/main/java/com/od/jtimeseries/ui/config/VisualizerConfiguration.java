@@ -46,7 +46,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
-    private Rectangle frameBounds;
+    private Rectangle frameLocation;
     private boolean isIcon;
     private boolean isShown = true;
     private int zPosition; //the z position of JInternalFrame containing the visualizer
@@ -143,12 +143,12 @@ public class VisualizerConfiguration implements ExportableConfig {
         this.tableColumns = columnSettings;
     }
 
-    public Rectangle getFrameBounds() {
-        return frameBounds;
+    public Rectangle getFrameLocation() {
+        return frameLocation;
     }
 
-    public void setFrameBounds(Rectangle frameBounds) {
-        this.frameBounds = frameBounds;
+    public void setFrameLocation(Rectangle frameBounds) {
+        this.frameLocation = frameBounds;
     }
 
     public boolean isIcon() {

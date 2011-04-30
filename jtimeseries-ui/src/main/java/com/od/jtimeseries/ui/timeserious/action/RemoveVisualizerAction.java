@@ -27,7 +27,7 @@ public class RemoveVisualizerAction extends AbstractRemoveHideablePeerAction<Vis
     protected boolean confirmRemove(List<VisualizerContext> desktops) {
         return JOptionPane.showConfirmDialog(
             SwingUtilities.getRoot(parentComponent),
-            "Remove visualizer" + (desktops.size() > 1 ? "s" : "") + "?",
+            "Remove visualizer" + (desktops.size() > 1 ? "s" : "") + " - are you sure?",
             "Remove Visualizer" + (desktops.size() > 1 ? "s" : "") + "?",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }

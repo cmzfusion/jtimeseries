@@ -46,5 +46,13 @@
         <string>title</string>
       </arguments>
     </migration>
+    <migration>
+      <targetVersion>201104291700</targetVersion>
+      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <arguments>
+        <string>frameBounds</string>
+        <string>frameLocation</string>
+      </arguments>
+    </migration>
   </migrationList>
 </configManager>

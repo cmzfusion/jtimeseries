@@ -15,8 +15,6 @@ import com.od.swing.util.AwtSafeListener;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -57,11 +55,11 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
 
             public void internalFrameActivated(InternalFrameEvent e) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
-                    new EventSender<TimeSeriousBusListener>() {
-                        public void sendEvent(TimeSeriousBusListener listener) {
-                            listener.visualizerSelected(visualizerContext);
+                        new EventSender<TimeSeriousBusListener>() {
+                            public void sendEvent(TimeSeriousBusListener listener) {
+                                listener.visualizerSelected(visualizerContext);
+                            }
                         }
-                    }
                 );
             }
 
@@ -99,8 +97,8 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
     public void setConfiguration(VisualizerConfiguration c) {
         if ( c != null) {
             TimeSeriesVisualizer.setVisualizerConfiguration(visualizer, c);
-            if ( c.getFrameBounds() != null) {
-                setBounds(c.getFrameBounds());
+            if ( c.getFrameLocation() != null) {
+                setBounds(c.getFrameLocation());
             }
         }
     }

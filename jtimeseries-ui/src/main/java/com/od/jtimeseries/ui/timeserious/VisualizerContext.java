@@ -25,7 +25,7 @@ public class VisualizerContext extends HideablePeerContext<VisualizerConfigurati
         VisualizerConfiguration c = TimeSeriesVisualizer.createVisualizerConfiguration(
                 peerFrame.getVisualizer()
         );
-        c.setFrameBounds(peerFrame.getBounds());
+        c.setFrameLocation(peerFrame.getBounds());
         c.setZPosition(peerFrame.getZPosition());
         c.setIsIcon(peerFrame.isIcon());
         c.setShown(isShown);

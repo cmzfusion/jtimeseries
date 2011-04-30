@@ -1,20 +1,15 @@
 package com.od.jtimeseries.ui.visualizer;
 
-import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.PathParser;
 
-import java.net.MalformedURLException;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -27,24 +22,20 @@ import java.util.List;
  */
 public class VisualizerRootContext extends AbstractUIRootContext {
 
+    private TimeSeriesServerDictionary serverDictionary;
 
     public VisualizerRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
-        super(serverDictionary, displayNameCalculator);
-        initializeFactoriesAndContextBusListener();
-    }
-
-    protected ContextFactory createContextFactory() {
-        return new ServerContextCreatingContextFactory();
-    }
-
-    protected TimeSeriesFactory createTimeSeriesFactory() {
-        return new VisualizerTimeSeriesFactory();
+        super(displayNameCalculator);
+        this.serverDictionary = serverDictionary;
+        ImportExportHandler h = new VisualizerImportExportHandler(this, serverDictionary);
+        initializeFactoriesAndContextBusListener(h);
     }
 
     protected ContextUpdatingBusListener createContextBusListener() {
         return new ContextUpdatingBusListener(this);
     }
 
+    /*
     public void addIdentifiables(List<? extends Identifiable> identifiables) {
 
         LinkedHashSet<UIPropertiesTimeSeries> toAdd = new LinkedHashSet<UIPropertiesTimeSeries>();
@@ -68,6 +59,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
             }
         }
     }
+    */
 
     /**
      * Add chart configs to this visualizer, under the local server node with
@@ -83,7 +75,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
                 //locally
                 PathParser p = new PathParser(c.getPath());
                 String serverDescription = p.removeFirstNode();
-                TimeSeriesServer s = getTimeSeriesServer(c, serverDescription);
+                TimeSeriesServer s = ServerContextCreatingContextFactory.getTimeSeriesServer(c, serverDescription, serverDictionary);
 
                 //TODO - handle case where we already have a series with this path?
                 String newLocalPath = s.getServerContextIdentifier() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + p.getRemainingPath();
@@ -93,19 +85,6 @@ public class VisualizerRootContext extends AbstractUIRootContext {
             } catch (Exception e) {
                 logMethods.logError("Failed to create series for config " + c, e);
             }
-        }
-    }
-
-    private class VisualizerTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
-
-        protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
-            //http series are unique by URL, to minimise unnecessary queries.
-            //Get or create the instance for this URL
-            RemoteHttpTimeSeries httpSeries = RemoteHttpTimeSeries.getOrCreateHttpSeries(config);
-
-            //the http series is wrapped with a ChartingTimeSeries instance which is unique to
-            //this visualizier, and so can have local settings for display name, colour etc.
-            return new ChartingTimeSeries(httpSeries, config);
         }
     }
 }

@@ -47,6 +47,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -304,7 +306,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
-        rootContext.addIdentifiables(selectedSeries);
+        rootContext.doImport(selectedSeries, rootContext);
     }
 
     //when this visualizer is garbage collected, give its series the chance to
@@ -321,7 +323,17 @@ public class TimeSeriesVisualizer extends JPanel {
         }
 
         public boolean canImport(TransferSupport supp) {
-            return supp.isDataFlavorSupported(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            boolean result = supp.isDataFlavorSupported(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            if ( result  ) {
+                List<Identifiable> transferData = null;
+                try {
+                    transferData = (List<Identifiable>)supp.getTransferable().getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+                    result = rootContext.canImport(transferData, rootContext);
+                 } catch (Exception e) {
+                   logMethods.logError("Failed during canImport", e);
+                }
+            }
+            return result;
         }
 
         public boolean importData(TransferSupport supp) {
@@ -338,12 +350,12 @@ public class TimeSeriesVisualizer extends JPanel {
                 e.printStackTrace();
             }
 
-            doImport(data);
+            doImport(data, rootContext);
             return true;
         }
 
-        protected void doImport(List<Identifiable> data) {
-            rootContext.addIdentifiables(data);
+        protected void doImport(List<Identifiable> data, Identifiable target) {
+            rootContext.doImport(data, target);
         }
     }
 }

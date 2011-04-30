@@ -40,7 +40,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
         return false;
     }
 
-    protected void doImport(List<Identifiable> data) {
+    protected void doImport(List<Identifiable> data, Identifiable target) {
     }
 
 }

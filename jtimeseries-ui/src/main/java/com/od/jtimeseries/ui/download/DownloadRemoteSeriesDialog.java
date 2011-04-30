@@ -18,10 +18,8 @@
  */
 package com.od.jtimeseries.ui.download;
 
-import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
@@ -30,7 +28,11 @@ import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
+import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
+import com.od.jtimeseries.ui.visualizer.ImportExportHandler;
+import com.od.jtimeseries.ui.visualizer.ServerContextCreatingContextFactory;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
@@ -119,24 +121,41 @@ public class DownloadRemoteSeriesDialog extends JFrame {
     private class SelectionRootContext extends AbstractUIRootContext {
 
         public SelectionRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
-            super(serverDictionary, displayNameCalculator);
-            initializeFactoriesAndContextBusListener();
-        }
-
-        protected ContextFactory createContextFactory() {
-            return new ServerContextCreatingContextFactory();
-        }
-
-        protected TimeSeriesFactory createTimeSeriesFactory() {
-            return new AbstractUIContextTimeSeriesFactory() {
-                protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
-                    return new ServerTimeSeries(config);
-                }
-            };
+            super(displayNameCalculator);
+            DownloadSeriesImportExportHandler h = new DownloadSeriesImportExportHandler(this, serverDictionary);
+            initializeFactoriesAndContextBusListener(h);
         }
 
         protected ContextUpdatingBusListener createContextBusListener() {
             return new ContextUpdatingBusListener(this);
         }
+    }
+
+    private class ServerTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
+        protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
+            return new ServerTimeSeries(config);
+        }
+    }
+
+    private class DownloadSeriesImportExportHandler extends ImportExportHandler {
+
+        public DownloadSeriesImportExportHandler(TimeSeriesContext rootContext, TimeSeriesServerDictionary serverDictionary) {
+            super(rootContext);
+            setContextFactory(new ServerContextCreatingContextFactory(rootContext, serverDictionary));
+            setTimeSeriesFactory(new ServerTimeSeriesFactory());
+        }
+
+        protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
+            return false;
+        }
+
+        protected boolean canImport(Identifiable i, Identifiable target) {
+            return false;
+        }
+
+        protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
+            return null;
+        }
+
     }
 }

@@ -1,19 +1,14 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.ContextFactory;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
-import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
+import com.od.jtimeseries.ui.visualizer.ImportExportHandler;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
-import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -30,23 +25,19 @@ import java.util.Map;
 public class TimeSeriousRootContext extends AbstractUIRootContext implements ConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
+    private TimeSeriesServerDictionary serverDictionary;
 
     public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
-        super(serverDictionary, displayNameCalculator);
+        super(displayNameCalculator);
+        this.serverDictionary = serverDictionary;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
-        initializeFactoriesAndContextBusListener();
+
+        ImportExportHandler h = new TimeSeriousRootImportExportHandler(this);
+        initializeFactoriesAndContextBusListener(h);
     }
 
     public DesktopContext getMainDesktopContext() {
         return get(DesktopConfiguration.MAIN_DESKTOP_NAME, DesktopContext.class);
-    }
-
-    protected ContextFactory createContextFactory() {
-        return new DefaultContextFactory();
-    }
-
-    protected TimeSeriesFactory createTimeSeriesFactory() {
-        return new TimeSeriousRootContextTimeSeriesFactory();
     }
 
     protected ContextUpdatingBusListener createContextBusListener() {
@@ -112,14 +103,4 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     public List<ConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
     }
-
-    //create ServerTimeSeries, which are lighter weight and not backed by an HttpTimeSeries
-    //we don't want to create a RemoteHttpTimeSeries for every series in the main selector tree
-    private class TimeSeriousRootContextTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
-
-        protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
-            return new ServerTimeSeries(config);
-        }
-    }
-
 }

@@ -31,46 +31,46 @@ public class IdentifiableTransferable implements Transferable {
     private static LogMethods logMethods = LogUtils.getLogMethods(IdentifiableTransferable.class);
 
     private static final String listType = DataFlavor.javaJVMLocalObjectMimeType +
-                       ";class=java.util.List";
-    public static DataFlavor LIST_OF_IDENTIFIABLE_FLAVOR;
+                       ";class=com.od.jtimeseries.ui.selector.shared.LocalSelectionsTransferData";
+    public static DataFlavor LOCAL_SELECTIONS_FLAVOR;
 
     static {
         try {
-            LIST_OF_IDENTIFIABLE_FLAVOR = new DataFlavor(listType);
+            LOCAL_SELECTIONS_FLAVOR = new DataFlavor(listType);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    private IdentifiableListActionModel selectionsModel;
+    private LocalSelectionsTransferData selections;
 
-    public IdentifiableTransferable(IdentifiableListActionModel selectionsModel) {
-        this.selectionsModel = selectionsModel;
+    public IdentifiableTransferable(LocalSelectionsTransferData selectionsModel) {
+        this.selections = selectionsModel;
     }
 
     public DataFlavor[] getTransferDataFlavors() {
-        return ( selectionsModel.isSelectionLimitedToType(ExportableConfigHolder.class)) ?
-         new DataFlavor[] { DataFlavor.javaFileListFlavor,  LIST_OF_IDENTIFIABLE_FLAVOR } :
-         new DataFlavor[] { LIST_OF_IDENTIFIABLE_FLAVOR };
+        return ( selections.isSelectionLimitedToType(ExportableConfigHolder.class)) ?
+         new DataFlavor[] { DataFlavor.javaFileListFlavor, LOCAL_SELECTIONS_FLAVOR} :
+         new DataFlavor[] {LOCAL_SELECTIONS_FLAVOR};
     }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         boolean result = false;
-        if (flavor.equals(LIST_OF_IDENTIFIABLE_FLAVOR)) {
+        if (flavor.equals(LOCAL_SELECTIONS_FLAVOR)) {
             result = true;
         } else if ( flavor.equals(DataFlavor.javaFileListFlavor )) {
-            result = selectionsModel.isSelectionLimitedToType(DesktopContext.class);
+            result = selections.isSelectionLimitedToType(DesktopContext.class);
         }
         return result;
     }
 
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         Object result = null;
-        if ( flavor == LIST_OF_IDENTIFIABLE_FLAVOR) {
-            result = selectionsModel.getSelected();
+        if ( flavor == LOCAL_SELECTIONS_FLAVOR) {
+            result = selections;
         } else if ( flavor == DataFlavor.javaFileListFlavor ) {
             //System.out.println("Creating file list");
-            List<ExportableConfigHolder> visualizerContexts = selectionsModel.getSelected(ExportableConfigHolder.class);
+            List<ExportableConfigHolder> visualizerContexts = selections.getSelected(ExportableConfigHolder.class);
             ConfigManager m = new ConfigManagerForTimeSerious();
             List<File> files = new LinkedList<File>();
             for (ExportableConfigHolder n : visualizerContexts) {

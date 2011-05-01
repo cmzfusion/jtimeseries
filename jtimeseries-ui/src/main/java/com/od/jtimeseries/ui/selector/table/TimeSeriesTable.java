@@ -68,6 +68,7 @@ class TimeSeriesTable<E extends UIPropertiesTimeSeries> extends SortableTable {
         setAutoCreateColumnsFromModel(false);
         setTableHeader(header);
         setModel(tableModel);
+        setFillsViewportHeight(true);
 
         //this has to be done after setting the model
         //it seems these values are reset otherwise:

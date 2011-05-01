@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableTransferable;
+import com.od.jtimeseries.ui.selector.shared.LocalSelectionsTransferData;
 import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -26,13 +27,13 @@ class VisualizerTransferHandler extends NoImportsSelectorTransferHandler {
     }
 
     public boolean canImport(TransferSupport supp) {
-        boolean result = supp.isDataFlavorSupported(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+        boolean result = supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
         if ( result  ) {
-            List<Identifiable> transferData;
+            LocalSelectionsTransferData transferData;
             try {
-                transferData = (List<Identifiable>)supp.getTransferable().getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+                transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
                 AbstractUIRootContext rootContext = getRootContext();
-                result = rootContext.canImport(transferData, rootContext);
+                result = rootContext.canImport(transferData.getSelected(), rootContext);
              } catch (Exception e) {
                logMethods.logError("Failed during canImport", e);
             }
@@ -48,13 +49,17 @@ class VisualizerTransferHandler extends NoImportsSelectorTransferHandler {
         // Fetch the Transferable and its data
         Transferable t = supp.getTransferable();
         List<Identifiable> data = null;
+        LocalSelectionsTransferData transferData = null;
         try {
-            data = (List<Identifiable>)t.getTransferData(IdentifiableTransferable.LIST_OF_IDENTIFIABLE_FLAVOR);
+            transferData = (LocalSelectionsTransferData) t.getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
+            data = transferData.getSelected();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         doImport(data, getRootContext());
+        int action = supp.isDrop() ? supp.getDropAction() : transferData.getAction();
+        transferData.getTransferListener().transferComplete(transferData, action);
         return true;
     }
 

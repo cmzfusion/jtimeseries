@@ -23,7 +23,7 @@ public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
         return context.toString();
     }
 
-    protected DesktopContext getIdentifiable() {
+    public DesktopContext getIdentifiable() {
         return context;
     }
 

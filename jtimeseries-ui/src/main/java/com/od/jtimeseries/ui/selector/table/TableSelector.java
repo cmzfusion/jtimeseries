@@ -109,7 +109,6 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     }
 
     public void setTransferHandler(TransferHandler h) {
-        super.setTransferHandler(h); //if we drop beneath the table rows
         table.setTransferHandler(h);
     }
 

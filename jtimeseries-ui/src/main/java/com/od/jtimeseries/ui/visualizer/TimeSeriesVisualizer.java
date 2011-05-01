@@ -132,7 +132,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
         SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(getSelectionActionModel());
         seriesSelectionPanel.setSelectorActionFactory(actionFactory);
-        seriesSelectionPanel.setTransferHandler(new VisualizerTransferHandler(rootContext, getSelectionActionModel()));
+        seriesSelectionPanel.setTransferHandler(new ImportExportTransferHandler(rootContext, getSelectionActionModel()));
     }
 
     private void layoutVisualizer() {

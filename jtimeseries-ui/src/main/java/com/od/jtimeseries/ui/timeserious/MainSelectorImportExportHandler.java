@@ -19,9 +19,9 @@ import java.util.List;
  * Time: 16:11
  * To change this template use File | Settings | File Templates.
  */
-public class TimeSeriousRootImportExportHandler extends ContextImportExportHandler {
+public class MainSelectorImportExportHandler extends ContextImportExportHandler {
 
-    public TimeSeriousRootImportExportHandler(TimeSeriesContext rootContext) {
+    public MainSelectorImportExportHandler(TimeSeriesContext rootContext) {
         super(rootContext);
         setTimeSeriesFactory(new TimeSeriousRootContextTimeSeriesFactory());
     }

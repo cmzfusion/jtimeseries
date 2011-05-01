@@ -14,7 +14,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 */
 public abstract class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode {
 
-    protected abstract Identifiable getIdentifiable();
+    public abstract Identifiable getIdentifiable();
 
     protected abstract Icon getIcon();
 

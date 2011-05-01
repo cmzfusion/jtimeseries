@@ -75,4 +75,8 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     protected AbstractUIRootContext getRootContext() {
         return rootContext;
     }
+
+    public IdentifiableListActionModel getSelectionsModel() {
+        return selectionsModel;
+    }
 }

@@ -23,8 +23,7 @@ public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
         return identifiable.toString();
     }
 
-    @Override
-    protected VisualizerContext getIdentifiable() {
+    public VisualizerContext getIdentifiable() {
         return identifiable;
     }
 

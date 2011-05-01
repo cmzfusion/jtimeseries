@@ -36,7 +36,7 @@ class ServerTreeNode extends ContextTreeNode implements AnimatedIconTree.Progres
         return context.toString();
     }
 
-    protected TimeSeriesContext getIdentifiable() {
+    public TimeSeriesContext getIdentifiable() {
         return context;
     }
 

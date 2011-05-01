@@ -25,8 +25,7 @@ class ContextTreeNode extends AbstractSeriesSelectionTreeNode {
         return context.toString();
     }
 
-    @Override
-    protected TimeSeriesContext getIdentifiable() {
+    public TimeSeriesContext getIdentifiable() {
         return context;
     }
 

@@ -29,8 +29,7 @@ class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSel
         return series;
     }
 
-    @Override
-    protected Identifiable getIdentifiable() {
+    public Identifiable getIdentifiable() {
         return series;
     }
 

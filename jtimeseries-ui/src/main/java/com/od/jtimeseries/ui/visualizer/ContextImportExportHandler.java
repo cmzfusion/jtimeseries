@@ -5,6 +5,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -48,14 +49,13 @@ public abstract class ContextImportExportHandler {
     }
 
     /**
-     * @return true if all the identifiable (and associated children) can be imported, apart from any nodes
+     * @return true if all the identifiable (and its descendants) can be imported, apart from any nodes
      * which are specifically ignored.
      */
-    protected boolean canImport(List<? extends Identifiable> identifiables, Identifiable target) {
+    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
         boolean result = true;
-        LinkedHashSet<Identifiable> all = getIdentifiablesAndAllDescendents(identifiables);
-        for ( Identifiable i : all) {
-            if ( ! shouldIgnoreForImport(i, target) && ! canImport(i, target)) {
+        for ( Identifiable i : identifiables.getSelected()) {
+            if ( ! canImport(i, target)) {
                 result = false;
                 break;
             }
@@ -67,17 +67,20 @@ public abstract class ContextImportExportHandler {
      * @return true if the identifiable should be ignored during import, e.g it is a folder node of a type which does
      * not need to be explicitly created. Ignored nodes in the selection will not prevent import taking place.
      */
-    protected abstract boolean shouldIgnoreForImport(Identifiable i, Identifiable target);
+    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
+        return false;
+    }
 
     /*
-     * @return true, if the identifiable can be imported
+     * @return true, if the identifiable (and its descendants) can be imported
      */
-    protected abstract boolean canImport(Identifiable i, Identifiable target);
+    protected boolean canImport(Identifiable i, Identifiable target) {
+        return true;
+    }
 
 
-    protected void doImport(List<? extends Identifiable> identifiables, Identifiable target) {
-        LinkedHashSet<Identifiable> toAdd = getIdentifiablesAndAllDescendents(identifiables);
-
+    protected void doImport(IdentifiableListActionModel identifiables, Identifiable target) {
+        LinkedHashSet<Identifiable> toAdd = getIdentifiablesAndAllDescendents(identifiables.getSelected());
         for ( Identifiable s : toAdd) {
             if ( ! shouldIgnoreForImport(s, target) ) {
                 ImportDetails d = getImportDetails(s, target);
@@ -94,7 +97,8 @@ public abstract class ContextImportExportHandler {
      */
     protected abstract ImportDetails getImportDetails(Identifiable identifiable, Identifiable target);
 
-    private LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {
+
+    protected LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {
         LinkedHashSet<Identifiable> toAdd = new LinkedHashSet<Identifiable>();
         for ( Identifiable i : identifiables) {
             //identifiables in the list may be at different levels of the hierarchy from
@@ -112,12 +116,12 @@ public abstract class ContextImportExportHandler {
     /**
      * @return the source actions e.g. COPY/CUT supported by this handler, one of the DnDConstants
      */
-    public abstract int getSourceActions(List<? extends Identifiable> selected);
+    public abstract int getSourceActions(IdentifiableListActionModel selected);
 
 
-    public void doExport(List<Identifiable> transferData, int action) {
+    public void doExport(IdentifiableListActionModel transferData, int action) {
         if ( action == DnDConstants.ACTION_MOVE) {
-            for ( Identifiable i : transferData) {
+            for ( Identifiable i : transferData.getSelected()) {
                 rootContext.remove(i.getPath());
             }
         }

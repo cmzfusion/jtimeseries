@@ -17,6 +17,8 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  */
 public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext {
 
+    public static final String SHOWN_PROPERTY = "shown";
+
     private E peerConfig;
     private P peerResource;
     private boolean shown;
@@ -66,7 +68,7 @@ public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext
                 peerConfig = createPeerConfig(false);
                 disposePeerResource();
             }
-            fireNodeChanged("shown");
+            fireNodeChanged(SHOWN_PROPERTY);
         }
     }
 

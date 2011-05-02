@@ -1,6 +1,5 @@
 package com.od.jtimeseries.ui.selector.shared;
 
-import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.util.List;
@@ -31,8 +30,8 @@ public class LocalSelectionsTransferData {
         return selections.getSelected(clazz);
     }
 
-    public List<Identifiable> getSelected() {
-        return selections.getSelected();
+    public IdentifiableListActionModel getSelections() {
+        return selections;
     }
 
     public TransferListener getTransferListener() {

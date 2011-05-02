@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -10,7 +11,6 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,12 +27,12 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         setContextFactory(new ServerContextCreatingContextFactory(rootContext, serverDictionary));
     }
 
-    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-        return TimeSeriesContext.class.isAssignableFrom(i.getClass());
+    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
+        return identifiables.isSelectionLimitedToType(TimeSeriesContext.class, UIPropertiesTimeSeries.class);
     }
 
-    protected boolean canImport(Identifiable i, Identifiable target) {
-        return i instanceof UIPropertiesTimeSeries;
+    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
+        return TimeSeriesContext.class.isAssignableFrom(i.getClass());
     }
 
     protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
@@ -45,7 +45,7 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         );
     }
 
-    public int getSourceActions(List<? extends Identifiable> selected) {
+    public int getSourceActions(IdentifiableListActionModel selected) {
         return DnDConstants.ACTION_COPY_OR_MOVE;
     }
 

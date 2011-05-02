@@ -142,6 +142,15 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
                 }
             }
         }
+
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+            for ( Identifiable c : contextTreeEvent.getNodes()) {
+                if ( c instanceof VisualizerContext) {
+                    VisualizerContext n = (VisualizerContext)c;
+                    n.setShown(false); //trigger VisualizerInternalFrame to dispose
+                }
+            }
+        }
     }
 
     /**

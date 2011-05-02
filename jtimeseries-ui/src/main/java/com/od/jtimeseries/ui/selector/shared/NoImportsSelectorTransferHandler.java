@@ -31,7 +31,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
     }
 
     public int getSourceActions(JComponent c) {
-        return rootContext.getSourceActions(selectionsModel.getSelected());
+        return rootContext.getSourceActions(selectionsModel);
     }
 
     public Transferable createTransferable(JComponent c) {
@@ -39,7 +39,7 @@ public class NoImportsSelectorTransferHandler extends TransferHandler {
         snapshotSelections.setSelected(selectionsModel.getSelected());
         LocalSelectionsTransferData transferData = new LocalSelectionsTransferData(snapshotSelections, new LocalSelectionsTransferData.TransferListener() {
             public void transferComplete(LocalSelectionsTransferData d, int actionType) {
-                rootContext.doExport(d.getSelected(), actionType);
+                rootContext.doExport(d.getSelections(), actionType);
             }
         });
         d = new WeakReference<LocalSelectionsTransferData>(transferData);

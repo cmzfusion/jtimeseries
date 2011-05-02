@@ -19,7 +19,14 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
 
     private Map<Class, List<? extends Identifiable>> nodesByClass = new HashMap<Class, List<? extends Identifiable>>();
 
-    public void setSelected(List<Identifiable> series) {
+    public IdentifiableListActionModel() {
+    }
+
+    public IdentifiableListActionModel(List<? extends Identifiable> l) {
+        setSelected(l);
+    }
+
+    public void setSelected(List<? extends Identifiable> series) {
         nodesByClass.clear();
         super.setSelected(series);
     }
@@ -44,8 +51,12 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
         super.doClearActionModelState();
     }
 
-    public boolean isSelectionLimitedToType(Class type) {
-        return getSelected(type).size() == getSelected().size();
+    public boolean isSelectionLimitedToType(Class... type) {
+        int total = 0;
+        for ( Class c : type ) {
+            total += getSelected(c).size();
+        }
+        return total == getSelected().size();
     }
 
     public <C extends Identifiable> java.util.List<C> getSelected(Class<C> clazz) {

@@ -104,6 +104,15 @@ public class FrameManager implements ConfigAware {
                 }
             }
         }
+
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+             for ( Identifiable c : contextTreeEvent.getNodes()) {
+                if ( c instanceof DesktopContext) {
+                    DesktopContext n = (DesktopContext)c;
+                    n.setShown(false);
+                }
+            }
+        }
     }
 
     private void showFrame(DesktopContext desktopContext) {

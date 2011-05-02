@@ -25,6 +25,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
@@ -158,11 +159,11 @@ public class DownloadRemoteSeriesDialog extends JFrame {
             return null;
         }
 
-        public int getSourceActions(List<? extends Identifiable> selected) {
+        public int getSourceActions(IdentifiableListActionModel selected) {
             return DnDConstants.ACTION_NONE;
         }
 
-        public void doExport(List<Identifiable> transferData, int action) {
+        public void doExport(IdentifiableListActionModel transferData, int action) {
         }
 
     }

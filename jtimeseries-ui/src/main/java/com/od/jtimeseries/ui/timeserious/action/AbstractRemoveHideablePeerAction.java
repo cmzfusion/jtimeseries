@@ -1,7 +1,6 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.HideablePeerContext;
 import com.od.swing.action.ModelDrivenAction;
 
@@ -33,8 +32,7 @@ public abstract class AbstractRemoveHideablePeerAction<E extends HideablePeerCon
         List<E> nodes = getActionModel().getSelected(hideablePeerClass);
         if ( confirmRemove(nodes) ) {
             for ( final E n : nodes ) {
-                    n.setShown(false);
-                    n.getParent().removeChild(n);
+                n.getParent().removeChild(n);
             }
         }
     }

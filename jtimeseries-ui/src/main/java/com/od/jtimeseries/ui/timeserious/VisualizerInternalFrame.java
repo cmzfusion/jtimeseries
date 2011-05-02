@@ -114,7 +114,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            if ("shown".equals(changeDescription)) {
+            if (HideablePeerContext.SHOWN_PROPERTY.equals(changeDescription)) {
                 if (! visualizerContext.isShown()) {
                     dispose();
                 }

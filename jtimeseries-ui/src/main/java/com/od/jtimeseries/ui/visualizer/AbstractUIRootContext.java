@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -11,7 +12,6 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.UIEventBus;
 
 import java.awt.dnd.DnDConstants;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,11 +43,11 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         setContextFactory(importExportHandler.getContextFactory());
     }
 
-    public boolean canImport(List<? extends Identifiable> identifiables, Identifiable target) {
+    public boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
         return importExportHandler.canImport(identifiables, target);
     }
 
-    public void doImport(List<? extends Identifiable> identifiables, Identifiable target) {
+    public void doImport(IdentifiableListActionModel identifiables, Identifiable target) {
         importExportHandler.doImport(identifiables, target);
     }
 
@@ -61,11 +61,11 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         }
     }
 
-    public int getSourceActions(List<Identifiable> selected) {
+    public int getSourceActions(IdentifiableListActionModel selected) {
         return importExportHandler.getSourceActions(selected);
     }
 
-    public void doExport(List<Identifiable> transferData, int action) {
+    public void doExport(IdentifiableListActionModel transferData, int action) {
         importExportHandler.doExport(transferData, action);
     }
 
@@ -87,11 +87,11 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
             return null;
         }
 
-        public int getSourceActions(List<? extends Identifiable> selected) {
+        public int getSourceActions(IdentifiableListActionModel selected) {
             return DnDConstants.ACTION_NONE;
         }
 
-        public void doExport(List<Identifiable> transferData, int action) {
+        public void doExport(IdentifiableListActionModel transferData, int action) {
         }
     }
 }

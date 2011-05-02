@@ -1,11 +1,11 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
@@ -14,7 +14,6 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,16 +29,9 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         setContextFactory(new MainSelectorContextFactory());
     }
 
-    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-        return ! (i instanceof VisualizerContext);
-    }
-
-    protected boolean canImport(Identifiable i, Identifiable target) {
-        boolean canImport = i instanceof VisualizerContext &&
-            target instanceof DesktopContext &&
-            ( i.getParent() != target);
-        System.out.println(i + " : " + target + ": " + canImport);
-        return canImport;
+    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
+        return target instanceof DesktopContext &&
+            identifiables.isSelectionLimitedToType(VisualizerContext.class);
     }
 
     protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
@@ -51,8 +43,9 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         );
     }
 
-    public int getSourceActions(List<? extends Identifiable> selected) {
-        return DnDConstants.ACTION_COPY_OR_MOVE;
+    public int getSourceActions(IdentifiableListActionModel selected) {
+        return selected.isSelectionLimitedToType(VisualizerContext.class) ?
+            DnDConstants.ACTION_COPY_OR_MOVE : DnDConstants.ACTION_COPY;
     }
 
     //create ServerTimeSeries, which are lighter weight and not backed by an HttpTimeSeries

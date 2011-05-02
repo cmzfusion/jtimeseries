@@ -300,7 +300,8 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
-        rootContext.doImport(selectedSeries, rootContext);
+        IdentifiableListActionModel identifiables = new IdentifiableListActionModel(selectedSeries);
+        rootContext.doImport(identifiables, rootContext);
     }
 
     //when this visualizer is garbage collected, give its series the chance to

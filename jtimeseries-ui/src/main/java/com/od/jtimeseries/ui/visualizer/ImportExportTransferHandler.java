@@ -36,7 +36,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
             try {
                 transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
                 Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
-                result = getRootContext().canImport(transferData.getSelected(), target);
+                result = getRootContext().canImport(transferData.getSelections(), target);
                 System.out.println("transfer canImport : " + target + ": " + result);
              } catch (Throwable t) {
                logMethods.logError("Failed during canImport", t);
@@ -53,14 +53,8 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
 
             // Fetch the Transferable and its data
             Transferable t = supp.getTransferable();
-            List<Identifiable> data = null;
-            LocalSelectionsTransferData transferData = null;
-            try {
-                transferData = (LocalSelectionsTransferData) t.getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
-                data = transferData.getSelected();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            LocalSelectionsTransferData transferData = (LocalSelectionsTransferData) t.getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
+            IdentifiableListActionModel data = transferData.getSelections();
 
             Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
             doImport(data, target);
@@ -98,7 +92,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
         return result;
     }
 
-    protected void doImport(List<Identifiable> data, Identifiable target) {
+    protected void doImport(IdentifiableListActionModel data, Identifiable target) {
         getRootContext().doImport(data, target);
     }
 }

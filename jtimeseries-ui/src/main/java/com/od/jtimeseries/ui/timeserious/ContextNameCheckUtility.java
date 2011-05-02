@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 
 import javax.swing.*;
@@ -14,40 +15,32 @@ import java.awt.*;
  */
 public class ContextNameCheckUtility {
 
-    private Component parentComponent;
-    private TimeSeriesContext context;
-
-    public ContextNameCheckUtility(Component parent, TimeSeriesContext context) {
-        this.parentComponent = parent;
-        this.context = context;
-    }
-
     /**
      * @return String valid name, or null if User cancelled request for new name
      */
-    public String getNameFromUser(Component parent, String text, String title, String defaultName) {
+    public static String getNameFromUser(Component parent, Identifiable targetContext, String text, String title, String defaultName) {
         Object userInput = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
         String result = null;
         if ( userInput != null) {
             result = userInput.toString();
             result = result.trim();
             result = result.length() == 0 ? defaultName : result;
-            result = checkName(result);
+            result = checkName(parent, targetContext, result);
         }
         return result;
     }
 
     /**
-     * Check the suggested name is valid, and not a duplicate of an existing identifiable within this context
+     * Check the suggested name is valid, and not a duplicate of an existing identifiable within this targetContext
      * If required, prompt the user for an alternative name
      * @return String valid name, or null if User cancelled request for new name
      */
-    public String checkName(String name) {
+    public static String checkName(Component parentComponent, Identifiable targetContext, String name) {
         String nameProblem = IdentifiablePathUtils.checkId(name);
         if ( nameProblem != null) {
-            name = getNameFromUser(parentComponent, nameProblem + ", please correct the name", "Invalid Name", name);
-        } else if ( context.contains(name) ) {
-            name = getNameFromUser(parentComponent, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
+            name = getNameFromUser(parentComponent, targetContext, nameProblem + ", please correct the name", "Invalid Name", name);
+        } else if ( targetContext.contains(name) ) {
+            name = getNameFromUser(parentComponent, targetContext, "Duplicate name, please choose another", "Duplicate Name", name + "_copy");
         }
         return name;
     }

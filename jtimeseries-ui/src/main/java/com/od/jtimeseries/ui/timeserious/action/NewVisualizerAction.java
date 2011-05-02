@@ -31,14 +31,13 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
 
     public void actionPerformed(ActionEvent e) {
         if ( getActionModel().isContextSelected() ) {
-            DesktopContext desktop = getActionModel().getSelectedContext();
-            ContextNameCheckUtility nameCheckUtility = new ContextNameCheckUtility(mainFrame, desktop);
-            String name = nameCheckUtility.getNameFromUser(
-                    mainFrame, "Name for visualizer?", "Choose Name", ""
+            DesktopContext desktopContext = getActionModel().getSelectedContext();
+            String name = ContextNameCheckUtility.getNameFromUser(
+                mainFrame, desktopContext, "Name for visualizer?", "Choose Name", ""
             );
             if ( name != null) { //check if user cancelled
                 VisualizerConfiguration c = new VisualizerConfiguration(name);
-                VisualizerContext visualizerContext = desktop.create(c.getTitle(), c.getTitle(), VisualizerContext.class, c);
+                VisualizerContext visualizerContext = desktopContext.create(c.getTitle(), c.getTitle(), VisualizerContext.class, c);
                 visualizerSelectionActionModel.setSelectedContext(visualizerContext);
             }
         }

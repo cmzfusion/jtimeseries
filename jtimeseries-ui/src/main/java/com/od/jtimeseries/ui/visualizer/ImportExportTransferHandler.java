@@ -11,6 +11,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.List;
 
@@ -30,17 +32,19 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
     }
 
     public boolean canImport(TransferSupport supp) {
-        boolean result = supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
-        if ( result  ) {
+        boolean result = false;
+        if ( supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR) ) {
             LocalSelectionsTransferData transferData;
             try {
                 transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
                 Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
-                result = getRootContext().canImport(transferData.getSelections(), target);
+                result = getRootContext().canImport(supp.getComponent(), transferData.getSelections(), target);
                 System.out.println("transfer canImport : " + target + ": " + result);
              } catch (Throwable t) {
                logMethods.logError("Failed during canImport", t);
             }
+        } else if ( supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            //TODO
         }
         return result;
     }
@@ -57,7 +61,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
             IdentifiableListActionModel data = transferData.getSelections();
 
             Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
-            doImport(data, target);
+            doImport(supp.getComponent(), data, target);
             int action = supp.isDrop() ? supp.getDropAction() : transferData.getAction();
             transferData.getTransferListener().transferComplete(transferData, action);
         } catch (Throwable t) {
@@ -92,7 +96,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
         return result;
     }
 
-    protected void doImport(IdentifiableListActionModel data, Identifiable target) {
-        getRootContext().doImport(data, target);
+    protected void doImport(Component component, IdentifiableListActionModel data, Identifiable target) {
+        getRootContext().doImport(component, data, target);
     }
 }

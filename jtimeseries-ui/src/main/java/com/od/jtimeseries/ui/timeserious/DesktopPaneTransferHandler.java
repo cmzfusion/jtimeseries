@@ -36,8 +36,6 @@ public class DesktopPaneTransferHandler extends TransferHandler {
     private DesktopContext desktopContext;
     private JDesktopPane desktopPane;
     private JFrame parentFrame;
-    private ContextNameCheckUtility desktopNameCheckUtility;
-    private ContextNameCheckUtility visualizerNameCheckUtility;
     private CascadeLocationCalculator cascadeLocationCalculator = new CascadeLocationCalculator(50, 50);
     private Rectangle lastVisualizerImportLocation;
     private Rectangle lastDesktopImportLocation;
@@ -48,8 +46,6 @@ public class DesktopPaneTransferHandler extends TransferHandler {
         this.desktopContext = desktopContext;
         this.desktopPane = desktopPane;
         this.parentFrame = parentFrame;
-        this.desktopNameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContainingContext);
-        this.visualizerNameCheckUtility = new ContextNameCheckUtility(parentFrame, desktopContext);
 
         importHandlers.put(VisualizerConfiguration.class, new VisualizerImportHandler());
         importHandlers.put(DesktopConfiguration.class, new DesktopImportHandler());
@@ -113,8 +109,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
 
         private boolean findUniqueName(ExportableConfig uiConfig) {
             String title = uiConfig.getTitle();
-            ContextNameCheckUtility cu = getNameCheckUtility(uiConfig);
-            title = cu.checkName(title);
+            title = checkName(title);
             boolean userCancelledImport = title == null;
             if ( ! userCancelledImport) {
                 uiConfig.setTitle(title); //update the config to reflect the updated name
@@ -122,15 +117,15 @@ public class DesktopPaneTransferHandler extends TransferHandler {
             return userCancelledImport;
         }
 
-        protected abstract ContextNameCheckUtility getNameCheckUtility(ExportableConfig uiConfig);
+        protected abstract String checkName(String title);
 
         protected abstract void handleImport(E config);
     }
 
     private class DesktopImportHandler extends ImportHandler<DesktopConfiguration> {
 
-        protected ContextNameCheckUtility getNameCheckUtility(ExportableConfig uiConfig) {
-            return desktopNameCheckUtility;
+        protected String checkName(String title) {
+            return ContextNameCheckUtility.checkName(parentFrame, desktopContainingContext, title);
         }
 
         protected void handleImport(DesktopConfiguration c) {
@@ -144,8 +139,8 @@ public class DesktopPaneTransferHandler extends TransferHandler {
 
      private class VisualizerImportHandler extends ImportHandler<VisualizerConfiguration> {
 
-        protected ContextNameCheckUtility getNameCheckUtility(ExportableConfig uiConfig) {
-            return visualizerNameCheckUtility;
+        protected String checkName(String title) {
+            return ContextNameCheckUtility.checkName(parentFrame, desktopContext, title);
         }
 
         protected void handleImport(VisualizerConfiguration c) {

@@ -10,6 +10,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -52,7 +53,7 @@ public abstract class ContextImportExportHandler {
      * @return true if all the identifiable (and its descendants) can be imported, apart from any nodes
      * which are specifically ignored.
      */
-    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
+    protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
         boolean result = true;
         for ( Identifiable i : identifiables.getSelected()) {
             if ( ! canImport(i, target)) {
@@ -79,23 +80,29 @@ public abstract class ContextImportExportHandler {
     }
 
 
-    protected void doImport(IdentifiableListActionModel identifiables, Identifiable target) {
+    protected void doImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
         LinkedHashSet<Identifiable> toAdd = getIdentifiablesAndAllDescendents(identifiables.getSelected());
         for ( Identifiable s : toAdd) {
             if ( ! shouldIgnoreForImport(s, target) ) {
-                ImportDetails d = getImportDetails(s, target);
+                ImportDetails d = getImportDetails(component, s, target);
                 //TODO we may want to flag the conflict up to the user
-                if ( ! rootContext.contains(d.getPath())) {
+                if ( rootContext.contains(d.getPath())) {
+                    alreadyExistsOnImport(component, s, target, d);
+                } else {
                     rootContext.create(d.getPath(), d.getDescription(), d.getLocalClassType(), d.getConfigObject());
                 }
             }
         }
     }
 
+    //may override to provide feedback to user where appropriate
+    protected void alreadyExistsOnImport(Component component, Identifiable i, Identifiable target, ImportDetails d) {
+    }
+
     /**
      * @return an ImportDetails, which contains everything necessary to import the target identifiable
      */
-    protected abstract ImportDetails getImportDetails(Identifiable identifiable, Identifiable target);
+    protected abstract ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target);
 
 
     protected LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {

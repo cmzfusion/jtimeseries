@@ -37,6 +37,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -155,7 +156,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
             return false;
         }
 
-        protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
+        protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
             return null;
         }
 

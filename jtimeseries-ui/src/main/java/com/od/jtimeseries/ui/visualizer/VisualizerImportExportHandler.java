@@ -9,6 +9,7 @@ import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
 
@@ -27,7 +28,7 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         setContextFactory(new ServerContextCreatingContextFactory(rootContext, serverDictionary));
     }
 
-    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
+    protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
         return identifiables.isSelectionLimitedToType(TimeSeriesContext.class, UIPropertiesTimeSeries.class);
     }
 
@@ -35,7 +36,7 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         return TimeSeriesContext.class.isAssignableFrom(i.getClass());
     }
 
-    protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
+    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
         UIPropertiesTimeSeries s = (UIPropertiesTimeSeries)identifiable;
         return new ImportDetails(
             s.getPath(),

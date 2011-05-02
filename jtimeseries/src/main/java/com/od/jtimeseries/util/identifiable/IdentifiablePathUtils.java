@@ -27,7 +27,6 @@ package com.od.jtimeseries.util.identifiable;
 public class IdentifiablePathUtils {
 
     public static final String DEFAULT_ROOT_CONTEXT_ID = "Root Context";
-    public static final String NAMESPACE_SEPARATOR = ".";
     public static final String NAMESPACE_SEPARATOR_REGEX_TOKEN = "\\.";
 
     /**
@@ -37,8 +36,8 @@ public class IdentifiablePathUtils {
         String problemDescription = null;
         if ( id == null ) {
             problemDescription = "The id cannot be null";
-        } else if ( id.contains(IdentifiablePathUtils.NAMESPACE_SEPARATOR)) {
-            problemDescription = "The id cannot contain a '" + IdentifiablePathUtils.NAMESPACE_SEPARATOR + "', this is the path separator symbol";
+        } else if ( id.contains(Identifiable.NAMESPACE_SEPARATOR)) {
+            problemDescription = "The id cannot contain a '" + Identifiable.NAMESPACE_SEPARATOR + "', this is the path separator symbol";
         } else if ( id.equals("")) {
             problemDescription = "The id cannot be an empty string";
         }

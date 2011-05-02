@@ -11,6 +11,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.UIEventBus;
 
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 
 /**
@@ -43,12 +44,12 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         setContextFactory(importExportHandler.getContextFactory());
     }
 
-    public boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
-        return importExportHandler.canImport(identifiables, target);
+    public boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
+        return importExportHandler.canImport(component, identifiables, target);
     }
 
-    public void doImport(IdentifiableListActionModel identifiables, Identifiable target) {
-        importExportHandler.doImport(identifiables, target);
+    public void doImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
+        importExportHandler.doImport(component, identifiables, target);
     }
 
     protected abstract ContextUpdatingBusListener createContextBusListener();
@@ -83,7 +84,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
             return false;
         }
 
-        protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
+        protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
             return null;
         }
 

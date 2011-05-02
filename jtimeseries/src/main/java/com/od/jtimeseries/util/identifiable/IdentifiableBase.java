@@ -339,7 +339,7 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     protected String getPathForChild(String id) {
-        return getPath() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + id;
+        return getPath() + NAMESPACE_SEPARATOR + id;
     }
 
 
@@ -385,7 +385,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         //add the path to the child node from which we received the event
         private String getNewPathForEvent(IdentifiableTreeEvent contextTreeEvent) {
             return contextTreeEvent.getSource().getId() +
-                (contextTreeEvent.getPath().length() > 0 ? IdentifiablePathUtils.NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
+                (contextTreeEvent.getPath().length() > 0 ? NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
         }
     }
 }

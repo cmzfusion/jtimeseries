@@ -6,7 +6,6 @@ import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.util.identifiable.PathParser;
 
 import java.util.List;
@@ -33,32 +32,6 @@ public class VisualizerRootContext extends AbstractUIRootContext {
         return new ContextUpdatingBusListener(this);
     }
 
-    /*
-    public void addIdentifiables(List<? extends Identifiable> identifiables) {
-
-        LinkedHashSet<UIPropertiesTimeSeries> toAdd = new LinkedHashSet<UIPropertiesTimeSeries>();
-        for ( Identifiable i : identifiables) {
-            //identifiables in the list may be at different levels of the hierarchy from
-            //the same tree structure, parents appear before their descendants
-            //Check we have not already added this node to the list before adding it,
-            if ( ! toAdd.contains(i)) {
-                //this node, plus any children
-                if ( i instanceof UIPropertiesTimeSeries) {
-                    toAdd.add((UIPropertiesTimeSeries)i);
-                }
-                toAdd.addAll(i.findAll(UIPropertiesTimeSeries.class).getAllMatches());
-            }
-        }
-
-        for ( UIPropertiesTimeSeries s : toAdd) {
-            //TODO we may want to flag the conflict up to the user
-            if ( ! contains(s.getPath())) {
-                create(s.getPath(), s.getDescription(), UIPropertiesTimeSeries.class, s);
-            }
-        }
-    }
-    */
-
     /**
      * Add chart configs to this visualizer, under the local server node with
      * matching URL to the server specified in each config
@@ -76,7 +49,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
                 TimeSeriesServer s = ServerContextCreatingContextFactory.getTimeSeriesServer(c, serverDescription, serverDictionary);
 
                 //TODO - handle case where we already have a series with this path?
-                String newLocalPath = s.getServerContextIdentifier() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + p.getRemainingPath();
+                String newLocalPath = s.getServerContextIdentifier() + NAMESPACE_SEPARATOR + p.getRemainingPath();
                 if ( ! contains(newLocalPath)) {
                     create(newLocalPath, c.getDescription(), UIPropertiesTimeSeries.class, c);
                 }

@@ -1,7 +1,5 @@
 package com.od.jtimeseries.util.identifiable;
 
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
-
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 
@@ -24,7 +22,7 @@ public class PathParser {
         if ( path.length() == 0 ) {
             throw new UnsupportedOperationException("Cannot remove a node from an empty path");
         }
-        int index = path.indexOf(IdentifiablePathUtils.NAMESPACE_SEPARATOR);
+        int index = path.indexOf(Identifiable.NAMESPACE_SEPARATOR);
         if ( index == -1) {
             result = path.toString();
             path.setLength(0);
@@ -40,7 +38,7 @@ public class PathParser {
         if ( path.length() == 0 ) {
             throw new UnsupportedOperationException("Cannot remove a node from an empty path");
         }
-        int index = path.lastIndexOf(IdentifiablePathUtils.NAMESPACE_SEPARATOR);
+        int index = path.lastIndexOf(Identifiable.NAMESPACE_SEPARATOR);
         if ( index == -1 ) {
             result = path.toString();
             path.setLength(0);
@@ -57,7 +55,7 @@ public class PathParser {
     }
 
     public boolean isSingleNode() {
-        int index = path.indexOf(IdentifiablePathUtils.NAMESPACE_SEPARATOR);
+        int index = path.indexOf(Identifiable.NAMESPACE_SEPARATOR);
         return index == -1 && path.length() > 0;
     }
 
@@ -67,7 +65,7 @@ public class PathParser {
 
     public static LinkedList<String> splitPath(String path) {
         LinkedList<String> l = new LinkedList<String>();
-        StringTokenizer st = new StringTokenizer(path, IdentifiablePathUtils.NAMESPACE_SEPARATOR);
+        StringTokenizer st = new StringTokenizer(path, Identifiable.NAMESPACE_SEPARATOR);
         while(st.hasMoreTokens()) {
             l.add(st.nextToken());
         }

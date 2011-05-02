@@ -38,6 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public interface Identifiable {
 
+    String NAMESPACE_SEPARATOR = ".";
+
     String getId();
 
     String getParentPath();

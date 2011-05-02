@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
 
@@ -118,6 +118,6 @@ public class UiTimeSeriesConfig {
     }
 
     public String getPath() {
-        return getParentPath() + IdentifiablePathUtils.NAMESPACE_SEPARATOR + getId();
+        return getParentPath() + Identifiable.NAMESPACE_SEPARATOR + getId();
     }
 }

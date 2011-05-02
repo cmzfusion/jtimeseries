@@ -12,6 +12,7 @@ import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
+import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
 
@@ -29,17 +30,34 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         setContextFactory(new MainSelectorContextFactory());
     }
 
-    protected boolean canImport(IdentifiableListActionModel identifiables, Identifiable target) {
-        return target instanceof DesktopContext &&
-            identifiables.isSelectionLimitedToType(VisualizerContext.class);
+    protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
+        boolean result = target instanceof DesktopContext && identifiables.isSelectionLimitedToType(VisualizerContext.class);
+        if ( result ) {
+            result = checkTargetIsNotCurrentlyParent(identifiables, target);
+        }
+        return result;
     }
 
-    protected ImportDetails getImportDetails(Identifiable identifiable, Identifiable target) {
+    private boolean checkTargetIsNotCurrentlyParent(IdentifiableListActionModel identifiables, Identifiable target) {
+        boolean result = true;
+        for (Identifiable i : identifiables.getSelected()) {
+            if ( i.getParent() == target) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+        String name = ContextNameCheckUtility.checkName(component, target, identifiable.getId());
+        VisualizerConfiguration configuration = ((VisualizerContext) identifiable).getConfiguration();
+        configuration.setTitle(name);
         return new ImportDetails(
-            target.getPath() + "." + identifiable.getId(),
+            target.getPath() + Identifiable.NAMESPACE_SEPARATOR + name,
             identifiable.getDescription(),
             VisualizerContext.class,
-            ((VisualizerContext)identifiable).getConfiguration()
+            configuration
         );
     }
 

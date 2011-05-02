@@ -49,14 +49,6 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         return DnDConstants.ACTION_COPY_OR_MOVE;
     }
 
-    public void doExport(List<Identifiable> transferData, int action) {
-        if ( action == DnDConstants.ACTION_MOVE) {
-            for ( Identifiable i : transferData) {
-                getRootContext().remove(i.getPath());
-            }
-        }
-    }
-
     private class VisualizerTimeSeriesFactory extends AbstractUIContextTimeSeriesFactory {
 
         protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {

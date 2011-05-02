@@ -26,17 +26,21 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     public AbstractUIRootContext(DisplayNameCalculator displayNameCalculator) {
         displayNameCalculator.addRootContext(this);
-    }
-
-    protected void initializeFactoriesAndContextBusListener(ContextImportExportHandler importExportHandler) {
-        this.importExportHandler = importExportHandler;
-        setTimeSeriesFactory(importExportHandler.getTimeSeriesFactory());
-        setContextFactory(importExportHandler.getContextFactory());
 
         UIEventBus.getInstance().addEventListener(
             TimeSeriousBusListener.class,
             createContextBusListener()
         );
+    }
+
+    /**
+     * Set the import export handler which defines logic for copy/paste
+     * drag/drop, and the factories to create items
+     */
+    protected void setImportExportHandler(ContextImportExportHandler importExportHandler) {
+        this.importExportHandler = importExportHandler;
+        setTimeSeriesFactory(importExportHandler.getTimeSeriesFactory());
+        setContextFactory(importExportHandler.getContextFactory());
     }
 
     public boolean canImport(List<? extends Identifiable> identifiables, Identifiable target) {

@@ -138,7 +138,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
             c.setFrameExtendedState(JFrame.NORMAL);
             lastDesktopImportLocation = cascadeLocationCalculator.getNextLocation(lastDesktopImportLocation, parentFrame.getBounds(), DESKTOP_IMPORT_WIDTH, DESKTOP_IMPORT_HEIGHT);
             c.setFrameLocation(lastDesktopImportLocation);
-            desktopContainingContext.addChild(new DesktopContext(c));
+            desktopContainingContext.create(c.getTitle(), c.getTitle(), DesktopContext.class, c);
         }
     }
 
@@ -153,7 +153,7 @@ public class DesktopPaneTransferHandler extends TransferHandler {
             c.setIsIcon(false);
             lastVisualizerImportLocation = cascadeLocationCalculator.getNextLocation(lastVisualizerImportLocation, desktopPane.getVisibleRect(), c.getFrameLocation().width, c.getFrameLocation().height);
             c.setFrameLocation(lastVisualizerImportLocation);
-            desktopContext.addChild(new VisualizerContext(c));
+            desktopContext.create(c.getTitle(), c.getTitle(), VisualizerContext.class, c);
         }
     }
 }

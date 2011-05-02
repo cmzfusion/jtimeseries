@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public class VisualizerContext extends HideablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> implements ExportableConfigHolder {
 
-    public VisualizerContext(VisualizerConfiguration visualizerConfiguration) {
-        super(visualizerConfiguration.getTitle(), visualizerConfiguration.getTitle(), visualizerConfiguration, visualizerConfiguration.isShown());
+    public VisualizerContext(TimeSeriesContext parent, VisualizerConfiguration visualizerConfiguration) {
+        super(parent, visualizerConfiguration.getTitle(), visualizerConfiguration.getTitle(), visualizerConfiguration, visualizerConfiguration.isShown());
     }
 
     protected VisualizerConfiguration createPeerConfig(boolean isShown) {

@@ -38,9 +38,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
             );
             if ( name != null) { //check if user cancelled
                 VisualizerConfiguration c = new VisualizerConfiguration(name);
-                VisualizerContext visualizerContext = new VisualizerContext(c);
-                visualizerContext.setShown(true);
-                desktop.addChild(visualizerContext);
+                VisualizerContext visualizerContext = desktop.create(c.getTitle(), c.getTitle(), VisualizerContext.class, c);
                 visualizerSelectionActionModel.setSelectedContext(visualizerContext);
             }
         }

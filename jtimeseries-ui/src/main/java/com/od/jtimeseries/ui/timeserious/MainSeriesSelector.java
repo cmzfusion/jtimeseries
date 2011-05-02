@@ -8,6 +8,7 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.visualizer.ImportExportTransferHandler;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
@@ -53,6 +54,9 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         addProxyingPropertyListeners();
 
         selectionPanel.getSelectionActionModel().addActionModelListener(new MainSelectorTreeSelectionListener(selectionPanel));
+
+        selectionPanel.setTransferHandler(new ImportExportTransferHandler(rootContext,
+                selectionPanel.getSelectionActionModel()));
 
         setLayout(new BorderLayout());
         add(selectionPanel, BorderLayout.CENTER);

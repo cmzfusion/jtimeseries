@@ -26,7 +26,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
         super(displayNameCalculator);
         this.serverDictionary = serverDictionary;
         ContextImportExportHandler h = new VisualizerImportExportHandler(this, serverDictionary);
-        initializeFactoriesAndContextBusListener(h);
+        setImportExportHandler(h);
     }
 
     protected ContextUpdatingBusListener createContextBusListener() {

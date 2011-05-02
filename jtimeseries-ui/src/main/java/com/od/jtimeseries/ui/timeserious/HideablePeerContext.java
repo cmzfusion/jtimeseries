@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 /**
@@ -20,8 +21,8 @@ public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext
     private P peerResource;
     private boolean shown;
 
-    public HideablePeerContext(String id, String description, E peerConfig, boolean shown) {
-        super(id, description);
+    public HideablePeerContext(TimeSeriesContext parent,String id, String description, E peerConfig, boolean shown) {
+        super(parent, id, description);
         this.peerConfig = peerConfig;
         this.shown = shown;
     }

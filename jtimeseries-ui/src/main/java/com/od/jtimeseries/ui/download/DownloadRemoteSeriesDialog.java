@@ -124,7 +124,7 @@ public class DownloadRemoteSeriesDialog extends JFrame {
         public SelectionRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
             super(displayNameCalculator);
             DownloadSeriesImportExportHandler h = new DownloadSeriesImportExportHandler(this, serverDictionary);
-            initializeFactoriesAndContextBusListener(h);
+            setImportExportHandler(h);
         }
 
         protected ContextUpdatingBusListener createContextBusListener() {

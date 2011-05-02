@@ -21,7 +21,7 @@ import java.util.List;
 * Time: 19:03
 *
 */
-class ImportExportTransferHandler extends NoImportsSelectorTransferHandler {
+public class ImportExportTransferHandler extends NoImportsSelectorTransferHandler {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ImportExportTransferHandler.class);
 
@@ -35,10 +35,11 @@ class ImportExportTransferHandler extends NoImportsSelectorTransferHandler {
             LocalSelectionsTransferData transferData;
             try {
                 transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
-                AbstractUIRootContext rootContext = getRootContext();
-                result = rootContext.canImport(transferData.getSelected(), rootContext);
-             } catch (Exception e) {
-               logMethods.logError("Failed during canImport", e);
+                Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
+                result = getRootContext().canImport(transferData.getSelected(), target);
+                System.out.println("transfer canImport : " + target + ": " + result);
+             } catch (Throwable t) {
+               logMethods.logError("Failed during canImport", t);
             }
         }
         return result;

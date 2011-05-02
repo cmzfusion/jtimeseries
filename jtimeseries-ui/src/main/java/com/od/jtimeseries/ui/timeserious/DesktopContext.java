@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
@@ -17,12 +18,11 @@ import java.util.List;
  */
 public class DesktopContext extends HideablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
-    public DesktopContext(DesktopConfiguration config) {
-        super(config.getTitle(), config.getTitle(), config, config.isShown());
+    public DesktopContext(TimeSeriesContext parent, DesktopConfiguration config) {
+        super(parent, config.getTitle(), config.getTitle(), config, config.isShown());
 
         for ( VisualizerConfiguration v : config.getVisualizerConfigurations()) {
-            VisualizerContext n = new VisualizerContext(v);
-            addChild(n);
+            create(v.getTitle(), v.getTitle(), VisualizerContext.class, v);
         }
     }
 

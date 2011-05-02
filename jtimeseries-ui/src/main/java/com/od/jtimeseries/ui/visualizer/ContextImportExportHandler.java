@@ -9,6 +9,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.awt.dnd.DnDConstants;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -114,7 +115,13 @@ public abstract class ContextImportExportHandler {
     public abstract int getSourceActions(List<? extends Identifiable> selected);
 
 
-    public abstract void doExport(List<Identifiable> transferData, int action);
+    public void doExport(List<Identifiable> transferData, int action) {
+        if ( action == DnDConstants.ACTION_MOVE) {
+            for ( Identifiable i : transferData) {
+                rootContext.remove(i.getPath());
+            }
+        }
+    }
 
 
     public TimeSeriesContext getRootContext() {

@@ -33,7 +33,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
 
         ContextImportExportHandler h = new MainSelectorImportExportHandler(this);
-        initializeFactoriesAndContextBusListener(h);
+        setImportExportHandler(h);
     }
 
     public DesktopContext getMainDesktopContext() {
@@ -92,11 +92,12 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
 
     private DesktopContext createDesktopContext(DesktopConfiguration desktopConfiguration) {
-        DesktopContext context = (DesktopContext)get(desktopConfiguration.getTitle());
-        if ( context == null) {
-            context = new DesktopContext(desktopConfiguration);
-            addChild(context);
-        }
+        DesktopContext context = create(desktopConfiguration.getTitle(), desktopConfiguration.getTitle(), DesktopContext.class, desktopConfiguration);
+//        DesktopContext context = (DesktopContext)get(desktopConfiguration.getTitle());
+//        if ( context == null) {
+//            context = new DesktopContext(desktopConfiguration);
+//            addChild(context);
+//        }
         return context;
     }
 

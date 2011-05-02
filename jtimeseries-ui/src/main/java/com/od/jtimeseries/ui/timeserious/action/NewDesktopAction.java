@@ -35,9 +35,10 @@ public class NewDesktopAction extends AbstractAction {
         String name = nameCheckUtility.getNameFromUser(frame, "Name for Desktop", "Choose Name", "");
         if ( name != null) { //check if user cancelled
             DesktopConfiguration config = new DesktopConfiguration(name);
-            DesktopContext desktopContext = new DesktopContext(config);
-            desktopContext.setShown(true);
-            desktopContainer.addChild(desktopContext);
+            //DesktopContext desktopContext = new DesktopContext(config);
+            //desktopContext.setShown(true);
+            //desktopContainer.addChild(desktopContext);
+            DesktopContext desktopContext = desktopContainer.create(name, name, DesktopContext.class, config);
             desktopSelectionActionModel.setSelectedContext(desktopContext);
         }
     }

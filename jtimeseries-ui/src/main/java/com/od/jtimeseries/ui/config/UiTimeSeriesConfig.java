@@ -29,7 +29,7 @@ import java.awt.*;
 * Date: 28-May-2009
 * Time: 17:20:00
 */
-public class UiTimeSeriesConfig {
+public class UiTimeSeriesConfig implements ExportableConfig {
     private String parentPath;
     private String id;
     private String description;
@@ -119,5 +119,13 @@ public class UiTimeSeriesConfig {
 
     public String getPath() {
         return getParentPath() + Identifiable.NAMESPACE_SEPARATOR + getId();
+    }
+
+    public String getTitle() {
+        return getId();
+    }
+
+    public void setTitle(String title) {
+        setId(title);
     }
 }

@@ -40,7 +40,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
         addListeners();
-        setTransferHandler(new DesktopPaneTransferHandler(rootContext, desktopContext, this,parentFrame));
+        setTransferHandler(new DesktopPaneTransferHandler(rootContext, desktopContext, this));
     }
 
     private void addListeners() {

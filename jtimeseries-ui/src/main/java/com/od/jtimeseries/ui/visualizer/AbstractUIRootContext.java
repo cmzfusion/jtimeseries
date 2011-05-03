@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
@@ -13,6 +14,7 @@ import com.od.swing.eventbus.UIEventBus;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,6 +54,10 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         importExportHandler.doImport(component, identifiables, target);
     }
 
+    public void doImport(Component component, List<ExportableConfig> configs, Identifiable target) {
+        importExportHandler.doImport(component, configs, target);
+    }
+
     protected abstract ContextUpdatingBusListener createContextBusListener();
 
     public void dispose() {
@@ -68,6 +74,10 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     public void doExport(IdentifiableListActionModel transferData, int action) {
         importExportHandler.doExport(transferData, action);
+    }
+
+    public boolean canImportFromExternalConfig(Component component, Identifiable target) {
+        return importExportHandler.canImportFromExternalConfig(component, target);
     }
 
     private class DummyImportExportHandler extends ContextImportExportHandler {

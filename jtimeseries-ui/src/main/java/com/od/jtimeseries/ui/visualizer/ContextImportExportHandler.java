@@ -5,6 +5,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -64,14 +65,6 @@ public abstract class ContextImportExportHandler {
         return result;
     }
 
-    /**
-     * @return true if the identifiable should be ignored during import, e.g it is a folder node of a type which does
-     * not need to be explicitly created. Ignored nodes in the selection will not prevent import taking place.
-     */
-    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-        return false;
-    }
-
     /*
      * @return true, if the identifiable (and its descendants) can be imported
      */
@@ -79,31 +72,69 @@ public abstract class ContextImportExportHandler {
         return true;
     }
 
+    protected boolean canImportFromExternalConfig(Component component, Identifiable target) {
+        return false;
+    }
 
     protected void doImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
         LinkedHashSet<Identifiable> toAdd = getIdentifiablesAndAllDescendents(identifiables.getSelected());
         for ( Identifiable s : toAdd) {
             if ( ! shouldIgnoreForImport(s, target) ) {
                 ImportDetails d = getImportDetails(component, s, target);
-                //TODO we may want to flag the conflict up to the user
-                if ( rootContext.contains(d.getPath())) {
-                    alreadyExistsOnImport(component, s, target, d);
-                } else {
-                    rootContext.create(d.getPath(), d.getDescription(), d.getLocalClassType(), d.getConfigObject());
-                }
+                doImport(component, target, d);
             }
         }
     }
 
-    //may override to provide feedback to user where appropriate
-    protected void alreadyExistsOnImport(Component component, Identifiable i, Identifiable target, ImportDetails d) {
+     /**
+     * @return true if the identifiable should be ignored during import, e.g it is a folder node of a type which does
+     * not need to be explicitly created. Ignored nodes in the selection will not prevent import taking place.
+     */
+    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
+        return false;
     }
 
     /**
      * @return an ImportDetails, which contains everything necessary to import the target identifiable
      */
-    protected abstract ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target);
+    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+        return null;
+    }
 
+
+    protected void doImport(Component component, List<ExportableConfig> configs, Identifiable target) {
+        for ( ExportableConfig s : configs) {
+            if ( ! shouldIgnoreForImport(s, target) ) {
+                ImportDetails d = getImportDetails(component, s, target);
+                doImport(component, target, d);
+            }
+        }
+    }
+
+    protected boolean shouldIgnoreForImport(ExportableConfig s, Identifiable target) {
+        return false;
+    }
+
+    /**
+     * @return an ImportDetails, which contains everything necessary to import the target exportable config
+     */
+    protected ImportDetails getImportDetails(Component component, ExportableConfig s, Identifiable target) {
+        return null;
+    }
+
+    protected void doImport(Component component, Identifiable target, ImportDetails d) {
+        if ( d != null) {
+            if ( rootContext.contains(d.getPath())) {
+                pathAlreadyExistsOnImport(component, target, d);
+            } else {
+                rootContext.create(d.getPath(), d.getDescription(), d.getLocalClassType(), d.getConfigObject());
+            }
+        }
+    }
+
+    //may override to provide feedback to user where appropriate
+    protected void pathAlreadyExistsOnImport(Component component, Identifiable target, ImportDetails d) {
+    }
 
     protected LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {
         LinkedHashSet<Identifiable> toAdd = new LinkedHashSet<Identifiable>();
@@ -139,36 +170,4 @@ public abstract class ContextImportExportHandler {
         return rootContext;
     }
 
-    /**
-     * All the information necessary to import an identifiable into this context
-     */
-    protected class ImportDetails {
-        String path;
-        String description;
-        Class<? extends Identifiable> localClassType;
-        Object configObject;
-
-        public ImportDetails(String path, String description, Class<? extends Identifiable> localClassType, Object configObject) {
-            this.path = path;
-            this.description = description;
-            this.localClassType = localClassType;
-            this.configObject = configObject;
-        }
-
-        public String getPath() {
-            return path;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public Class<? extends Identifiable> getLocalClassType() {
-            return localClassType;
-        }
-
-        public Object getConfigObject() {
-            return configObject;
-        }
-    }
 }

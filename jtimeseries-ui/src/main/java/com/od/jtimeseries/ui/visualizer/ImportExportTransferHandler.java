@@ -1,9 +1,7 @@
 package com.od.jtimeseries.ui.visualizer;
 
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableTransferable;
-import com.od.jtimeseries.ui.selector.shared.LocalSelectionsTransferData;
-import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
+import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -11,9 +9,11 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
-import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -33,20 +33,25 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
 
     public boolean canImport(TransferSupport supp) {
         boolean result = false;
-        if ( supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR) ) {
-            LocalSelectionsTransferData transferData;
-            try {
-                transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
-                Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
+        try {
+            Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
+
+            if ( supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR) ) {
+                LocalSelectionsTransferData transferData = (LocalSelectionsTransferData)supp.getTransferable().getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
                 result = getRootContext().canImport(supp.getComponent(), transferData.getSelections(), target);
-                System.out.println("transfer canImport : " + target + ": " + result);
-             } catch (Throwable t) {
-               logMethods.logError("Failed during canImport", t);
+                //System.out.println("transfer canImportFromExternalConfig : " + target + ": " + result);
+            } else if ( supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                result = getRootContext().canImportFromExternalConfig(supp.getComponent(), target);
             }
-        } else if ( supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-            //TODO
+        } catch (Throwable t) {
+           logMethods.logError("Failed during canImportFromExternalConfig", t);
         }
         return result;
+    }
+
+    private List<ExportableConfig> getExportableConfigs(TransferSupport supp) throws UnsupportedFlavorException, IOException {
+        List<File> fileList = (List<File>)supp.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+        return ImportFileList.getConfigs(fileList);
     }
 
     public boolean importData(TransferSupport supp) {
@@ -57,13 +62,19 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
 
             // Fetch the Transferable and its data
             Transferable t = supp.getTransferable();
-            LocalSelectionsTransferData transferData = (LocalSelectionsTransferData) t.getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
-            IdentifiableListActionModel data = transferData.getSelections();
-
             Identifiable target = getTargetIdentifiableForDropOrPaste(supp);
-            doImport(supp.getComponent(), data, target);
-            int action = supp.isDrop() ? supp.getDropAction() : transferData.getAction();
-            transferData.getTransferListener().transferComplete(transferData, action);
+
+            if ( supp.isDataFlavorSupported(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR) ) {
+                  LocalSelectionsTransferData transferData = (LocalSelectionsTransferData) t.getTransferData(IdentifiableTransferable.LOCAL_SELECTIONS_FLAVOR);
+                  IdentifiableListActionModel data = transferData.getSelections();
+                  getRootContext().doImport(supp.getComponent(), data, target);
+                  //now complete the export from the source component, if this is a local paste
+                  int action = supp.isDrop() ? supp.getDropAction() : transferData.getAction();
+                  transferData.getTransferListener().transferComplete(transferData, action);
+            } else if ( supp.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                  List<ExportableConfig> configs = getExportableConfigs(supp);
+                  getRootContext().doImport(supp.getComponent(), configs, target);
+            }
         } catch (Throwable t) {
             logMethods.logError("Error in importData", t);
         }
@@ -96,7 +107,4 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
         return result;
     }
 
-    protected void doImport(Component component, IdentifiableListActionModel data, Identifiable target) {
-        getRootContext().doImport(component, data, target);
-    }
 }

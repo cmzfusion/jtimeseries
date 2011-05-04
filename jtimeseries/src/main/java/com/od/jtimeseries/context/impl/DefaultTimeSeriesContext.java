@@ -55,7 +55,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
      * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
      */
     public DefaultTimeSeriesContext() {
-        this(null, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID);
+        this(IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID);
     }
 
     /**
@@ -64,17 +64,17 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
      * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
      */
     public DefaultTimeSeriesContext(String id, String description) {
-        this(null, id, description);
+        this(id, description, true);
     }
 
     /**
-     * Create a context which is a child of the parentContext supplied
-     * @param parentContext parentContext or null, if null then a root context is created
+     * Create a context, specifiying whether this is to be a root context
+     * @param createRootContextResources, whether this context is to be a root context, in which case we need to create root context resources etc.
      */
-    public DefaultTimeSeriesContext(TimeSeriesContext parentContext, String id, String description) {
-        super(parentContext, id, description);
+    public DefaultTimeSeriesContext(String id, String description, boolean createRootContextResources) {
+        super(id, description);
         checkId(id);
-        if ( parentContext == null) {
+        if (createRootContextResources) {
             createRootContextResources();
         }
     }

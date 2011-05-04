@@ -40,7 +40,7 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
 
     public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
         if (classType.isAssignableFrom(DefaultTimeSeriesContext.class)) {
-            return (E)new DefaultTimeSeriesContext(parent, id, description);
+            return (E)new DefaultTimeSeriesContext(id, description, false);
         } else {
             throw new UnsupportedOperationException("Cannot create a context of type " + classType);
         }

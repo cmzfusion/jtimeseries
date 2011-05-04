@@ -63,7 +63,7 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
     private TimeSeriesServerContext findOrCreateServerContext() {
         TimeSeriesServerContext serverContext = (TimeSeriesServerContext) destinationRootContext.get(server.getServerContextIdentifier());
         if (serverContext == null) {
-            serverContext = new TimeSeriesServerContext(destinationRootContext, server);
+            serverContext = new TimeSeriesServerContext(server);
             destinationRootContext.addChild(serverContext);
         }
         return serverContext;

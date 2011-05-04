@@ -32,10 +32,6 @@ import java.util.List;
  */
 public abstract class LockingTimeSeriesContext extends IdentifiableBase implements TimeSeriesContext {
 
-    public LockingTimeSeriesContext(Identifiable parent, String id, String description) {
-        super(parent, id, description);
-    }
-
     public LockingTimeSeriesContext(String id, String description) {
         super(id, description);
     }
@@ -239,7 +235,7 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, TimedValueSupplier.class, CaptureFunctions.RAW_VALUES, valueSupplier, timePeriod);
     }
 
-    //here we need to make sure we send RawValues as the function if none is specified, so that we end up creating a capture/timesries
+    //here we need to make sure we send RawValues as the function if none is specified, so that we end up creating a capture/timeseries
     //otherwise the request to create the value source will be interpreted as just that, rather than a request to create a capture/series too
     private CaptureFunction[] getFunctions(CaptureFunction... captureFunctions) {
         return captureFunctions.length == 0 ? new CaptureFunction[] {CaptureFunctions.RAW_VALUES} : captureFunctions;

@@ -18,9 +18,13 @@ import java.util.List;
  */
 public class DesktopContext extends HideablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
-    public DesktopContext(TimeSeriesContext parent, DesktopConfiguration config) {
-        super(parent, config.getTitle(), config.getTitle(), config, config.isShown());
+    public DesktopContext(DesktopConfiguration config) {
+        super(config.getTitle(), config.getTitle(), config, config.isShown());
+        setContextFactory(new MainSelectorTreeContextFactory());
+        createChildVisualizers(config);
+    }
 
+    private void createChildVisualizers(DesktopConfiguration config) {
         for ( VisualizerConfiguration v : config.getVisualizerConfigurations()) {
             create(v.getTitle(), v.getTitle(), VisualizerContext.class, v);
         }
@@ -64,4 +68,9 @@ public class DesktopContext extends HideablePeerContext<DesktopConfiguration, Pe
     public boolean isMainDesktopContext() {
         return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
     }
+
+    public HideablePeerContext<DesktopConfiguration, PeerDesktop> newInstance(TimeSeriesContext parent, DesktopConfiguration config) {
+        return new DesktopContext(config);
+    }
+
 }

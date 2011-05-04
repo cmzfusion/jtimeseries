@@ -34,10 +34,10 @@ public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements
         }
     };
 
-    public TimeSeriesServerContext(TimeSeriesContext parentContext, TimeSeriesServer server) {
+    public TimeSeriesServerContext(TimeSeriesServer server) {
         //the server context renderer will render the description, which may change
         //the actual identifier is the address + port, which forms the unchanging key for the server
-        super(parentContext, server.getServerContextIdentifier(), server.getServerContextIdentifier());
+        super(server.getServerContextIdentifier(), server.getServerContextIdentifier(), false);
         this.server = server;
         addServerListener(server);
     }

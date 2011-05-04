@@ -9,6 +9,7 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
+import com.od.jtimeseries.ui.timeserious.action.ExitAction;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;

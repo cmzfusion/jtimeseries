@@ -38,7 +38,8 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
 
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
         TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
-        FilesystemTimeSeries s = new FilesystemTimeSeries(context, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        context.addChild(s);
         File file = roundRobinSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();
         return s;
@@ -125,7 +126,8 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
     public void testMaximumSize() throws SerializationException {
         TimeSeriesContext c = new DefaultTimeSeriesContext().createContext("test");
         int maxSize = 3;
-        FilesystemTimeSeries series = new FilesystemTimeSeries(c, "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, maxSize, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries series = new FilesystemTimeSeries(c.getPath(), "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, maxSize, Time.seconds(10), Time.seconds(10));
+        c.addChild(series);
 
         //after creation, we have just read the header, not deserialized the series yet
         assertTrue(series.isSeriesCollected());
@@ -191,7 +193,8 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
         assertEquals(3, series.getFileHeader().getMostRecentItemTimestamp());
 
         TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
-        FilesystemTimeSeries s = new FilesystemTimeSeries(context, series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        context.addChild(s);
         assertEquals(3, s.getLatestTimestamp());
     }
 

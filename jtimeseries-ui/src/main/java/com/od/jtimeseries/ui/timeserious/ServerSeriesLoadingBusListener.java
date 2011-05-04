@@ -34,7 +34,7 @@ class ServerSeriesLoadingBusListener extends ContextUpdatingBusListener {
     //visualizer contexts don't do this automatically otherwise the visualizers would end up with all the
     //known servers, even if they don't have any series
     public void serverAdded(TimeSeriesServer s) {
-        TimeSeriesServerContext context = new TimeSeriesServerContext(rootContext, s);
+        TimeSeriesServerContext context = new TimeSeriesServerContext(s);
         rootContext.addChild(context);
         addServerLoadTask(s);
     }

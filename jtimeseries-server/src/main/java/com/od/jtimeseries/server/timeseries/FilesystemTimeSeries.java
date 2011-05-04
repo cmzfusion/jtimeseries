@@ -74,12 +74,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private volatile boolean persistenceStopped = false;
     private volatile long modCount;
 
-    public FilesystemTimeSeries(Identifiable parentContext, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
-        super(parentContext, id, description);
+    public FilesystemTimeSeries(String parentPath, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+        super(id, description);
         this.roundRobinSerializer = roundRobinSerializer;
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
-        this.fileHeader = new FileHeader(getPath(), description, seriesLength);
+        this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + id, description, seriesLength);
         checkOrCreateFileAndUpdateHeader(fileHeader);
         this.writeBehindCache = new WriteBehindCache();
     }

@@ -19,7 +19,7 @@ public class ContextNameCheckUtility {
      * @return String valid name, or null if User cancelled request for new name
      */
     public static String getNameFromUser(Component parent, Identifiable targetContext, String text, String title, String defaultName) {
-        Object userInput = JOptionPane.showInputDialog(parent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
+        Object userInput = JOptionPane.showInputDialog(SwingUtilities.windowForComponent(parent), text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
         String result = null;
         if ( userInput != null) {
             result = userInput.toString();

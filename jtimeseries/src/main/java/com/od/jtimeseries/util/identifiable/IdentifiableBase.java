@@ -307,7 +307,9 @@ public class IdentifiableBase extends LockingIdentifiable {
             E s = get(path, clazz);
             if ( s == null) {
                 s = doCreate(path, description, clazz, parameters);
-                addChild(s);
+                if ( s != null) {
+                    addChild(s);
+                }
             }
             return s;
         } else {

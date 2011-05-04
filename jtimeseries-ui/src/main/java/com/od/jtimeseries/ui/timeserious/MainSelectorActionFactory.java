@@ -32,6 +32,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action removeVisualizerAction;
     private Action removeDesktopAction;
     private Action showHiddenDesktopAction;
+    private Action renameAction;
 
     public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentComponent) {
         this.selectionModel = selectionPanel.getSelectionActionModel();
@@ -43,6 +44,7 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel, parentComponent);
         removeDesktopAction = new RemoveDesktopAction(selectionModel, parentComponent);
         showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
+        renameAction = new RenameAction(parentComponent, selectionModel);
     }
 
     public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
@@ -54,7 +56,8 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         } else if ( selectionModel.isSelectionLimitedToType(VisualizerContext.class)) {
             result = Arrays.asList(
                 showHiddenVisualizerAction,
-                removeVisualizerAction
+                removeVisualizerAction,
+                renameAction
             );
         } else if ( selectionModel.isSelectionLimitedToType(TimeSeriesServerContext.class)) {
             result = Arrays.asList(
@@ -65,7 +68,8 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         } else if ( selectionModel.isSelectionLimitedToType(DesktopContext.class)) {
             result = Arrays.asList(
                 removeDesktopAction,
-                showHiddenDesktopAction
+                showHiddenDesktopAction,
+                renameAction
             );
         }
         return result;

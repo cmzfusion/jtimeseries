@@ -51,19 +51,15 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
      * Create a UdpPublishingTimeSeriesContext as a root context 
      */
     public UdpPublishingTimeSeriesContext(UdpClient udpClient) {
-        this(udpClient, null, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID);
+        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, true);
     }
 
     public UdpPublishingTimeSeriesContext(UdpClient udpClient, String id, String description) {
-        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, null, id, description);
+        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, id, description, false);
     }
 
-    public UdpPublishingTimeSeriesContext(UdpClient udpClient, TimeSeriesContext parent, String id, String description) {
-        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, parent, id, description);
-    }
-
-    public UdpPublishingTimeSeriesContext(UdpClient udpClient, int minSendIntervalMillis, TimeSeriesContext parent, String id, String description) {
-        super(parent, id, description);
+    public UdpPublishingTimeSeriesContext(UdpClient udpClient, int minSendIntervalMillis, String id, String description, boolean rootContext) {
+        super(id, description, rootContext);
         this.udpClient = udpClient;
         this.minSendIntervalMillis = minSendIntervalMillis;
         setContextFactory(new UdpPublishingContextFactory());
@@ -128,7 +124,7 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
         public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
             E result;
             if ( classType.isAssignableFrom(UdpPublishingTimeSeriesContext.class)) {
-                result = (E)new UdpPublishingTimeSeriesContext(udpClient, minSendIntervalMillis, parent, id, description);
+                result = (E)new UdpPublishingTimeSeriesContext(udpClient, minSendIntervalMillis, id, description, false);
             } else {
                 result = super.createContext(parent, id, description, classType, parameters);
             }

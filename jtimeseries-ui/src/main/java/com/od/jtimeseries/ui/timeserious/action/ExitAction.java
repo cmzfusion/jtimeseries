@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
@@ -22,7 +22,7 @@ public class ExitAction extends AbstractAction {
     private ConfigInitializer configInitializer;
     private JFrame mainFrame;
 
-    ExitAction(ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
+    public ExitAction(ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
         super("Exit", ImageUtils.EXIT_16x16);
         this.configTree = configTree;
         this.configInitializer = configInitializer;

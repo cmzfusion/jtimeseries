@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;

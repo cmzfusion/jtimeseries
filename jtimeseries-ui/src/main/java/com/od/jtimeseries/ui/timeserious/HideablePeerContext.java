@@ -2,6 +2,7 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +16,7 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  *
  * When the peer component is hidden, it's config is stored so that it can be shown again
  */
-public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext {
+public abstract class HideablePeerContext<E extends ExportableConfig, P> extends DefaultTimeSeriesContext {
 
     public static final String SHOWN_PROPERTY = "shown";
 
@@ -23,8 +24,8 @@ public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext
     private P peerResource;
     private boolean shown;
 
-    public HideablePeerContext(TimeSeriesContext parent,String id, String description, E peerConfig, boolean shown) {
-        super(parent, id, description);
+    public HideablePeerContext(String id, String description, E peerConfig, boolean shown) {
+        super(id, description, false);
         this.peerConfig = peerConfig;
         this.shown = shown;
     }
@@ -79,4 +80,6 @@ public abstract class HideablePeerContext<E, P> extends DefaultTimeSeriesContext
     protected P getPeerResource() {
         return peerResource;
     }
+
+    public abstract HideablePeerContext<E,P> newInstance(TimeSeriesContext parent, E config);
 }

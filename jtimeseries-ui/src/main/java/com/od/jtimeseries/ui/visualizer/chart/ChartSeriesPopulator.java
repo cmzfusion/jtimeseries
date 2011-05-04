@@ -113,7 +113,8 @@ public class ChartSeriesPopulator {
     private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
         TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(
             contextTimeSeries,
-            domainSelection
+            domainSelection,
+            true
         );
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
     }

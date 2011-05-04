@@ -6,11 +6,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.NewDesktopAction;
-import com.od.jtimeseries.ui.timeserious.action.NewServerAction;
-import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
-import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.timeserious.action.*;
 
 import javax.swing.*;
 import java.awt.*;

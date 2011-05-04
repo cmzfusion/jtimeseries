@@ -3,15 +3,13 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.ExitAction;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
-import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
 import java.awt.event.WindowAdapter;

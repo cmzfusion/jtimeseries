@@ -60,19 +60,15 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     private volatile TimeSource startTime;
     private boolean valid;
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly) {
-        this(wrappedSeries, snapshotOnly, MovingWindowTimeSeries.OPEN_START_TIME);
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly, boolean useSwingThread) {
+        this(wrappedSeries, snapshotOnly, MovingWindowTimeSeries.OPEN_START_TIME, useSwingThread);
     }
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries) {
-        this(wrappedSeries, false, MovingWindowTimeSeries.OPEN_START_TIME);
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, TimeSource startTime, boolean useSwingThread) {
+        this(wrappedSeries, false, startTime, useSwingThread);
     }
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, TimeSource startTime) {
-        this(wrappedSeries, false, startTime);
-    }
-
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly, TimeSource startTime) {
+    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries wrappedSeries, boolean snapshotOnly, TimeSource startTime, boolean useSwingThread) {
         this.snapshotOnly = snapshotOnly;
         this.startTime = startTime;
         columnNames = new String[]{"Date Time", wrappedSeries.getDescription()};
@@ -80,18 +76,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
 
         TimePeriod t = snapshotOnly ? null : Time.seconds(10);
 
-        this.movingWindowSeries = new MovingWindowTimeSeries(startTime, MovingWindowTimeSeries.OPEN_END_TIME, t) {
-            //fire events synchronously, since this moving window series becomes part of the swing
-            //table model and should only be updated / fire events on the swing event thread
-            protected Executor getSeriesEventExecutor() {
-                return new Executor() {
-                    public void execute(Runnable command) {
-                        command.run();
-                    }
-                };
-            }
-        };
-        movingWindowSeries.setCheckWindowInSwingThread(true);
+        this.movingWindowSeries = getMovingWindowSeries(startTime, t, useSwingThread);
+        movingWindowSeries.setCheckWindowInSwingThread(useSwingThread);
 
         movingWindowSeries.addTimeSeriesListener(
             new TimeSeriesListener() {
@@ -115,6 +101,22 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
                 }
             }
         );
+    }
+
+    private MovingWindowTimeSeries getMovingWindowSeries(final TimeSource startTime, final TimePeriod t, final boolean useSwingThread) {
+        return new MovingWindowTimeSeries(startTime, MovingWindowTimeSeries.OPEN_END_TIME, t) {
+            //if use swing thread, fire events synchronously, since this moving window series becomes part of the swing
+            //table model and should only be updated / fire events on the swing event thread
+            protected Executor getSeriesEventExecutor() {
+                return useSwingThread ?
+                    new Executor() {
+                        public void execute(Runnable command) {
+                            command.run();
+                        }
+                    } :
+                    super.getSeriesEventExecutor();
+            }
+        };
     }
 
     public TimeSource getStartTime() {

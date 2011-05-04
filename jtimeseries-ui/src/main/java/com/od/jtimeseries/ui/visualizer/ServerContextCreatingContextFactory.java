@@ -50,7 +50,7 @@ public class ServerContextCreatingContextFactory extends DefaultContextFactory {
                 if (parameters[0] instanceof UiTimeSeriesConfig) {
                     try {
                         TimeSeriesServer server = getTimeSeriesServer(((UiTimeSeriesConfig)parameters[0]), id, serverDictionary);
-                        result = (E)new TimeSeriesServerContext(parent, server);
+                        result = (E)new TimeSeriesServerContext(server);
                     } catch (Exception e) {
                        ContextImportExportHandler.logMethods.logError("Failed to create ServerContext for " + id, e);
                     }

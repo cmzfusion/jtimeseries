@@ -14,9 +14,9 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +33,7 @@ public class FrameManager implements ConfigAware {
     private TimeSeriousRootContext rootContext;
     private ExitAction exitAction;
     private MainSeriesSelector mainSeriesSelector;
+    private Map<DesktopContext, AbstractDesktopFrame> desktopContextToFrameMap = new HashMap<DesktopContext, AbstractDesktopFrame>();
 
     public FrameManager(UiTimeSeriesServerDictionary udpPingHttpServerDictionary,
                         ApplicationActionModels applicationActionModels,
@@ -109,7 +110,10 @@ public class FrameManager implements ConfigAware {
              for ( Identifiable c : contextTreeEvent.getNodes()) {
                 if ( c instanceof DesktopContext) {
                     DesktopContext n = (DesktopContext)c;
-                    n.setShown(false);
+                    AbstractDesktopFrame f = desktopContextToFrameMap.get(n);
+                    if ( f != null) { //could already be hidden
+                        f.dispose();
+                    }
                 }
             }
         }
@@ -130,6 +134,16 @@ public class FrameManager implements ConfigAware {
             );
         }
         frame.setVisible(true);
+        addToFrameMap(desktopContext, frame);
+    }
+
+    private void addToFrameMap(final DesktopContext desktopContext, AbstractDesktopFrame frame) {
+        desktopContextToFrameMap.put(desktopContext, frame);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                desktopContextToFrameMap.remove(desktopContext);
+            }
+        });
     }
 
     private TimeSeriousMainFrame createMainFrame(DesktopContext desktopContext) {

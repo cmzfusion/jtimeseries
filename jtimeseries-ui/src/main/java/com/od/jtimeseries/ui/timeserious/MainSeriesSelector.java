@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
@@ -79,10 +80,15 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
         config.setMainSeriesSelectorTableVisible(selectionPanel.isTableSelectorVisible());
+        config.setMainSelectorColumnSettings(selectionPanel.getColumnSettings());
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
         selectionPanel.setTableSelectorVisible(config.isMainSeriesSelectorTableVisible());
+        List<ColumnSettings> mainSelectorColumnSettings = config.getMainSelectorColumnSettings();
+        if ( mainSelectorColumnSettings != null) {
+            selectionPanel.setColumnSettings(mainSelectorColumnSettings);
+        }
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

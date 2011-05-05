@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.download.panel;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.table.FixedColumn;
@@ -83,7 +82,7 @@ public class ChooseSeriesPanel extends AbstractDownloadWizardPanel {
     private JComponent createSeriesSelector(AbstractUIRootContext timeSeriesContext) {
         seriesSelectionPanel = new SeriesSelectionPanel(timeSeriesContext, ServerTimeSeries.class);
         java.util.List<ColumnSettings> defaultColumnSettings = getDefaultColumnSettings();
-        seriesSelectionPanel.setColumns(defaultColumnSettings);
+        seriesSelectionPanel.setColumnSettings(defaultColumnSettings);
         seriesSelectionPanel.addAllDynamicColumns();
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setLeftComponent(seriesSelectionPanel);

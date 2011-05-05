@@ -22,6 +22,8 @@ import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -46,6 +48,21 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
         this.tableModel = tableModel;
         this.selectionColumnName = selectionColumnName;
         setupDefaultColumns();
+        addStructureChangeListener();
+    }
+
+    private void addStructureChangeListener() {
+        tableModel.addTableModelListener(new TableModelListener() {
+            //we need to update our column model following a change to the
+            //table model column structure, the index of columns in the table model
+            //may change
+            public void tableChanged(TableModelEvent e) {
+                if (e == null || e.getFirstRow() == TableModelEvent.HEADER_ROW) {
+                    List<ColumnSettings> s = getColumnSettings();
+                    setColumns(s);
+                }
+            }
+        });
     }
 
     private void setupDefaultColumns() {
@@ -76,14 +93,14 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
         for ( int col = 0; col < columnModel.getColumnCount(); col ++ ) {
             TableColumn c = columnModel.getColumn(col);
             l.add(new ColumnSettings(
-                tableModel.getColumnName(c.getModelIndex()),
+                c.getIdentifier().toString(),
                 c.getPreferredWidth()
             ));
         }
         return l;
     }
 
-    public String[] getAllColumnNames() {
+    public String[] getAllColumnNamesInTableModel() {
         java.util.List<String> columnNames = new ArrayList<String>();
         for ( int col=0; col < tableModel.getColumnCount(); col ++) {
             columnNames.add(tableModel.getColumnName(col));
@@ -104,14 +121,14 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
     public void removeColumn(String columnName) {
         for ( int col = 0; col < columnModel.getColumnCount(); col++) {
             TableColumn column = columnModel.getColumn(col);
-            if ( tableModel.getColumnName(column.getModelIndex()).equals(columnName) ) {
+            if ( column.getIdentifier().equals(columnName) ) {
                 columnModel.removeColumn(column);
                 break;
             }
         }
     }
 
-    public boolean isInTable(String columnName) {
+    public boolean isInTableModel(String columnName) {
         boolean result = false;
         for ( int col = 0; col < columnModel.getColumnCount(); col++) {
             TableColumn column = columnModel.getColumn(col);
@@ -125,38 +142,39 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
 
     private TableColumn createColumn(String columnName) {
         TableColumn newColumn = new TableColumn(
-            getColumnIndex(columnName),
+            getTableModelIndex(columnName),
             FixedColumn.getDefaultColumnWidth(columnName)
         );
         TableCellRenderer r = FixedColumn.getCellRenderer(columnName);
         if ( r != null ) {
             newColumn.setCellRenderer(r);
         }
-        setColumnIdentifier(columnName, newColumn);
+        newColumn.setIdentifier(columnName);
+        setColumnHeader(columnName, newColumn);
         return newColumn;
     }
 
-    private void setColumnIdentifier(String columnName, TableColumn newColumn) {
+    private void setColumnHeader(String columnName, TableColumn newColumn) {
         //support special column name for selected column
-        String columnIdentifier = columnName;
+        String header = columnName;
         if ( columnName.equals(FixedColumn.Selected.getColumnName())) {
-            columnIdentifier = selectionColumnName;
+            header = selectionColumnName;
         }
         //handle the special stats column names
-        String id = ContextProperties.isSummaryStatsProperty(columnIdentifier) ? ContextProperties.parseStatisticName(columnIdentifier) : columnIdentifier;
+        String id = ContextProperties.isSummaryStatsProperty(header) ? ContextProperties.parseStatisticName(header) : header;
         newColumn.setHeaderValue(id);
     }
 
 
     private void addDynamicColumnIfRequired(String columnName) {
-        int index = getColumnIndex(columnName);
+        int index = getTableModelIndex(columnName);
         if ( index == -1 ) {
             //if it is not a predefined column which should already exist, then it must be a dynamic column
             tableModel.addDynamicColumn(columnName);
         }
     }
 
-    private int getColumnIndex(String columnName) {
+    private int getTableModelIndex(String columnName) {
         int index = -1;
         for ( int col = 0 ; col < tableModel.getColumnCount(); col ++) {
             if ( tableModel.getColumnName(col).equals(columnName)) {
@@ -171,7 +189,7 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
         boolean result = false;
         for ( int col = 0; col < columnModel.getColumnCount(); col++) {
             TableColumn column = columnModel.getColumn(col);
-            if ( tableModel.getColumnName(column.getModelIndex()).equals(columnName) ) {
+            if ( column.getIdentifier().equals(columnName) ) {
                 result = true;
                 break;
             }
@@ -180,7 +198,7 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
     }
 
     public String getColumnDescription(String columnName) {
-        int index = getColumnIndex(columnName);
+        int index = getTableModelIndex(columnName);
         return tableModel.getColumnDescription(index);
     }
 

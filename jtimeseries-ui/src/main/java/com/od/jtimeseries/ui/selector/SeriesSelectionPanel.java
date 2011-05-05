@@ -221,7 +221,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         selectionListForCharting.setSelectedTimeSeries(selections);
     }
 
-    public void setColumns(List<ColumnSettings> columnSettings) {
+    public void setColumnSettings(List<ColumnSettings> columnSettings) {
         tableSelector.setColumns(columnSettings);
     }
 

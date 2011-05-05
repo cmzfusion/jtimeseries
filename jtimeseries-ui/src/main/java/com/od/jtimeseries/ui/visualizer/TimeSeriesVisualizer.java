@@ -233,7 +233,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void setColumns(List<ColumnSettings> columnSettings) {
-        seriesSelectionPanel.setColumns(columnSettings);
+        seriesSelectionPanel.setColumnSettings(columnSettings);
     }
 
     public void setSelectorActionFactory(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {

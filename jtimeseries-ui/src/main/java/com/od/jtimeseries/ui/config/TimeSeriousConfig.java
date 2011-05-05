@@ -1,5 +1,7 @@
 package com.od.jtimeseries.ui.config;
 
+import com.od.jtimeseries.ui.selector.table.FixedColumn;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +21,7 @@ public class TimeSeriousConfig implements ExportableConfig {
     private Integer splitPaneLocationWhenTreeSelected = 300;
     private boolean mainSeriesSelectorTableVisible;
     private String title = "TimeSeriousConfig";
+    private List<ColumnSettings> mainSelectorColumnSettings;
 
     private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
 
@@ -77,6 +80,14 @@ public class TimeSeriousConfig implements ExportableConfig {
 
     public void setMainSeriesSelectorTableVisible(boolean mainSeriesSelectorTableVisible) {
         this.mainSeriesSelectorTableVisible = mainSeriesSelectorTableVisible;
+    }
+
+    public List<ColumnSettings> getMainSelectorColumnSettings() {
+        return mainSelectorColumnSettings;
+    }
+
+    public void setMainSelectorColumnSettings(List<ColumnSettings> mainSelectorColumnSettings) {
+        this.mainSelectorColumnSettings = mainSelectorColumnSettings;
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to

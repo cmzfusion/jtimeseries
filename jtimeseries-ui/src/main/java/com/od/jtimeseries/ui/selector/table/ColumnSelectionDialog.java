@@ -75,7 +75,7 @@ public class ColumnSelectionDialog extends JDialog {
     private JPanel createColumnsPanel() {
         JPanel columnPanel = new JPanel();
         columnPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        String[] columnNames = tableColumnManager.getAllColumnNames();
+        String[] columnNames = tableColumnManager.getAllColumnNamesInTableModel();
         Arrays.sort(columnNames);
 
         int rows = 8;
@@ -88,7 +88,7 @@ public class ColumnSelectionDialog extends JDialog {
             if (ContextProperties.isSummaryStatsProperty(displayName)) {
                 displayName = ContextProperties.parseStatisticName(displayName);
             }
-            final JCheckBox checkBox = new JCheckBox(displayName, tableColumnManager.isInTable(name));
+            final JCheckBox checkBox = new JCheckBox(displayName, tableColumnManager.isInTableModel(name));
             checkBox.setToolTipText(tableColumnManager.getColumnDescription(name));
             columnPanel.add(checkBox);
 

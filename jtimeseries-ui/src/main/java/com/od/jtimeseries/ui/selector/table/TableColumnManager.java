@@ -197,9 +197,9 @@ public class TableColumnManager<E extends UIPropertiesTimeSeries> {
 
     private List<ColumnSettings> getDefaultColumnSettings() {
         List<ColumnSettings> columns = new ArrayList<ColumnSettings>();
-        FixedColumn.addFixedColumn(columns, FixedColumn.Selected);
-        FixedColumn.addFixedColumn(columns, FixedColumn.DisplayName);
-        FixedColumn.addFixedColumn(columns, FixedColumn.Color);
+        for ( FixedColumn f : FixedColumn.getDefaultVisualizerColumns()) {
+            FixedColumn.addFixedColumn(columns, f);
+        }
         return columns;
     }
 }

@@ -39,7 +39,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         visualizer.setToolbarVisible(false);
         setFrameIcon(ImageUtils.FRAME_ICON_16x16);
         getContentPane().add(visualizer);
-        setSize(800, 600);
+        setSize(VisualizerConfiguration.DEFAULT_WIDTH, VisualizerConfiguration.DEFAULT_HEIGHT);
 
         addMouseListener(new MouseAdapter() {
              public void mouseClicked(MouseEvent e) {

@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.config;
 
+import com.od.jtimeseries.ui.selector.table.FixedColumn;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
 import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
 
@@ -35,10 +36,12 @@ import java.util.List;
  */
 public class VisualizerConfiguration implements ExportableConfig {
 
-    public static final int DEFAULT_DIVIDER_LOCATION = 300;
+    public static final int DEFAULT_DIVIDER_LOCATION = FixedColumn.getWidthOfDefaultVisualizerColumns() + 15;
+    public static final int DEFAULT_WIDTH = 850;  //wide enough to stop horizontal scroll bars showing
+    public static final int DEFAULT_HEIGHT = 600;
 
     private String title = "Visualizer";
-    private boolean tableSelectorVisible;
+    private boolean tableSelectorVisible = true;  //show table by default
     private List<UiTimeSeriesConfig> chartConfigs = new ArrayList<UiTimeSeriesConfig>();
     private int dividorLocation = DEFAULT_DIVIDER_LOCATION;
     private boolean showLegendOnChart = true;

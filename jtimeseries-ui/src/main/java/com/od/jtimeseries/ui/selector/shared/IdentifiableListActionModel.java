@@ -56,7 +56,7 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
         for ( Class c : type ) {
             total += getSelected(c).size();
         }
-        return total == getSelected().size();
+        return total == getSelected().size() && total > 0;
     }
 
     public <C extends Identifiable> java.util.List<C> getSelected(Class<C> clazz) {

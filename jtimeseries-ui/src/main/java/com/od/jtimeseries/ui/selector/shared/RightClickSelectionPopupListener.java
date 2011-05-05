@@ -3,12 +3,8 @@ package com.od.jtimeseries.ui.selector.shared;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -63,18 +59,15 @@ public abstract class RightClickSelectionPopupListener extends MouseAdapter {
 
             selectorComponent.refreshActions();
 
-            List<JMenuItem> menuItems = getMenuItems(e);
-            if (menuItems != null) {
-                showMenu(e, menuItems);
+            menu.removeAll();
+            addMenuItems(menu, e);
+            if (menu.getComponentCount() > 0) {
+                showMenu(e);
             }
         }
     }
 
-    private void showMenu(MouseEvent e, List<JMenuItem> menuItems) {
-        menu.removeAll();
-        for (JMenuItem i : menuItems) {
-            menu.add(i);
-        }
+    private void showMenu(MouseEvent e) {
         menu.show(eventSource, e.getX() + 3, e.getY() + 3);
     }
 
@@ -87,17 +80,13 @@ public abstract class RightClickSelectionPopupListener extends MouseAdapter {
      */
     protected abstract void setSelectedItemsOnPopupTrigger(MouseEvent e);
 
-    private List<JMenuItem> getMenuItems(MouseEvent e) {
-        List<JMenuItem> menuItems = new ArrayList<JMenuItem>();
+    private void addMenuItems(JPopupMenu menu, MouseEvent e) {
         List<Identifiable> selectedIdentifiable = getSelectedIdentifiable(e);
-        List<Action> actions = selectorComponent.getSelectorActionFactory().getActions(
-                getSelectorComponent(),
-                selectedIdentifiable
+        selectorComponent.getPopupMenuPopulator().addMenuItems(
+            menu,
+            getSelectorComponent(),
+            selectedIdentifiable
         );
-        for (Action a : actions) {
-            menuItems.add(new JMenuItem(a));
-        }
-        return menuItems;
     }
 
     protected abstract List<Identifiable> getSelectedIdentifiable(MouseEvent mouseEvent);

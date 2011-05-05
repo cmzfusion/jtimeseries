@@ -3,12 +3,11 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.TimeSeriousDesktopPane;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
 
-import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -19,12 +18,12 @@ import java.awt.event.ActionEvent;
  */
 public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActionModel> {
 
-    private JFrame mainFrame;
+    private Component parentComponent;
     private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
-    public NewVisualizerAction(JFrame mainFrame, DesktopSelectionActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
+    public NewVisualizerAction(Component parentComponent, DesktopSelectionActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
         super(m, "New Visualizer", ImageUtils.VISUALIZER_NEW_16x16);
-        this.mainFrame = mainFrame;
+        this.parentComponent = parentComponent;
         this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }
@@ -33,7 +32,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
         if ( getActionModel().isContextSelected() ) {
             DesktopContext desktopContext = getActionModel().getSelectedContext();
             String name = ContextNameCheckUtility.getNameFromUser(
-                mainFrame, desktopContext, "Name for visualizer?", "Choose Name", ""
+                    parentComponent, desktopContext, "Name for visualizer?", "Choose Name", ""
             );
             if ( name != null) { //check if user cancelled
                 VisualizerConfiguration c = new VisualizerConfiguration(name);

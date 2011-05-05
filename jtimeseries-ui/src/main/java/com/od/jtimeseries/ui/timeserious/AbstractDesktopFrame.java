@@ -5,7 +5,9 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 
@@ -32,7 +34,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         this.desktopContext = desktopContext;
         this.rootContext = rootContext;
         this.actionModels = actionModels;
-        this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext, rootContext);
+        this.desktopPane = new TimeSeriousDesktopPane(this, serverDictionary, displayNameCalculator, selectionPanel, desktopContext, rootContext, actionModels);
         setIconImage(ImageUtils.FRAME_ICON_16x16.getImage());
         getContentPane().add(desktopPane, BorderLayout.CENTER);
         setConfiguration(desktopContext);

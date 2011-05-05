@@ -28,7 +28,7 @@ import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
+import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -130,8 +130,8 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
 
-        SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(getSelectionActionModel());
-        seriesSelectionPanel.setSelectorActionFactory(actionFactory);
+        SelectorPopupMenuPopulator popupMenuPopulator = new VisualizerSelectionPopupMenuPopulator(getSelectionActionModel());
+        seriesSelectionPanel.setSelectorActionFactory(popupMenuPopulator);
         seriesSelectionPanel.setTransferHandler(new ImportExportTransferHandler(rootContext, getSelectionActionModel()));
     }
 
@@ -236,8 +236,8 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.setColumns(columnSettings);
     }
 
-    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
-        seriesSelectionPanel.setSelectorActionFactory(selectorActionFactory);
+    public void setSelectorActionFactory(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
+        seriesSelectionPanel.setSelectorActionFactory(selectorPopupMenuPopulator);
     }
 
     public IdentifiableListActionModel getSelectionActionModel() {

@@ -12,7 +12,7 @@ import java.util.List;
  * Time: 19:24
  * To change this template use File | Settings | File Templates.
  */
-public interface SelectorActionFactory {
+public interface SelectorPopupMenuPopulator {
 
-    List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable);
+    void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable);
 }

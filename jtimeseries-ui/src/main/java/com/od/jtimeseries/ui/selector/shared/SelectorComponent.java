@@ -24,7 +24,6 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 
 import javax.swing.*;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,9 +39,8 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
 
     private TimeSeriesContext rootContext;
     private IdentifiableListActionModel selectionsActionModel;
-    private SelectorActionFactory selectorActionFactory = new SelectorActionFactory() {
-        public List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-            return Collections.emptyList();
+    private SelectorPopupMenuPopulator popupMenuPopulator = new SelectorPopupMenuPopulator() {
+        public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
         }
     };
 
@@ -51,12 +49,12 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         this.selectionsActionModel = selectionsActionModel;
     }
 
-    public SelectorActionFactory getSelectorActionFactory() {
-        return selectorActionFactory;
+    public SelectorPopupMenuPopulator getPopupMenuPopulator() {
+        return popupMenuPopulator;
     }
 
-    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
-        this.selectorActionFactory = selectorActionFactory;
+    public void setPopupMenuPopulator(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
+        this.popupMenuPopulator = selectorPopupMenuPopulator;
     }
 
     public void showSelections(List<Identifiable> selected) {

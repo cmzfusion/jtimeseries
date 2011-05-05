@@ -7,6 +7,7 @@ import com.od.jtimeseries.ui.timeserious.DesktopContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
@@ -17,20 +18,20 @@ import java.awt.event.ActionEvent;
  */
 public class NewDesktopAction extends AbstractAction {
 
-    private JFrame frame;
+    private Component component;
     private TimeSeriesContext desktopContainingContext;
     private DesktopSelectionActionModel desktopSelectionActionModel;
 
-    public NewDesktopAction(JFrame frame, TimeSeriesContext desktopContainingContext, DesktopSelectionActionModel desktopSelectionActionModel) {
+    public NewDesktopAction(Component component, TimeSeriesContext desktopContainingContext, DesktopSelectionActionModel desktopSelectionActionModel) {
         super("New Desktop", ImageUtils.DESKTOP_NEW_16x16);
-        this.frame = frame;
+        this.component = component;
         this.desktopContainingContext = desktopContainingContext;
         this.desktopSelectionActionModel = desktopSelectionActionModel;
-        super.putValue(SHORT_DESCRIPTION, "Create a new desktop frame");
+        super.putValue(SHORT_DESCRIPTION, "Create a new desktop component");
     }
 
     public void actionPerformed(ActionEvent e) {
-        String name = ContextNameCheckUtility.getNameFromUser(frame, desktopContainingContext, "Name for Desktop", "Choose Name", "");
+        String name = ContextNameCheckUtility.getNameFromUser(component, desktopContainingContext, "Name for Desktop", "Choose Name", "");
         if ( name != null) { //check if user cancelled
             DesktopConfiguration config = new DesktopConfiguration(name);
             DesktopContext desktopContext = desktopContainingContext.create(name, name, DesktopContext.class, config);

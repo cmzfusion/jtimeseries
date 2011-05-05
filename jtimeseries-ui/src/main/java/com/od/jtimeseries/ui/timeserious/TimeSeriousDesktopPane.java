@@ -4,7 +4,10 @@ import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
+import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerPopupMenuPopulator;
+import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
@@ -34,15 +37,18 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     private DisplayNameCalculator displayNameCalculator;
     private SeriesSelectionPanel mainSelectionPanel;
     private DesktopContext desktopContext;
+    private ApplicationActionModels applicationActionModels;
     private Map<VisualizerContext,VisualizerInternalFrame> visualizerContextToFrame = new HashMap<VisualizerContext, VisualizerInternalFrame>();
 
-    public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext, TimeSeriousRootContext rootContext) {
+    public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext, TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels) {
         this.parentFrame = parentFrame;
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSelectionPanel = mainSelectionPanel;
         this.desktopContext = desktopContext;
+        this.applicationActionModels = applicationActionModels;
         addListeners();
+        addPopupMenu();
         setTransferHandler(new DesktopPaneTransferHandler(rootContext, desktopContext, this));
     }
 
@@ -54,6 +60,22 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
 
         parentFrame.addWindowListener(new InternalFrameDeactivatingWindowListener());
     }
+
+
+    private void addPopupMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem item = new JMenuItem(
+            new NewVisualizerAction(
+            this,
+            applicationActionModels.getDesktopSelectionActionModel(),
+            applicationActionModels.getVisualizerSelectionActionModel()
+        ));
+        menu.add(item);
+        addMouseListener(new PopupTriggerMouseAdapter(
+            menu, this
+        ));
+    }
+
 
     private void deactivateAllFrames() {
         for (JInternalFrame f : this.getAllFrames()) {
@@ -114,7 +136,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     }
 
     private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerContext visualizerNode) {
-        visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
+        visualizer.setSelectorActionFactory(new TimeSeriousVisualizerPopupMenuPopulator(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel
         ));

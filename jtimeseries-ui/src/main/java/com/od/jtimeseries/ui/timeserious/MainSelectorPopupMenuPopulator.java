@@ -4,7 +4,7 @@ import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
+import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.*;
@@ -21,7 +21,7 @@ import java.util.List;
 * Date: 16/03/11
 * Time: 07:03
 */
-public class MainSelectorActionFactory implements SelectorActionFactory {
+public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulator {
 
     private IdentifiableListActionModel selectionModel;
     private Action addSeriesAction;
@@ -33,8 +33,15 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
     private Action removeDesktopAction;
     private Action showHiddenDesktopAction;
     private Action renameAction;
+    private Action newDesktopAction;
+    private Action newVisualizerAction;
 
-    public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentComponent) {
+    private TimeSeriesServerDictionary timeSeriesServerDictionary;
+    private JComponent parentComponent;
+
+    public MainSelectorPopupMenuPopulator(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentComponent) {
+        this.timeSeriesServerDictionary = timeSeriesServerDictionary;
+        this.parentComponent = parentComponent;
         this.selectionModel = selectionPanel.getSelectionActionModel();
         addSeriesAction = new AddSeriesToActiveVisualizerAction(applicationActionModels.getVisualizerSelectionActionModel(), selectionModel);
         refreshServerAction = new RefreshServerSeriesAction(rootContext, selectionModel);
@@ -45,33 +52,35 @@ public class MainSelectorActionFactory implements SelectorActionFactory {
         removeDesktopAction = new RemoveDesktopAction(selectionModel, parentComponent);
         showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
         renameAction = new RenameAction(parentComponent, selectionModel);
+        newDesktopAction = new NewDesktopAction(parentComponent, rootContext, applicationActionModels.getDesktopSelectionActionModel());
+        newVisualizerAction = new NewVisualizerAction(parentComponent, applicationActionModels.getDesktopSelectionActionModel(), applicationActionModels.getVisualizerSelectionActionModel());
     }
 
-    public java.util.List<Action> getActions(SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-        java.util.List<Action> result = Collections.emptyList();
+    public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
         if (selectionModel.isSelectionLimitedToType(UIPropertiesTimeSeries.class)) {
-            result = Arrays.asList(
-                addSeriesAction
-            );
+            menu.add(new JMenuItem(addSeriesAction));
         } else if ( selectionModel.isSelectionLimitedToType(VisualizerContext.class)) {
-            result = Arrays.asList(
-                showHiddenVisualizerAction,
-                removeVisualizerAction,
-                renameAction
-            );
+            menu.add(showHiddenVisualizerAction);
+            menu.add(removeVisualizerAction);
+            menu.add(renameAction);
         } else if ( selectionModel.isSelectionLimitedToType(TimeSeriesServerContext.class)) {
-            result = Arrays.asList(
-                refreshServerAction,
-                removeServerAction,
-                renameServerAction
-            );
+            menu.add(refreshServerAction);
+            menu.add(removeServerAction);
+            menu.add(renameServerAction);
         } else if ( selectionModel.isSelectionLimitedToType(DesktopContext.class)) {
-            result = Arrays.asList(
-                removeDesktopAction,
-                showHiddenDesktopAction,
-                renameAction
-            );
+            menu.add(removeDesktopAction);
+            menu.add(showHiddenDesktopAction);
+            menu.add(renameAction);
+            menu.add(new JMenuBar());
+            menu.add(newVisualizerAction);
+        } else if ( selectionModel.getSelected().size() == 0) {
+            JFrame windowAncestor = (JFrame) SwingUtilities.getWindowAncestor(parentComponent);
+            menu.add(new NewServerAction(
+                windowAncestor,
+                timeSeriesServerDictionary
+            ));
+            menu.add(newDesktopAction);
         }
-        return result;
     }
+
 }

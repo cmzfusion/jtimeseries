@@ -18,18 +18,15 @@
  */
 package com.od.jtimeseries.ui.selector;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
+import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
-import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.jtimeseries.ui.visualizer.VisualizerRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -120,9 +117,9 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setSeriesSelectionEnabled(selectable);
     }
 
-    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
-        treeSelector.setSelectorActionFactory(selectorActionFactory);
-        tableSelector.setSelectorActionFactory(selectorActionFactory);
+    public void setSelectorActionFactory(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
+        treeSelector.setPopupMenuPopulator(selectorPopupMenuPopulator);
+        tableSelector.setPopupMenuPopulator(selectorPopupMenuPopulator);
     }
 
     public void setTreeComparator(Comparator<Identifiable> treeComparator) {

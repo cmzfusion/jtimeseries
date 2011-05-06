@@ -49,7 +49,6 @@ public class ImageUtils {
     public static ImageIcon OK_16x16 = getImageIcon("/images/ok16x16.png");
     public static ImageIcon TABLE_COLUMN_ADD_16x16 = getImageIcon("/images/table_column_add_16x16.png");
     public static ImageIcon FIND_IN_MAIN_SELECTOR_16x16 = getImageIcon("/images/find_in_main_selector_16x16.png");
-    public static ImageIcon EXIT_16x16 = getImageIcon("/images/exit_16x16.png");
     public static ImageIcon DESKTOP_NEW_16x16 = getImageIcon("/images/window_new_16x16.png");
     public static ImageIcon DESKTOP_DELETE_16x16 = getImageIcon("/images/window_delete_16x16.png");
     public static ImageIcon DESKTOP_SHOW_16x16 = getImageIcon("/images/window_show_16x16.png");

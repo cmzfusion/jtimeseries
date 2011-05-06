@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
+import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
@@ -29,7 +31,8 @@ public class FrameManager implements ConfigAware {
     private ApplicationActionModels applicationActionModels;
     private DisplayNameCalculator displayNameCalculator;
     private TimeSeriousRootContext rootContext;
-    private ExitAction exitAction;
+    private ConfigAwareTreeManager configTreeManager;
+    private ConfigInitializer configInitializer;
     private MainSeriesSelector mainSeriesSelector;
     private Map<DesktopContext, AbstractDesktopFrame> desktopContextToFrameMap = new HashMap<DesktopContext, AbstractDesktopFrame>();
 
@@ -37,12 +40,14 @@ public class FrameManager implements ConfigAware {
                         ApplicationActionModels applicationActionModels,
                         DisplayNameCalculator displayNameCalculator,
                         TimeSeriousRootContext rootContext,
-                        final ExitAction exitAction) {
+                        ConfigAwareTreeManager configTreeManager,
+                        ConfigInitializer configInitializer) {
         this.udpPingHttpServerDictionary = udpPingHttpServerDictionary;
         this.applicationActionModels = applicationActionModels;
         this.displayNameCalculator = displayNameCalculator;
         this.rootContext = rootContext;
-        this.exitAction = exitAction;
+        this.configTreeManager = configTreeManager;
+        this.configInitializer = configInitializer;
         this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             applicationActionModels,
@@ -145,6 +150,6 @@ public class FrameManager implements ConfigAware {
     }
 
     private TimeSeriousMainFrame createMainFrame(DesktopContext desktopContext) {
-        return new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, exitAction, displayNameCalculator, rootContext, mainSeriesSelector, desktopContext);
+        return new TimeSeriousMainFrame(udpPingHttpServerDictionary,applicationActionModels, configTreeManager, configInitializer, displayNameCalculator, rootContext, mainSeriesSelector, desktopContext);
     }
 }

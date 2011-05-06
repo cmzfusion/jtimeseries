@@ -22,7 +22,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
     private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
     public NewVisualizerAction(Component parentComponent, DesktopSelectionActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
-        super(m, "New Visualizer", ImageUtils.VISUALIZER_NEW_16x16);
+        super(m, "New Visualizer...", ImageUtils.VISUALIZER_NEW_16x16);
         this.parentComponent = parentComponent;
         this.visualizerSelectionActionModel = visualizerSelectionActionModel;
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");

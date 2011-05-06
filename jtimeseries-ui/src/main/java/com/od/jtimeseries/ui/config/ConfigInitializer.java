@@ -153,4 +153,14 @@ public class ConfigInitializer {
     private void doSave(TimeSeriousConfig config) throws ConfigManagerException {
         configManager.saveConfig(MAIN_CONFIG_NAME, config);
     }
+
+    public void exportConfig(JFrame mainFrame, TimeSeriousConfig c, File selectedFile) {
+        try {
+            configManager.saveConfig(MAIN_CONFIG_NAME, c, new FileSink(selectedFile));
+        } catch (ConfigManagerException e) {
+            logMethods.logError("Failed to export config to file " + selectedFile, e);
+            JOptionPane.showMessageDialog(mainFrame, "Failed to export config", "Error exporting config", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
 }

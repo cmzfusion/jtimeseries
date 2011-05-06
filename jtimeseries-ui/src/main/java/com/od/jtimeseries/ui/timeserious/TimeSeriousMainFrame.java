@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
+import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
@@ -30,17 +32,21 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private NewDesktopAction newDesktopAction;
     private NewServerAction newServerAction;
     private EditDisplayNamePatternsAction editDisplayNamePatternsAction;
+    private ConfigAwareTreeManager configTreeManager;
+    private ConfigInitializer configInitializer;
     private DisplayNameCalculator displayNameCalculator;
     private UiTimeSeriesServerDictionary serverDictionary;
-    private ExitAction exitAction;
-    private final JSplitPane splitPane = new JSplitPane();
+    private JSplitPane splitPane = new JSplitPane();
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
+    private ExitAction exitAction;
+    private ExportConfigAction exportConfigAction;
 
-    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ExitAction exitAction, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector, DesktopContext desktopContext) {
+    public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ConfigAwareTreeManager configTreeManager, ConfigInitializer configInitializer, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector, DesktopContext desktopContext) {
         super(serverDictionary, displayNameCalculator, desktopContext, mainSeriesSelector.getSelectionPanel(), rootContext, actionModels);
         this.serverDictionary = serverDictionary;
-        this.exitAction = exitAction;
+        this.configTreeManager = configTreeManager;
+        this.configInitializer = configInitializer;
         this.displayNameCalculator = displayNameCalculator;
         this.mainSeriesSelector = mainSeriesSelector;
         createActions();
@@ -65,6 +71,10 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     private void createActions() {
+        exitAction = new ExitAction(this, configTreeManager, configInitializer);
+
+        exportConfigAction = new ExportConfigAction(this, configTreeManager, configInitializer);
+
         newVisualizerAction = new NewVisualizerAction(
             this,
             getActionModels().getDesktopSelectionActionModel(),
@@ -135,6 +145,9 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
 
         JMenuItem newServerItem = new JMenuItem(newServerAction);
         fileMenu.add(newServerItem);
+
+        JMenuItem exportConfigItem = new JMenuItem(exportConfigAction);
+        fileMenu.add(exportConfigItem);
 
         JMenuItem exitItem = new JMenuItem(exitAction);
         fileMenu.add(exitItem);

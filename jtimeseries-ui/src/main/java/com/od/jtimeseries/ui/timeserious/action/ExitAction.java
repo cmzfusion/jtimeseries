@@ -22,15 +22,12 @@ public class ExitAction extends AbstractAction {
     private ConfigInitializer configInitializer;
     private JFrame mainFrame;
 
-    public ExitAction(ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
-        super("Exit", ImageUtils.EXIT_16x16);
+    public ExitAction(JFrame mainFrame, ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
+        super("Exit", null);
+        this.mainFrame = mainFrame;
         this.configTree = configTree;
         this.configInitializer = configInitializer;
         super.putValue(SHORT_DESCRIPTION, "Exit and save config");
-    }
-
-    public void setMainFrame(JFrame mainFrame) {
-        this.mainFrame = mainFrame;
     }
 
     public void actionPerformed(ActionEvent e) {

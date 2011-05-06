@@ -37,19 +37,18 @@ public class TimeSerious implements ConfigAware {
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
     private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator);
-    private ConfigAwareTreeManager configTree  = new ConfigAwareTreeManager(this);
-    private ExitAction exitAction = new ExitAction(configTree, configInitializer);
+    private ConfigAwareTreeManager configTreeManager = new ConfigAwareTreeManager(this);
     private FrameManager frameManager = new FrameManager(
         udpPingHttpServerDictionary,
         applicationActionModels,
         displayNameCalculator,
         rootContext,
-        exitAction
+        configTreeManager,
+        configInitializer
     );
     private TimeSeriousConfig config;
 
     public void start() {
-        exitAction.setMainFrame(frameManager.getMainFrame());
         startJmxAndLocalHttpd();
         setupServerDictionary();
 
@@ -60,7 +59,7 @@ public class TimeSerious implements ConfigAware {
             e.printStackTrace();
         }
 
-        configTree.restoreConfig(config);
+        configTreeManager.restoreConfig(config);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -114,21 +113,6 @@ public class TimeSerious implements ConfigAware {
         } catch (IOException e) {
             logMethods.logError("Could not start timeserious httpd for local metrics", e);
         }
-
-//        try {
-//            udpPingHttpServerDictionary.addServer(
-//                new TimeSeriesServer(
-//                    InetAddress.getLocalHost(),
-//                    httpdPort,
-//                    "Timeserious",
-//                    System.currentTimeMillis()
-//                )
-//            );
-//        } catch (UnknownHostException e) {
-//            logMethods.logError("Could not add local timeseries server", e);
-//        }
-
-
     }
 
 

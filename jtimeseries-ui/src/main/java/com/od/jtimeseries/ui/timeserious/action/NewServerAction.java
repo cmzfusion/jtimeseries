@@ -37,7 +37,7 @@ public class NewServerAction extends AbstractAction {
     private TimeSeriesServerDictionary serverDictionary;
 
     public NewServerAction(JFrame frame, TimeSeriesServerDictionary serverDictionary) {
-        super("New Server", ImageUtils.ADD_SERVER_ICON_16x16);
+        super("New Server...", ImageUtils.ADD_SERVER_ICON_16x16);
         this.frame = frame;
         this.serverDictionary = serverDictionary;
         super.putValue(SHORT_DESCRIPTION, "Add a new server to connect and download series data");

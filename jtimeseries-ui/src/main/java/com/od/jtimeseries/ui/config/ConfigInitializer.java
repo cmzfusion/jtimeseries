@@ -163,4 +163,15 @@ public class ConfigInitializer {
         }
 
     }
+
+    public TimeSeriousConfig importConfig(JFrame mainFrame, File selectedFile) {
+        TimeSeriousConfig result = null;
+        try {
+            result = configManager.loadConfig(MAIN_CONFIG_NAME, TimeSeriousConfig.class, new FileSource(selectedFile));
+        } catch (ConfigManagerException e) {
+            logMethods.logError("Failed to import config to file " + selectedFile, e);
+            JOptionPane.showMessageDialog(mainFrame, "Failed to import config", "Error importing config", JOptionPane.ERROR_MESSAGE);
+        }
+        return result;
+    }
 }

@@ -6,6 +6,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
+import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -93,15 +94,20 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private DesktopContext createDesktopContext(DesktopConfiguration desktopConfiguration) {
         DesktopContext context = create(desktopConfiguration.getTitle(), desktopConfiguration.getTitle(), DesktopContext.class, desktopConfiguration);
-//        DesktopContext context = (DesktopContext)get(desktopConfiguration.getTitle());
-//        if ( context == null) {
-//            context = new DesktopContext(desktopConfiguration);
-//            addChild(context);
-//        }
         return context;
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
+    }
+
+    public void clearConfig() {
+        for ( Identifiable i : getChildren()) {
+            if ( i instanceof TimeSeriesServerContext ) {
+                serverDictionary.removeServer(((TimeSeriesServerContext)i).getServer());
+            } else if ( i instanceof DesktopContext) {
+                removeChild(i);
+            }
+        }
     }
 }

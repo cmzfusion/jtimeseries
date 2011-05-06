@@ -59,11 +59,18 @@ public class FrameManager implements ConfigAware {
         return Arrays.asList((ConfigAware)mainSeriesSelector, mainFrame);
     }
 
+    public void clearConfig() {
+        mainFrame = null;
+    }
+
     public void prepareConfigForSave(TimeSeriousConfig config) {
     }
 
     public void restoreConfig(TimeSeriousConfig config) {
-        this.mainFrame = createMainFrame(rootContext.getMainDesktopContext());
+        DesktopContext c = rootContext.getMainDesktopContext();
+        this.mainFrame = createMainFrame(c);
+        addToFrameMap(c, mainFrame);
+
         showFrames();
         addShowFrameTreeListener();
     }
@@ -79,10 +86,6 @@ public class FrameManager implements ConfigAware {
 
     private void addShowFrameTreeListener() {
         rootContext.addTreeListener(AwtSafeListener.getAwtSafeListener(new ShowFrameTreeListener(), IdentifiableTreeListener.class));
-    }
-
-    public TimeSeriousMainFrame getMainFrame() {
-        return mainFrame;
     }
 
     private class ShowFrameTreeListener extends IdentifiableTreeListenerAdapter {

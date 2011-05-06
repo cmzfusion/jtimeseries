@@ -74,6 +74,9 @@ public class TimeSerious implements ConfigAware {
         return Arrays.asList(rootContext, frameManager);
     }
 
+    public void clearConfig() {
+    }
+
 
     public static void main(String[] args) {
 

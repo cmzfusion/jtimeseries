@@ -17,4 +17,6 @@ public interface ConfigAware {
 
     List<ConfigAware> getConfigAwareChildren();
 
+    void clearConfig();
+
 }

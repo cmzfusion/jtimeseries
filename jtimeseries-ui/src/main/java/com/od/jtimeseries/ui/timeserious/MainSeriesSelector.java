@@ -95,6 +95,9 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         return Collections.emptyList();
     }
 
+    public void clearConfig() {
+    }
+
     public SeriesSelectionPanel<UIPropertiesTimeSeries> getSelectionPanel() {
         return selectionPanel;
     }

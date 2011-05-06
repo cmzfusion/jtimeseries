@@ -41,6 +41,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private int treeSplitPanePosition;
     private ExitAction exitAction;
     private ExportConfigAction exportConfigAction;
+    private ImportConfigAction importConfigAction;
 
     public TimeSeriousMainFrame(UiTimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ConfigAwareTreeManager configTreeManager, ConfigInitializer configInitializer, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector, DesktopContext desktopContext) {
         super(serverDictionary, displayNameCalculator, desktopContext, mainSeriesSelector.getSelectionPanel(), rootContext, actionModels);
@@ -74,6 +75,8 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         exitAction = new ExitAction(this, configTreeManager, configInitializer);
 
         exportConfigAction = new ExportConfigAction(this, configTreeManager, configInitializer);
+
+        importConfigAction = new ImportConfigAction(this, configTreeManager, configInitializer);
 
         newVisualizerAction = new NewVisualizerAction(
             this,
@@ -149,6 +152,9 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         JMenuItem exportConfigItem = new JMenuItem(exportConfigAction);
         fileMenu.add(exportConfigItem);
 
+        JMenuItem importConfigItem = new JMenuItem(importConfigAction);
+        fileMenu.add(importConfigItem);
+
         JMenuItem exitItem = new JMenuItem(exitAction);
         fileMenu.add(exitItem);
 
@@ -171,6 +177,9 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
 
     public java.util.List<ConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
+    }
+
+    public void clearConfig() {
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {

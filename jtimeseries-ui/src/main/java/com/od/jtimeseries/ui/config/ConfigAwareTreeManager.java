@@ -28,6 +28,17 @@ public class ConfigAwareTreeManager {
         restore(config, rootNode);
     }
 
+    public void clearConfig() {
+        clear(rootNode);
+    }
+
+    private void clear(ConfigAware node) {
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
+            clear(c);
+        }
+        node.clearConfig();
+    }
+
     private void restore(TimeSeriousConfig config, ConfigAware node) {
         node.restoreConfig(config);
         for ( ConfigAware c : node.getConfigAwareChildren()) {
@@ -41,4 +52,6 @@ public class ConfigAwareTreeManager {
             save(config, c);
         }
     }
+
+
 }

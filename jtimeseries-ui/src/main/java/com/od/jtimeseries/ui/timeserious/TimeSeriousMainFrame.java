@@ -40,6 +40,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
     private int tableSplitPanePosition;
     private int treeSplitPanePosition;
     private ExitAction exitAction;
+    private SaveAction saveAction;
     private ExportConfigAction exportConfigAction;
     private ImportConfigAction importConfigAction;
 
@@ -62,7 +63,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
     private void addExitListener() {
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if (!exitAction.confirmAndSaveConfig(e.getWindow())) {
+                if (!exitAction.confirmAndSaveConfig("Exit TimeSerious")) {
                     //there's no mechanism to cancel the close which I can find, barring throwing an exception
                     //which is then handled by some dedicated logic in the Component class
                     throw new RuntimeException("User cancelled exit");
@@ -73,11 +74,9 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
 
     private void createActions() {
         exitAction = new ExitAction(this, configTreeManager, configInitializer);
-
+        saveAction = new SaveAction(this, configTreeManager, configInitializer);
         exportConfigAction = new ExportConfigAction(this, configTreeManager, configInitializer);
-
         importConfigAction = new ImportConfigAction(this, configTreeManager, configInitializer);
-
         newVisualizerAction = new NewVisualizerAction(
             this,
             getActionModels().getDesktopSelectionActionModel(),
@@ -154,6 +153,9 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
 
         JMenuItem importConfigItem = new JMenuItem(importConfigAction);
         fileMenu.add(importConfigItem);
+
+        JMenuItem saveItem = new JMenuItem(saveAction);
+        fileMenu.add(saveItem);
 
         JMenuItem exitItem = new JMenuItem(exitAction);
         fileMenu.add(exitItem);

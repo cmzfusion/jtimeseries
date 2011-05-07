@@ -16,48 +16,17 @@ import java.awt.event.ActionEvent;
 * Date: 08/04/11
 * Time: 06:58
 */
-public class ExitAction extends AbstractAction {
-
-    private ConfigAwareTreeManager configTree;
-    private ConfigInitializer configInitializer;
-    private JFrame mainFrame;
+public class ExitAction extends AbstractSaveConfigAction {
 
     public ExitAction(JFrame mainFrame, ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
-        super("Exit", null);
-        this.mainFrame = mainFrame;
-        this.configTree = configTree;
-        this.configInitializer = configInitializer;
+        super("Exit", null, mainFrame, configTree, configInitializer);
         super.putValue(SHORT_DESCRIPTION, "Exit and save config");
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ( confirmAndSaveConfig(mainFrame) ) {
+        if ( confirmAndSaveConfig("Exit TimeSerious") ) {
             System.exit(0);
         }
     }
-
-    public boolean confirmAndSaveConfig(Component c) {
-        int option = JOptionPane.showConfirmDialog(
-                c,
-                "Save Config?",
-                "Exit TimeSerious",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE
-        );
-        if ( option == JOptionPane.YES_OPTION) {
-            saveConfigOnShutdown();
-        }
-        return option != JOptionPane.CANCEL_OPTION;
-    }
-
-    private void saveConfigOnShutdown() {
-        TimeSeriousConfig config = new TimeSeriousConfig();
-        configTree.prepareConfigForSave(config);
-        try {
-            configInitializer.saveConfig(mainFrame, config);
-        } catch (ConfigManagerException e1) {
-            //todo, add handling
-            e1.printStackTrace();
-        }
-    }
 }
+

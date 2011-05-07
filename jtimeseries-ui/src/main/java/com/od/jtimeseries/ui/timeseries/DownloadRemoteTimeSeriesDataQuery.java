@@ -29,6 +29,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.swing.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,14 +72,11 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
         };
     }
 
-
     private void refreshSummaryStatsProperties(Attributes attributes) {
         String stats = attributes.getValue(AttributeName.summaryStats.name());
         Properties p = ContextProperties.createSummaryStatsProperties(stats);
-        destinationSeries.putAllProperties(p);
-        destinationSeries.setStatsRefreshTime(new Date());
+        destinationSeries.updateSummaryStats(p);
     }
-
 
     private void parseTimeSeriesItem(Attributes attributes) {
         String timestamp = attributes.getValue(AttributeName.timestamp.name());

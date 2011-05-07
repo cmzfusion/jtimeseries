@@ -31,6 +31,7 @@ import swingcommand.SwingCommand;
 import swingcommand.Task;
 import swingcommand.TaskListenerAdapter;
 
+import javax.swing.*;
 import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -265,11 +266,23 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     public static void updateSummaryStats(UiTimeSeriesConfig config, Properties summaryStats) {
-        RemoteHttpTimeSeries s = getWeakReferencedSeries(config);
+        final RemoteHttpTimeSeries s = getWeakReferencedSeries(config);
         if (s != null) {
-            s.putAllProperties(summaryStats);
-            s.setStatsRefreshTime(new Date());
+            s.updateSummaryStats(summaryStats);
         }
+    }
+
+    protected void updateSummaryStats(Properties summaryStats) {
+        putAllProperties(summaryStats);
+
+        //at present all UI times series properties must
+        //be set on the swing event thread since jide
+        //bean table model expects this
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                setStatsRefreshTime(new Date());
+            }
+        });
     }
 
 }

@@ -111,7 +111,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     public void setStatsRefreshTime(Date statsRefreshTime) {
         Date oldValue = this.statsRefreshTime;
         this.statsRefreshTime = statsRefreshTime;
-        firePropertyChange("statsRefreshTime", oldValue, this.statsRefreshTime);
+        firePropertyChange(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY, oldValue, this.statsRefreshTime);
     }
 
     public Color getColor() {

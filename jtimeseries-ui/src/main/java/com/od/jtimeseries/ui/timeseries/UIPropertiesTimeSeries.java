@@ -13,7 +13,10 @@ import java.util.Date;
  * User: nick
  * Date: 27-Nov-2010
  * Time: 23:57:31
- * To change this template use File | Settings | File Templates.
+ *
+ *  At present all UI times series properties must
+ *  be set on the swing event thread since jide
+ *  bean table model expects this
  */
 public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displayable {
 

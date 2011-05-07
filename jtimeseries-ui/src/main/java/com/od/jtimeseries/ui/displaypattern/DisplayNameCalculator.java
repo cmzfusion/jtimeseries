@@ -21,9 +21,12 @@ package com.od.jtimeseries.ui.displaypattern;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.util.NamedExecutors;
+import com.od.swing.util.UIUtilities;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,30 +41,27 @@ import java.util.regex.Pattern;
  */
 public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatternListener {
 
+    private static final Executor displayNameUpdateExecutor = NamedExecutors.newSingleThreadExecutor("DisplayNameCalculator");
+
     private List<DisplayNamePattern> displayNamePatterns = new ArrayList<DisplayNamePattern>();
     private Map<DisplayNamePattern, Pattern> patternMap = new HashMap<DisplayNamePattern, Pattern>();
 
     //allow contexts to be garbage collected
     private List<WeakReference<TimeSeriesContext>> rootContexts = new LinkedList<WeakReference<TimeSeriesContext>>();
 
-    public DisplayNameCalculator() {
-    }
-
     public void addRootContext(TimeSeriesContext rootContext) {
         rootContexts.add(new WeakReference<TimeSeriesContext>(rootContext));
     }
 
-    public void setDisplayName(UIPropertiesTimeSeries s) {
-        String path = s.getPath();
-        String displayName = s.getId();
-        for (DisplayNamePattern p : patternMap.keySet()) {
-            Matcher m = patternMap.get(p).matcher(path);
-            if ( m.matches() ) {
-                displayName = m.replaceAll(p.getReplacement());
-                break;
+    public void updateDisplayNames(final List<UIPropertiesTimeSeries> l) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                for ( UIPropertiesTimeSeries ts : l) {
+                    calculateAndUpdateDisplayName(ts);
+                }
             }
-        }
-        s.setDisplayName(displayName);
+        };
+        displayNameUpdateExecutor.execute(runnable);
     }
 
     public void displayPatternsChanged(List<DisplayNamePattern> newPatterns, boolean applyNow) {
@@ -78,20 +78,46 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
         }
     }
 
-    public void applyPatternsToAllTimeseries() {
+    private void applyPatternsToAllTimeseries() {
         Iterator<WeakReference<TimeSeriesContext>> i = rootContexts.iterator();
         while(i.hasNext()) {
             WeakReference<TimeSeriesContext> s = i.next();
             TimeSeriesContext c = s.get();
             if ( c != null) {
                 List<UIPropertiesTimeSeries> l = c.findAll(UIPropertiesTimeSeries.class).getAllMatches();
-                for ( UIPropertiesTimeSeries ts : l) {
-                    setDisplayName(ts);
-                }
+                updateDisplayNames(l);
             } else {
                 i.remove();
             }
         }
+    }
+
+    private void calculateAndUpdateDisplayName(final UIPropertiesTimeSeries s) {
+        String path = s.getPath();
+        String displayName = s.getId();
+        for (DisplayNamePattern p : patternMap.keySet()) {
+            Matcher m = patternMap.get(p).matcher(path);
+            if ( m.matches() ) {
+                displayName = m.replaceAll(p.getReplacement());
+                break;
+            }
+        }
+
+        if ( ! s.getId().equals(displayName)) {
+            updateDisplayName(s, displayName);
+        }
+    }
+
+    private void updateDisplayName(final UIPropertiesTimeSeries s, final String displayName) {
+        UIUtilities.runInDispatchThread(
+            new Runnable() {
+                public void run() {
+                    //UIPropertiesTimeSeries property should always be set on event thread
+                    //while jide bean table model is in use
+                    s.setDisplayName(displayName);
+                }
+            }
+        );
     }
 
     public List<DisplayNamePattern> getDisplayNamePatterns() {

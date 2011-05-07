@@ -23,14 +23,7 @@ class DisplayNameCalculatingTreeListener extends IdentifiableTreeListenerAdapter
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
         for ( Identifiable i : contextTreeEvent.getNodes()) {
             final List<UIPropertiesTimeSeries> l = i.findAll(UIPropertiesTimeSeries.class).getAllMatches();
-            UIUtilities.runInDispatchThread(new Runnable() {
-                public void run() {
-                    for (UIPropertiesTimeSeries series : l) {
-                        displayNameCalculator.setDisplayName(series);
-                    }
-                }
-            });
-
+            displayNameCalculator.updateDisplayNames(l);
         }
     }
 }

@@ -127,10 +127,10 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
     }
 
     private void createToolBar() {
+        getToolBar().add(editDisplayNamePatternsAction);
+        getToolBar().add(newServerAction);
         getToolBar().add(newDesktopAction);
         getToolBar().add(newVisualizerAction);
-        getToolBar().add(newServerAction);
-        getToolBar().add(editDisplayNamePatternsAction);
     }
 
     private void initializeFrame() {
@@ -148,11 +148,15 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
         JMenuItem newServerItem = new JMenuItem(newServerAction);
         fileMenu.add(newServerItem);
 
-        JMenuItem exportConfigItem = new JMenuItem(exportConfigAction);
-        fileMenu.add(exportConfigItem);
+        fileMenu.add(new JMenuBar());
 
         JMenuItem importConfigItem = new JMenuItem(importConfigAction);
         fileMenu.add(importConfigItem);
+
+        JMenuItem exportConfigItem = new JMenuItem(exportConfigAction);
+        fileMenu.add(exportConfigItem);
+
+        fileMenu.add(new JMenuBar());
 
         JMenuItem saveItem = new JMenuItem(saveAction);
         fileMenu.add(saveItem);
@@ -161,7 +165,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Collec
         fileMenu.add(exitItem);
 
         JMenu windowMenu = new JMenu("Window");
-        JMenuItem newVisualizerItem = new JMenuItem(newVisualizerAction);
+        JMenuItem newVisualizerItem = new JMenuItem(newDesktopAction);
         windowMenu.add(newVisualizerItem);
 
         windowMenu.setOpaque(false);

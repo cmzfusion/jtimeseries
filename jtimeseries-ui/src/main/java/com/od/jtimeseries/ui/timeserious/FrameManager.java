@@ -1,13 +1,12 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.ExitAction;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -24,7 +23,7 @@ import java.util.*;
  * Date: 08/04/11
  * Time: 06:43
  */
-public class FrameManager implements ConfigAware {
+public class FrameManager implements CollectionClearingConfigAware {
 
     private TimeSeriousMainFrame mainFrame;
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary;
@@ -55,8 +54,8 @@ public class FrameManager implements ConfigAware {
         );
     }
 
-    public List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList((ConfigAware)mainSeriesSelector, mainFrame);
+    public List<CollectionClearingConfigAware> getConfigAwareChildren() {
+        return Arrays.asList((CollectionClearingConfigAware)mainSeriesSelector, mainFrame);
     }
 
     public void clearConfig() {

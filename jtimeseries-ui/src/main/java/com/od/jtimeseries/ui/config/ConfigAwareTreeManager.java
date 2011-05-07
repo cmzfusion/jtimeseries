@@ -1,8 +1,5 @@
 package com.od.jtimeseries.ui.config;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -14,9 +11,9 @@ import java.util.List;
  */
 public class ConfigAwareTreeManager {
 
-    private ConfigAware rootNode;
+    private CollectionClearingConfigAware rootNode;
 
-    public ConfigAwareTreeManager(ConfigAware rootNode) {
+    public ConfigAwareTreeManager(CollectionClearingConfigAware rootNode) {
         this.rootNode = rootNode;
     }
 
@@ -32,23 +29,23 @@ public class ConfigAwareTreeManager {
         clear(rootNode);
     }
 
-    private void clear(ConfigAware node) {
-        for ( ConfigAware c : node.getConfigAwareChildren()) {
+    private void clear(CollectionClearingConfigAware node) {
+        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
             clear(c);
         }
         node.clearConfig();
     }
 
-    private void restore(TimeSeriousConfig config, ConfigAware node) {
+    private void restore(TimeSeriousConfig config, CollectionClearingConfigAware node) {
         node.restoreConfig(config);
-        for ( ConfigAware c : node.getConfigAwareChildren()) {
+        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
             restore(config, c);
         }
     }
 
-    private void save(TimeSeriousConfig config, ConfigAware node) {
+    private void save(TimeSeriousConfig config, CollectionClearingConfigAware node) {
         node.prepareConfigForSave(config);
-        for ( ConfigAware c : node.getConfigAwareChildren()) {
+        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
             save(config, c);
         }
     }

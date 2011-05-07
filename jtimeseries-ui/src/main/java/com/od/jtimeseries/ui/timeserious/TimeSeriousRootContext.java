@@ -23,7 +23,7 @@ import java.util.Map;
  * Time: 07:19:42
  * To change this template use File | Settings | File Templates.
  */
-public class TimeSeriousRootContext extends AbstractUIRootContext implements ConfigAware {
+public class TimeSeriousRootContext extends AbstractUIRootContext implements CollectionClearingConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
     private TimeSeriesServerDictionary serverDictionary;
@@ -97,7 +97,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         return context;
     }
 
-    public List<ConfigAware> getConfigAwareChildren() {
+    public List<CollectionClearingConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
     }
 

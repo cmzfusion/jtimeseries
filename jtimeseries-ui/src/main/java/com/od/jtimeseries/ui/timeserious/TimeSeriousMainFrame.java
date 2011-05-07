@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
@@ -24,7 +24,7 @@ import java.util.Collections;
  * Date: 26-Mar-2010
  * Time: 15:14:34
  */
-public class TimeSeriousMainFrame extends AbstractDesktopFrame implements ConfigAware {
+public class TimeSeriousMainFrame extends AbstractDesktopFrame implements CollectionClearingConfigAware {
 
     private JMenuBar mainMenuBar = new JMenuBar();
     private MainSeriesSelector mainSeriesSelector;
@@ -175,7 +175,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         treeSplitPanePosition = config.getSplitPaneLocationWhenTreeSelected();
     }
 
-    public java.util.List<ConfigAware> getConfigAwareChildren() {
+    public java.util.List<CollectionClearingConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
     }
 

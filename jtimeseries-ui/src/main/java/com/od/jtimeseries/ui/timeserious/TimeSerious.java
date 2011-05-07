@@ -2,14 +2,14 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpServer;
-import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
-import com.od.jtimeseries.ui.timeserious.action.ExitAction;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -28,7 +28,7 @@ import java.util.*;
  *
  * Standalone UI for time series exploration
  */
-public class TimeSerious implements ConfigAware {
+public class TimeSerious implements CollectionClearingConfigAware {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSerious.class);
 
@@ -70,8 +70,8 @@ public class TimeSerious implements ConfigAware {
         displayNameCalculator.setDisplayNamePatterns(config.getDisplayNamePatterns());
     }
 
-    public java.util.List<ConfigAware> getConfigAwareChildren() {
-        return Arrays.asList(rootContext, frameManager);
+    public java.util.List<CollectionClearingConfigAware> getConfigAwareChildren() {
+        return Arrays.asList(rootContext, frameManager, RemoteHttpTimeSeriesCollection.getConfigAware());
     }
 
     public void clearConfig() {

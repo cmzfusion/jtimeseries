@@ -32,7 +32,6 @@ import swingcommand.Task;
 import swingcommand.TaskListenerAdapter;
 
 import javax.swing.*;
-import java.lang.ref.WeakReference;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -55,7 +54,6 @@ import java.util.concurrent.TimeUnit;
 public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSeriesListener {
 
     private static final long STARTUP_TIME = System.currentTimeMillis();
-    private static Map<String, WeakReference<RemoteHttpTimeSeries>> existingHttpSeries = Collections.synchronizedMap(new HashMap<String, WeakReference<RemoteHttpTimeSeries>>());
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
 
@@ -72,15 +70,16 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
-    private static final int NOT_TICKING_REFRESH_TIME = 1800; //half an hour
+    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 1800; //half an hour
+    private static final int TICKING_FLAG_HOURS_SINCE_LAST_UPDATE = 4; //if no new data for this time a series is considered 'not ticking'
 
 
-    private RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
+    RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
         this(config.getId(), config.getDescription(), new URL(config.getTimeSeriesUrl()), Time.seconds(config.getRefreshTimeSeconds()));
         setDisplayName(config.getDisplayName());
     }
 
-    private RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
+    RemoteHttpTimeSeries(String id, String description, URL timeSeriesUrl, TimePeriod refreshTime) {
         super(id, description);
         setTimeSeriesURL(timeSeriesUrl);
         setRefreshFrequencySeconds((int) refreshTime.getLengthInMillis() / 1000);
@@ -112,29 +111,32 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
             ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
+            if ( immediateRefresh) {
+                refreshExecutor.execute(runCommandTask);
+            }
+
             int refreshTime = calculateRefreshTime();
-            int delayTime = immediateRefresh ? 1 : refreshTime;
-
-            refreshTask = refreshExecutor.scheduleWithFixedDelay(
-                runCommandTask, delayTime, refreshTime, TimeUnit.SECONDS
+            refreshTask = refreshExecutor.schedule(
+                runCommandTask, refreshTime, TimeUnit.SECONDS
             );
-
-            //cancel refresh task if this series is gc'd
-            runCommandTask.setFutureToCancel(refreshTask);
         }
     }
 
     private int calculateRefreshTime() {
-        return ticking ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME;
+        return ticking ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
     }
 
+    /**
+     * A flag which indicates whether a series in the server is currently 'active' / growing
+     * If not, we don't want to hit the server frequently to get new data points
+     */
     private boolean setTickingFlag() {
         long timeSinceUpdate = System.currentTimeMillis() - getLatestTimestamp();
 
          //enough time for local timeserious generated metrics to start to get datapoints
         boolean justStarted = System.currentTimeMillis() - STARTUP_TIME < 60000;
 
-        boolean ticking = timeSinceUpdate < Time.hours(1).getLengthInMillis() || justStarted;
+        boolean ticking = timeSinceUpdate < Time.hours(TICKING_FLAG_HOURS_SINCE_LAST_UPDATE).getLengthInMillis() || justStarted;
         boolean result = ticking != this.ticking;
         this.ticking = ticking;
         return result;
@@ -172,7 +174,6 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         }
         this.displayedChartCount = displayedCount;
     }
-
 
     private class RefreshDataCommand extends SwingCommand {
 
@@ -230,43 +231,14 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
         private class RescheduleListener extends TaskListenerAdapter {
             public void finished(Task task) {
-                boolean tickingChanged = setTickingFlag();
-                if ( tickingChanged ) {
-                    scheduleRefreshIfDisplayed(false);
-                }
+                setTickingFlag();
+                scheduleRefreshIfDisplayed(false);
             }
         }
     }
 
-    private static RemoteHttpTimeSeries createRemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
-        RemoteHttpTimeSeries r = new RemoteHttpTimeSeries(config);
-        r.scheduleRefreshIfDisplayed(true);
-        return r;
-    }
-
-    public static RemoteHttpTimeSeries getOrCreateHttpSeries(UiTimeSeriesConfig config) throws MalformedURLException {
-        RemoteHttpTimeSeries result = getWeakReferencedSeries(config);
-        if ( result == null ) {
-            //use the config mechanism as a way of cloning the time series, the original
-            //need only have been a UIPropertiesTimeSeries, not necessarily RemoteHttpTimeSeries
-            result = RemoteHttpTimeSeries.createRemoteHttpTimeSeries(config);
-            WeakReference<RemoteHttpTimeSeries> httpSeries = new WeakReference<RemoteHttpTimeSeries>(result);
-            existingHttpSeries.put(config.getTimeSeriesUrl(), httpSeries);
-        }
-        return result;
-    }
-
-    private static RemoteHttpTimeSeries getWeakReferencedSeries(UiTimeSeriesConfig config) {
-        RemoteHttpTimeSeries result = null;
-        WeakReference<RemoteHttpTimeSeries> httpSeries = existingHttpSeries.get(config.getTimeSeriesUrl());
-        if ( httpSeries != null ) {
-            result = httpSeries.get();
-        }
-        return result;
-    }
-
     public static void updateSummaryStats(UiTimeSeriesConfig config, Properties summaryStats) {
-        final RemoteHttpTimeSeries s = getWeakReferencedSeries(config);
+        final RemoteHttpTimeSeries s = RemoteHttpTimeSeriesCollection.getWeakReferencedSeries(config);
         if (s != null) {
             s.updateSummaryStats(summaryStats);
         }

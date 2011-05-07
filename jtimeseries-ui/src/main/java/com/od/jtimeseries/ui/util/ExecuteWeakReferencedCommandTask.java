@@ -10,16 +10,13 @@ import java.util.concurrent.ScheduledFuture;
 * User: Nick Ebbutt
 * Date: 09-Dec-2010
 * Time: 16:24:50
+*
+* Hold a weak reference to the command, so that we don't hold on to the
+* http series and prevent it being collected
 */
 public class ExecuteWeakReferencedCommandTask implements Runnable {
 
     private WeakReference<SwingCommand> command;
-    private volatile ScheduledFuture future;
-
-    //set the ScheduledFuture to cancel if the SwingCommand has been gc'd
-    public void setFutureToCancel(ScheduledFuture task) {
-        this.future = task;
-    }
 
     public ExecuteWeakReferencedCommandTask(SwingCommand c) {
         command = new WeakReference<SwingCommand>(c);
@@ -29,10 +26,6 @@ public class ExecuteWeakReferencedCommandTask implements Runnable {
         SwingCommand c = command.get();
         if ( c != null ) {
             c.execute();
-        } else {
-            if ( future != null ) {
-                future.cancel(false);
-            }
         }
     }
 }

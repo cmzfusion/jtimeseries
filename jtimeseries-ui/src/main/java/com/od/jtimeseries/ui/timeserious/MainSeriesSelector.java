@@ -1,13 +1,13 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.visualizer.ImportExportTransferHandler;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -26,7 +26,7 @@ import java.util.List;
  * Date: 24-Nov-2010
  * Time: 09:36:25
  */
-public class MainSeriesSelector extends JPanel implements ConfigAware {
+public class MainSeriesSelector extends JPanel implements CollectionClearingConfigAware {
 
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -91,7 +91,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
         }
     }
 
-    public List<ConfigAware> getConfigAwareChildren() {
+    public List<CollectionClearingConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
     }
 

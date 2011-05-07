@@ -6,6 +6,7 @@ import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
+import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
@@ -55,7 +56,7 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         protected UIPropertiesTimeSeries createTimeSeriesForConfig(UiTimeSeriesConfig config) throws MalformedURLException {
             //http series are unique by URL, to minimise unnecessary queries.
             //Get or create the instance for this URL
-            RemoteHttpTimeSeries httpSeries = RemoteHttpTimeSeries.getOrCreateHttpSeries(config);
+            RemoteHttpTimeSeries httpSeries = RemoteHttpTimeSeriesCollection.getOrCreateHttpSeries(config);
 
             //the http series is wrapped with a ChartingTimeSeries instance which is unique to
             //this visualizier, and so can have local settings for display name, colour etc.

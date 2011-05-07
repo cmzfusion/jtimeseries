@@ -9,13 +9,13 @@ import java.util.List;
  * Time: 18:32
  * To change this template use File | Settings | File Templates.
  */
-public interface ConfigAware {
+public interface CollectionClearingConfigAware {
 
     void prepareConfigForSave(TimeSeriousConfig config);
 
     void restoreConfig(TimeSeriousConfig config);
 
-    List<ConfigAware> getConfigAwareChildren();
+    List<CollectionClearingConfigAware> getConfigAwareChildren();
 
     void clearConfig();
 

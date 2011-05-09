@@ -19,9 +19,8 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
@@ -29,10 +28,8 @@ import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
-import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
@@ -169,11 +166,11 @@ public class TimeSeriesVisualizer extends JPanel {
         return chart.getTitle();
     }
 
-    public List<DisplayNamePattern> getDisplayNamePatterns() {
+    public DisplayNamePatternConfig getDisplayNamePatterns() {
         return editDisplayNameAction.getDisplayNamePatterns();
     }
 
-    public void setDisplayNamePatterns(List<DisplayNamePattern> patterns) {
+    public void setDisplayNamePatterns(DisplayNamePatternConfig patterns) {
         editDisplayNameAction.setDisplayNamePatterns(patterns);
     }
 

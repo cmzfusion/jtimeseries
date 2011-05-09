@@ -32,9 +32,4 @@ class ContextTreeNode extends AbstractSeriesSelectionTreeNode {
     protected Icon getIcon() {
         return context instanceof TimeSeriesServerContext ? ImageUtils.TIMESERIES_SERVER_ICON_16x16 : ImageUtils.CONTEXT_ICON_16x16;
     }
-
-    @Override
-    public boolean isSelected() {
-        return false;
-    }
 }

@@ -11,9 +11,9 @@ package com.od.jtimeseries.ui.config;
  */
 public class ConfigAwareTreeManager {
 
-    private CollectionClearingConfigAware rootNode;
+    private ConfigAware rootNode;
 
-    public ConfigAwareTreeManager(CollectionClearingConfigAware rootNode) {
+    public ConfigAwareTreeManager(ConfigAware rootNode) {
         this.rootNode = rootNode;
     }
 
@@ -29,23 +29,23 @@ public class ConfigAwareTreeManager {
         clear(rootNode);
     }
 
-    private void clear(CollectionClearingConfigAware node) {
-        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
+    private void clear(ConfigAware node) {
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
             clear(c);
         }
         node.clearConfig();
     }
 
-    private void restore(TimeSeriousConfig config, CollectionClearingConfigAware node) {
+    private void restore(TimeSeriousConfig config, ConfigAware node) {
         node.restoreConfig(config);
-        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
             restore(config, c);
         }
     }
 
-    private void save(TimeSeriousConfig config, CollectionClearingConfigAware node) {
+    private void save(TimeSeriousConfig config, ConfigAware node) {
         node.prepareConfigForSave(config);
-        for ( CollectionClearingConfigAware c : node.getConfigAwareChildren()) {
+        for ( ConfigAware c : node.getConfigAwareChildren()) {
             save(config, c);
         }
     }

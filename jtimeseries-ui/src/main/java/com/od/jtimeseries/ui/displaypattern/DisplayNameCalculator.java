@@ -19,7 +19,10 @@
 package com.od.jtimeseries.ui.displaypattern;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.DisplayNamePattern;
+import com.od.jtimeseries.ui.config.DisplayNamePatternConfig;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.swing.util.UIUtilities;
@@ -39,7 +42,7 @@ import java.util.regex.Pattern;
  * Store a list of patterns to calculate displayName from contextPath for a TimeSeries
  * Implement logic to apply the patterns to a new series, or to all the series in TimeSeriesContext
  */
-public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatternListener {
+public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatternListener, ConfigAware {
 
     private static final Executor displayNameUpdateExecutor = NamedExecutors.newSingleThreadExecutor("DisplayNameCalculator");
 
@@ -120,11 +123,28 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
         );
     }
 
-    public List<DisplayNamePattern> getDisplayNamePatterns() {
-        return displayNamePatterns;
+    public DisplayNamePatternConfig getDisplayNamePatternConfig() {
+        return new DisplayNamePatternConfig(displayNamePatterns);
     }
 
-    public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
-        displayPatternsChanged(displayNamePatterns, false);
+    public void setDisplayNamePatternConfig(DisplayNamePatternConfig c) {
+        displayPatternsChanged(c.getDisplayNamePatterns(), false);
+    }
+
+    public void prepareConfigForSave(TimeSeriousConfig config) {
+        config.setDisplayNamePatterns(getDisplayNamePatternConfig());
+    }
+
+    public void restoreConfig(TimeSeriousConfig config) {
+        setDisplayNamePatternConfig(config.getDisplayNamePatterns());
+    }
+
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Collections.emptyList();
+    }
+
+    public void clearConfig() {
+        displayNamePatterns.clear();
+        patternMap.clear();
     }
 }

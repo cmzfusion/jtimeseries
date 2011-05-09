@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 
@@ -51,13 +52,13 @@ public class RemoteHttpTimeSeriesCollection {
         return collectionClearingConfigAware;
     }
 
-    private static class CollectionClearingConfigAware implements com.od.jtimeseries.ui.config.CollectionClearingConfigAware {
+    private static class CollectionClearingConfigAware implements ConfigAware {
 
         public void prepareConfigForSave(TimeSeriousConfig config) {}
 
         public void restoreConfig(TimeSeriousConfig config) {}
 
-        public List<com.od.jtimeseries.ui.config.CollectionClearingConfigAware> getConfigAwareChildren() {
+        public List<ConfigAware> getConfigAwareChildren() {
             return Collections.emptyList();
         }
 

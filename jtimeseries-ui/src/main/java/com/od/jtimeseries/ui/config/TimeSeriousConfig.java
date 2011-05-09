@@ -22,16 +22,11 @@ public class TimeSeriousConfig implements ExportableConfig {
     private boolean mainSeriesSelectorTableVisible;
     private String title = "TimeSeriousConfig";
     private List<ColumnSettings> mainSelectorColumnSettings;
+    private DisplayNamePatternConfig displayNamePatterns = new DisplayNamePatternConfig();
 
-    private List<DisplayNamePattern> displayNamePatterns = new LinkedList<DisplayNamePattern>();
-
-    public DesktopConfiguration getOrCreateDesktopConfiguration(String desktopName) {
-        DesktopConfiguration c = this.desktopConfigs.get(desktopName);
-        if ( c == null) {
-            c = new DesktopConfiguration(desktopName);
-            this.desktopConfigs.put(desktopName, c);
-        }
-        return c;
+    public TimeSeriousConfig() {
+        //main desktop config should exist when we create an initial config
+        desktopConfigs.put(DesktopConfiguration.MAIN_DESKTOP_NAME, new DesktopConfiguration(DesktopConfiguration.MAIN_DESKTOP_NAME));
     }
 
     public Map<String, DesktopConfiguration> getDesktopConfigs() {
@@ -50,11 +45,11 @@ public class TimeSeriousConfig implements ExportableConfig {
         this.serverConfigs = serverConfigs;
     }
 
-    public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
-        this.displayNamePatterns = displayNamePatterns;
+    public void setDisplayNamePatterns(DisplayNamePatternConfig displayNamePatternConfig) {
+        this.displayNamePatterns = displayNamePatternConfig;
     }
 
-    public List<DisplayNamePattern> getDisplayNamePatterns() {
+    public DisplayNamePatternConfig getDisplayNamePatterns() {
         return displayNamePatterns;
     }
 
@@ -98,7 +93,7 @@ public class TimeSeriousConfig implements ExportableConfig {
             serverConfigs = new LinkedList<TimeSeriesServerConfig>();
         }
         if (displayNamePatterns == null) {
-            displayNamePatterns = new LinkedList<DisplayNamePattern>();
+            displayNamePatterns = new DisplayNamePatternConfig();
         }
         if ( splitPaneLocationWhenTableSelected == null ) {
             splitPaneLocationWhenTableSelected = 400;

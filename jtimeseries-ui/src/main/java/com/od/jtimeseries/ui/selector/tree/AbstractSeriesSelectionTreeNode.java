@@ -17,6 +17,4 @@ public abstract class AbstractSeriesSelectionTreeNode extends DefaultMutableTree
     public abstract Identifiable getIdentifiable();
 
     protected abstract Icon getIcon();
-
-    public abstract boolean isSelected();
 }

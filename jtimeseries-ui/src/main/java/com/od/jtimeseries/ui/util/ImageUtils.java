@@ -58,6 +58,7 @@ public class ImageUtils {
     public static ImageIcon VISUALIZER_DELETE_16x16 = getImageIcon("/images/visualizer_delete_16x16.png");
     public static ImageIcon VISUALIZER_SHOW_16x16 = getImageIcon("/images/visualizer_show_16x16.png");
     public static ImageIcon VISUALIZER_ADD_TO_16x16 = getImageIcon("/images/visualizer_add_to_16x16.png");
+    public static ImageIcon SETTINGS_16x16 = getImageIcon("/images/settings_16x16.png");
 
 
     public static ImageIcon getImageIcon(String name) {

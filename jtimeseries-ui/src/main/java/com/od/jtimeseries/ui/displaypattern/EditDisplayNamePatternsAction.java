@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.displaypattern;
 
-import com.od.jtimeseries.ui.config.DisplayNamePattern;
+import com.od.jtimeseries.ui.config.DisplayNamePatternConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -64,12 +64,12 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
         d.setVisible(true);
     }
 
-    public List<DisplayNamePattern> getDisplayNamePatterns() {
-        return displayNameCalculator.getDisplayNamePatterns();
+    public DisplayNamePatternConfig getDisplayNamePatterns() {
+        return displayNameCalculator.getDisplayNamePatternConfig();
     }
 
-    public void setDisplayNamePatterns(List<DisplayNamePattern> patterns) {
-        displayNameCalculator.setDisplayNamePatterns(patterns);
+    public void setDisplayNamePatterns(DisplayNamePatternConfig patterns) {
+        displayNameCalculator.setDisplayNamePatternConfig(patterns);
     }
 
     public DisplayNameCalculator getDisplayNameCalculator() {

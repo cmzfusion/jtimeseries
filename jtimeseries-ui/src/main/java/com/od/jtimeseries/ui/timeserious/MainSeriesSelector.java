@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
+import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
@@ -26,7 +26,7 @@ import java.util.List;
  * Date: 24-Nov-2010
  * Time: 09:36:25
  */
-public class MainSeriesSelector extends JPanel implements CollectionClearingConfigAware {
+public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -91,7 +91,7 @@ public class MainSeriesSelector extends JPanel implements CollectionClearingConf
         }
     }
 
-    public List<CollectionClearingConfigAware> getConfigAwareChildren() {
+    public List<ConfigAware> getConfigAwareChildren() {
         return Collections.emptyList();
     }
 
@@ -118,6 +118,19 @@ public class MainSeriesSelector extends JPanel implements CollectionClearingConf
             if ( o1IsServerContext != o2IsServerContext) {
                 return o1IsServerContext ? -1 : 1;
             }
+
+            boolean o1IsSettings = o1 instanceof SettingsContext;
+            boolean o2IsSettings = o2 instanceof SettingsContext;              if ( o1IsSettings != o2IsSettings) {
+                return o1IsSettings ? 1 : -1;
+            }
+
+            boolean o1IsMainDesktop = o1 instanceof DesktopContext && ((DesktopContext)o1).isMainDesktopContext();
+            boolean o2IsMainDesktop = o2 instanceof DesktopContext && ((DesktopContext)o2).isMainDesktopContext();
+            if ( o1IsMainDesktop != o2IsMainDesktop &&
+            o1 instanceof DesktopContext && o2 instanceof DesktopContext) {
+                return o1IsMainDesktop ? -1 : 1;
+            }
+
             return super.compare(o1, o2);
         }
     }

@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.displaypattern;
 
 import com.od.jtimeseries.ui.config.DisplayNamePattern;
+import com.od.jtimeseries.ui.config.DisplayNamePatternConfig;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -40,12 +41,12 @@ public class DisplayPatternDialog extends JDialog {
     private DisplayPatternTable table;
     private static final int DIALOG_WIDTH = 400;
 
-    public DisplayPatternDialog(List<DisplayNamePattern> patterns) {
+    public DisplayPatternDialog(DisplayNamePatternConfig patterns) {
         setTitle("Edit Display Name Patterns");
         setAlwaysOnTop(true);
         setModal(false);
         setSize(DIALOG_WIDTH, 600);
-        addComponents(patterns);
+        addComponents(patterns.getDisplayNamePatterns());
         setIconImage(ImageUtils.DISPLAY_NAME_16x16.getImage());
     }
 

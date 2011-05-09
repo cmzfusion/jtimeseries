@@ -30,9 +30,5 @@ public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
     protected Icon getIcon() {
         return ImageUtils.DESKTOP_16x16;
     }
-
-    public boolean isSelected() {
-        return false;
-    }
 }
 

@@ -47,10 +47,6 @@ class ServerTreeNode extends ContextTreeNode implements AnimatedIconTree.Progres
                 ImageUtils.TIMESERIES_SERVER_ICON_16x16;
     }
 
-    public boolean isSelected() {
-        return false;
-    }
-
     public IconComponentAnimator getIconComponentAnimator() {
         return animator;
     }

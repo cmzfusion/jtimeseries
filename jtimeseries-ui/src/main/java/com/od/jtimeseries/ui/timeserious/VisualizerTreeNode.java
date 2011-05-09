@@ -30,10 +30,5 @@ public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
     protected Icon getIcon() {
         return ImageUtils.VISUALIZER_16x16;
     }
-
-    @Override
-    public boolean isSelected() {
-        return false;
-    }
 }
 

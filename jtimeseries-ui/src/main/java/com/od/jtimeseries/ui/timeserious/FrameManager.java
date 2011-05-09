@@ -1,6 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.CollectionClearingConfigAware;
+import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
@@ -23,7 +23,7 @@ import java.util.*;
  * Date: 08/04/11
  * Time: 06:43
  */
-public class FrameManager implements CollectionClearingConfigAware {
+public class FrameManager implements ConfigAware {
 
     private TimeSeriousMainFrame mainFrame;
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary;
@@ -54,8 +54,8 @@ public class FrameManager implements CollectionClearingConfigAware {
         );
     }
 
-    public List<CollectionClearingConfigAware> getConfigAwareChildren() {
-        return Arrays.asList((CollectionClearingConfigAware)mainSeriesSelector, mainFrame);
+    public List<ConfigAware> getConfigAwareChildren() {
+        return Arrays.asList((ConfigAware)mainSeriesSelector, mainFrame);
     }
 
     public void clearConfig() {

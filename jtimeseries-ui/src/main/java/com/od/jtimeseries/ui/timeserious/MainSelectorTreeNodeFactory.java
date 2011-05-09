@@ -25,6 +25,8 @@ public class MainSelectorTreeNodeFactory extends SelectorTreeNodeFactory<UIPrope
             result = new DesktopTreeNode((DesktopContext)identifiable);
         } else if ( identifiable instanceof VisualizerContext) {
             result = new VisualizerTreeNode((VisualizerContext)identifiable);
+        } else if ( identifiable instanceof SettingsContext) {
+            result = new SettingsTreeNode((SettingsContext)identifiable);
         } else {
             result = super.buildNode(identifiable, tree);
         }

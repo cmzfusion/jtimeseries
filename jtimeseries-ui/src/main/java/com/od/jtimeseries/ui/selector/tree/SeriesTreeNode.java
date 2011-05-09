@@ -36,9 +36,4 @@ class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSel
     protected Icon getIcon() {
         return ImageUtils.SERIES_ICON_16x16;
     }
-
-    @Override
-    public boolean isSelected() {
-        return series.isSelected();
-    }
 }

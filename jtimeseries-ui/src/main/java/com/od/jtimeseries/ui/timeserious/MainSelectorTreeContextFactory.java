@@ -20,6 +20,8 @@ class MainSelectorTreeContextFactory extends DefaultContextFactory {
             return (E)new VisualizerContext((VisualizerConfiguration)parameters[0]);
         }  else if ( DesktopContext.class.isAssignableFrom(classType)) {
             return (E)new DesktopContext((DesktopConfiguration)parameters[0]);
+        } else if ( SettingsContext.class.isAssignableFrom(classType)) {
+            return (E)new SettingsContext();
         } else {
             return super.createContext(parent, id, description, classType, parameters);
         }

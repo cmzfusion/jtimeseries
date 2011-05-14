@@ -11,7 +11,9 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  */
 public class SettingsContext extends DefaultTimeSeriesContext {
 
+    public static final String SETTINGS_NODE_NAME = "Settings";
+
     public SettingsContext() {
-        super("Settings", "Settings", false);
+        super(SETTINGS_NODE_NAME, SETTINGS_NODE_NAME, false);
     }
 }

@@ -79,9 +79,9 @@ public abstract class ContextImportExportHandler {
     protected void doImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
         LinkedHashSet<Identifiable> toAdd = getIdentifiablesAndAllDescendents(identifiables.getSelected());
         for ( Identifiable s : toAdd) {
-            if ( ! shouldIgnoreForImport(s, target) ) {
-                ImportDetails d = getImportDetails(component, s, target);
-                doImport(component, target, d);
+            if ( shouldImport(s, target) ) {
+                ImportItem d = getImportItem(component, s, target);
+                doImportForItem(component, target, d);
             }
         }
     }
@@ -90,50 +90,52 @@ public abstract class ContextImportExportHandler {
      * @return true if the identifiable should be ignored during import, e.g it is a folder node of a type which does
      * not need to be explicitly created. Ignored nodes in the selection will not prevent import taking place.
      */
-    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-        return false;
+    protected boolean shouldImport(Identifiable i, Identifiable target) {
+        return true;
     }
 
     /**
-     * @return an ImportDetails, which contains everything necessary to import the target identifiable
+     * Subclass should override to create ImportItem if this Identifiable can be imported
+     * @return an ImportDetails, which contains everything necessary to import the target exportable config, or null
      */
-    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+    protected ImportItem getImportItem(Component component, Identifiable identifiable, Identifiable target) {
         return null;
     }
 
 
     protected void doImport(Component component, List<ExportableConfig> configs, Identifiable target) {
         for ( ExportableConfig s : configs) {
-            if ( ! shouldIgnoreForImport(s, target) ) {
-                ImportDetails d = getImportDetails(component, s, target);
-                doImport(component, target, d);
+            if ( shouldImport(s, target) ) {
+                ImportItem d = getImportItem(component, s, target);
+                doImportForItem(component, target, d);
             }
         }
     }
 
-    protected boolean shouldIgnoreForImport(ExportableConfig s, Identifiable target) {
-        return false;
+    protected boolean shouldImport(ExportableConfig s, Identifiable target) {
+        return true;
     }
 
     /**
-     * @return an ImportDetails, which contains everything necessary to import the target exportable config
+     * Subclass should override to create ImportItem if this ExportableConfig can be imported
+     * @return an ImportDetails, which contains everything necessary to import the target exportable config, or null
      */
-    protected ImportDetails getImportDetails(Component component, ExportableConfig s, Identifiable target) {
+    protected ImportItem getImportItem(Component component, ExportableConfig s, Identifiable target) {
         return null;
     }
 
-    protected void doImport(Component component, Identifiable target, ImportDetails d) {
-        if ( d != null) {
-            if ( rootContext.contains(d.getPath())) {
-                pathAlreadyExistsOnImport(component, target, d);
+    protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
+        if ( item != null) {
+            if ( rootContext.contains(item.getPath())) {
+                pathAlreadyExistsOnImport(component, target, item);
             } else {
-                rootContext.create(d.getPath(), d.getDescription(), d.getLocalClassType(), d.getConfigObject());
+                rootContext.create(item.getPath(), item.getDescription(), item.getLocalClassType(), item.getConfigObject());
             }
         }
     }
 
     //may override to provide feedback to user where appropriate
-    protected void pathAlreadyExistsOnImport(Component component, Identifiable target, ImportDetails d) {
+    protected void pathAlreadyExistsOnImport(Component component, Identifiable target, ImportItem d) {
     }
 
     protected LinkedHashSet<Identifiable> getIdentifiablesAndAllDescendents(List<? extends Identifiable> identifiables) {

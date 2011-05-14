@@ -86,15 +86,15 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
             super(AbstractUIRootContext.this);
         }
 
-        protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-            return false;
+        protected boolean shouldImport(Identifiable i, Identifiable target) {
+            return true;
         }
 
         protected boolean canImport(Identifiable i, Identifiable target) {
             return false;
         }
 
-        protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+        protected ImportItem getImportItem(Component component, Identifiable identifiable, Identifiable target) {
             return null;
         }
 

@@ -5,6 +5,7 @@ import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 
 import java.awt.*;
 import java.util.*;
@@ -18,9 +19,12 @@ import java.util.List;
  */
 public class DesktopContext extends HidablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
-    public DesktopContext(DesktopConfiguration config) {
+    private DisplayNameCalculator displayNameCalculator;
+
+    public DesktopContext(DesktopConfiguration config, DisplayNameCalculator displayNameCalculator) {
         super(config.getTitle(), config.getTitle(), config, config.isShown());
-        setContextFactory(new MainSelectorTreeContextFactory());
+        this.displayNameCalculator = displayNameCalculator;
+        setContextFactory(new MainSelectorTreeContextFactory(displayNameCalculator));
         createChildVisualizers(config);
     }
 
@@ -70,7 +74,7 @@ public class DesktopContext extends HidablePeerContext<DesktopConfiguration, Pee
     }
 
     public HidablePeerContext<DesktopConfiguration, PeerDesktop> newInstance(TimeSeriesContext parent, DesktopConfiguration config) {
-        return new DesktopContext(config);
+        return new DesktopContext(config, displayNameCalculator);
     }
 
 }

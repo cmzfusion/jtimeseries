@@ -33,7 +33,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         this.serverDictionary = serverDictionary;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
 
-        ContextImportExportHandler h = new MainSelectorImportExportHandler(this);
+        ContextImportExportHandler h = new MainSelectorImportExportHandler(this, displayNameCalculator);
         setImportExportHandler(h);
         createSettingsNodes();
     }

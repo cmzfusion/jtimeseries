@@ -3,7 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.util.CascadeLocationCalculator;
-import com.od.jtimeseries.ui.visualizer.ImportDetails;
+import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
@@ -26,7 +26,7 @@ class VisualizerExportableConfigImportUtility extends ExportableConfigImportUtil
         lastImportLocationByDesktop.clear();
     }
 
-    protected ImportDetails doGetImportDetails(Component component, ExportableConfig s, Identifiable target) {
+    protected ImportItem doGetImportDetails(Component component, ExportableConfig s, Identifiable target) {
 
         VisualizerConfiguration c = (VisualizerConfiguration)s;
 
@@ -44,11 +44,15 @@ class VisualizerExportableConfigImportUtility extends ExportableConfigImportUtil
         lastImportLocationByDesktop.put(d, lastVisualizerImportLocation);
         c.setFrameLocation(lastVisualizerImportLocation);
 
-        return new ImportDetails(
+        return new ImportItem(
             target.getPath() + Identifiable.NAMESPACE_SEPARATOR + c.getTitle(),
             c.getTitle(),
             VisualizerContext.class,
             c
         );
+    }
+
+    public boolean handlesOwnImport() {
+        return false;
     }
 }

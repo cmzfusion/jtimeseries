@@ -7,13 +7,14 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 /**
  * All the information necessary to import an identifiable into this context
  */
-public class ImportDetails {
-    String path;
-    String description;
-    Class<? extends Identifiable> localClassType;
-    ExportableConfig configObject;
+public class ImportItem {
 
-    public ImportDetails(String path, String description, Class<? extends Identifiable> localClassType, ExportableConfig configObject) {
+    private String path;
+    private String description;
+    private Class<? extends Identifiable> localClassType;
+    private ExportableConfig configObject;
+
+    public ImportItem(String path, String description, Class<? extends Identifiable> localClassType, ExportableConfig configObject) {
         this.path = path;
         this.description = description;
         this.localClassType = localClassType;

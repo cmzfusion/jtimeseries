@@ -3,15 +3,12 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.util.CascadeLocationCalculator;
-import com.od.jtimeseries.ui.visualizer.ImportDetails;
+import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
 * Created by IntelliJ IDEA.
@@ -40,7 +37,7 @@ class DesktopExportableConfigImportUtility extends ExportableConfigImportUtility
         return rootContext; //desktops always live under main root context
     }
 
-    protected ImportDetails doGetImportDetails(Component component, ExportableConfig s, Identifiable target) {
+    protected ImportItem doGetImportDetails(Component component, ExportableConfig s, Identifiable target) {
         Rectangle parentWindowBounds = SwingUtilities.getWindowAncestor(component).getBounds();
         if ( lastDesktopImportLocation == null) {
             lastDesktopImportLocation = parentWindowBounds;
@@ -51,11 +48,15 @@ class DesktopExportableConfigImportUtility extends ExportableConfigImportUtility
         lastDesktopImportLocation = cascadeLocationCalculator.getNextLocation(lastDesktopImportLocation, parentWindowBounds, DESKTOP_IMPORT_WIDTH, DESKTOP_IMPORT_HEIGHT);
         c.setFrameLocation(lastDesktopImportLocation);
 
-        return new ImportDetails(
+        return new ImportItem(
             target.getPath() + Identifiable.NAMESPACE_SEPARATOR + c.getTitle(),
             c.getTitle(),
             DesktopContext.class,
             c
         );
+    }
+
+    public boolean handlesOwnImport() {
+        return false;
     }
 }

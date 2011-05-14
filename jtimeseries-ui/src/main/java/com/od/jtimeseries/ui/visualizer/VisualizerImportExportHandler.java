@@ -33,13 +33,13 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         return identifiables.isSelectionLimitedToType(TimeSeriesContext.class, UIPropertiesTimeSeries.class);
     }
 
-    protected boolean shouldIgnoreForImport(Identifiable i, Identifiable target) {
-        return TimeSeriesContext.class.isAssignableFrom(i.getClass());
+    protected boolean shouldImport(Identifiable i, Identifiable target) {
+        return ! TimeSeriesContext.class.isAssignableFrom(i.getClass());  //ignore contexts when importing, import only timeseries leaf nodes
     }
 
-    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+    protected ImportItem getImportItem(Component component, Identifiable identifiable, Identifiable target) {
         UIPropertiesTimeSeries s = (UIPropertiesTimeSeries)identifiable;
-        return new ImportDetails(
+        return new ImportItem(
             s.getPath(),
             s.getDescription(),
             UIPropertiesTimeSeries.class,

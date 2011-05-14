@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.visualizer.ImportDetails;
+import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
@@ -19,17 +19,17 @@ abstract class ExportableConfigImportUtility {
 
     protected abstract void reset();
 
-    protected final ImportDetails getImportDetails(Component component, ExportableConfig s, Identifiable target) {
+    protected final ImportItem getImportDetails(Component component, ExportableConfig c, Identifiable target) {
         target = getRealTargetContext(target);
-        boolean userCancelled = findUniqueName(component, s, target);
-        ImportDetails result = null;
+        boolean userCancelled = findUniqueName(component, c, target);
+        ImportItem result = null;
         if ( ! userCancelled) {
-            result = doGetImportDetails(component, s, target);
+            result = doGetImportDetails(component, c, target);
         }
         return result;
     }
 
-    private boolean findUniqueName(Component component, ExportableConfig c, Identifiable target) {
+    protected boolean findUniqueName(Component component, ExportableConfig c, Identifiable target) {
         String title = ContextNameCheckUtility.checkName(component, target, c.getTitle());
         boolean userCancelledImport = title == null;
         if ( ! userCancelledImport) {
@@ -38,9 +38,21 @@ abstract class ExportableConfigImportUtility {
         return userCancelledImport;
     }
 
-    protected abstract ImportDetails doGetImportDetails(Component component, ExportableConfig s, Identifiable target);
+    protected abstract ImportItem doGetImportDetails(Component component, ExportableConfig c, Identifiable target);
 
     protected Identifiable getRealTargetContext(Identifiable target) {
         return target;
+    }
+
+    /**
+     * @return true, if this import utility contains custom logic to handle it's own import, which should be used
+     * instead of the default ImportExportHandler logic
+     */
+    public abstract boolean handlesOwnImport();
+
+    /**
+     * Called if this ExportableConfigImportUtility handlesImport()
+     */
+    protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
     }
 }

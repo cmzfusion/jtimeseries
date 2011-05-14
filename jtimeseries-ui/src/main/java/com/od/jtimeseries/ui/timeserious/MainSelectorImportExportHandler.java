@@ -2,12 +2,13 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.*;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
-import com.od.jtimeseries.ui.visualizer.ImportDetails;
+import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
@@ -25,14 +26,14 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
 
     private Map<Class, ExportableConfigImportUtility> exportableConfigImportUtilities = new HashMap<Class, ExportableConfigImportUtility>();
 
-    public MainSelectorImportExportHandler(TimeSeriesContext rootContext) {
+    public MainSelectorImportExportHandler(TimeSeriesContext rootContext, DisplayNameCalculator displayNameCalculator) {
         super(rootContext);
         setTimeSeriesFactory(new TimeSeriousRootContextTimeSeriesFactory());
-        setContextFactory(new MainSelectorTreeContextFactory());
+        setContextFactory(new MainSelectorTreeContextFactory(displayNameCalculator));
 
         exportableConfigImportUtilities.put(DesktopConfiguration.class, new DesktopExportableConfigImportUtility(rootContext));
         exportableConfigImportUtilities.put(VisualizerConfiguration.class, new VisualizerExportableConfigImportUtility());
-        exportableConfigImportUtilities.put(DisplayNamePatternConfig.class, new DisplayNameConfigImportUtility());
+        exportableConfigImportUtilities.put(DisplayNamePatternConfig.class, new DisplayNameConfigImportUtility(displayNameCalculator));
     }
 
     protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
@@ -44,12 +45,13 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
     }
 
     protected boolean canImportFromExternalConfig(Component component, Identifiable target) {
-        return target.isRoot() || target instanceof DesktopContext;
+        return target.isRoot() || target instanceof DesktopContext || target instanceof SettingsContext;
     }
 
-    protected boolean shouldIgnoreForImport(ExportableConfig c, Identifiable target) {
-        return ! (c instanceof DesktopConfiguration ||
-              (c instanceof VisualizerConfiguration && target instanceof DesktopContext));
+    protected boolean shouldImport(ExportableConfig c, Identifiable target) {
+        return (c instanceof DesktopConfiguration ||
+               (c instanceof VisualizerConfiguration && target instanceof DesktopContext)) ||
+               c instanceof DisplayNamePatternConfig;
     }
 
     private boolean checkTargetIsNotCurrentlyParent(IdentifiableListActionModel identifiables, Identifiable target) {
@@ -63,11 +65,11 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         return result;
     }
 
-    protected ImportDetails getImportDetails(Component component, Identifiable identifiable, Identifiable target) {
+    protected ImportItem getImportItem(Component component, Identifiable identifiable, Identifiable target) {
         String name = ContextNameCheckUtility.checkName(component, target, identifiable.getId());
         VisualizerConfiguration configuration = ((VisualizerContext) identifiable).getConfiguration();
         configuration.setTitle(name);
-        return new ImportDetails(
+        return new ImportItem(
             target.getPath() + Identifiable.NAMESPACE_SEPARATOR + name,
             identifiable.getDescription(),
             VisualizerContext.class,
@@ -84,13 +86,22 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         super.doImport(component, configs, target);
     }
 
-    protected ImportDetails getImportDetails(Component component, ExportableConfig s, Identifiable target) {
+    protected ImportItem getImportItem(Component component, ExportableConfig s, Identifiable target) {
         ExportableConfigImportUtility u = exportableConfigImportUtilities.get(s.getClass());
-        ImportDetails result = null;
+        ImportItem result = null;
         if ( u != null) {
             result = u.getImportDetails(component, s, target);
         }
         return result;
+    }
+
+    protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
+        ExportableConfigImportUtility u = exportableConfigImportUtilities.get(item.getConfigObject().getClass());
+        if ( u.handlesOwnImport()) {
+            u.doImportForItem(component, target, item);
+        } else {
+            super.doImportForItem(component, target, item);
+        }
     }
 
     public int getSourceActions(IdentifiableListActionModel selected) {

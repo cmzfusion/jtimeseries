@@ -60,7 +60,7 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
             d.addDisplayPatternListener(l);
         }
 
-        d.setLocationRelativeTo(componentToPositionDialog);
+        d.setLocationRelativeTo(SwingUtilities.getWindowAncestor(componentToPositionDialog));
         d.setVisible(true);
     }
 
@@ -70,9 +70,5 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
 
     public void setDisplayNamePatterns(DisplayNamePatternConfig patterns) {
         displayNameCalculator.setDisplayNamePatternConfig(patterns);
-    }
-
-    public DisplayNameCalculator getDisplayNameCalculator() {
-        return displayNameCalculator;
     }
 }

@@ -50,7 +50,8 @@ public class FrameManager implements ConfigAware {
         this.mainSeriesSelector = new MainSeriesSelector(
             rootContext,
             applicationActionModels,
-            udpPingHttpServerDictionary
+            udpPingHttpServerDictionary,
+            displayNameCalculator
         );
     }
 

@@ -1,6 +1,8 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
@@ -35,11 +37,12 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
     private Action renameAction;
     private Action newDesktopAction;
     private Action newVisualizerAction;
+    private Action editDisplayNamePatternsAction;
 
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private JComponent parentComponent;
 
-    public MainSelectorPopupMenuPopulator(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, JComponent parentComponent) {
+    public MainSelectorPopupMenuPopulator(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, JComponent parentComponent) {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.parentComponent = parentComponent;
         this.selectionModel = selectionPanel.getSelectionActionModel();
@@ -53,7 +56,7 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
         showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
         renameAction = new RenameAction(parentComponent, selectionModel);
         newDesktopAction = new NewDesktopAction(parentComponent, rootContext, applicationActionModels.getDesktopSelectionActionModel());
-        newVisualizerAction = new NewVisualizerAction(parentComponent, applicationActionModels.getDesktopSelectionActionModel(), applicationActionModels.getVisualizerSelectionActionModel());
+        newVisualizerAction = new NewVisualizerAction(parentComponent, applicationActionModels.getDesktopSelectionActionModel(), applicationActionModels.getVisualizerSelectionActionModel());     editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(parentComponent, displayNameCalculator);
     }
 
     public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
@@ -73,6 +76,8 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
             menu.add(renameAction);
             menu.add(new JMenuBar());
             menu.add(newVisualizerAction);
+        } else if ( selectionModel.isSelectionLimitedToType(DisplayNamesContext.class)) {
+            menu.add(editDisplayNamePatternsAction);
         } else if ( selectionModel.getSelected().size() == 0) {
             JFrame windowAncestor = (JFrame) SwingUtilities.getWindowAncestor(parentComponent);
             menu.add(new NewServerAction(

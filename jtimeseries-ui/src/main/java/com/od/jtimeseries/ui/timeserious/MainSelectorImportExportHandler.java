@@ -1,10 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.config.DesktopConfiguration;
-import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
+import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
@@ -35,7 +32,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
 
         exportableConfigImportUtilities.put(DesktopConfiguration.class, new DesktopExportableConfigImportUtility(rootContext));
         exportableConfigImportUtilities.put(VisualizerConfiguration.class, new VisualizerExportableConfigImportUtility());
-
+        exportableConfigImportUtilities.put(DisplayNamePatternConfig.class, new DisplayNameConfigImportUtility());
     }
 
     protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {

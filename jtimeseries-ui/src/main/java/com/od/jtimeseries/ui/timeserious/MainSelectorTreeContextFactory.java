@@ -11,8 +11,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 * User: Nick
 * Date: 04/05/11
 * Time: 11:34
-* To change this template use File | Settings | File Templates.
-*/
+ */
 class MainSelectorTreeContextFactory extends DefaultContextFactory {
 
     public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
@@ -22,6 +21,8 @@ class MainSelectorTreeContextFactory extends DefaultContextFactory {
             return (E)new DesktopContext((DesktopConfiguration)parameters[0]);
         } else if ( SettingsContext.class.isAssignableFrom(classType)) {
             return (E)new SettingsContext();
+        } else if ( DisplayNamesContext.class.isAssignableFrom(classType)) {
+            return (E)new DisplayNamesContext();
         } else {
             return super.createContext(parent, id, description, classType, parameters);
         }

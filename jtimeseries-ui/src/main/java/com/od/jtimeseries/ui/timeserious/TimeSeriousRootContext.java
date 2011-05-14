@@ -40,6 +40,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
 
     private void createSettingsNodes() {
         create("Settings", "Settings", SettingsContext.class);
+        create("Settings.Display Name Rules", "Display Name Rules", DisplayNamesContext.class);
     }
 
     public DesktopContext getMainDesktopContext() {

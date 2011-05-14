@@ -3,6 +3,7 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.ConfigAware;
 import com.od.jtimeseries.ui.config.ColumnSettings;
+import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.tree.IdentifiableTreeComparator;
@@ -30,8 +31,10 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
     private SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private DisplayNameCalculator displayNameCalculator;
 
-    public MainSeriesSelector(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, TimeSeriesServerDictionary dictionary) {
+    public MainSeriesSelector(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, TimeSeriesServerDictionary dictionary, DisplayNameCalculator displayNameCalculator) {
+        this.displayNameCalculator = displayNameCalculator;
         selectionPanel = new SeriesSelectionPanel<UIPropertiesTimeSeries>(
             rootContext,
             UIPropertiesTimeSeries.class,
@@ -48,6 +51,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
             applicationActionModels,
             selectionPanel,
             dictionary,
+            displayNameCalculator,
             this
         );
 

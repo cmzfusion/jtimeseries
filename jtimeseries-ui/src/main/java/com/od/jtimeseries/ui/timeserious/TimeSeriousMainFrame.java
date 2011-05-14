@@ -63,7 +63,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private void addExitListener() {
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                if (!exitAction.confirmAndSaveConfig("Exit TimeSerious")) {
+                if (!exitAction.confirmAndSaveConfig("Exit TimeSerious", JOptionPane.YES_NO_CANCEL_OPTION)) {
                     //there's no mechanism to cancel the close which I can find, barring throwing an exception
                     //which is then handled by some dedicated logic in the Component class
                     throw new RuntimeException("User cancelled exit");

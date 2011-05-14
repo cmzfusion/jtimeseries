@@ -87,7 +87,7 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
     //close the main frame
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            if (HideablePeerContext.SHOWN_PROPERTY.equals(changeDescription)) {
+            if (HidablePeerContext.SHOWN_PROPERTY.equals(changeDescription)) {
                 if (!getDesktopContext().isShown()) {
                     dispose();
                 }

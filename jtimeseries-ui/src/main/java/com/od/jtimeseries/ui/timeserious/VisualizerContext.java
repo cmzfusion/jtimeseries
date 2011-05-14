@@ -15,7 +15,7 @@ import java.util.List;
  * Date: 10/03/11
  * Time: 08:34
  */
-public class VisualizerContext extends HideablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> implements ExportableConfigHolder {
+public class VisualizerContext extends HidablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> implements ExportableConfigHolder {
 
     public VisualizerContext(VisualizerConfiguration visualizerConfiguration) {
         super(visualizerConfiguration.getTitle(), visualizerConfiguration.getTitle(), visualizerConfiguration, visualizerConfiguration.isShown());
@@ -51,7 +51,7 @@ public class VisualizerContext extends HideablePeerContext<VisualizerConfigurati
         getPeerResource().addTimeSeries(selectedSeries);
     }
 
-    public HideablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> newInstance(TimeSeriesContext parent, VisualizerConfiguration config) {
+    public HidablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> newInstance(TimeSeriesContext parent, VisualizerConfiguration config) {
         return new VisualizerContext(config);
     }
 }

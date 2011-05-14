@@ -1,8 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.timeserious.HideablePeerContext;
-import com.od.swing.action.ModelDrivenAction;
+import com.od.jtimeseries.ui.timeserious.HidablePeerContext;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +14,7 @@ import java.util.List;
  * Time: 16:03
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractRemoveHideablePeerAction<E extends HideablePeerContext> extends ModelDrivenAction<IdentifiableListActionModel> {
+public abstract class AbstractRemoveHideablePeerAction<E extends HidablePeerContext> extends AbstractTimeSeriousIdentifiableAction {
 
     private Class<E> hideablePeerClass;
 

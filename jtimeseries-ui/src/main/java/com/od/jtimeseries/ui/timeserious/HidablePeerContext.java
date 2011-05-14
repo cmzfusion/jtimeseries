@@ -16,7 +16,7 @@ import com.od.jtimeseries.ui.config.ExportableConfig;
  *
  * When the peer component is hidden, it's config is stored so that it can be shown again
  */
-public abstract class HideablePeerContext<E extends ExportableConfig, P> extends DefaultTimeSeriesContext {
+public abstract class HidablePeerContext<E extends ExportableConfig, P> extends DefaultTimeSeriesContext {
 
     public static final String SHOWN_PROPERTY = "shown";
 
@@ -24,7 +24,7 @@ public abstract class HideablePeerContext<E extends ExportableConfig, P> extends
     private P peerResource;
     private boolean shown;
 
-    public HideablePeerContext(String id, String description, E peerConfig, boolean shown) {
+    public HidablePeerContext(String id, String description, E peerConfig, boolean shown) {
         super(id, description, false);
         this.peerConfig = peerConfig;
         this.shown = shown;
@@ -81,5 +81,5 @@ public abstract class HideablePeerContext<E extends ExportableConfig, P> extends
         return peerResource;
     }
 
-    public abstract HideablePeerContext<E,P> newInstance(TimeSeriesContext parent, E config);
+    public abstract HidablePeerContext<E,P> newInstance(TimeSeriesContext parent, E config);
 }

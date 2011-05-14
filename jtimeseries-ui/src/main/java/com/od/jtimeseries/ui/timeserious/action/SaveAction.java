@@ -24,7 +24,7 @@ public class SaveAction extends AbstractSaveConfigAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        confirmAndSaveConfig("Save Config?");
+        confirmAndSaveConfig("Save Config?", JOptionPane.YES_NO_OPTION);
     }
 
 }

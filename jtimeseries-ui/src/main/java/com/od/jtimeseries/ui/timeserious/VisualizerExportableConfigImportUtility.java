@@ -31,13 +31,16 @@ class VisualizerExportableConfigImportUtility extends ExportableConfigImportUtil
         VisualizerConfiguration c = (VisualizerConfiguration)s;
 
         DesktopContext d = (DesktopContext)target;
+        int width = c.getFrameLocation() != null ? c.getFrameLocation().width : VisualizerConfiguration.DEFAULT_WIDTH;
+        int height = c.getFrameLocation() != null ? c.getFrameLocation().height : VisualizerConfiguration.DEFAULT_HEIGHT;
+
         if ( ! lastImportLocationByDesktop.containsKey(d)) {
-            lastImportLocationByDesktop.put(d, new Rectangle(0, 0, c.getFrameLocation().width, c.getFrameLocation().height) );
+            lastImportLocationByDesktop.put(d, new Rectangle(0, 0, width, height) );
         }
 
         c.setShown(true);  //always show on import
         c.setIsIcon(false);
-        Rectangle lastVisualizerImportLocation = cascadeLocationCalculator.getNextLocation(lastImportLocationByDesktop.get(d), d.getFrameLocation(), c.getFrameLocation().width, c.getFrameLocation().height);
+        Rectangle lastVisualizerImportLocation = cascadeLocationCalculator.getNextLocation(lastImportLocationByDesktop.get(d), d.getFrameLocation(), width, height);
         lastImportLocationByDesktop.put(d, lastVisualizerImportLocation);
         c.setFrameLocation(lastVisualizerImportLocation);
 

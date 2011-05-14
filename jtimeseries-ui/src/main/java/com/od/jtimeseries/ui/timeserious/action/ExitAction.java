@@ -24,7 +24,7 @@ public class ExitAction extends AbstractSaveConfigAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ( confirmAndSaveConfig("Exit TimeSerious") ) {
+        if ( confirmAndSaveConfig("Exit TimeSerious", JOptionPane.YES_NO_CANCEL_OPTION) ) {
             System.exit(0);
         }
     }

@@ -33,12 +33,12 @@ public abstract class AbstractSaveConfigAction extends AbstractAction {
         this.configInitializer = configInitializer;
     }
 
-    public boolean confirmAndSaveConfig(String title) {
+    public boolean confirmAndSaveConfig(String title, int options) {
         int option = JOptionPane.showConfirmDialog(
                 mainFrame,
                 "Save your config?",
                 title,
-                JOptionPane.YES_NO_CANCEL_OPTION,
+                options,
                 JOptionPane.QUESTION_MESSAGE
         );
 

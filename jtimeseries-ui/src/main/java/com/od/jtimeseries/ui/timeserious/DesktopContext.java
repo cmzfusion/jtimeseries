@@ -16,7 +16,7 @@ import java.util.List;
  * Date: 10/03/11
  * Time: 08:37
  */
-public class DesktopContext extends HideablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
+public class DesktopContext extends HidablePeerContext<DesktopConfiguration, PeerDesktop> implements ExportableConfigHolder {
 
     public DesktopContext(DesktopConfiguration config) {
         super(config.getTitle(), config.getTitle(), config, config.isShown());
@@ -69,7 +69,7 @@ public class DesktopContext extends HideablePeerContext<DesktopConfiguration, Pe
         return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
     }
 
-    public HideablePeerContext<DesktopConfiguration, PeerDesktop> newInstance(TimeSeriesContext parent, DesktopConfiguration config) {
+    public HidablePeerContext<DesktopConfiguration, PeerDesktop> newInstance(TimeSeriesContext parent, DesktopConfiguration config) {
         return new DesktopContext(config);
     }
 

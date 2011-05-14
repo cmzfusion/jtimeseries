@@ -2,18 +2,13 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.HideablePeerContext;
+import com.od.jtimeseries.ui.timeserious.HidablePeerContext;
 import com.od.jtimeseries.ui.timeserious.VisualizerContext;
-import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
-import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 
 /**
@@ -25,7 +20,7 @@ import java.awt.event.ActionEvent;
  * Rename identifiable by changing the id
  * (as opposed to a logical name whereby the Displayable name changes only)
  */
-public class RenameAction extends ModelDrivenAction<IdentifiableListActionModel> {
+public class RenameAction extends AbstractTimeSeriousIdentifiableAction {
 
     private JComponent parent;
 
@@ -35,8 +30,8 @@ public class RenameAction extends ModelDrivenAction<IdentifiableListActionModel>
     }
 
     public void actionPerformed(ActionEvent e) {
-         java.util.List<HideablePeerContext> serverContexts = getActionModel().getSelected(HideablePeerContext.class);
-         for ( HideablePeerContext s : serverContexts ) {
+         java.util.List<HidablePeerContext> serverContexts = getActionModel().getSelected(HidablePeerContext.class);
+         for ( HidablePeerContext s : serverContexts ) {
             String name = JOptionPane.showInputDialog(
                     SwingUtilities.getRoot(parent),
                     "Rename " + s.getId() + "?",
@@ -48,7 +43,7 @@ public class RenameAction extends ModelDrivenAction<IdentifiableListActionModel>
                 p.removeChild(s);
                 ExportableConfig configuration = s.getConfiguration();
                 configuration.setTitle(name);
-                HideablePeerContext c = s.newInstance(p, configuration);
+                HidablePeerContext c = s.newInstance(p, configuration);
                 p.addChild(c);
             }
         }
@@ -56,6 +51,7 @@ public class RenameAction extends ModelDrivenAction<IdentifiableListActionModel>
 
     public boolean isModelStateActionable() {
         return getActionModel().isSelectionLimitedToType(VisualizerContext.class) ||
-                getActionModel().isSelectionLimitedToType(DesktopContext.class);
+                ( getActionModel().isSelectionLimitedToType(DesktopContext.class) &&
+                ! isMainDesktopSelected());
     }
 }

@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.timeserious.HideablePeerContext;
+import com.od.jtimeseries.ui.timeserious.HidablePeerContext;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;
@@ -17,9 +17,9 @@ import java.util.List;
  */
 public abstract class AbstractShowHiddenPeerAction extends ModelDrivenAction<IdentifiableListActionModel> {
 
-    private Class<? extends HideablePeerContext> hideableClass;
+    private Class<? extends HidablePeerContext> hideableClass;
 
-    public AbstractShowHiddenPeerAction(IdentifiableListActionModel actionModel, String name, ImageIcon imageIcon, Class<? extends HideablePeerContext> hideableClass) {
+    public AbstractShowHiddenPeerAction(IdentifiableListActionModel actionModel, String name, ImageIcon imageIcon, Class<? extends HidablePeerContext> hideableClass) {
         super(actionModel, name, imageIcon);
         this.hideableClass = hideableClass;
     }
@@ -27,8 +27,8 @@ public abstract class AbstractShowHiddenPeerAction extends ModelDrivenAction<Ide
     public boolean isModelStateActionable() {
         boolean result = getActionModel().isSelectionLimitedToType(hideableClass);
         if ( result ) {
-            List<? extends HideablePeerContext> nodes = getActionModel().getSelected(hideableClass);
-            for ( final HideablePeerContext n : nodes ) {
+            List<? extends HidablePeerContext> nodes = getActionModel().getSelected(hideableClass);
+            for ( final HidablePeerContext n : nodes ) {
                 result &= n.isHidden();
             }
         }
@@ -36,8 +36,8 @@ public abstract class AbstractShowHiddenPeerAction extends ModelDrivenAction<Ide
     }
 
     public void actionPerformed(ActionEvent e) {
-        List<? extends HideablePeerContext> nodes = getActionModel().getSelected(hideableClass);
-        for ( final HideablePeerContext n : nodes ) {
+        List<? extends HidablePeerContext> nodes = getActionModel().getSelected(hideableClass);
+        for ( final HidablePeerContext n : nodes ) {
             if ( n.isHidden() ) {
                 n.setShown(true);
             }

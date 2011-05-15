@@ -3,7 +3,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.VisualizerContext;
-import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
+import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ModelDrivenAction;
 

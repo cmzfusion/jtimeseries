@@ -9,6 +9,8 @@ import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.frame.FrameManager;
+import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;

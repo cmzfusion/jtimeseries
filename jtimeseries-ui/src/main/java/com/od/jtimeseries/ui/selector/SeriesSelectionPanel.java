@@ -19,8 +19,8 @@
 package com.od.jtimeseries.ui.selector;
 
 import com.od.jtimeseries.ui.config.ColumnSettings;
-import com.od.jtimeseries.ui.selector.shared.AbstractUIRootContext;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.selector.table.TableSelector;

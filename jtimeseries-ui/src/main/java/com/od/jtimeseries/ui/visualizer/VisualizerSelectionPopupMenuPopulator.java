@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
 import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.util.identifiable.Identifiable;

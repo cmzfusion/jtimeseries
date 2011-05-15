@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;

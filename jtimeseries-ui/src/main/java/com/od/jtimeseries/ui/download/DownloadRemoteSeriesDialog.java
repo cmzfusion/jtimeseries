@@ -25,11 +25,11 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
-import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
+import com.od.jtimeseries.ui.uicontext.*;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 

@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.swing.action.ModelDrivenAction;
 
 import javax.swing.*;

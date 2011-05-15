@@ -1,8 +1,8 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.visualizer.VisualizerSelectionPopupMenuPopulator;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 

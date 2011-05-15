@@ -18,9 +18,6 @@
  */
 package com.od.jtimeseries.ui.config;
 
-import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
-import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;

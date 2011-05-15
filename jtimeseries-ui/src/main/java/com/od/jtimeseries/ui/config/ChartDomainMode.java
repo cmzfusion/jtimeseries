@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.visualizer.chart;
+package com.od.jtimeseries.ui.config;
 
 /**
  * Created by IntelliJ IDEA.

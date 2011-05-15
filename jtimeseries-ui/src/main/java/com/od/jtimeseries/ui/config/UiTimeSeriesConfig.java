@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.config;
 
-import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
@@ -42,15 +41,15 @@ public class UiTimeSeriesConfig implements ExportableConfig {
     //no params constructor required for bean xml persistence
     public UiTimeSeriesConfig() {}
 
-    public UiTimeSeriesConfig(UIPropertiesTimeSeries s) {
-        this.parentPath = s.getParentPath();
-        this.id = s.getId();
-        this.description = s.getDescription();
-        this.timeSeriesUrl = s.getTimeSeriesURL().toExternalForm();
-        this.refreshTimeSeconds = s.getRefreshFrequencySeconds();
-        this.selected = s.isSelected();
-        this.displayName = s.getDisplayName();
-        this.color = s.getColor();
+    public UiTimeSeriesConfig(String parentPath, String id, String description, String timeSeriesUrl, int refreshTimeSeconds, boolean selected, String displayName, Color color) {
+        this.parentPath = parentPath;
+        this.id = id;
+        this.description = description;
+        this.timeSeriesUrl = timeSeriesUrl;
+        this.refreshTimeSeconds = refreshTimeSeconds;
+        this.selected = selected;
+        this.displayName = displayName;
+        this.color = color;
     }
 
     public void setId(String id) {

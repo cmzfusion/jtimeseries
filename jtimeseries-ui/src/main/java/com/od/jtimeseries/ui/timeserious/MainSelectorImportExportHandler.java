@@ -12,7 +12,7 @@ import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.ImportItem;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
+import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;

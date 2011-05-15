@@ -19,6 +19,8 @@
 package com.od.jtimeseries.ui.visualizer.chart;
 
 import com.jidesoft.combobox.ColorComboBox;
+import com.od.jtimeseries.ui.config.ChartRangeMode;
+import com.od.jtimeseries.ui.config.DomainTimeSelection;
 
 import javax.swing.*;
 import java.awt.*;

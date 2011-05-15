@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeseries;
 
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.InternStringFieldOptimiser;
 
 import java.awt.*;
@@ -106,6 +107,23 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
 
     public Date getStatsRefreshTime() {
         return statsRefreshTime;
+    }
+
+    public UiTimeSeriesConfig getConfig() {
+        return getConfig();
+    }
+
+    public static UiTimeSeriesConfig getConfig(UIPropertiesTimeSeries s) {
+        return new UiTimeSeriesConfig(
+            s.getParentPath(),
+            s.getId(),
+            s.getDescription(),
+            s.getTimeSeriesURL().toExternalForm(),
+            s.getRefreshFrequencySeconds(),
+            s.isSelected(),
+            s.getDisplayName(),
+            s.getColor()
+        );
     }
 
     public void setStatsRefreshTime(Date statsRefreshTime) {

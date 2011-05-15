@@ -3,9 +3,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.selector.shared.ContextImportExportHandler;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.ImportItem;
+import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
@@ -45,7 +43,7 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
             s.getPath(),
             s.getDescription(),
             UIPropertiesTimeSeries.class,
-            new UiTimeSeriesConfig(s)
+            s.getConfig()
         );
     }
 

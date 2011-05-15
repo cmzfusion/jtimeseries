@@ -32,8 +32,8 @@ import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
-import com.od.jtimeseries.ui.visualizer.chart.ChartRangeMode;
-import com.od.jtimeseries.ui.visualizer.chart.DomainTimeSelection;
+import com.od.jtimeseries.ui.config.ChartRangeMode;
+import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -278,7 +278,7 @@ public class TimeSeriesVisualizer extends JPanel {
         List<UIPropertiesTimeSeries> l = rootContext.findAll(UIPropertiesTimeSeries.class).getAllMatches();
         List<UiTimeSeriesConfig> configs = new ArrayList<UiTimeSeriesConfig>();
         for ( UIPropertiesTimeSeries i : l ) {
-            configs.add(new UiTimeSeriesConfig(i));
+            configs.add(i.getConfig());
         }
         return configs;
     }

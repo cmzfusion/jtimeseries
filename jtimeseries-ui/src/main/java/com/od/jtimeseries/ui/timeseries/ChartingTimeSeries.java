@@ -140,6 +140,10 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         return wrappedSeries.getStatsRefreshTime();
     }
 
+    public UiTimeSeriesConfig getConfig() {
+        return DefaultUITimeSeries.getConfig(this);
+    }
+
     public void setStatsRefreshTime(Date statsRefreshTime) {
         wrappedSeries.setStatsRefreshTime(statsRefreshTime);
     }

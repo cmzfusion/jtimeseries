@@ -1,5 +1,8 @@
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.od.jtimeseries.ui.config.ChartDomainMode;
+import com.od.jtimeseries.ui.config.DomainTimeSelection;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;

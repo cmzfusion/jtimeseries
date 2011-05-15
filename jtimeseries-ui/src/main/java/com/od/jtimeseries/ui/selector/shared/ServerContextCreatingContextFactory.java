@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;

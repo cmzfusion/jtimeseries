@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.net.udp;
+package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.UdpPingTimeSeriesServerDictionary;

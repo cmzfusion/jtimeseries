@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.Displayable;
 
 import java.awt.*;
@@ -64,4 +65,6 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     void setStatsRefreshTime(Date time);
 
     Date getStatsRefreshTime();
+
+    UiTimeSeriesConfig getConfig();
 }

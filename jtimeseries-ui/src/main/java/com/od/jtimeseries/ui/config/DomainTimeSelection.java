@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.visualizer.chart;
+package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.util.time.TimeSource;
 

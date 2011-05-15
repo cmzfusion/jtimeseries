@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.od.jtimeseries.ui.config.ChartRangeMode;
+import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;

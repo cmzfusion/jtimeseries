@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.visualizer.chart;
+package com.od.jtimeseries.ui.config;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 26-Feb-2010
  * Time: 23:39:08
- * To change this template use File | Settings | File Templates.
+ *
  */
 public enum ChartRangeMode {
     

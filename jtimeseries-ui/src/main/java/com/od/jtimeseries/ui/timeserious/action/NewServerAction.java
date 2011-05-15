@@ -8,7 +8,7 @@ import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
 import com.od.jtimeseries.net.httpd.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.net.AbstractRemoteQuery;
+import com.od.jtimeseries.ui.util.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.util.ProgressIndicatorWizard;
 import com.od.swing.progress.ProgressIndicatorTaskListener;

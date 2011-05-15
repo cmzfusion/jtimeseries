@@ -81,7 +81,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
         return true;
     }
 
-    private Identifiable getTargetIdentifiableForDropOrPaste(TransferSupport supp) {
+    protected Identifiable getTargetIdentifiableForDropOrPaste(TransferSupport supp) {
         Identifiable result = getRootContext();
         if ( supp.isDrop()) {
             DropLocation l = supp.getDropLocation();

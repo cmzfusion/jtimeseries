@@ -20,15 +20,10 @@ package com.od.jtimeseries.ui.selector.table;
 
 import com.jidesoft.grid.SortableTable;
 import com.jidesoft.grid.TableModelWrapperUtils;
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ColumnSettings;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
-import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;

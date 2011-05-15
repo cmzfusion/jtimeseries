@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.identifiable;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
@@ -73,11 +73,11 @@ public abstract class HidablePeerContext<E extends ExportableConfig, P> extends 
         }
     }
 
-    protected void setPeerResource(P peerResource) {
+    public void setPeerResource(P peerResource) {
         this.peerResource = peerResource;
     }
 
-    protected P getPeerResource() {
+    public P getPeerResource() {
         return peerResource;
     }
 

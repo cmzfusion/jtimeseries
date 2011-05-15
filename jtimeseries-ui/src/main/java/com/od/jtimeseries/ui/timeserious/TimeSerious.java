@@ -3,13 +3,13 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
+import com.od.jtimeseries.ui.config.ConfigInitializer;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
-import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -18,7 +18,7 @@ import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.

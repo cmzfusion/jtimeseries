@@ -18,13 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector.tree;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.NoImportsSelectorTransferHandler;
-import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.ui.selector.shared.*;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -34,7 +29,6 @@ import com.od.swing.util.AwtSafeListener;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;

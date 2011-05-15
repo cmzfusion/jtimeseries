@@ -2,12 +2,12 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.identifiable.PeerDesktop;
 import com.od.jtimeseries.ui.net.udp.UiTimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 

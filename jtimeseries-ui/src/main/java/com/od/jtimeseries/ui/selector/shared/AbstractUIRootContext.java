@@ -1,11 +1,9 @@
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.timeserious.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -24,7 +22,7 @@ import java.util.List;
  */
 public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
-    protected static final LogMethods logMethods = LogUtils.getLogMethods(VisualizerRootContext.class);
+    protected static final LogMethods logMethods = LogUtils.getLogMethods(AbstractUIRootContext.class);
     private ContextImportExportHandler importExportHandler = new DummyImportExportHandler();
 
     public AbstractUIRootContext(DisplayNameCalculator displayNameCalculator) {

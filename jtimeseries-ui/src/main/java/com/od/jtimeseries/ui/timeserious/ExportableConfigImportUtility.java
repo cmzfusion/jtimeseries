@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.visualizer.ImportItem;
+import com.od.jtimeseries.ui.selector.shared.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;

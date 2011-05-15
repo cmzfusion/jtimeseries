@@ -3,7 +3,6 @@ package com.od.jtimeseries.ui.util;
 import swingcommand.SwingCommand;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.ScheduledFuture;
 
 /**
 * Created by IntelliJ IDEA.

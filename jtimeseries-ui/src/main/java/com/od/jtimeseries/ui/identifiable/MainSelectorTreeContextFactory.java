@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.identifiable;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
@@ -13,7 +13,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 * Date: 04/05/11
 * Time: 11:34
  */
-class MainSelectorTreeContextFactory extends DefaultContextFactory {
+public class MainSelectorTreeContextFactory extends DefaultContextFactory {
 
     private DisplayNameCalculator displayNameCalculator;
 

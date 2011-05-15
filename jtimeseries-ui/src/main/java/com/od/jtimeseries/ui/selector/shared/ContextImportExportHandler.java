@@ -1,4 +1,4 @@
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -6,7 +6,6 @@ import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -24,7 +23,7 @@ import java.util.List;
  */
 public abstract class ContextImportExportHandler {
 
-    protected static final LogMethods logMethods = LogUtils.getLogMethods(ContextImportExportHandler.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(ContextImportExportHandler.class);
 
     private TimeSeriesContext rootContext;
     private ContextFactory contextFactory = new DefaultContextFactory();

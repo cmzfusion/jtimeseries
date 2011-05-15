@@ -122,12 +122,4 @@ public enum FixedColumn {
     public static List<FixedColumn> getDefaultVisualizerColumns() {
         return Arrays.asList(Selected, DisplayName, Color);
     }
-
-    public static int getWidthOfDefaultVisualizerColumns() {
-        int result = 0;
-        for ( FixedColumn f : getDefaultVisualizerColumns()) {
-            result += f.getDefaultWidth();
-        }
-        return result;
-    }
 }

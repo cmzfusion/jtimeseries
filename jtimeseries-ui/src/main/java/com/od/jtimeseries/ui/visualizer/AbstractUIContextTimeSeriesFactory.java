@@ -4,6 +4,8 @@ import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 
@@ -15,6 +17,8 @@ import java.net.MalformedURLException;
 */
 public abstract class AbstractUIContextTimeSeriesFactory extends DefaultTimeSeriesFactory {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractUIContextTimeSeriesFactory.class);
+
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters) {
         UIPropertiesTimeSeries result = null;
         try {
@@ -24,7 +28,7 @@ public abstract class AbstractUIContextTimeSeriesFactory extends DefaultTimeSeri
                 }
             }
         } catch (Exception e) {
-            ContextImportExportHandler.logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
+            logMethods.logError("Failed to create timeseries for visualizer based on series in source root context", e);
         }
         return (E)result;
     }

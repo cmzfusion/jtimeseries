@@ -1,7 +1,6 @@
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**

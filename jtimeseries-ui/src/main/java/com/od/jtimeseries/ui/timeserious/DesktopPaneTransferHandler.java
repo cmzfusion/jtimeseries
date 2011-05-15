@@ -1,17 +1,12 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.selector.shared.AbstractUIRootContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.selector.shared.ImportFileList;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 import com.od.jtimeseries.ui.visualizer.ImportExportTransferHandler;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
-import java.awt.datatransfer.DataFlavor;
-import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.

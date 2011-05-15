@@ -2,11 +2,8 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
-import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**

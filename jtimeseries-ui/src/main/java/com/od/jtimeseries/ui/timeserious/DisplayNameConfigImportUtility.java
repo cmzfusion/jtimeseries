@@ -4,7 +4,9 @@ import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.config.DisplayNamePatternConfig;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.visualizer.ImportItem;
+import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
+import com.od.jtimeseries.ui.identifiable.SettingsContext;
+import com.od.jtimeseries.ui.selector.shared.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;

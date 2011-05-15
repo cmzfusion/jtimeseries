@@ -1,10 +1,9 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.identifiable;
 
+import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 
 import java.awt.*;
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,7 +13,7 @@ import java.util.*;
  */
 public interface PeerVisualizerFrame {
 
-    TimeSeriesVisualizer getVisualizer();
+    VisualizerConfiguration getVisualizerConfiguration();
 
     Rectangle getBounds();
 

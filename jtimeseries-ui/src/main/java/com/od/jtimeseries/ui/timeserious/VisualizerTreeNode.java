@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.timeserious;
 
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
 

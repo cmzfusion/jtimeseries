@@ -8,7 +8,6 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.

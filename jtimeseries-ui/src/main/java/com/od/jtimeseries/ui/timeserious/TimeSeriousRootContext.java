@@ -1,11 +1,18 @@
 package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.config.*;
+import com.od.jtimeseries.ui.config.ConfigAware;
+import com.od.jtimeseries.ui.config.DesktopConfiguration;
+import com.od.jtimeseries.ui.config.TimeSeriesServerConfig;
+import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
-import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
+import com.od.jtimeseries.ui.identifiable.SettingsContext;
+import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.selector.shared.AbstractUIRootContext;
+import com.od.jtimeseries.ui.selector.shared.ContextImportExportHandler;
+import com.od.jtimeseries.ui.selector.shared.ContextUpdatingBusListener;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -60,7 +67,11 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         List<TimeSeriesServerContext> serverContexts = findAll(TimeSeriesServerContext.class).getAllMatches();
         List<TimeSeriesServerConfig> serverConfigs = new LinkedList<TimeSeriesServerConfig>();
         for ( TimeSeriesServerContext c : serverContexts) {
-            serverConfigs.add(new TimeSeriesServerConfig(c));
+            serverConfigs.add(new TimeSeriesServerConfig(
+                c.getServer().getHostName(),
+                c.getServer().getPort(),
+                c.getServer().getDescription())
+            );
         }
         config.setTimeSeriesServerConfigs(serverConfigs);
     }

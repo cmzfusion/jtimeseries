@@ -5,8 +5,10 @@ import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,6 +21,8 @@ import java.net.UnknownHostException;
 * Time: 15:51
 */
 public class ServerContextCreatingContextFactory extends DefaultContextFactory {
+
+    private static final LogMethods logMethods = LogUtils.getLogMethods(ServerContextCreatingContextFactory.class);
 
     private TimeSeriesContext rootContext;
     private TimeSeriesServerDictionary serverDictionary;
@@ -52,7 +56,7 @@ public class ServerContextCreatingContextFactory extends DefaultContextFactory {
                         TimeSeriesServer server = getTimeSeriesServer(((UiTimeSeriesConfig)parameters[0]), id, serverDictionary);
                         result = (E)new TimeSeriesServerContext(server);
                     } catch (Exception e) {
-                       ContextImportExportHandler.logMethods.logError("Failed to create ServerContext for " + id, e);
+                       logMethods.logError("Failed to create ServerContext for " + id, e);
                     }
                 }
             }

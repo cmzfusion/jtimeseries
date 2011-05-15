@@ -3,7 +3,8 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.download.panel.LoadSeriesFromServerCommand;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
+import com.od.jtimeseries.ui.selector.shared.ContextUpdatingBusListener;
 import com.od.jtimeseries.util.NamedExecutors;
 
 import java.util.concurrent.*;

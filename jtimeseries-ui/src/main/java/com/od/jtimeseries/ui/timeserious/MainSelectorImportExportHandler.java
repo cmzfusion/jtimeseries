@@ -3,18 +3,23 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.identifiable.MainSelectorTreeContextFactory;
+import com.od.jtimeseries.ui.identifiable.SettingsContext;
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
+import com.od.jtimeseries.ui.selector.shared.ContextImportExportHandler;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.selector.shared.ImportItem;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.visualizer.AbstractUIContextTimeSeriesFactory;
-import com.od.jtimeseries.ui.visualizer.ContextImportExportHandler;
-import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

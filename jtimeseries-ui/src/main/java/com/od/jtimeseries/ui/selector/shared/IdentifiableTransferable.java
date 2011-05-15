@@ -1,15 +1,14 @@
 package com.od.jtimeseries.ui.selector.shared;
 
+import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
-import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import od.configutil.ConfigManager;
 import od.configutil.ConfigManagerException;
 import od.configutil.FileSink;
-import od.configutil.FileSource;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -17,7 +16,6 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

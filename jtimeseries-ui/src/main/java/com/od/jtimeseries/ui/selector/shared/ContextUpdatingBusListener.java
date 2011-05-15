@@ -1,9 +1,9 @@
-package com.od.jtimeseries.ui.timeserious;
+package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
+import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
@@ -11,6 +11,8 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  * User: Nick Ebbutt
  * Date: 16/02/11
  * Time: 17:45
+ *
+ * Remove series if a server is removed
  */
 public class ContextUpdatingBusListener extends TimeSeriousBusListenerAdapter {
 

@@ -2,11 +2,11 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeserious.ContextNameCheckUtility;
-import com.od.jtimeseries.ui.timeserious.DesktopContext;
-import com.od.jtimeseries.ui.timeserious.HidablePeerContext;
-import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

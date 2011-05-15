@@ -2,8 +2,8 @@ package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import od.configutil.ConfigManager;
 import od.configutil.ConfigLogImplementation;
+import od.configutil.ConfigManager;
 import od.configutil.XStreamSeralizer;
 
 /**

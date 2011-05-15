@@ -1,7 +1,5 @@
 package com.od.jtimeseries.ui.config;
 
-import com.od.jtimeseries.ui.selector.table.FixedColumn;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;

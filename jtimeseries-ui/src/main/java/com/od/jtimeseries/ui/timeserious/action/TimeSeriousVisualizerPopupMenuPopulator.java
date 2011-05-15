@@ -7,7 +7,6 @@ import com.od.jtimeseries.ui.visualizer.VisualizerSelectionPopupMenuPopulator;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
 /**

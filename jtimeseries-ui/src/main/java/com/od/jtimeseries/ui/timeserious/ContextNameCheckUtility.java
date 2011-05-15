@@ -1,6 +1,5 @@
 package com.od.jtimeseries.ui.timeserious;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
 

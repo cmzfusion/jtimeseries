@@ -3,8 +3,9 @@ package com.od.jtimeseries.ui.timeserious;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.ExportableConfig;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.selector.shared.ImportItem;
 import com.od.jtimeseries.ui.util.CascadeLocationCalculator;
-import com.od.jtimeseries.ui.visualizer.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 import javax.swing.*;

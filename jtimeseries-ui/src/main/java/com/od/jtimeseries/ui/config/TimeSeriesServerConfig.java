@@ -1,7 +1,6 @@
 package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
-import com.od.jtimeseries.ui.download.panel.TimeSeriesServerContext;
 
 import java.net.UnknownHostException;
 
@@ -18,10 +17,10 @@ public class TimeSeriesServerConfig {
     private int port;
     private String description;
 
-    public TimeSeriesServerConfig(TimeSeriesServerContext c) {
-        this.hostName = c.getServer().getHostName();
-        this.description = c.getServer().getDescription();
-        this.port = c.getServer().getPort();
+    public TimeSeriesServerConfig(String hostName, int port, String description) {
+        this.hostName = hostName;
+        this.port = port;
+        this.description = description;
     }
 
     public String getHostName() {

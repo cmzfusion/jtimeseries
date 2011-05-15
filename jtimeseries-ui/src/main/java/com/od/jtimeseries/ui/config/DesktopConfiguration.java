@@ -1,7 +1,7 @@
 package com.od.jtimeseries.ui.config;
 
 import java.awt.*;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.List;
 
 /**

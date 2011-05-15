@@ -1,6 +1,5 @@
-package com.od.jtimeseries.ui.download.panel;
+package com.od.jtimeseries.ui.identifiable;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.util.Displayable;

@@ -2,6 +2,9 @@ package com.od.jtimeseries.ui.timeserious;
 
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
+import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
+import com.od.jtimeseries.ui.identifiable.PeerVisualizerFrame;
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
@@ -86,8 +89,8 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         );
     }
 
-    public TimeSeriesVisualizer getVisualizer() {
-        return visualizer;
+    public VisualizerConfiguration getVisualizerConfiguration() {
+        return TimeSeriesVisualizer.createVisualizerConfiguration(visualizer);
     }
 
     public int getZPosition() {
@@ -105,10 +108,6 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
 
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
         visualizer.addTimeSeries(selectedSeries);
-    }
-
-    public VisualizerContext getVisualizerContext() {
-        return visualizerContext;
     }
 
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {

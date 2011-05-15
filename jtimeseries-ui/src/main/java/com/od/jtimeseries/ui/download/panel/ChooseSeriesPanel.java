@@ -20,10 +20,10 @@ package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.shared.AbstractUIRootContext;
 import com.od.jtimeseries.ui.selector.table.FixedColumn;
 import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.ui.visualizer.AbstractUIRootContext;
 
 import javax.swing.*;
 import java.awt.*;

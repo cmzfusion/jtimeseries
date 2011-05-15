@@ -1,8 +1,8 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.shared.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.ui.timeserious.VisualizerContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;

@@ -2,7 +2,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListenerAdapter;
-import com.od.jtimeseries.ui.timeserious.VisualizerContext;
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.swing.eventbus.UIEventBus;
 
 /**

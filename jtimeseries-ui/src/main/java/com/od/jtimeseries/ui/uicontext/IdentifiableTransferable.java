@@ -30,8 +30,10 @@ public class IdentifiableTransferable implements Transferable {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(IdentifiableTransferable.class);
 
+    private static final String LOCAL_SELECTIONS_TRANSFER_DATA_CLASS = LocalSelectionsTransferData.class.getName();
+
     private static final String listType = DataFlavor.javaJVMLocalObjectMimeType +
-                       ";class=com.od.jtimeseries.ui.selector.shared.LocalSelectionsTransferData";
+            ";class=" + LOCAL_SELECTIONS_TRANSFER_DATA_CLASS;
     public static DataFlavor LOCAL_SELECTIONS_FLAVOR;
 
     static {

@@ -110,7 +110,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public UiTimeSeriesConfig getConfig() {
-        return getConfig();
+        return getConfig(this);
     }
 
     public static UiTimeSeriesConfig getConfig(UIPropertiesTimeSeries s) {

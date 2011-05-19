@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  * Store a list of patterns to calculate displayName from contextPath for a TimeSeries
  * Implement logic to apply the patterns to a new series, or to all the series in TimeSeriesContext
  */
-public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatternListener, ConfigAware {
+public class DisplayNameCalculator implements DisplayNamePatternDialog.DisplayPatternListener, ConfigAware {
 
     private static final Executor displayNameUpdateExecutor = NamedExecutors.newSingleThreadExecutor("DisplayNameCalculator");
 
@@ -74,6 +74,7 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
             if (pattern.isValid()) {
                 patternMap.put(pattern, Pattern.compile(pattern.getPattern()));
             }
+            pattern.setFailed(! pattern.isValid());
         }
 
         if ( applyNow ) {
@@ -99,10 +100,14 @@ public class DisplayNameCalculator implements DisplayPatternDialog.DisplayPatter
         String path = s.getPath();
         String displayName = s.getId();
         for (DisplayNamePattern p : patternMap.keySet()) {
-            Matcher m = patternMap.get(p).matcher(path);
-            if ( m.matches() ) {
-                displayName = m.replaceAll(p.getReplacement());
-                break;
+            try {
+                Matcher m = patternMap.get(p).matcher(path);
+                if ( m.matches() ) {
+                    displayName = m.replaceAll(p.getReplacement());
+                    break;
+                }
+            } catch (Throwable e) {
+                p.setFailed(true);
             }
         }
 

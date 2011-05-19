@@ -25,8 +25,9 @@ public class ConfigAwareTreeManager {
         restore(config, rootNode);
     }
 
-    public void clearConfig() {
+    public void clearAndRestoreConfig(TimeSeriousConfig config) {
         clear(rootNode);
+        restoreConfig(config);
     }
 
     private void clear(ConfigAware node) {

@@ -54,6 +54,6 @@ abstract class ExportableConfigImportUtility {
     /**
      * Called if this ExportableConfigImportUtility handlesImport()
      */
-    protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
+    protected void doOwnImport(Component component, Identifiable target, ImportItem item) {
     }
 }

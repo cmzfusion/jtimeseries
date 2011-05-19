@@ -48,7 +48,7 @@ public class DisplayNameConfigImportUtility extends ExportableConfigImportUtilit
         return true;
     }
 
-    protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
+    protected void doOwnImport(Component component, Identifiable target, ImportItem item) {
         Window window = SwingUtilities.windowForComponent(component);
         int result = JOptionPane.showConfirmDialog(window, "Import Rules?", "Import Display Name Rules", JOptionPane.OK_CANCEL_OPTION);
         if ( result != JOptionPane.CANCEL_OPTION) {

@@ -1,10 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.rootcontext;
 
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
-import com.od.jtimeseries.ui.config.ConfigAware;
-import com.od.jtimeseries.ui.config.DesktopConfiguration;
-import com.od.jtimeseries.ui.config.TimeSeriesServerConfig;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
@@ -35,12 +32,12 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriousRootContext.class);
     private TimeSeriesServerDictionary serverDictionary;
 
-    public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator) {
+    public TimeSeriousRootContext(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, ConfigAwareTreeManager configAwareTreeManager) {
         super(displayNameCalculator);
         this.serverDictionary = serverDictionary;
         addTreeListener(new DisplayNameCalculatingTreeListener(displayNameCalculator));
 
-        ContextImportExportHandler h = new MainSelectorImportExportHandler(this, displayNameCalculator);
+        ContextImportExportHandler h = new MainSelectorImportExportHandler(this, displayNameCalculator, configAwareTreeManager);
         setImportExportHandler(h);
         createSettingsNodes();
     }

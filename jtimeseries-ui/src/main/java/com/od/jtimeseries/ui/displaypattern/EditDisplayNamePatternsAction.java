@@ -37,7 +37,7 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
 
     private Component componentToPositionDialog;
     private DisplayNameCalculator displayNameCalculator;
-    private List<DisplayPatternDialog.DisplayPatternListener> displayPatternListeners = new ArrayList<DisplayPatternDialog.DisplayPatternListener>();
+    private List<DisplayNamePatternDialog.DisplayPatternListener> displayPatternListeners = new ArrayList<DisplayNamePatternDialog.DisplayPatternListener>();
 
     public EditDisplayNamePatternsAction(Component componentToPositionDialog, DisplayNameCalculator displayNameCalculator) {
         super("Display Name Patterns", ImageUtils.DISPLAY_NAME_16x16);
@@ -48,15 +48,15 @@ public class EditDisplayNamePatternsAction extends AbstractAction {
         this.displayNameCalculator = displayNameCalculator;
     }
 
-    public void addDisplayPatternListener(DisplayPatternDialog.DisplayPatternListener l) {
+    public void addDisplayPatternListener(DisplayNamePatternDialog.DisplayPatternListener l) {
         displayPatternListeners.add(l);
     }
 
     public void actionPerformed(ActionEvent e) {
-        DisplayPatternDialog d = new DisplayPatternDialog(getDisplayNamePatterns());
+        DisplayNamePatternDialog d = new DisplayNamePatternDialog(getDisplayNamePatterns());
 
         d.addDisplayPatternListener(displayNameCalculator);
-        for ( DisplayPatternDialog.DisplayPatternListener l : displayPatternListeners ) {
+        for ( DisplayNamePatternDialog.DisplayPatternListener l : displayPatternListeners ) {
             d.addDisplayPatternListener(l);
         }
 

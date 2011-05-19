@@ -37,8 +37,9 @@ public class TimeSerious implements ConfigAware {
     private ApplicationActionModels applicationActionModels = new ApplicationActionModels();
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
-    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator);
     private ConfigAwareTreeManager configTreeManager = new ConfigAwareTreeManager(this);
+    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator, configTreeManager);
+
     private FrameManager frameManager = new FrameManager(
         udpPingHttpServerDictionary,
         applicationActionModels,

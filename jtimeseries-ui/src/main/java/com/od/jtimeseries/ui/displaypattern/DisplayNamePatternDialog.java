@@ -35,13 +35,13 @@ import java.util.List;
  * Date: 01-Jun-2009
  * Time: 10:49:24
  */
-public class DisplayPatternDialog extends JDialog {
+public class DisplayNamePatternDialog extends JDialog {
 
     private List<DisplayPatternListener> displayPatternListeners = new ArrayList<DisplayPatternListener>();
-    private DisplayPatternTable table;
+    private DisplayNamePatternTable table;
     private static final int DIALOG_WIDTH = 400;
 
-    public DisplayPatternDialog(DisplayNamePatternConfig patterns) {
+    public DisplayNamePatternDialog(DisplayNamePatternConfig patterns) {
         setTitle("Edit Display Name Patterns");
         setAlwaysOnTop(true);
         setModal(false);
@@ -59,7 +59,7 @@ public class DisplayPatternDialog extends JDialog {
     }
 
     private void addComponents(List<DisplayNamePattern> patterns) {
-        table = new DisplayPatternTable(patterns);
+        table = new DisplayNamePatternTable(patterns);
 
         JButton applyNowButton = new JButton(new ApplyNowAction());
         JButton okButton = new JButton(new OkAction());
@@ -118,6 +118,7 @@ public class DisplayPatternDialog extends JDialog {
             for ( DisplayPatternListener l : displayPatternListeners) {
                 l.displayPatternsChanged(table.getDisplayPatterns(), true);
             }
+            table.repaint(); //failed status may have changed
         }
     }
 

@@ -30,6 +30,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.IntrospectionException;
@@ -42,14 +44,14 @@ import java.util.List;
  * Date: 01-Jun-2009
  * Time: 10:33:35
  */
-public class DisplayPatternTable extends JPanel {
+public class DisplayNamePatternTable extends JPanel {
 
     private BeanTableModel<DisplayNamePattern> beanTableModel;
     private SortableTable sortableTable;
     private JPopupMenu tablePopupMenu;
     private ListSelectionActionModel<DisplayNamePattern> seriesSelectionModel = new ListSelectionActionModel<DisplayNamePattern>();
 
-    public DisplayPatternTable(List<DisplayNamePattern> displayNamePatterns) {
+    public DisplayNamePatternTable(List<DisplayNamePattern> displayNamePatterns) {
         createPopupMenu();
         try {
             beanTableModel = new BeanTableModel<DisplayNamePattern>(
@@ -65,6 +67,8 @@ public class DisplayPatternTable extends JPanel {
         sortableTable.addMouseListener(
             new PopupTriggerMouseAdapter(tablePopupMenu, sortableTable)
         );
+
+        sortableTable.setDefaultCellRenderer(new FailedPattenRenderer());
 
         JComponent buttonBar = createButtonBar();
 
@@ -150,4 +154,18 @@ public class DisplayPatternTable extends JPanel {
     }
 
 
+    private class FailedPattenRenderer extends DefaultTableCellRenderer {
+
+         public Component getTableCellRendererComponent(JTable table, Object value,
+                          boolean isSelected, boolean hasFocus, int row, int column) {
+             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+             DisplayNamePattern displayNamePattern = beanTableModel.getObject(row);
+             if ( displayNamePattern.isFailed()) {
+                 Color colour = isSelected ? Color.RED.darker() : Color.RED;
+                 c.setBackground(colour);
+             }
+             return c;
+         }
+
+    }
 }

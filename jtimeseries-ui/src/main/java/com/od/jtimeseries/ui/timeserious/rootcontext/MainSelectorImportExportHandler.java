@@ -32,7 +32,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
 
     private Map<Class, ExportableConfigImportUtility> exportableConfigImportUtilities = new HashMap<Class, ExportableConfigImportUtility>();
 
-    public MainSelectorImportExportHandler(TimeSeriesContext rootContext, DisplayNameCalculator displayNameCalculator) {
+    public MainSelectorImportExportHandler(TimeSeriesContext rootContext, DisplayNameCalculator displayNameCalculator, ConfigAwareTreeManager configAwareTreeManager) {
         super(rootContext);
         setTimeSeriesFactory(new TimeSeriousRootContextTimeSeriesFactory());
         setContextFactory(new MainSelectorTreeContextFactory(displayNameCalculator));
@@ -40,6 +40,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         exportableConfigImportUtilities.put(DesktopConfiguration.class, new DesktopExportableConfigImportUtility(rootContext));
         exportableConfigImportUtilities.put(VisualizerConfiguration.class, new VisualizerExportableConfigImportUtility());
         exportableConfigImportUtilities.put(DisplayNamePatternConfig.class, new DisplayNameConfigImportUtility(displayNameCalculator));
+        exportableConfigImportUtilities.put(TimeSeriousConfig.class, new MainConfigImportUtility(configAwareTreeManager));
     }
 
     protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
@@ -57,7 +58,8 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
     protected boolean shouldImport(ExportableConfig c, Identifiable target) {
         return (c instanceof DesktopConfiguration ||
                (c instanceof VisualizerConfiguration && target instanceof DesktopContext)) ||
-               c instanceof DisplayNamePatternConfig;
+               c instanceof DisplayNamePatternConfig ||
+                c instanceof TimeSeriousConfig;
     }
 
     private boolean checkTargetIsNotCurrentlyParent(IdentifiableListActionModel identifiables, Identifiable target) {
@@ -104,7 +106,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
     protected void doImportForItem(Component component, Identifiable target, ImportItem item) {
         ExportableConfigImportUtility u = exportableConfigImportUtilities.get(item.getConfigObject().getClass());
         if ( u.handlesOwnImport()) {
-            u.doImportForItem(component, target, item);
+            u.doOwnImport(component, target, item);
         } else {
             super.doImportForItem(component, target, item);
         }

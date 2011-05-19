@@ -28,6 +28,7 @@ public class DisplayNamePattern {
 
     private String pattern;
     private String replacement;
+    private transient boolean failed;
 
     public DisplayNamePattern() {
     }
@@ -60,6 +61,14 @@ public class DisplayNamePattern {
 
     public boolean isValid() {
         return pattern != null && pattern.length() > 0 && replacement != null && replacement.length() > 0;
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public void setFailed(boolean failed) {
+        this.failed = failed;
     }
 
     //nb. equals is on pattern only, so that we can check a rule for a pattern exists but not replace

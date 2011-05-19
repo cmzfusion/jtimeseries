@@ -32,6 +32,9 @@ public abstract class AbstractSaveConfigAction extends AbstractAction {
         this.configInitializer = configInitializer;
     }
 
+    /**
+     * @return  true, if app may exit
+     */
     public boolean confirmAndSaveConfig(String title, int options) {
         int option = JOptionPane.showConfirmDialog(
                 mainFrame,
@@ -41,11 +44,12 @@ public abstract class AbstractSaveConfigAction extends AbstractAction {
                 JOptionPane.QUESTION_MESSAGE
         );
 
-        boolean errorOnSave = false;
+        boolean saveOK = true;
         if ( option == JOptionPane.YES_OPTION) {
-            errorOnSave = doSave();
+            saveOK = doSave();
         }
-        return option != JOptionPane.CANCEL_OPTION || ! errorOnSave;
+
+        return option == JOptionPane.CANCEL_OPTION ? false : saveOK;
     }
 
     private boolean doSave() {

@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.ui.displaypattern.DisplayPatternDialog;
+import com.od.jtimeseries.ui.displaypattern.DisplayNamePatternDialog;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
@@ -151,7 +151,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createDisplayNameAction() {
         editDisplayNameAction = new EditDisplayNamePatternsAction(this, displayNameCalculator);
 
-        editDisplayNameAction.addDisplayPatternListener(new DisplayPatternDialog.DisplayPatternListener() {
+        editDisplayNameAction.addDisplayPatternListener(new DisplayNamePatternDialog.DisplayPatternListener() {
             public void displayPatternsChanged(List<DisplayNamePattern> newPatterns, boolean applyNow) {
                 //display names may have changed, repaint the ui to reflect the new names
                 repaint();

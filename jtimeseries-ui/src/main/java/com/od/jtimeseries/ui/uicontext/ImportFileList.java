@@ -34,7 +34,7 @@ public class ImportFileList {
                 if (w != null && w.lastModifiedTime == f.lastModified()) {
                     uiConfig = w.config;
                 } else {
-                    uiConfig = cm.loadConfig("importFromFile", ExportableConfig.class, new FileSource((File)f));
+                    uiConfig = cm.loadConfig("importFromFile", ExportableConfig.class, new FileSource(f));
                     weakMap.put(f, new ExportableConfigWrapper(f.lastModified(), uiConfig));
                 }
                 c.add(uiConfig);

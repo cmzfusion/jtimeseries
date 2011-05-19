@@ -36,8 +36,7 @@ public class ImportConfigAction extends ExportImportFileAction {
             File selectedFile = f.getSelectedFile();
             TimeSeriousConfig c = configInitializer.importConfig(mainFrame, selectedFile);
             if ( c != null) {
-                configTree.clearConfig();
-                configTree.restoreConfig(c);
+                configTree.clearAndRestoreConfig(c);
             }
         }
     }

@@ -61,7 +61,10 @@ public abstract class AbstractRemoteQuery {
         }
         parser.setContentHandler(getContentHandler());
         parser.parse(url.toString());
-        logMethods.logInfo(getClass().getName() + " query took " + ((System.nanoTime() - time) / 1000000) + " millis");
+        long timeTaken = (System.nanoTime() - time) / 1000000;
+        LocalJmxMetrics.getInstance().getQueryTimesRecorder().newValue(timeTaken);
+        LocalJmxMetrics.getInstance().getQueryCounter().incrementCount();
+        logMethods.logInfo(getClass().getName() + " query took " + timeTaken + " millis");
     }
 
     protected void doBeforeRun() {

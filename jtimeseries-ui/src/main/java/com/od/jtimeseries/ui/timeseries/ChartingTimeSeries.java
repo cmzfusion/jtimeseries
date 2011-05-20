@@ -46,7 +46,7 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     private final RemoteHttpTimeSeries wrappedSeries;
     private volatile boolean selected;
-    private String displayName;
+    private volatile String displayName;
     private Color color = colorRotator.getNextColor();
     public WrappedSeriesTreeListener wrappedSeriesTreeListener;
     public PropertyChangeListener proxyingPropertyListener;
@@ -94,6 +94,7 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         String oldValue = this.displayName;
         this.displayName = displayName;
         firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
+        fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
     }
 
 

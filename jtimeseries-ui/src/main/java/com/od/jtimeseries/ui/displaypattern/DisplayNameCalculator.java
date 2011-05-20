@@ -111,7 +111,7 @@ public class DisplayNameCalculator implements DisplayNamePatternDialog.DisplayPa
             }
         }
 
-        if ( ! s.getId().equals(displayName)) {
+        if ( ! s.getDisplayName().equals(displayName)) {
             updateDisplayName(s, displayName);
         }
     }

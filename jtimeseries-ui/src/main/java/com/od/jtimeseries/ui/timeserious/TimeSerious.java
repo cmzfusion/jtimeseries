@@ -12,6 +12,7 @@ import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.frame.FrameManager;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.JideInitialization;
+import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
@@ -105,7 +106,7 @@ public class TimeSerious implements ConfigAware {
     }
 
     private void startJmxAndLocalHttpd() {
-        LocalJmxMetrics localJmxMetrics = new LocalJmxMetrics();
+        LocalJmxMetrics localJmxMetrics = LocalJmxMetrics.getInstance();
         localJmxMetrics.startJmxManagementService(17001);
         localJmxMetrics.startLocalMetricCollection();
 

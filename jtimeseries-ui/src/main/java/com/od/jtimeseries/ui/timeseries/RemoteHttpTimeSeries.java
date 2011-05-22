@@ -55,9 +55,9 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private static final long STARTUP_TIME = System.currentTimeMillis();
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(ChartingTimeSeries.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(RemoteHttpTimeSeries.class);
 
-    private final Map<UIPropertiesTimeSeries, UIPropertiesTimeSeries> weakClientSeries = new WeakHashMap<UIPropertiesTimeSeries, UIPropertiesTimeSeries>();
+    private final Map<UIPropertiesTimeSeries, String> weakClientSeries = new WeakHashMap<UIPropertiesTimeSeries, String>();
 
     private static ScheduledExecutorService refreshExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeriesRefresh");
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
@@ -146,10 +146,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         switch(e.getChartSeriesEventType()) {
             case SERIES_CHART_DISPLAYED:
                 refreshImmediately = true;
-                weakClientSeries.put(e.getSourceSeries(), e.getSourceSeries());
+                weakClientSeries.put(e.getSourceSeries(), "UNUSED");
                 break;
             case SERIES_CHART_HIDDEN:
-                weakClientSeries.put(e.getSourceSeries(), e.getSourceSeries());
+                weakClientSeries.put(e.getSourceSeries(), "UNUSED");
                 break;
             case SERIES_CHART_DISPOSED:
                 weakClientSeries.remove(e.getSourceSeries());

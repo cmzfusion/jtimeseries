@@ -28,6 +28,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.progress.AnimatedIconTree;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -66,6 +67,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
     private Comparator<Identifiable> treeComparator = new IdentifiableTreeComparator();
+    private IdentifiableTreeListener treeUpdateListener;
 
     public TreeSelector(IdentifiableListActionModel selectionsActionModel, AbstractUIRootContext rootContext, SelectorTreeNodeFactory nodeFactory) {
         super(rootContext, selectionsActionModel);
@@ -74,6 +76,10 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
         treeModel = new DefaultTreeModel(new DefaultMutableTreeNode());
         tree = new AnimatedIconTree();
+        treeUpdateListener = AwtSafeListener.getAwtSafeListener(
+            new ContextTreeUpdaterListener(),
+            IdentifiableTreeListener.class
+        );
         setupSeries();
 
         tree.setModel(treeModel);
@@ -120,12 +126,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     protected void addContextTreeListener() {
-        rootContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
-                new ContextTreeUpdaterListener(),
-                IdentifiableTreeListener.class
-            )
-        );
+        WeakReferenceListener w = new WeakReferenceListener(treeUpdateListener);
+        w.addListenerTo(rootContext);
     }
 
     private class ContextTreeUpdaterListener implements IdentifiableTreeListener {

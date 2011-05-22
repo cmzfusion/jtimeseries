@@ -14,6 +14,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -33,6 +34,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
     private TimeSeriesVisualizer visualizer;
     private JDesktopPane desktopPane;
     private VisualizerContext visualizerContext;
+    private IdentifiableTreeListener frameDisposingContextTreeListener;
 
     public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerContext) {
         super(visualizer.getChartsTitle(), true, true, true, true);
@@ -81,12 +83,12 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         //the visualizerContext is essentially the model for this frame view
         //although the user can hide the visualizer by closing the frame, we also have to monitor the shown state
         //of the node, and close the frame if it changes
-        visualizerContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
+        frameDisposingContextTreeListener = AwtSafeListener.getAwtSafeListener(
                 new FrameDisposingContextListener(),
                 IdentifiableTreeListener.class
-            )
         );
+        WeakReferenceListener w = new WeakReferenceListener(frameDisposingContextTreeListener);
+        w.addListenerTo(visualizerContext);
     }
 
     public VisualizerConfiguration getVisualizerConfiguration() {

@@ -9,6 +9,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.UIEventBus;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;
@@ -24,14 +25,14 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
 
     protected static final LogMethods logMethods = LogUtils.getLogMethods(AbstractUIRootContext.class);
     private ContextImportExportHandler importExportHandler = new DummyImportExportHandler();
+    private ContextUpdatingBusListener contextBusListener;
 
     public AbstractUIRootContext(DisplayNameCalculator displayNameCalculator) {
         displayNameCalculator.addRootContext(this);
 
-        UIEventBus.getInstance().addEventListener(
-            TimeSeriousBusListener.class,
-            createContextBusListener()
-        );
+        contextBusListener = createContextBusListener();
+        WeakReferenceListener l = new WeakReferenceListener(TimeSeriousBusListener.class, contextBusListener);
+        l.addListenerTo(UIEventBus.getInstance());
     }
 
     /**

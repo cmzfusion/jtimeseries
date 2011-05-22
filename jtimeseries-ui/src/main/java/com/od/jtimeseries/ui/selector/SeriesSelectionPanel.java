@@ -32,6 +32,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -77,6 +78,7 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
     private IdentifiableListActionModel selectionActionModel;
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private IdentifiableTreeListener updateSelectedForChartingContextListener;
 
     public SeriesSelectionPanel(AbstractUIRootContext context, Class seriesClass) {
         this(context, "Selected", new SelectorTreeNodeFactory<E>(seriesClass), seriesClass);
@@ -176,12 +178,12 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
 
         getSelectionActionModel().addActionModelListener(descriptionSettingSelectorListener);
 
-        context.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
+        updateSelectedForChartingContextListener = AwtSafeListener.getAwtSafeListener(
                 new UpdateSelectedForChartingTreeListener(),
                 IdentifiableTreeListener.class
-            )
         );
+        WeakReferenceListener w = new WeakReferenceListener(updateSelectedForChartingContextListener);
+        w.addListenerTo(context);
     }
 
     private void addComponents() {

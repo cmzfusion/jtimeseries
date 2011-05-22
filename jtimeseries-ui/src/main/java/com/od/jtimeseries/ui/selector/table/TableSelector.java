@@ -28,6 +28,7 @@ import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -56,6 +57,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
     private SortableTable table;
     private TableColumnManager<E> tableColumnManager;
     private JToolBar toolbar = new JToolBar();
+    private CoalescingTableUpdater<E> coalescingTableUpdateListener;
 
     public TableSelector(IdentifiableListActionModel selectionsActionModel,
                          AbstractUIRootContext rootContext,
@@ -115,11 +117,9 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         return getFrameForComponent(parentComponent.getParent());
     }
 
-    @Override
     protected void addContextTreeListener() {
-        rootContext.addTreeListener(
-            new CoalescingTableUpdater<E>(seriesClass, tableModel, this)
-        );
+        WeakReferenceListener weakReferenceListener = new WeakReferenceListener(coalescingTableUpdateListener);
+        weakReferenceListener.addListenerTo(rootContext);
     }
 
     private TableColumnManager getTableColumnManager() {
@@ -161,6 +161,7 @@ public class TableSelector<E extends UIPropertiesTimeSeries> extends SelectorCom
         tableModel = new TableModelCreator().createTableModel(seriesClass);
         tableColumnManager = new TableColumnManager<E>(tableModel, selectionText);
         table = new TimeSeriesTable<E>(tableModel, tableColumnManager);
+        coalescingTableUpdateListener = new CoalescingTableUpdater<E>(seriesClass, tableModel, this);
     }
 
     private void addSeriesSelectionListener() {

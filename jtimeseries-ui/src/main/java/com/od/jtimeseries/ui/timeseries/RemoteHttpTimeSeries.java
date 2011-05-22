@@ -97,30 +97,6 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         super.setStale(stale);
     }
 
-    //Cancel any existing task and schedule a new one if series selected
-    private synchronized void scheduleRefreshIfDisplayed(boolean immediateRefresh) {
-        updateDisplayedChartCount();
-
-        if ( refreshTask != null) {
-            refreshTask.cancel(false);
-        }
-
-        if ( displayedChartCount > 0) {
-            //A task which doesn't hold a strong reference to this series
-            //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
-            ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
-
-            if ( immediateRefresh) {
-                refreshExecutor.execute(runCommandTask);
-            }
-
-            int refreshTime = calculateRefreshTime();
-            refreshTask = refreshExecutor.schedule(
-                runCommandTask, refreshTime, TimeUnit.SECONDS
-            );
-        }
-    }
-
     private int calculateRefreshTime() {
         return ticking ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
     }
@@ -157,6 +133,30 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             default:
         }
         scheduleRefreshIfDisplayed(refreshImmediately);
+    }
+
+    //Cancel any existing task and schedule a new one if series selected
+    private synchronized void scheduleRefreshIfDisplayed(boolean immediateRefresh) {
+        updateDisplayedChartCount();
+
+        if ( refreshTask != null) {
+            refreshTask.cancel(false);
+        }
+
+        if ( displayedChartCount > 0) {
+            //A task which doesn't hold a strong reference to this series
+            //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
+            ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
+
+            if ( immediateRefresh) {
+                refreshExecutor.execute(runCommandTask);
+            }
+
+            int refreshTime = calculateRefreshTime();
+            refreshTask = refreshExecutor.schedule(
+                runCommandTask, refreshTime, TimeUnit.SECONDS
+            );
+        }
     }
 
     private void updateDisplayedChartCount() {

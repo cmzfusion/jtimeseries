@@ -17,6 +17,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
@@ -41,6 +42,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     private DesktopContext desktopContext;
     private ApplicationActionModels applicationActionModels;
     private Map<VisualizerContext,VisualizerInternalFrame> visualizerContextToFrame = new HashMap<VisualizerContext, VisualizerInternalFrame>();
+    private IdentifiableTreeListener desktopContextTreeListener;
 
     public TimeSeriousDesktopPane(JFrame parentFrame, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, SeriesSelectionPanel mainSelectionPanel, DesktopContext desktopContext, TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels) {
         this.parentFrame = parentFrame;
@@ -55,10 +57,10 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     }
 
     private void addListeners() {
-        desktopContext.addTreeListener(
-            AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
-            IdentifiableTreeListener.class)
-        );
+        desktopContextTreeListener = AwtSafeListener.getAwtSafeListener(new ShowVisualizerTreeListener(),
+                IdentifiableTreeListener.class);
+        WeakReferenceListener l = new WeakReferenceListener(desktopContextTreeListener);
+        l.addListenerTo(desktopContext);
 
         parentFrame.addWindowListener(new InternalFrameDeactivatingWindowListener());
     }

@@ -66,11 +66,15 @@ public abstract class HidablePeerContext<E extends ExportableConfig, P> extends 
         if (this.shown != shown) {
             this.shown = shown;
             if (!shown) {
-                peerConfig = createPeerConfig(false);
-                disposePeerResource();
+                disposePeerWhenParentHidden();
             }
             fireNodeChanged(SHOWN_PROPERTY);
         }
+    }
+
+    public void disposePeerWhenParentHidden() {
+        peerConfig = createPeerConfig(false);
+        disposePeerResource();
     }
 
     public void setPeerResource(P peerResource) {

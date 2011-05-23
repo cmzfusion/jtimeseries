@@ -14,6 +14,9 @@ import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -40,20 +43,36 @@ public class LocalJmxMetrics {
     private String metricRootPath = "timeSerious";
     private ValueRecorder queryTimesRecorder;
     private Counter queryCounter;
+    private Counter httpSeriesCount;
+    private Counter visualizerCount;
 
     private LocalJmxMetrics() {
+        rootContext.setTimeSeriesFactory(new RoundRobinTimeSeriesFactory());
+
         queryTimesRecorder = rootContext.createValueRecorderSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Series Query Time",
                 "Time taken by queries to load series data in milliseconds",
                 CaptureFunctions.RAW_VALUES(),
-                CaptureFunctions.MEAN(Time.seconds(60)),
-                CaptureFunctions.MAX(Time.seconds(60))
+                CaptureFunctions.MEAN(Time.minutes(1)),
+                CaptureFunctions.MAX(Time.minutes(1))
         );
 
         queryCounter = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Series Query Count",
                 "Number of queries executed",
-                CaptureFunctions.COUNT(Time.seconds(60))
+                CaptureFunctions.COUNT(Time.minutes(1))
+        );
+
+        httpSeriesCount = rootContext.createCounterSeries(
+                metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "RemoteHttpTimeSeries Count",
+                "Number of memory resident RemoteHttpTimeSeries",
+                CaptureFunctions.LAST(Time.minutes(1))
+        );
+
+        visualizerCount = rootContext.createCounterSeries(
+                metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Visualizer Count",
+                "Number of memory resident TimeSeriesVisualizer",
+                CaptureFunctions.LAST(Time.minutes(1))
         );
     }
 
@@ -106,5 +125,25 @@ public class LocalJmxMetrics {
 
     public TimeSeriesContext getRootContext() {
         return rootContext;
+    }
+
+    public Counter getHttpSeriesCount() {
+        return httpSeriesCount;
+    }
+
+    public Counter getVisualizerCount() {
+        return visualizerCount;
+    }
+
+    private static class RoundRobinTimeSeriesFactory extends DefaultTimeSeriesFactory {
+
+        private static final int ROUND_ROBIN_TIME_SERIES_MAX_SIZE = 1440;
+
+        public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+            if (classType.isAssignableFrom(DefaultIdentifiableTimeSeries.class)) {
+                return (E) new DefaultIdentifiableTimeSeries(id, description, new RoundRobinTimeSeries(ROUND_ROBIN_TIME_SERIES_MAX_SIZE));
+            }
+            throw new UnsupportedOperationException("Cannot create time series of class " + classType);
+        }
     }
 }

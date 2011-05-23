@@ -5,6 +5,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
+import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
@@ -15,6 +16,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +32,7 @@ import java.awt.event.WindowEvent;
 public class DefaultDesktopFrame extends AbstractDesktopFrame {
 
     private Action newVisualizerAction;
+    private IdentifiableTreeListener frameDisposingDesktopContextListener;
 
     public DefaultDesktopFrame(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel,
                                TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
@@ -42,12 +45,12 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
     }
 
     private void addListeners() {
-        getDesktopContext().addTreeListener(
-            AwtSafeListener.getAwtSafeListener(
+        frameDisposingDesktopContextListener = AwtSafeListener.getAwtSafeListener(
                 new FrameDisposingContextListener(),
                 IdentifiableTreeListener.class
-            )
         );
+        WeakReferenceListener l = new WeakReferenceListener(frameDisposingDesktopContextListener);
+        l.addListenerTo(getDesktopContext());
         addWindowListener(new DesktopWindowListener());
     }
 
@@ -61,7 +64,20 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
                     }
                 }
             );
+
             getDesktopContext().setShown(false);
+            disposeVisualizerResources();
+        }
+
+        //for each shown visualizer, we need it to release its
+        //peer visualizer frame, and convert it to config when desktop
+        //is hidden
+        private void disposeVisualizerResources() {
+            for ( VisualizerContext v : getDesktopContext().findAll(VisualizerContext.class).getAllMatches() ) {
+                if ( v.isShown()) {
+                    v.disposePeerWhenParentHidden();
+                }
+            }
         }
     }
 

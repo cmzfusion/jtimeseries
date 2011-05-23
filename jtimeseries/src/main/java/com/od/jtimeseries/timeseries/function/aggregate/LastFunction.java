@@ -33,6 +33,13 @@ public class LastFunction extends AbstractDoubleBasedAggregateFunction {
     private static final String DESCRIPTION = "Last";
     private double last = Double.NaN;
 
+    public LastFunction() {
+    }
+
+    public LastFunction(double last) {
+        this.last = last;
+    }
+
     protected void doAddValue(double d) {
         last = d;
     }
@@ -50,6 +57,6 @@ public class LastFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public AggregateFunction next() {
-        return new LastFunction();
+        return new LastFunction(last);
     }
 }

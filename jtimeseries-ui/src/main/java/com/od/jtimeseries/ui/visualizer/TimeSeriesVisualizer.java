@@ -32,6 +32,7 @@ import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.ImportExportTransferHandler;
 import com.od.jtimeseries.ui.util.JideInitialization;
+import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
@@ -93,6 +94,7 @@ public class TimeSeriesVisualizer extends JPanel {
         createSplitPane(chartPanel);
         layoutVisualizer();
         addSeriesSelectionListener();
+        LocalJmxMetrics.getInstance().getVisualizerCount().incrementCount();
     }
 
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
@@ -307,6 +309,7 @@ public class TimeSeriesVisualizer extends JPanel {
     public void finalize() throws Throwable {
         rootContext.dispose();
         super.finalize();
+        LocalJmxMetrics.getInstance().getVisualizerCount().decrementCount();
     }
 
 }

@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.net.httpd.HttpParameterName;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.ExecuteWeakReferencedCommandTask;
+import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -83,6 +84,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         super(id, description);
         setTimeSeriesURL(timeSeriesUrl);
         setRefreshFrequencySeconds((int) refreshTime.getLengthInMillis() / 1000);
+        LocalJmxMetrics.getInstance().getHttpSeriesCount().incrementCount();
     }
 
     public void setRefreshFrequencySeconds(int seconds) {
@@ -254,6 +256,11 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                 setStatsRefreshTime(new Date());
             }
         });
+    }
+
+    public void finalize() throws Throwable {
+        super.finalize();
+        LocalJmxMetrics.getInstance().getHttpSeriesCount().decrementCount();
     }
 
 }

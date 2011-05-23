@@ -38,6 +38,6 @@ public class RenameServerAction extends ModelDrivenAction<IdentifiableListAction
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(TimeSeriesServerContext.class);
+        return getActionModel().isSelectionLimitedToTypes(TimeSeriesServerContext.class);
     }
 }

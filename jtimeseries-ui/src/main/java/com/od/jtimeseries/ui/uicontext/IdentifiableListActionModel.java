@@ -1,5 +1,6 @@
 package com.od.jtimeseries.ui.uicontext;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 
@@ -51,7 +52,7 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
         super.doClearActionModelState();
     }
 
-    public boolean isSelectionLimitedToType(Class... type) {
+    public boolean isSelectionLimitedToTypes(Class... type) {
         int total = 0;
         for ( Class c : type ) {
             total += getSelected(c).size();
@@ -72,6 +73,17 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
             nodesByClass.put(clazz, identifiables);
         }
         return identifiables;
+    }
+
+    public boolean containsItemsFromRootContext(TimeSeriesContext root) {
+        boolean result = false;
+        for ( Identifiable i : getSelected()) {
+            if ( i.getRoot() == root) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
 }

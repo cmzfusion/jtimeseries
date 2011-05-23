@@ -24,7 +24,7 @@ public abstract class AbstractRemoveHideablePeerAction<E extends HidablePeerCont
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(hideablePeerClass);
+        return getActionModel().isSelectionLimitedToTypes(hideablePeerClass);
     }
 
     public void actionPerformed(ActionEvent e) {

@@ -23,7 +23,7 @@ public class LocalSelectionsTransferData {
     }
 
     public boolean isSelectionLimitedToType(Class c) {
-        return selections.isSelectionLimitedToType(c);
+        return selections.isSelectionLimitedToTypes(c);
     }
 
     public <C extends Identifiable> List<C> getSelected(Class<C> clazz) {

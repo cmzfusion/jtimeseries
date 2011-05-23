@@ -50,8 +50,8 @@ public class RenameAction extends AbstractTimeSeriousIdentifiableAction {
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(VisualizerContext.class) ||
-                ( getActionModel().isSelectionLimitedToType(DesktopContext.class) &&
+        return getActionModel().isSelectionLimitedToTypes(VisualizerContext.class) ||
+                ( getActionModel().isSelectionLimitedToTypes(DesktopContext.class) &&
                 ! isMainDesktopSelected());
     }
 }

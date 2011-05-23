@@ -32,8 +32,8 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
         setContextFactory(new ServerContextCreatingContextFactory(rootContext, serverDictionary));
     }
 
-    protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
-        return identifiables.isSelectionLimitedToType(TimeSeriesContext.class, UIPropertiesTimeSeries.class);
+    protected boolean canImport(Component component, IdentifiableListActionModel i, Identifiable target) {
+        return i.isSelectionLimitedToTypes(TimeSeriesContext.class, UIPropertiesTimeSeries.class) && ! i.containsItemsFromRootContext(getRootContext());
     }
 
     protected boolean shouldImport(Identifiable i, Identifiable target) {

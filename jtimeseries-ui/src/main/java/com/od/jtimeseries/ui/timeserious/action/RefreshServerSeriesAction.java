@@ -33,6 +33,6 @@ public class RefreshServerSeriesAction extends ModelDrivenAction<IdentifiableLis
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(TimeSeriesServerContext.class);
+        return getActionModel().isSelectionLimitedToTypes(TimeSeriesServerContext.class);
     }
 }

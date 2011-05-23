@@ -31,14 +31,14 @@ class MainSelectorTreeSelectionListener implements ActionModelListener {
     public void actionStateUpdated() {
         final IdentifiableListActionModel actionModel = selectionPanel.getSelectionActionModel();
         if ( actionModel.getSelected().size() == 1) {
-            if ( actionModel.isSelectionLimitedToType(DesktopContext.class)) {
+            if ( actionModel.isSelectionLimitedToTypes(DesktopContext.class)) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {
                         listener.desktopSelected((DesktopContext)actionModel.getSelected().get(0));
                     }
                 });
-            } else if ( actionModel.isSelectionLimitedToType(VisualizerContext.class)) {
+            } else if ( actionModel.isSelectionLimitedToTypes(VisualizerContext.class)) {
                 UIEventBus.getInstance().fireEvent(TimeSeriousBusListener.class,
                 new EventSender<TimeSeriousBusListener>() {
                     public void sendEvent(TimeSeriousBusListener listener) {

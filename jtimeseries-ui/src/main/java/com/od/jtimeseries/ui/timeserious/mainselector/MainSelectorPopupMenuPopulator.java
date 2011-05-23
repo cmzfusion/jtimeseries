@@ -62,23 +62,23 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
     }
 
     public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-        if (selectionModel.isSelectionLimitedToType(UIPropertiesTimeSeries.class)) {
+        if (selectionModel.isSelectionLimitedToTypes(UIPropertiesTimeSeries.class)) {
             menu.add(new JMenuItem(addSeriesAction));
-        } else if ( selectionModel.isSelectionLimitedToType(VisualizerContext.class)) {
+        } else if ( selectionModel.isSelectionLimitedToTypes(VisualizerContext.class)) {
             menu.add(showHiddenVisualizerAction);
             menu.add(removeVisualizerAction);
             menu.add(renameAction);
-        } else if ( selectionModel.isSelectionLimitedToType(TimeSeriesServerContext.class)) {
+        } else if ( selectionModel.isSelectionLimitedToTypes(TimeSeriesServerContext.class)) {
             menu.add(refreshServerAction);
             menu.add(removeServerAction);
             menu.add(renameServerAction);
-        } else if ( selectionModel.isSelectionLimitedToType(DesktopContext.class)) {
+        } else if ( selectionModel.isSelectionLimitedToTypes(DesktopContext.class)) {
             menu.add(removeDesktopAction);
             menu.add(showHiddenDesktopAction);
             menu.add(renameAction);
             menu.add(new JMenuBar());
             menu.add(newVisualizerAction);
-        } else if ( selectionModel.isSelectionLimitedToType(DisplayNamesContext.class)) {
+        } else if ( selectionModel.isSelectionLimitedToTypes(DisplayNamesContext.class)) {
             menu.add(editDisplayNamePatternsAction);
         } else if ( selectionModel.getSelected().size() == 0) {
             JFrame windowAncestor = (JFrame) SwingUtilities.getWindowAncestor(parentComponent);

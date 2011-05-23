@@ -44,7 +44,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
     }
 
     protected boolean canImport(Component component, IdentifiableListActionModel identifiables, Identifiable target) {
-        boolean result = target instanceof DesktopContext && identifiables.isSelectionLimitedToType(VisualizerContext.class);
+        boolean result = target instanceof DesktopContext && identifiables.isSelectionLimitedToTypes(VisualizerContext.class);
         if ( result ) {
             result = checkTargetIsNotCurrentlyParent(identifiables, target);
         }
@@ -113,7 +113,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
     }
 
     public int getSourceActions(IdentifiableListActionModel selected) {
-        return selected.isSelectionLimitedToType(VisualizerContext.class) ?
+        return selected.isSelectionLimitedToTypes(VisualizerContext.class) ?
             DnDConstants.ACTION_COPY_OR_MOVE : DnDConstants.ACTION_COPY;
     }
 

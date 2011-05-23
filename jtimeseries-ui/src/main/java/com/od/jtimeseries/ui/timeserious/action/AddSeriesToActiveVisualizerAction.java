@@ -49,6 +49,6 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
     }
 
     public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class) && visualizerSelectionActionModel.isModelValid();
+        return getActionModel().isSelectionLimitedToTypes(UIPropertiesTimeSeries.class) && visualizerSelectionActionModel.isModelValid();
     }
 }

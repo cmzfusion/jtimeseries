@@ -25,7 +25,7 @@ public abstract class AbstractShowHiddenPeerAction extends ModelDrivenAction<Ide
     }
 
     public boolean isModelStateActionable() {
-        boolean result = getActionModel().isSelectionLimitedToType(hideableClass);
+        boolean result = getActionModel().isSelectionLimitedToTypes(hideableClass);
         if ( result ) {
             List<? extends HidablePeerContext> nodes = getActionModel().getSelected(hideableClass);
             for ( final HidablePeerContext n : nodes ) {

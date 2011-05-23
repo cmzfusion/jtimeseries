@@ -32,7 +32,7 @@ public class ReconnectSeriesAction extends ModelDrivenAction<IdentifiableListAct
 
     protected boolean isModelStateActionable() {
         boolean result = false;
-        if (getActionModel().isSelectionLimitedToType(UIPropertiesTimeSeries.class) ) {
+        if (getActionModel().isSelectionLimitedToTypes(UIPropertiesTimeSeries.class) ) {
             result = true;
             //actionable if all selected are stale
             for (Identifiable i : getActionModel().getSelected()) {

@@ -356,15 +356,20 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return getRoundRobinSeries().contains(o);
     }
 
+    /**
+     * Intentionally break the contract of List.equals() - we shoudln't need to support logical equality of
+     * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
+     */
     public synchronized boolean equals(Object o) {
-        return getRoundRobinSeries().equals(o);
+        return o == this;
     }
 
+    /**
+     * Intentionally break the contract of List.hashCode() - we shoudln't need to support logical equality of
+     * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
+     */
     public synchronized int hashCode() {
-        //it may seem a bit odd to deserialize for this, but a ListTimeseries is a List of TimeSeriesItem, and the
-        //contract of List requires us to base hashcode on each element. In practise, it is unlikely that we will
-        //need to compute a hashcode for FilesystemTimeSeries frequently
-        return getRoundRobinSeries().hashCode();
+        return super.hashCode();
     }
 
     public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
@@ -424,7 +429,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         timeSeriesEventHandler.removeTimeSeriesListener(l);
     }
 
-    private RoundRobinTimeSeries getRoundRobinSeries() {
+    protected RoundRobinTimeSeries getRoundRobinSeries() {
         return getRoundRobinSeries(true);
     }
 

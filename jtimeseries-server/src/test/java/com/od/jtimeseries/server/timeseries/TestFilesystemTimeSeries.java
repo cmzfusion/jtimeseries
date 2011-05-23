@@ -38,7 +38,19 @@ public class TestFilesystemTimeSeries extends AbstractListTimeSeriesTest<Filesys
 
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
         TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
-        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10)) {
+
+            //override filesystem time series so we can support the contract of List for equality
+            //during the tests
+
+            public boolean equals(Object o) {
+                return getRoundRobinSeries().equals(o);
+            }
+
+            public int hashCode() {
+                return getRoundRobinSeries().hashCode();
+            }
+        };
         context.addChild(s);
         File file = roundRobinSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();

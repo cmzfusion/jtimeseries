@@ -97,7 +97,7 @@ public class MovingWindowTimeSeries extends AbstractListTimeSeries implements Mo
                     if ( forceChangeEvent || oldStartIndex != startIndex || oldEndIndex != endIndex || oldStartTime != startTime || oldEndTime != endTime ) {
                         //need to do this to invalidate iterators even if no event fired
                         long newModCount = modCount.incrementAndGet();
-                        queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), newModCount ));
+                        queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(MovingWindowTimeSeries.this, getSnapshot(), newModCount ));
                     }
                 }
             }

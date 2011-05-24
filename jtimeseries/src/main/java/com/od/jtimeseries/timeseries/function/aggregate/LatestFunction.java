@@ -26,26 +26,27 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * User: nick
  * Date: 01-Feb-2010
  * Time: 22:59:54
- * To change this template use File | Settings | File Templates.
+ *
+ * Take the latest value from a collection of values
  */
-public class LastFunction extends AbstractDoubleBasedAggregateFunction {
+public class LatestFunction extends AbstractDoubleBasedAggregateFunction {
 
-    private static final String DESCRIPTION = "Last";
-    private double last = Double.NaN;
+    private static final String DESCRIPTION = "Latest";
+    private double latest = Double.NaN;
 
-    public LastFunction() {
+    public LatestFunction() {
     }
 
-    public LastFunction(double last) {
-        this.last = last;
+    public LatestFunction(double latest) {
+        this.latest = latest;
     }
 
     protected void doAddValue(double d) {
-        last = d;
+        latest = d;
     }
 
     public Numeric calculateAggregateValue() {
-        return DoubleNumeric.valueOf(last);
+        return DoubleNumeric.valueOf(latest);
     }
 
     public String getDescription() {
@@ -53,10 +54,10 @@ public class LastFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public void clear() {
-        last = Double.NaN;
+        latest = Double.NaN;
     }
 
     public AggregateFunction next() {
-        return new LastFunction(last);
+        return new LatestFunction(latest);
     }
 }

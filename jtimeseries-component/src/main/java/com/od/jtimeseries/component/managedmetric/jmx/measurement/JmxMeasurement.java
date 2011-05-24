@@ -44,7 +44,7 @@ public class JmxMeasurement {
      * JMX Measurement which reads a single value from a jmx bean
      */
     public JmxMeasurement(String parentContextPath, String id, String description, JmxValue value) {
-        this(parentContextPath, id, description, Arrays.asList(value), AggregateFunctions.LAST());
+        this(parentContextPath, id, description, Arrays.asList(value), AggregateFunctions.LATEST());
     }
 
     /**

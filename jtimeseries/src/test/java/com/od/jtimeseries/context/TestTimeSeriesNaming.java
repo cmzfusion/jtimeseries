@@ -1,7 +1,6 @@
 package com.od.jtimeseries.context;
 
 import junit.framework.TestCase;
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.source.*;
@@ -67,7 +66,7 @@ public class TestTimeSeriesNaming extends TestCase {
                 CaptureFunctions.MEAN_COUNT(Time.seconds(30), Time.hours(1)),
                 CaptureFunctions.SUM(Time.hours(3)),
                 CaptureFunctions.MIN(Time.minutes(120)),
-                CaptureFunctions.LAST(Time.seconds(10)),
+                CaptureFunctions.LATEST(Time.seconds(10)),
                 CaptureFunctions.RAW_VALUES()
         );
 

@@ -76,7 +76,7 @@ public class JmxMetric implements ManagedMetric {
      * A JmxMetric with a single series / measurement
      */
     public JmxMetric(TimePeriod timePeriod, String serviceUrl, String metricParentContextPath, String metricId, String metricDescription, JmxValue metricJmxValue ) {
-        this(timePeriod, metricParentContextPath, metricId, metricDescription, serviceUrl, Arrays.asList(metricJmxValue), AggregateFunctions.LAST()); //last of 1 value is that value
+        this(timePeriod, metricParentContextPath, metricId, metricDescription, serviceUrl, Arrays.asList(metricJmxValue), AggregateFunctions.LATEST()); //last of 1 value is that value
     }
 
     /**

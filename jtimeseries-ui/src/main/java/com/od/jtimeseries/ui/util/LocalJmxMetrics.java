@@ -66,13 +66,13 @@ public class LocalJmxMetrics {
         httpSeriesCount = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "RemoteHttpTimeSeries Count",
                 "Number of memory resident RemoteHttpTimeSeries",
-                CaptureFunctions.LAST(Time.minutes(1))
+                CaptureFunctions.LATEST(Time.minutes(1))
         );
 
         visualizerCount = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Visualizer Count",
                 "Number of memory resident TimeSeriesVisualizer",
-                CaptureFunctions.LAST(Time.minutes(1))
+                CaptureFunctions.LATEST(Time.minutes(1))
         );
     }
 

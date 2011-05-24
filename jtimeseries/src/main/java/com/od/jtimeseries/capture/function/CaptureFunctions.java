@@ -105,8 +105,8 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, new MeanCountAggregateFunction(timeIntervalToExpressCount, timePeriod));
     }
 
-    public static CaptureFunction LAST(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LAST());
+    public static CaptureFunction LATEST(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST());
     }
 
     /**

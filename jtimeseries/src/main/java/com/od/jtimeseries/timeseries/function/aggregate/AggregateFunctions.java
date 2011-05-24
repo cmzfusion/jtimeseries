@@ -65,7 +65,7 @@ public class AggregateFunctions {
         return new ChangeFunction(initialValue);
     }
 
-    public static AggregateFunction LAST() {
-        return new LastFunction();
+    public static AggregateFunction LATEST() {
+        return new LatestFunction();
     }
 }

@@ -1,0 +1,76 @@
+<%
+String	urlSt = request.getRequestURL().toString();
+String	jnlpBaseUrl = urlSt.substring(0, urlSt.lastIndexOf('/') + 1);
+
+String port = "8080";
+String hostname = "localhost";
+String upcryptServerAppPath = "upcrypt-server";
+
+//try to get the hostname from the server.properties deployed on the cluster, default to localhost
+java.io.InputStream is = getClass().getResourceAsStream("/server.properties");
+if ( is != null )
+{
+  java.util.Properties p = new java.util.Properties();
+    try {
+        p.load(is);
+        hostname = p.getProperty("tomcat.host", "localhost");
+        upcryptServerAppPath = p.getProperty("upcrypt.server.path", "upcrypt");
+        port = p.getProperty("tomcat.port", "8080");
+    } catch (java.io.IOException e) {
+        e.printStackTrace();
+    }
+}
+%>
+
+<%--
+	Need to set a JNLP mime type - if Web Start is installed on the client,     
+	this header will induce the browser to drive the Web Start Client
+--%>
+<%
+	response.setContentType("application/x-java-jnlp-file");
+	response.setHeader("Cache-Control", "must-revalidate"); 
+	response.setHeader("Pragma", "no-cache");
+
+	long now = System.currentTimeMillis();
+	response.setDateHeader("Date", now);
+	response.setDateHeader("Last-Modified", now);
+	response.setDateHeader("Expires", 0);
+
+	//Force IE to recognize MIME type
+	String fileName = request.getServletPath();
+	fileName = fileName.substring(fileName.lastIndexOf("/") + 1 );
+	fileName = fileName.substring(0, fileName.indexOf(".")) + ".jnlp";
+	response.setHeader("Content-Disposition", "Inline; fileName=" + fileName);
+%>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="<%=jnlpBaseUrl%>" href="upcrypt.jsp">
+    <information>
+        <title>Upcrypt</title>
+        <vendor>Object Definitions Ltd</vendor>
+        <homepage href="/upcrypt-client"/>
+        <description>Upcrypt encryption</description>
+        <description kind="tooltip">Upcrypt encryption</description>
+        <icon href="login.png" kind="splash"/>
+        <offline-allowed/>
+        <shortcut online="true">
+            <desktop/>
+            <menu submenu="Upcrypt"/>
+        </shortcut>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.5.0_04+" href="http://java.sun.com/products/autodl/j2se" max-heap-size="256m"/>
+        <property name="UPCRYPT_SERVER_HOSTNAME" value="<%=hostname%>"/>
+        <property name="UPCRYPT_SERVER_APP_PATH" value="<%=upcryptServerAppPath%>"/>
+        <property name="UPCRYPT_SERVER_PORT" value="<%=port%>"/>
+        <property name="DUMP_SYS_PROPS" value="true"/>
+        $dependencies
+    </resources>
+    <application-desc main-class="$mainClass">
+        <!--<argument><%=jnlpBaseUrl%>dbProperties.jsp</argument>-->
+    </application-desc>
+
+</jnlp>

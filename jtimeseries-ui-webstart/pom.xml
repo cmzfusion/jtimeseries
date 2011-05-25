@@ -1,0 +1,136 @@
+
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>od</groupId>
+		<artifactId>od-parent</artifactId>
+		<version>2.1</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>od</groupId>
+	<artifactId>od-upcrypt-webstart</artifactId>
+	<name>od-upcrypt-webstart</name>
+	<description>Upcrypt webstart packaging</description>
+	<packaging>pom</packaging>
+	<version>1.0-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jnlp</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jnlp</goal>
+							<!-- use jnlp, jnlp-inline or jnlp-single as appropriate -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+
+					<!-- JNLP generation -->
+					<jnlp>
+						<!-- default values -->
+						<!--resources>${project.basedir}/src/main/jnlp/resources</resources-->
+						<!--inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath-->
+						<inputTemplate>src/jnlp/upcrypt.vm</inputTemplate>
+						<!-- relative to inputTemplateResourcePath -->
+						<!-- defaults to launch.jnlp -->
+						<outputFile>upcrypt.jsp</outputFile>
+						<!-- used to automatically identify the jar containing the main class. -->
+						<!-- this is perhaps going to change -->
+						<mainClass>com.od.upcrypt.frame.UpCrypt</mainClass>
+					</jnlp>
+
+					<!-- defining this will automatically sign the jar and its dependencies, if necessary -->
+					<sign>
+						<keystore>../../src/keystore/mykeystore</keystore>
+						<storepass>password</storepass>
+						<alias>vegas</alias>
+						<verify>true</verify>
+					</sign>
+
+					<!-- BUILDING PROCESS -->
+
+					<!-- should we have some more configurations here? E.g. compression level (aka packing effort) -->
+					<!-- not yet implemented -->
+					<pack200>false</pack200>
+					<gzip>true</gzip>
+					<!-- default force when pack200 false, true when pack200 selected ?? -->
+					<!-- causes a version attribute to be output in each jar resource element, optional, default is false -->
+					<outputJarVersions>true</outputJarVersions>
+
+					<verbose>true</verbose>
+				</configuration>
+			</plugin>
+			<!-- This plugin can be enabled if it is necessary to unsign jars before resigning them
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<tasks unless="maven.test.skip">
+
+								<macrodef name="unsignjar">
+
+									<attribute name="jar" />
+
+									<sequential>
+
+										<tempfile prefix="usignjar-" destdir="${java.io.tmpdir}" property="temp.file" />
+										<echo message="Removing signatures from JAR: @{jar}" />
+										<mkdir dir="${temp.file}" />
+
+										<unjar src="@{jar}" dest="${temp.file}">
+											<patternset>
+												<include name="**" />
+												<exclude name="META-INF/*.SF" />
+												<exclude name="META-INF/*.DSA" />
+												<exclude name="META-INF/*.RSA" />
+											</patternset>
+										</unjar>
+
+										<delete file="@{jar}" failonerror="true" />
+
+										<mkdir dir="${temp.file}/META-INF" />
+										<touch file="${temp.file}/META-INF/MANIFEST.MF" />
+
+										<jar destfile="@{jar}" basedir="${temp.file}" includes="**" manifest="${temp.file}/META-INF/MANIFEST.MF" />
+
+										<delete dir="${temp.file}" failonerror="true" />
+									</sequential>
+								</macrodef>
+
+								<unsignjar jar="target/jnlp/jconn-2.0.jar" />
+									
+								<signjar alias="vegas" storepass="password" keystore="src/keystore/mykeystore" lazy="true">
+									<fileset dir="target/jnlp">
+										<include name="**/*.jar" />
+									</fileset>
+								</signjar>
+
+								<zip destfile="target/cat-reporting-client-webstart-1.0-SNAPSHOT.zip" basedir="target/jnlp" />
+							</tasks> 
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> -->
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>od</groupId>
+			<artifactId>od-upcrypt-client</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+	</dependencies>
+</project>

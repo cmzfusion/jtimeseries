@@ -12,9 +12,13 @@ import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.ui.timeserious.mainselector.MainSeriesSelector;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
+import com.od.jtimeseries.ui.util.ImageUtils;
+import org.jfree.ui.about.AboutDialog;
+import org.jfree.ui.about.ProjectInfo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -173,6 +177,34 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
 
         windowMenu.setOpaque(false);
         mainMenuBar.add(windowMenu);
+
+
+        Action showHelpAction = new AbstractAction() {
+            { setName("About"); }
+
+            public void actionPerformed(ActionEvent e) {
+                org.jfree.ui.about.AboutDialog.PREFERRED_SIZE.width = 800;
+                org.jfree.ui.about.AboutDialog.PREFERRED_SIZE.height = 600;
+                AboutDialog d = new AboutDialog(
+                    TimeSeriousMainFrame.this, "TimeSerious", new ProjectInfo(
+                            "TimeSerious",
+                            "1.0",
+                            "TimeSerious is the user interface from the JTimeseries project",
+                            ImageUtils.SPLASH_SCREEN.getImage(),
+                            "(c) Object Definitions Ltd.",
+                            null,
+                            null)
+                );
+                d.setVisible(true);
+            }
+        };
+
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem aboutItem = new JMenuItem(showHelpAction);
+        helpMenu.add(aboutItem);
+        helpMenu.setOpaque(false);
+        mainMenuBar.add(helpMenu);
+
         setJMenuBar(mainMenuBar);
     }
 

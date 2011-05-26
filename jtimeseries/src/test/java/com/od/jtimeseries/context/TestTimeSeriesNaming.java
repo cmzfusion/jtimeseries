@@ -77,7 +77,7 @@ public class TestTimeSeriesNaming extends TestCase {
         assertNotNull(rootContext.get("Login Attempts (Count Per 30s Over 1hr)"));
         assertNotNull(rootContext.get("Login Attempts (Sum 3hr)"));
         assertNotNull(rootContext.get("Login Attempts (Min 120min)"));
-        assertNotNull(rootContext.get("Login Attempts (Last 10s)"));
+        assertNotNull(rootContext.get("Login Attempts (Latest 10s)"));
         assertNotNull(rootContext.get("Login Attempts")); //the raw values
     }
 

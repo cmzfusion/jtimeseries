@@ -24,7 +24,9 @@
                     </archive>
                     <descriptors>
                         <descriptor>src/assemble/all-dependencies.xml</descriptor>
-                        <descriptor>src/assemble/no-jfreechart.xml</descriptor>                        
+                        <descriptor>src/assemble/no-jfreechart.xml</descriptor>
+                        <descriptor>src/assemble/timeserious.xml</descriptor>
+
                     </descriptors>
                 </configuration>
                 <executions>

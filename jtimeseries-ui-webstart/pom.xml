@@ -1,19 +1,17 @@
 
 <!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<groupId>od</groupId>
-		<artifactId>od-parent</artifactId>
-		<version>2.1</version>
-	</parent>
+    <parent>
+        <groupId>od</groupId>
+        <artifactId>jtimeseries-parent</artifactId>
+        <version>1.0.11-SNAPSHOT</version>
+    </parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>od</groupId>
-	<artifactId>od-upcrypt-webstart</artifactId>
-	<name>od-upcrypt-webstart</name>
-	<description>Upcrypt webstart packaging</description>
+	<artifactId>jtimeseries-ui-webstart</artifactId>
+	<name>jtimeseries-ui-webstart</name>
+	<description>JTimeSeries webstart packaging</description>
 	<packaging>pom</packaging>
-	<version>1.0-SNAPSHOT</version>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -36,13 +34,13 @@
 						<!-- default values -->
 						<!--resources>${project.basedir}/src/main/jnlp/resources</resources-->
 						<!--inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath-->
-						<inputTemplate>src/jnlp/upcrypt.vm</inputTemplate>
+						<inputTemplate>src/jnlp/timeserious.vm</inputTemplate>
 						<!-- relative to inputTemplateResourcePath -->
 						<!-- defaults to launch.jnlp -->
-						<outputFile>upcrypt.jsp</outputFile>
+						<outputFile>timeserious.jsp</outputFile>
 						<!-- used to automatically identify the jar containing the main class. -->
 						<!-- this is perhaps going to change -->
-						<mainClass>com.od.upcrypt.frame.UpCrypt</mainClass>
+						<mainClass>com.od.jtimeseries.ui.timeserious.TimeSerious</mainClass>
 					</jnlp>
 
 					<!-- defining this will automatically sign the jar and its dependencies, if necessary -->
@@ -128,9 +126,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>od</groupId>
-			<artifactId>od-upcrypt-client</artifactId>
+			<artifactId>jtimeseries-ui</artifactId>
 			<version>${project.version}</version>
-			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

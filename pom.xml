@@ -15,6 +15,7 @@
   <module>jtimeseries-server</module>
   <module>jtimeseries-ui</module>
   <module>jtimeseries-ui-webstart</module>
+  <module>jtimeseries-ui-webapp</module>
 	</modules>
     <build>
         <plugins>

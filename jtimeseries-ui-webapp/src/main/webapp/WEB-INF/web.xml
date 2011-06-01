@@ -5,14 +5,12 @@
 
 <!--suppress WebProperties -->
 <web-app>
-    <display-name>Vegas Client Download Server</display-name>
-    <description>
-        CAT Reporting Tool
-    </description>
+    <display-name>TimeSerious - JTimeSeries UI</display-name>
+    <description>TimeSerious - JTimeSeries User Interface</description>
 
     <filter>
         <filter-name>ResponseHeaderFilter_JNLP</filter-name>
-        <filter-class>com.bnpparibas.risk.valrisk.vegas.jws.ResponseHeaderFilter</filter-class>
+        <filter-class>ResponseHeaderFilter</filter-class>
         <init-param>
             <param-name>Cache-Control</param-name>
             <param-value>max-age=10, s-max-age=10, must-revalidate, proxy-revalidate</param-value>
@@ -26,7 +24,7 @@
 
     <filter>
         <filter-name>ResponseHeaderFilter_JAR</filter-name>
-        <filter-class>com.bnpparibas.risk.valrisk.vegas.jws.ResponseHeaderFilter</filter-class>
+        <filter-class>ResponseHeaderFilter</filter-class>
         <init-param>
             <param-name>Cache-Control</param-name>
             <param-value>must-revalidate, proxy-revalidate</param-value>
@@ -47,6 +45,5 @@
         <filter-name>ResponseHeaderFilter_JAR</filter-name>
         <url-pattern>*.jar</url-pattern>
     </filter-mapping>
-
 
 </web-app>

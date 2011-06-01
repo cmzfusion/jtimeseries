@@ -1,25 +1,6 @@
 <%
-String	urlSt = request.getRequestURL().toString();
-String	jnlpBaseUrl = urlSt.substring(0, urlSt.lastIndexOf('/') + 1);
-
-String port = "8080";
-String hostname = "localhost";
-String upcryptServerAppPath = "upcrypt-server";
-
-//try to get the hostname from the server.properties deployed on the cluster, default to localhost
-java.io.InputStream is = getClass().getResourceAsStream("/server.properties");
-if ( is != null )
-{
-  java.util.Properties p = new java.util.Properties();
-    try {
-        p.load(is);
-        hostname = p.getProperty("tomcat.host", "localhost");
-        upcryptServerAppPath = p.getProperty("upcrypt.server.path", "upcrypt");
-        port = p.getProperty("tomcat.port", "8080");
-    } catch (java.io.IOException e) {
-        e.printStackTrace();
-    }
-}
+String urlSt = request.getRequestURL().toString();
+String jnlpBaseUrl = urlSt.substring(0, urlSt.lastIndexOf('/') + 1);
 %>
 
 <%--
@@ -44,18 +25,18 @@ if ( is != null )
 %>
 
 <?xml version="1.0" encoding="UTF-8"?>
-<jnlp spec="1.0+" codebase="<%=jnlpBaseUrl%>" href="upcrypt.jsp">
+<jnlp spec="1.0+" codebase="<%=jnlpBaseUrl%>" href="timeserious.jsp">
     <information>
-        <title>Upcrypt</title>
-        <vendor>Object Definitions Ltd</vendor>
-        <homepage href="/upcrypt-client"/>
-        <description>Upcrypt encryption</description>
-        <description kind="tooltip">Upcrypt encryption</description>
-        <icon href="login.png" kind="splash"/>
+        <title>TimeSerious</title>
+        <vendor>JTimeseries / Object Definitions Ltd</vendor>
+        <homepage href="/timeserious"/>
+        <description>Time series visualizer</description>
+        <description kind="tooltip">Time series visualizer</description>
+        <icon href="seizmograph.png" kind="splash"/>
         <offline-allowed/>
         <shortcut online="true">
             <desktop/>
-            <menu submenu="Upcrypt"/>
+            <menu submenu="TimeSerious"/>
         </shortcut>
     </information>
     <security>
@@ -63,9 +44,6 @@ if ( is != null )
     </security>
     <resources>
         <j2se version="1.5.0_04+" href="http://java.sun.com/products/autodl/j2se" max-heap-size="256m"/>
-        <property name="UPCRYPT_SERVER_HOSTNAME" value="<%=hostname%>"/>
-        <property name="UPCRYPT_SERVER_APP_PATH" value="<%=upcryptServerAppPath%>"/>
-        <property name="UPCRYPT_SERVER_PORT" value="<%=port%>"/>
         <property name="DUMP_SYS_PROPS" value="true"/>
         $dependencies
     </resources>

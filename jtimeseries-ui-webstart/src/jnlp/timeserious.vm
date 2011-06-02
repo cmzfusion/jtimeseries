@@ -32,7 +32,7 @@ String jnlpBaseUrl = urlSt.substring(0, urlSt.lastIndexOf('/') + 1);
         <homepage href="/timeserious"/>
         <description>Time series visualizer</description>
         <description kind="tooltip">Time series visualizer</description>
-        <icon href="seizmograph.png" kind="splash"/>
+        <icon href="seizmograph.jpg" kind="splash"/>
         <offline-allowed/>
         <shortcut online="true">
             <desktop/>

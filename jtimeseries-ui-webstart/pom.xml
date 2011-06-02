@@ -22,7 +22,7 @@
 						<id>jnlp</id>
 						<phase>package</phase>
 						<goals>
-							<goal>jnlp</goal>
+							<goal>jnlp-inline</goal>
 							<!-- use jnlp, jnlp-inline or jnlp-single as appropriate -->
 						</goals>
 					</execution>
@@ -59,7 +59,7 @@
 					<gzip>true</gzip>
 					<!-- default force when pack200 false, true when pack200 selected ?? -->
 					<!-- causes a version attribute to be output in each jar resource element, optional, default is false -->
-					<outputJarVersions>true</outputJarVersions>
+					<outputJarVersions>false</outputJarVersions>
 
 					<verbose>true</verbose>
 				</configuration>
@@ -128,6 +128,7 @@
 			<groupId>od</groupId>
 			<artifactId>jtimeseries-ui</artifactId>
 			<version>${project.version}</version>
+            <type>jar</type>
 		</dependency>
 	</dependencies>
 </project>

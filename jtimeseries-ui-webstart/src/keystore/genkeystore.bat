@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\Java\jdk1.6.0_22\bin\keytool" -genkey -alias timeSerious -keystore timeseriousStore -storepass jt1m3s3r13s -validity 36500

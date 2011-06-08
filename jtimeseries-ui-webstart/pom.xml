@@ -45,9 +45,9 @@
 
 					<!-- defining this will automatically sign the jar and its dependencies, if necessary -->
 					<sign>
-						<keystore>../../src/keystore/mykeystore</keystore>
-						<storepass>password</storepass>
-						<alias>vegas</alias>
+						<keystore>../../src/keystore/timeseriousStore</keystore>
+						<storepass>jt1m3s3r13s</storepass>
+						<alias>timeSerious</alias>
 						<verify>true</verify>
 					</sign>
 

@@ -39,15 +39,19 @@ public class ContextHandler extends AbstractHandler {
     }
 
     public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms) {
-
+        NanoHTTPD.Response result;
         TimeSeriesContext context = findContextForRequest(uri);
-        String xml = createContextXml(context);
-
-        return new NanoHTTPD.NoCacheResponse(
-                NanoHTTPD.HTTP_OK,
-                "text/xml",
-                xml
-        );
+        if ( context == null) {
+            result = createNotFoundResponse(uri);
+        } else {
+            String xml = createContextXml(context);
+            return new NanoHTTPD.NoCacheResponse(
+                    NanoHTTPD.HTTP_OK,
+                    "text/xml",
+                    xml
+            );
+        }
+        return result;
     }
 
     private String createContextXml(TimeSeriesContext contextForRequest) {

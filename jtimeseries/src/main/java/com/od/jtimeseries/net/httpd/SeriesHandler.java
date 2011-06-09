@@ -53,7 +53,18 @@ public class SeriesHandler extends AbstractHandler {
     }
 
     public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms) {
+        NanoHTTPD.Response result;
         TimeSeriesContext context = findContextForRequest(uri);
+        if ( context == null) {
+            result = createNotFoundResponse(uri);
+        } else {
+            result = createSeriesResponse(uri, parms, context);
+        }
+        return result;
+    }
+
+    private NanoHTTPD.Response createSeriesResponse(String uri, Properties parms, TimeSeriesContext context) {
+        NanoHTTPD.Response result;
         String lastToken = getLastUriToken(uri);
         String seriesId = lastToken.substring(0, lastToken.length() - SERIES_POSTFIX.length() );
         IdentifiableTimeSeries timeSeries = context.getTimeSeries(seriesId);
@@ -69,14 +80,13 @@ public class SeriesHandler extends AbstractHandler {
             statsOnly = Boolean.valueOf(parms.getProperty(HttpParameterName.statsOnly.name()));
         }
 
-        NanoHTTPD.Response response;
         if ( timeSeries == null) {
-            response = createNotFoundResponse(uri);
+            result = createNotFoundResponse(uri);
         } else {
             String xmlResponse = createTimeSeriesResponse(context, timeSeries, lastTimestamp, statsOnly);
-            response = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
+            result = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
         }
-        return response;
+        return result;
     }
 
     private String createTimeSeriesResponse(TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp, boolean statsOnly) {

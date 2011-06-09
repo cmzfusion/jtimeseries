@@ -50,15 +50,24 @@ public abstract class AbstractHandler implements HttpHandler {
     public abstract NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms);
 
     protected TimeSeriesContext findContextForRequest(String uri) {
-        StringTokenizer st = new StringTokenizer(uri, "/");
-        TimeSeriesContext currentContext = rootContext;
-        while( st.hasMoreTokens()) {
-            String nextToken = decodeUrl(st.nextToken());
-            if ( st.hasMoreTokens() || uri.endsWith("/")) {  //otherwise this may be a file/image
-                currentContext = currentContext.getContext(nextToken);
-            }
+        String contextPath = getContextPathFromUri(uri);
+        return rootContext.getContext(contextPath);
+    }
+
+    private String getContextPathFromUri(String uri) {
+        int endOfContextPathInUri;
+        if ( ! uri.contains(".")) {
+            //no file extension so treat the last token in the uri as
+            //a context name rather than a reference to a file.
+            endOfContextPathInUri = uri.length();
+        } else {
+            //take the content up to the last forward slash to be the context path
+            endOfContextPathInUri = uri.lastIndexOf('/');
         }
-        return currentContext;
+
+        String contextPath = uri.substring(1, Math.max(1,endOfContextPathInUri)); //strip leading /
+        contextPath = contextPath.replace("/", Identifiable.NAMESPACE_SEPARATOR);
+        return contextPath;
     }
 
     //TODO

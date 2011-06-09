@@ -49,17 +49,27 @@ public class ChartPngHandler extends AbstractHandler {
     }
 
     public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties params) {
-        TimeSeriesContext requestContext = findContextForRequest(uri);
+        NanoHTTPD.Response result;
 
+        TimeSeriesContext requestContext = findContextForRequest(uri);
+        if ( requestContext == null) {
+            result = createNotFoundResponse(uri);
+        } else {
+            result = createChartResponse(uri, params, requestContext);
+        }
+        return result;
+    }
+
+    private NanoHTTPD.Response createChartResponse(String uri, Properties params, TimeSeriesContext requestContext) {
+        NanoHTTPD.Response result;
         String idToken = getLastUriToken(uri);
         idToken = idToken.substring(0, idToken.length() - CHART_PNG_POSTFIX.length());
 
-        NanoHTTPD.Response result;
         IdentifiableTimeSeries h = requestContext.getTimeSeries(idToken);
         if ( h == null) {
             result = createNotFoundResponse(uri);
         } else {
-            result = createImageResponse(params, h);    
+            result = createImageResponse(params, h);
         }
         return result;
     }

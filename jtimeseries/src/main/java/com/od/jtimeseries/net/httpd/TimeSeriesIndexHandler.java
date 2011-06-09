@@ -40,10 +40,15 @@ public class TimeSeriesIndexHandler extends AbstractHandler {
     }
 
     public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms) {
+        NanoHTTPD.Response result;
         TimeSeriesContext context = findContextForRequest(uri);
-
-        String xmlResponse = createIndexResponse(context);
-        return new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
+        if ( context == null) {
+            result = createNotFoundResponse(uri);
+        } else {
+            String xmlResponse = createIndexResponse(context);
+            result = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
+        }
+        return result;
     }
 
     private String createIndexResponse(TimeSeriesContext context) {

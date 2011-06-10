@@ -100,7 +100,7 @@ public class ChartPngHandler extends AbstractHandler {
             e.printStackTrace();
         }
 
-        result = new NanoHTTPD.NoCacheResponse(
+        result = new NanoHTTPD.InputStreamResponse(
                 NanoHTTPD.HTTP_OK,
                 "image/png",
                 new ByteArrayInputStream(bos.toByteArray())

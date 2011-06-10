@@ -23,6 +23,7 @@ import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -108,7 +109,7 @@ public abstract class AbstractHandler implements HttpHandler {
 
     protected NanoHTTPD.Response createNotFoundResponse(String uri) {
         NanoHTTPD.Response result;
-        result = new NanoHTTPD.Response(NanoHTTPD.HTTP_NOTFOUND, NanoHTTPD.MIME_PLAINTEXT, "Could not find resource " + uri);
+        result = new NanoHTTPD.TextResponse(NanoHTTPD.HTTP_NOTFOUND, NanoHTTPD.MIME_PLAINTEXT, "Could not find resource " + uri);
         return result;
     }
 
@@ -128,14 +129,43 @@ public abstract class AbstractHandler implements HttpHandler {
         }
     }
 
-    protected void appendSeries(String parentContextUrl, StringBuilder builder, IdentifiableTimeSeries s) {
-        builder.append("\n<").append(ElementName.series);
-        builder.append(" ").append(AttributeName.parentPath).append("=\"").append(encodeXml(s.getParentPath())).append("\"");
-        builder.append(" ").append(AttributeName.id).append("=\"").append(encodeXml(s.getId())).append("\"");
-        builder.append(" ").append(AttributeName.description).append("=\"").append(encodeXml(s.getDescription())).append("\"");
-        builder.append(" ").append(AttributeName.seriesUrl).append("=\"").append(parentContextUrl).append(encodeUrlToken(s.getId())).append(SeriesHandler.SERIES_POSTFIX).append("\"");
-        builder.append(" ").append(AttributeName.chartImage).append("=\"").append(encodeUrlToken(s.getId())).append(ChartPngHandler.CHART_PNG_POSTFIX).append("\"");
-        builder.append(" ").append(AttributeName.summaryStats).append("=\"").append(encodeXml(ContextProperties.getSummaryStatsStringRepresentation(s.getProperties()))).append("\"");
-        builder.append("/>");
+    protected void appendSeries(PrintWriter pw, String parentContextUrl, IdentifiableTimeSeries s) {
+        pw.write("\n<");
+        pw.write(ElementName.series.toString());
+        pw.write(" ");
+        pw.write(AttributeName.parentPath.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(s.getParentPath()));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.id.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(s.getId()));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.description.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(s.getDescription()));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.seriesUrl.toString());
+        pw.write("=\"");
+        pw.write(parentContextUrl);
+        pw.write(encodeUrlToken(s.getId()));
+        pw.write(SeriesHandler.SERIES_POSTFIX);
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.chartImage.toString());
+        pw.write("=\"");
+        pw.write(encodeUrlToken(s.getId()));
+        pw.write(ChartPngHandler.CHART_PNG_POSTFIX);
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.summaryStats.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(ContextProperties.getSummaryStatsStringRepresentation(s.getProperties())));
+        pw.write("\"");
+        pw.write("/>");
     }
+
 }

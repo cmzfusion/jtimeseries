@@ -139,6 +139,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void startTimeSeriesHttpServer() throws IOException {
+        logMethods.logInfo("Starting HTTP Server");
         httpdServer.start();
     }
 

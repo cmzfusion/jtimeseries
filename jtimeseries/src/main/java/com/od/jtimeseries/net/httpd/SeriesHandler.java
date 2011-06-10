@@ -23,6 +23,8 @@ import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -83,50 +85,84 @@ public class SeriesHandler extends AbstractHandler {
         if ( timeSeries == null) {
             result = createNotFoundResponse(uri);
         } else {
-            String xmlResponse = createTimeSeriesResponse(context, timeSeries, lastTimestamp, statsOnly);
-            result = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
+            result = new SeriesResponse(context, timeSeries, lastTimestamp, statsOnly);
         }
         return result;
     }
 
-    private String createTimeSeriesResponse(TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp, boolean statsOnly) {
-        StringBuilder builder = new StringBuilder("<?xml version=\"1.0\"?>");
-        builder.append("\n<?xml-stylesheet type=\"text/xsl\" href=\"/").append(SERIES_XSL_RESOURCE).append("\"?>");
-        builder.append("\n<timeSeries>");
+    private class SeriesResponse extends NanoHTTPD.Response {
+
+        private final TimeSeriesContext context;
+        private final IdentifiableTimeSeries timeSeries;
+        private final long lastTimestamp;
+        private final boolean statsOnly;
+
+        public SeriesResponse(TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp, boolean statsOnly) {
+            super(NanoHTTPD.HTTP_OK, "text/xml");
+            this.context = context;
+            this.timeSeries = timeSeries;
+            this.lastTimestamp = lastTimestamp;
+            this.statsOnly = statsOnly;
+        }
+
+        public void writeResponseBody(OutputStream out, PrintWriter pw) {
+            writeTimeSeriesResponse(pw, context, timeSeries, lastTimestamp, statsOnly);
+        }
+    }
+
+    private void writeTimeSeriesResponse(PrintWriter pw, TimeSeriesContext context, IdentifiableTimeSeries timeSeries, long lastTimestamp, boolean statsOnly) {
+        pw.write("<?xml version=\"1.0\"?>");
+        pw.write("\n<?xml-stylesheet type=\"text/xsl\" href=\"/");
+        pw.write(SERIES_XSL_RESOURCE);
+        pw.write("\"?>");
+        pw.write("\n<timeSeries>");
         String contextUrl = createUrlForIdentifiable(context);
-        appendSeries(contextUrl, builder, timeSeries);
-        builder.append("\n<summaryStats>");
-        appendSummaryStats(contextUrl, builder, timeSeries);
-        builder.append("\n</summaryStats>");
+        appendSeries(pw, contextUrl, timeSeries);
+        pw.write("\n<summaryStats>");
+        appendSummaryStats(pw, timeSeries);
+        pw.write("\n</summaryStats>");
         //statsOnly feature is actually quite important for performance, since showing summary stats only
         //does not require a timeseries to be deserialized, which would be required for seriesItems
         if ( ! statsOnly ) {
-            builder.append("\n<seriesItems>");
-            appendTimeSeriesItems(timeSeries, builder, lastTimestamp);
-            builder.append("\n</seriesItems>");
+            pw.write("\n<seriesItems>");
+            appendTimeSeriesItems(timeSeries, pw, lastTimestamp);
+            pw.write("\n</seriesItems>");
         }
-        builder.append("\n</timeSeries>");
-        return builder.toString();
+        pw.write("\n</timeSeries>");
     }
 
-    private void appendSummaryStats(String contextUrl, StringBuilder builder, IdentifiableTimeSeries timeSeries) {
+    private void appendSummaryStats(PrintWriter pw, IdentifiableTimeSeries timeSeries) {
         Properties properties = timeSeries.getProperties();
         List<String> propertyNames = ContextProperties.getSummaryStatsPropertyNames(properties);
         for (String p : propertyNames) {
-            builder.append("\n  <summaryStat name=\"").append(ContextProperties.parseStatisticName(p)).append("\" value=\"").append(properties.getProperty(p)).append("\"/>");
+            pw.write("\n  <summaryStat name=\"");
+            pw.write(ContextProperties.parseStatisticName(p));
+            pw.write("\" value=\"");
+            pw.write(properties.getProperty(p));
+            pw.write("\"/>");
         }
     }
 
-    private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, StringBuilder builder, long lastTimestamp) {
+    private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, PrintWriter pw, long lastTimestamp) {
         Collection<TimeSeriesItem> seriesItems = timeSeries.getSubSeries(lastTimestamp + 1);  //we require anything more recent than last timestamp
         Date date = new Date();
         for ( TimeSeriesItem h : seriesItems) {
-            builder.append("\n<").append(ElementName.seriesItem).append(" ");
-            builder.append(AttributeName.timestamp).append("=\"").append(h.getTimestamp()).append("\" ");
+            pw.write("\n<");
+            pw.write(ElementName.seriesItem.toString());
+            pw.write(" ");
+            pw.write(AttributeName.timestamp.toString());
+            pw.write("=\"");
+            pw.write(String.valueOf(h.getTimestamp()));
+            pw.write("\" ");
             date.setTime(h.getTimestamp());
-            builder.append("datetime=\"").append(simpleDateFormat.get().format(date)).append("\" ");
-            builder.append(AttributeName.value).append("=\"").append(decinalFormat.format(h.getValue().doubleValue())).append("\" ");
-            builder.append("/>");
+            pw.write("datetime=\"");
+            pw.write(simpleDateFormat.get().format(date));
+            pw.write("\" ");
+            pw.write(AttributeName.value.toString());
+            pw.write("=\"");
+            pw.write(decinalFormat.format(h.getValue().doubleValue()));
+            pw.write("\" ");
+            pw.write("/>");
         }
     }
 

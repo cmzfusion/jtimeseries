@@ -50,7 +50,7 @@ public class ClassPathResourceResponseHandler extends AbstractHandler {
         } else {
             InputStream is = ClassPathResourceResponseHandler.class.getResourceAsStream(resourcePath);
             if ( is != null) {
-                result = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, mimeType, is);
+                result = new NanoHTTPD.InputStreamResponse(NanoHTTPD.HTTP_OK, mimeType, is);
             } else {
                 result = createNotFoundResponse(uri);
             }

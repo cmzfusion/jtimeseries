@@ -21,6 +21,8 @@ package com.od.jtimeseries.net.httpd;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Properties;
 
 /**
@@ -45,20 +47,35 @@ public class TimeSeriesIndexHandler extends AbstractHandler {
         if ( context == null) {
             result = createNotFoundResponse(uri);
         } else {
-            String xmlResponse = createIndexResponse(context);
-            result = new NanoHTTPD.Response(NanoHTTPD.HTTP_OK, "text/xml", xmlResponse);
+            result = new IndexResponse(context);
         }
         return result;
     }
 
-    private String createIndexResponse(TimeSeriesContext context) {
-        StringBuilder builder = new StringBuilder("<?xml version=\"1.0\"?>");
-        builder.append("\n<?xml-stylesheet type=\"text/xsl\" href=\"/").append(INDEX_XSL_RESOURCE).append("\"?>");
-        builder.append("\n<timeSeries>");
+    private void writeIndexResponse(PrintWriter pw, TimeSeriesContext context) {
+        pw.write("<?xml version=\"1.0\"?>");
+        pw.write("\n<?xml-stylesheet type=\"text/xsl\" href=\"/");
+        pw.write(INDEX_XSL_RESOURCE);
+        pw.write("\"?>");
+        pw.write("\n<timeSeries>");
         for (IdentifiableTimeSeries t : context.findAllTimeSeries().getAllMatches()) {
-            appendSeries(createUrlForIdentifiable(t.getParent()), builder, t);
+            appendSeries(pw, createUrlForIdentifiable(t.getParent()), t);
         }
-        builder.append("\n</timeSeries>");
-        return builder.toString();
+        pw.write("\n</timeSeries>");
     }
+
+    private class IndexResponse extends NanoHTTPD.Response {
+
+        private TimeSeriesContext context;
+
+        public IndexResponse(TimeSeriesContext context) {
+            super(NanoHTTPD.HTTP_OK, "text/xml");
+            this.context = context;
+        }
+
+        public void writeResponseBody(OutputStream out, PrintWriter pw) {
+            writeIndexResponse(pw, context);
+        }
+    }
+
 }

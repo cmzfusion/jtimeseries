@@ -57,7 +57,7 @@ public class JTimeSeriesHttpd extends NanoHTTPD {
         if ( handler != null) {
             return handler.createResponse(uri, method, header, parms);
         } else {
-            return new Response(HTTP_NOTFOUND, MIME_PLAINTEXT, "Error 404, file not found - JTimeSeries cannot serve resource " + uri);
+            return new TextResponse(HTTP_NOTFOUND, MIME_PLAINTEXT, "Error 404, file not found - JTimeseries cannot serve resource " + uri);
         }
     }
 

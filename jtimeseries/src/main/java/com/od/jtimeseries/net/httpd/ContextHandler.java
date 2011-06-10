@@ -21,6 +21,8 @@ package com.od.jtimeseries.net.httpd;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
 
@@ -44,62 +46,100 @@ public class ContextHandler extends AbstractHandler {
         if ( context == null) {
             result = createNotFoundResponse(uri);
         } else {
-            String xml = createContextXml(context);
-            return new NanoHTTPD.NoCacheResponse(
-                    NanoHTTPD.HTTP_OK,
-                    "text/xml",
-                    xml
-            );
+            return new ContextResponse(context);
         }
         return result;
     }
 
-    private String createContextXml(TimeSeriesContext contextForRequest) {
-        StringBuilder builder = new StringBuilder("<?xml version=\"1.0\"?>");
-        builder.append("\n<?xml-stylesheet type=\"text/xsl\" href=\"/").append(CONTEXT_XSL_RESOURCE).append("\"?>");
-        builder.append("\n<timeSeriesContext>");
-        builder.append("\n<contextTree>");
-        createContextTree(builder, getRootContext(), contextForRequest);
-        builder.append("\n</contextTree>");
+    
+    private class ContextResponse extends NanoHTTPD.NoCacheResponse {
 
-        builder.append("<selectedContext ");
-        builder.append("id=\"").append(encodeXml(contextForRequest.getId())).append("\" ");
-        builder.append("description=\"").append(encodeXml(contextForRequest.getDescription())).append("\" >");
+        private TimeSeriesContext context;
+
+        public ContextResponse(TimeSeriesContext context) {
+            super(NanoHTTPD.HTTP_OK, "text/xml");
+            this.context = context;
+        }
+        
+        public void writeResponseBody(OutputStream out, PrintWriter pw) {
+            writeContextXml(pw, context);
+        }
+    }
+    
+    
+    private void writeContextXml(PrintWriter pw, TimeSeriesContext contextForRequest) {
+        pw.write("<?xml version=\"1.0\"?>");
+        pw.write("\n<?xml-stylesheet type=\"text/xsl\" href=\"/");
+        pw.write(CONTEXT_XSL_RESOURCE);
+        pw.write("\"?>");
+        pw.write("\n<timeSeriesContext>");
+        pw.write("\n<contextTree>");
+        createContextTree(pw, getRootContext(), contextForRequest);
+        pw.write("\n</contextTree>");
+
+        pw.write("<selectedContext ");
+        pw.write("id=\"");
+        pw.write(encodeXml(contextForRequest.getId()));
+        pw.write("\" ");
+        pw.write("description=\"");
+        pw.write(encodeXml(contextForRequest.getDescription()));
+        pw.write("\" >");
 
         String urlForCurrentContext = createUrlForIdentifiable(contextForRequest);
         List<IdentifiableTimeSeries> series = contextForRequest.getTimeSeries();
-        builder.append("\n<timeSeries>");
+        pw.write("\n<timeSeries>");
         for (IdentifiableTimeSeries s : series) {
-            appendSeries(urlForCurrentContext, builder, s);
+            appendSeries(pw, urlForCurrentContext, s);
         }
 
-        builder.append("\n</timeSeries>");
-        builder.append("</selectedContext>");
-        builder.append("\n</timeSeriesContext>");
-        return builder.toString();
+        pw.write("\n</timeSeries>");
+        pw.write("</selectedContext>");
+        pw.write("\n</timeSeriesContext>");
     }
 
-    private void createContextTree(StringBuilder builder, TimeSeriesContext context, TimeSeriesContext contextForRequest) {
-        appendContextNode(builder, context, contextForRequest);
+    private void createContextTree(PrintWriter pw, TimeSeriesContext context, TimeSeriesContext contextForRequest) {
+        appendContextNode(pw, context, contextForRequest);
         List<TimeSeriesContext> childContexts = context.getChildContexts();
         if ( childContexts.size() > 0 ) {
             for ( TimeSeriesContext b : childContexts) {
-                createContextTree(builder, b, contextForRequest);
+                createContextTree(pw, b, contextForRequest);
             }
         }
-        builder.append("</").append(ElementName.context).append(">");
+        pw.write("</");
+        pw.write(ElementName.context.toString());
+        pw.write(">");
     }
 
-    private void appendContextNode(StringBuilder builder, TimeSeriesContext c, TimeSeriesContext contextForRequest) {
-        builder.append("\n<").append(ElementName.context);
-        builder.append(" ").append(AttributeName.contextUrl).append("=\"").append(createUrlForIdentifiable(c)).append("\"");
-        builder.append(" ").append(AttributeName.id).append("=\"").append(encodeXml(c.getId())).append("\"");
-        builder.append(" ").append(AttributeName.contextPath).append("=\"").append(encodeXml(c.getPath())).append("\"");
-        builder.append(" ").append(AttributeName.description).append("=\"").append(encodeXml(c.getDescription())).append("\"");
+    private void appendContextNode(PrintWriter pw, TimeSeriesContext c, TimeSeriesContext contextForRequest) {
+        pw.write("\n<");
+        pw.write(ElementName.context.toString());
+        pw.write(" ");
+        pw.write(AttributeName.contextUrl.toString());
+        pw.write("=\"");
+        pw.write(createUrlForIdentifiable(c));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.id.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(c.getId()));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.contextPath.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(c.getPath()));
+        pw.write("\"");
+        pw.write(" ");
+        pw.write(AttributeName.description.toString());
+        pw.write("=\"");
+        pw.write(encodeXml(c.getDescription()));
+        pw.write("\"");
         if ( c == contextForRequest) {
-            builder.append(" ").append(AttributeName.selected).append("=\"true\"");
+            pw.write(" ");
+            pw.write(AttributeName.selected.toString());
+            pw.write("=\"true\"");
         }
-        builder.append(">");
+        pw.write(">");
     }
+
 
 }

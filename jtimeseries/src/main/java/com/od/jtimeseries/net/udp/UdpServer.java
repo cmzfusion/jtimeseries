@@ -60,7 +60,6 @@ public class UdpServer {
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
-        startReceive();
     }
 
     public void setMessageFactory(MessageFactory m) {
@@ -102,6 +101,10 @@ public class UdpServer {
             String message = "Unknown UDP message received with type " + p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);
             limitedLogger.logError(message);
         }
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public static interface UdpMessageListener {

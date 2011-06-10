@@ -84,7 +84,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         new JmxManagementService().startJmxManagementService(jmxManagementPort);
         setupServerMetrics();
         startSummaryStats();
-        addUdpMessageListeners();
+        startUdpServer();
         startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
@@ -100,10 +100,12 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
     }
 
-    private void addUdpMessageListeners() {
+    private void startUdpServer() {
         logMethods.logInfo("Adding UDP message listeners");
         udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
+        logMethods.logInfo("Starting UDP server on port " + udpServer.getPort());
+        udpServer.startReceive();
     }
 
     private void setupServerMetrics() {
@@ -124,7 +126,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void startJmx() {
-        logMethods.logInfo("Starting JMX Html Adapter Interface");
+        logMethods.logInfo("Starting JMX Html Adapter Interface on port " + htmlAdaptorServer.getPort());
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
@@ -139,7 +141,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void startTimeSeriesHttpServer() throws IOException {
-        logMethods.logInfo("Starting HTTP Server");
+        logMethods.logInfo("Starting HTTP Server on port " + httpdServer.getPort());
         httpdServer.start();
     }
 

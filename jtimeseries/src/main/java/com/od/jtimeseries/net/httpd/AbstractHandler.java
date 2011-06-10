@@ -56,15 +56,8 @@ public abstract class AbstractHandler implements HttpHandler {
     }
 
     private String getContextPathFromUri(String uri) {
-        int endOfContextPathInUri;
-        if ( ! uri.contains(".")) {
-            //no file extension so treat the last token in the uri as
-            //a context name rather than a reference to a file.
-            endOfContextPathInUri = uri.length();
-        } else {
-            //take the content up to the last forward slash to be the context path
-            endOfContextPathInUri = uri.lastIndexOf('/');
-        }
+        //take the content up to the last forward slash to be the context path
+        int endOfContextPathInUri = uri.lastIndexOf('/');
 
         String contextPath = uri.substring(1, Math.max(1,endOfContextPathInUri)); //strip leading /
         contextPath = contextPath.replace("/", Identifiable.NAMESPACE_SEPARATOR);

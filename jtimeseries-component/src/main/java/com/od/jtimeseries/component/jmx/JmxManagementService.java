@@ -28,7 +28,7 @@ public class JmxManagementService {
 
     public void startJmxManagementService(int jmxManagementPort) {
         try {
-            logMethods.logInfo("Starting JMX Management Service");
+            logMethods.logInfo("Starting JMX Management Service on port " + jmxManagementPort);
             LocateRegistry.createRegistry(jmxManagementPort);
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             serviceUrl = "service:jmx:rmi:///jndi/rmi://:" + jmxManagementPort + "/jmxrmi";

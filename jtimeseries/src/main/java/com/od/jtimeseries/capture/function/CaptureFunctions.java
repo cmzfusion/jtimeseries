@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2009 (nick @ objectdefinitions.com)
+ * Copyright (C) 2011 (nick @ objectdefinitions.com)
  *
  * This file is part of JTimeseries.
  *

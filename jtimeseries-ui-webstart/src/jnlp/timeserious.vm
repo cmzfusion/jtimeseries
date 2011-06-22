@@ -28,7 +28,7 @@ String jnlpBaseUrl = urlSt.substring(0, urlSt.lastIndexOf('/') + 1);
 <jnlp spec="1.0+" codebase="<%=jnlpBaseUrl%>" href="timeserious.jsp">
     <information>
         <title>TimeSerious</title>
-        <vendor>JTimeseries / Object Definitions Ltd</vendor>
+        <vendor>JTimeseries</vendor>
         <homepage href="/timeserious"/>
         <description>Time series visualizer</description>
         <description kind="tooltip">Time series visualizer</description>

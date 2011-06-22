@@ -19,7 +19,6 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.util.NamedExecutors;
-import com.sun.deploy.net.HttpResponse;
 
 import java.io.*;
 import java.net.ServerSocket;

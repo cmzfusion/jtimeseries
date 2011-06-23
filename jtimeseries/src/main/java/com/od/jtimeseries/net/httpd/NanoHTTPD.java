@@ -490,22 +490,8 @@ public class NanoHTTPD {
                 pw.flush();
 
                 response.writeResponseBody(out, pw);
-
-//				if ( data != null )
-//				{
-//					byte[] buff = new byte[2048];
-//					while (true)
-//					{
-//						int read = data.read( buff, 0, 2048 );
-//						if (read <= 0)
-//							break;
-//						out.write( buff, 0, read );
-//					}
-//				}
                 pw.flush();
                 pw.close();
-//				if ( data != null )
-//					data.close();
             } catch (IOException ioe) {
                 // Couldn't write? No can do.
                 try {

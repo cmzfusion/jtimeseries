@@ -1,10 +1,11 @@
 package com.od.jtimeseries.server.servermetrics;
 
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.server.ServerStatsHttpHandlerFactory;
-import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,9 +17,15 @@ public class HttpCallsMetric extends AbstractManagedMetric {
 
     private static final String id = "HttpRequestTime";
     private String parentContextPath;
+    private TimePeriod captureTime;
 
     public HttpCallsMetric(String parentContextPath) {
+        this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    }
+
+    public HttpCallsMetric(String parentContextPath, TimePeriod captureTime) {
         this.parentContextPath = parentContextPath;
+        this.captureTime = captureTime;
     }
 
     public String getSeriesId() {
@@ -30,7 +37,7 @@ public class HttpCallsMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.createValueRecorderSeries(id, "Length of time taken to process HTTP requests");
-        ServerStatsHttpHandlerFactory.setHttpCallsValueRecorder(v);
+        ValueRecorder v = metricContext.createValueRecorderSeries(id, "Length of time taken to process HTTP requests", CaptureFunctions.MEDIAN(captureTime), CaptureFunctions.MAX(captureTime));
+        ServerHttpRequestMonitor.setHtpRequestTimeValueRecorder(v);
     }
 }

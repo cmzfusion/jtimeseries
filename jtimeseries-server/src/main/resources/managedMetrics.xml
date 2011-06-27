@@ -39,11 +39,16 @@
                                 <constructor-arg value="${serverMetricsContextPath}"/>
                             </bean>
 
+                            <!-- Count of UDP updates received -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.HttpCallsMetric">
+                                <constructor-arg value="${serverMetricsContextPath}"/>
+                            </bean>
+
                              <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
                             <bean class="com.od.jtimeseries.component.managedmetric.jmx.JmxMetric">
                                 <constructor-arg>
                                     <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="1"/>  <!-- connect to jmx service to take measurements every 5 mins -->
+                                        <constructor-arg value="1"/>  <!-- connect to jmx service to take measurements every 1 mins -->
                                     </bean>
                                 </constructor-arg>
                                 <constructor-arg value="service:jmx:rmi:///jndi/rmi://localhost:${jmxManagementPort}/jmxrmi"/>

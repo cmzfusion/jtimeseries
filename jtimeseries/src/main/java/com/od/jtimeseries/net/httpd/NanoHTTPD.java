@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A simple, tiny, nicely embeddable HTTP 1.0 server in Java
@@ -69,6 +70,10 @@ import java.util.concurrent.Executor;
 public class NanoHTTPD {
 
     private static Executor httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 5, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+
+    private static AtomicLong lastRequestId = new AtomicLong();
+
+    private volatile HttpRequestMonitor requestMonitor = HttpRequestMonitor.DUMMY_REQUEST_MONITOR;
 
     // ==================================================
     // API parts
@@ -317,10 +322,14 @@ public class NanoHTTPD {
         }
 
         public void run() {
+            long requestId = lastRequestId.incrementAndGet();
+            BufferedReader in = null;
             try {
                 InputStream is = mySocket.getInputStream();
                 if (is == null) return;
-                BufferedReader in = new BufferedReader(new InputStreamReader(is));
+
+                requestMonitor.requestStarting(requestId, mySocket);
+                in = new BufferedReader(new InputStreamReader(is));
 
                 // Read the request line
                 StringTokenizer st = new StringTokenizer(in.readLine());
@@ -335,10 +344,10 @@ public class NanoHTTPD {
                 String uri = st.nextToken();
 
                 // Decode parameters from the URI
-                Properties parms = new Properties();
+                Properties params = new Properties();
                 int qmi = uri.indexOf('?');
                 if (qmi >= 0) {
-                    decodeParms(uri.substring(qmi + 1), parms);
+                    decodeParms(uri.substring(qmi + 1), params);
                     uri = decodePercent(uri.substring(0, qmi));
                 } else uri = decodePercent(uri);
 
@@ -378,26 +387,37 @@ public class NanoHTTPD {
                             read = in.read(buf);
                     }
                     postLine = postLine.trim();
-                    decodeParms(postLine, parms);
+                    decodeParms(postLine, params);
                 }
+                requestMonitor.servingRequest(requestId, mySocket, uri, method,  header, params);
 
                 // Ok, now do the serve()
-                Response r = serve(uri, method, header, parms);
-                if (r == null)
+                Response r = serve(uri, method, header, params);
+                if (r == null) {
                     sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
-                else
+                } else {
                     sendResponse(r);
-
-                in.close();
+                }
             } catch (IOException ioe) {
                 try {
                     sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-                } catch (Throwable t) {
+                } catch (SendErrorException t) {
+                    requestMonitor.handledException(requestId, mySocket);
                 }
-            } catch (InterruptedException ie) {
+            } catch (SendErrorException ie) {
                 // Thrown by sendError, ignore and exit the thread.
             } catch (Throwable t) {
+                requestMonitor.unhandledException(requestId, mySocket, t);
                 t.printStackTrace();
+            } finally {
+                if ( in != null) {
+                    try {
+                        in.close();
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+                }
+                requestMonitor.finishedRequest(requestId, mySocket);
             }
         }
 
@@ -405,7 +425,7 @@ public class NanoHTTPD {
          * Decodes the percent encoding scheme. <br/>
          * For example: "an+example%20string" -> "an example string"
          */
-        private String decodePercent(String str) throws InterruptedException {
+        private String decodePercent(String str) throws SendErrorException {
             try {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < str.length(); i++) {
@@ -435,8 +455,7 @@ public class NanoHTTPD {
          * ( e.g. "name=Jack%20Daniels&pass=Single%20Malt" ) and
          * adds them to given Properties.
          */
-        private void decodeParms(String parms, Properties p)
-                throws InterruptedException {
+        private void decodeParms(String parms, Properties p) throws SendErrorException {
             if (parms == null)
                 return;
 
@@ -452,11 +471,11 @@ public class NanoHTTPD {
 
         /**
          * Returns an error message as a HTTP response and
-         * throws InterruptedException to stop furhter request processing.
+         * throws SendErrorException to stop further request processing.
          */
-        private void sendError(String status, String msg) throws InterruptedException {
+        private void sendError(String status, String msg) throws SendErrorException {
             sendResponse(new TextResponse(status, MIME_PLAINTEXT, msg));
-            throw new InterruptedException();
+            throw new SendErrorException();
         }
 
         /**
@@ -502,9 +521,10 @@ public class NanoHTTPD {
         }
 
         private Socket mySocket;
+
+        private class SendErrorException extends Exception {}
     }
 
-    ;
 
     /**
      * URL-encodes everything between "/"-characters.
@@ -664,6 +684,10 @@ public class NanoHTTPD {
         } catch (IOException ioe) {
             return new TextResponse(HTTP_FORBIDDEN, MIME_PLAINTEXT, "FORBIDDEN: Reading file failed.");
         }
+    }
+
+    public void setRequestMonitor(HttpRequestMonitor requestMonitor) {
+        this.requestMonitor = requestMonitor;
     }
 
     /**

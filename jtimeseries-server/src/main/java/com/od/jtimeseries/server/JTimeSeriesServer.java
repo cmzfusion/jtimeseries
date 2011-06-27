@@ -142,6 +142,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     private void startTimeSeriesHttpServer() throws IOException {
         logMethods.logInfo("Starting HTTP Server on port " + httpdServer.getPort());
+        httpdServer.setRequestMonitor(new ServerHttpRequestMonitor());
         httpdServer.start();
     }
 

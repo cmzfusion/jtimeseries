@@ -77,6 +77,7 @@ public class FrameManager implements ConfigAware {
             udpPingHttpServerDictionary,
             displayNameCalculator
         );
+        addShowFrameTreeListener();
     }
 
     public List<ConfigAware> getConfigAwareChildren() {
@@ -84,7 +85,16 @@ public class FrameManager implements ConfigAware {
     }
 
     public void clearConfig() {
+        disposeAllFrames();
+    }
+
+    private void disposeAllFrames() {
         mainFrame = null;
+        for ( AbstractDesktopFrame f : desktopContextToFrameMap.values()) {
+            f.setVisible(false);
+            f.dispose();
+        }
+        desktopContextToFrameMap.clear();
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -94,9 +104,6 @@ public class FrameManager implements ConfigAware {
         DesktopContext c = rootContext.getMainDesktopContext();
         this.mainFrame = createMainFrame(c);
         addToFrameMap(c, mainFrame);
-
-        showFrames();
-        addShowFrameTreeListener();
     }
 
     private void showFrames() {

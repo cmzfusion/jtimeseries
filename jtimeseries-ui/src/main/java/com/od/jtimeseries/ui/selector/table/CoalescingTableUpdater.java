@@ -26,9 +26,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -54,7 +52,7 @@ class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
     private Class seriesClass;
     private BeanPerRowModel<E> tableModel;
     private Component tableComponent;
-    private HashSet tableContents = new HashSet();
+    private LinkedHashSet tableContents = new LinkedHashSet();
 
     CoalescingTableUpdater(Class seriesClass, BeanPerRowModel<E> tableModel, Component tableComponent) {
         this.seriesClass = seriesClass;
@@ -152,12 +150,22 @@ class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
                             tableModel.addObjects(toAdd);
                             tableContents.addAll(toAdd);
                         } else {
-                            //TODO since there's no method to remove multiple beans the only way would be
-                            //to clear and re-add everything, at present we don't coalesce removes
-                            for ( Object o : c.getBeans()) {
-                                tableModel.removeObject((E)o);
+                            //Since there's no jide table model method to remove multiple beans the only way is
+                            //to clear and re-add everything!
+                            //however, only do this for large selections, since we are more likely to affect
+                            //aspects of the JTable view such as user selections by firing bulk clear and add events
+                            if ( c.getBeans().size() > 10) {
+                                tableModel.clear();
+                                tableContents.removeAll(c.getBeans());
+                                tableModel.addObjects(new ArrayList(tableContents));
+                            }  else {
+                                for ( Object o : c.getBeans()) {
+                                    tableModel.removeObject((E)o);
+                                }
+                                tableContents.removeAll(c.getBeans());
                             }
-                            tableContents.removeAll(c.getBeans());
+
+
                         }
                     }
                 }

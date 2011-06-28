@@ -80,7 +80,7 @@ class ServerSeriesLoadingBusListener extends ContextUpdatingBusListener {
                 }
             }
         };
-        ScheduledFuture f = loadSeriesFromServerExecutor.scheduleWithFixedDelay(loadTask, 0, SERVER_REFRESH_RATE_MINS, TimeUnit.MINUTES);
+        ScheduledFuture f = loadSeriesFromServerExecutor.scheduleWithFixedDelay(loadTask, 1, SERVER_REFRESH_RATE_MINS * 60, TimeUnit.SECONDS);
         loadTasksByServer.put(s, f);
     }
 

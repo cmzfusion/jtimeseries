@@ -70,17 +70,16 @@ public class TimeSerious implements ConfigAware {
     private TimeSeriousConfig config;
 
     public void start() {
-        startJmxAndLocalHttpd();
-        setupServerDictionary();
+        Runnable r = new StartServicesRunnable();
+        new Thread(r, "Startup Services Thread").start();
 
         try {
             config = configInitializer.loadConfig();
+            configTreeManager.restoreConfig(config);
         } catch (ConfigManagerException e) {
-            //todo, add handling
-            e.printStackTrace();
+            logMethods.logError("Failed to load config or create default config, canot start TimeSerious", e);
         }
 
-        configTreeManager.restoreConfig(config);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {
@@ -117,7 +116,7 @@ public class TimeSerious implements ConfigAware {
 
     }
 
-    private void setupServerDictionary() {
+    private void startServerForUdpServerUpdates() {
         UdpServer server = new UdpServer(17000);
         server.addUdpMessageListener(udpPingHttpServerDictionary);
         server.startReceive();
@@ -138,4 +137,17 @@ public class TimeSerious implements ConfigAware {
     }
 
 
+    private class StartServicesRunnable implements Runnable {
+
+        public void run() {
+            try {
+                logMethods.logInfo("Starting services");
+                startJmxAndLocalHttpd();
+                startServerForUdpServerUpdates();
+                logMethods.logInfo("Finished starting services");
+            } catch (Throwable t) {
+                logMethods.logError("Error starting services", t);
+            }
+        }
+    }
 }

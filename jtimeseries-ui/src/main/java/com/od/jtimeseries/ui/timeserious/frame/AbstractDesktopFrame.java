@@ -25,6 +25,9 @@ import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.PeerDesktop;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
+import com.od.jtimeseries.ui.timeserious.action.CascadeVisualizersAction;
+import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.TileVisualizersAction;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.eventbus.EventSender;
@@ -48,6 +51,9 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
     private TimeSeriousRootContext rootContext;
     private ApplicationActionModels actionModels;
     private JToolBar mainToolBar = new JToolBar();
+    protected Action newVisualizerAction;
+    protected Action tileVisualizersAction;
+    private Action cascadeVisualizersAction;
 
     public AbstractDesktopFrame(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel, TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
         this.desktopContext = desktopContext;
@@ -59,6 +65,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         setConfiguration(desktopContext);
         desktopContext.setPeerResource(this);
         addWindowFocusListener(new DesktopSelectionWindowFocusListener());
+        createCommonActions();
     }
 
     protected TimeSeriousDesktopPane getDesktopPane() {
@@ -87,6 +94,38 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
 
     protected ApplicationActionModels getActionModels() {
         return actionModels;
+    }
+
+    protected Action getNewVisualizerAction() {
+        return newVisualizerAction;
+    }
+
+    protected Action getTileVisualizersAction() {
+        return tileVisualizersAction;
+    }
+
+    protected Action getCascadeVisualizersAction() {
+        return cascadeVisualizersAction;
+    }
+
+    protected void addSeparator(JToolBar toolBar) {
+        toolBar.addSeparator(new Dimension(16, 16));
+    }
+
+    protected void createCommonActions() {
+         newVisualizerAction = new NewVisualizerAction(
+            this,
+            getActionModels().getDesktopSelectionActionModel(),
+            getActionModels().getVisualizerSelectionActionModel()
+        );
+
+        tileVisualizersAction = new TileVisualizersAction(
+            getDesktopPane()
+        );
+
+        cascadeVisualizersAction = new CascadeVisualizersAction(
+            getDesktopPane()
+        );
     }
 
     //set the selected desktop in the desktopSelectionActionModel when this window is focused

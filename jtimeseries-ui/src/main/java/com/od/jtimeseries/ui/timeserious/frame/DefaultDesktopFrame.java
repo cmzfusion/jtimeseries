@@ -27,6 +27,7 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
+import com.od.jtimeseries.ui.timeserious.action.TileVisualizersAction;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
@@ -49,13 +50,11 @@ import java.awt.event.WindowEvent;
  */
 public class DefaultDesktopFrame extends AbstractDesktopFrame {
 
-    private Action newVisualizerAction;
     private IdentifiableTreeListener frameDisposingDesktopContextListener;
 
     public DefaultDesktopFrame(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel,
                                TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
         super(serverDictionary, displayNameCalculator, desktopContext, selectionPanel, rootContext, actionModels);
-        createActions();
         createToolBar();
         layoutFrame();
         initializeFrame();
@@ -103,16 +102,12 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         setTitle("TimeSerious " + getDesktopContext().getId());
     }
 
-    private void createActions() {
-        newVisualizerAction = new NewVisualizerAction(
-            this,
-            getActionModels().getDesktopSelectionActionModel(),
-            getActionModels().getVisualizerSelectionActionModel()
-        );
-    }
-
     private void createToolBar() {
-        getToolBar().add(newVisualizerAction);
+        JToolBar toolBar = getToolBar();
+        toolBar.add(getNewVisualizerAction());
+        addSeparator(toolBar);
+        toolBar.add(getTileVisualizersAction());
+        toolBar.add(getCascadeVisualizersAction());
     }
 
     protected Component getMainComponent() {

@@ -150,10 +150,14 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     private void createToolBar() {
-        getToolBar().add(editDisplayNamePatternsAction);
-        getToolBar().add(newServerAction);
-        getToolBar().add(newDesktopAction);
-        getToolBar().add(newVisualizerAction);
+        JToolBar toolBar = getToolBar();
+        toolBar.add(editDisplayNamePatternsAction);
+        toolBar.add(newServerAction);
+        toolBar.add(newDesktopAction);
+        toolBar.add(getNewVisualizerAction());
+        addSeparator(toolBar);
+        toolBar.add(getTileVisualizersAction());
+        toolBar.add(getCascadeVisualizersAction());
     }
 
     private void initializeFrame() {

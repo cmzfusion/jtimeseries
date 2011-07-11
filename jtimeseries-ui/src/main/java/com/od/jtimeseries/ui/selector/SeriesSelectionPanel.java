@@ -77,7 +77,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
     private CardLayout cardLayout;
     private DescriptionListener descriptionSettingSelectorListener = new DescriptionListener();
     private IdentifiableListActionModel selectionActionModel;
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private IdentifiableTreeListener updateSelectedForChartingContextListener;
 
     public SeriesSelectionPanel(AbstractUIRootContext context, Class seriesClass) {
@@ -142,13 +141,13 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         return selectionActionModel;
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
+//    public void addPropertyChangeListener(PropertyChangeListener listener) {
+//        propertyChangeSupport.addPropertyChangeListener(listener);
+//    }
+//
+//    public void removePropertyChangeListener(PropertyChangeListener listener) {
+//        propertyChangeSupport.removePropertyChangeListener(listener);
+//    }
 
     private void createTitlePanel() {
         titleBox = Box.createHorizontalBox();

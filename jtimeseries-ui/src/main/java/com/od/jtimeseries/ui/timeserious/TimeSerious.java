@@ -33,7 +33,6 @@ import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 import od.configutil.ConfigManagerException;
 
 import javax.swing.*;
@@ -104,11 +103,7 @@ public class TimeSerious implements ConfigAware {
                 JideInitialization.applyLicense();
                 JideInitialization.setupJide();
 
-                try {
-                    UIManager.setLookAndFeel(WindowsLookAndFeel.class.getName());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                new LookAndFeelManager().installLookAndFeel();
 
                 new TimeSerious().start();
             }

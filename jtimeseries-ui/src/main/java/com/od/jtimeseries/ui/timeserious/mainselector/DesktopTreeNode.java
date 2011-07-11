@@ -47,7 +47,7 @@ public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
     }
 
     protected Icon getIcon() {
-        return ImageUtils.DESKTOP_16x16;
+        return context.isShown() ? ImageUtils.DESKTOP_16x16 : ImageUtils.DESKTOP_HIDDEN_16x16;
     }
 }
 

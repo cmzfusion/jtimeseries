@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.mainselector;
 
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
@@ -47,7 +48,7 @@ public class VisualizerTreeNode  extends AbstractSeriesSelectionTreeNode {
     }
 
     protected Icon getIcon() {
-        return ImageUtils.VISUALIZER_16x16;
+        return identifiable.isShown() ? ImageUtils.VISUALIZER_16x16 : ImageUtils.VISUALIZER_HIDDEN_16x16;
     }
 }
 

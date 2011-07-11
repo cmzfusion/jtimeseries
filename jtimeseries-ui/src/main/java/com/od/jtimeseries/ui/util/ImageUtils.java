@@ -55,7 +55,9 @@ public class ImageUtils {
     public static ImageIcon DESKTOP_DELETE_16x16 = getImageIcon("/images/window_delete_16x16.png");
     public static ImageIcon DESKTOP_SHOW_16x16 = getImageIcon("/images/window_show_16x16.png");
     public static ImageIcon DESKTOP_16x16 = getImageIcon("/images/window_16x16.png");
+    public static ImageIcon DESKTOP_HIDDEN_16x16 = getImageIcon("/images/window_hidden_16x16.png");
     public static ImageIcon VISUALIZER_16x16 = getImageIcon("/images/visualizer_16x16.png");
+    public static ImageIcon VISUALIZER_HIDDEN_16x16 = getImageIcon("/images/visualizer_hidden_16x16.png");
     public static ImageIcon VISUALIZER_NEW_16x16 = getImageIcon("/images/visualizer_new_16x16.png");
     public static ImageIcon VISUALIZER_DELETE_16x16 = getImageIcon("/images/visualizer_delete_16x16.png");
     public static ImageIcon VISUALIZER_SHOW_16x16 = getImageIcon("/images/visualizer_show_16x16.png");

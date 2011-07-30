@@ -45,7 +45,7 @@ public class NewDesktopAction extends AbstractAction {
         this.component = component;
         this.desktopContainingContext = desktopContainingContext;
         this.desktopSelectionActionModel = desktopSelectionActionModel;
-        super.putValue(SHORT_DESCRIPTION, "Create a new desktop component");
+        super.putValue(SHORT_DESCRIPTION, "Create a new desktop");
     }
 
     public void actionPerformed(ActionEvent e) {

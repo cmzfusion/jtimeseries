@@ -57,7 +57,9 @@ class DesktopExportableConfigImportUtility extends ExportableConfigImportUtility
     }
 
     protected ImportItem doGetImportDetails(Component component, ExportableConfig s, Identifiable target) {
-        Rectangle parentWindowBounds = SwingUtilities.getWindowAncestor(component).getBounds();
+        Rectangle parentWindowBounds = component instanceof Window ?
+            component.getBounds() :
+            SwingUtilities.getWindowAncestor(component).getBounds();
         if ( lastDesktopImportLocation == null) {
             lastDesktopImportLocation = parentWindowBounds;
         }

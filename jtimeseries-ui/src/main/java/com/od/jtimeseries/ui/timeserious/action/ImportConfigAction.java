@@ -20,11 +20,14 @@ package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
+import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,14 +38,14 @@ import java.io.File;
  */
 public class ImportConfigAction extends ExportImportFileAction {
 
- private ConfigAwareTreeManager configTree;
     private ConfigInitializer configInitializer;
     private JFrame mainFrame;
+    private TimeSeriousRootContext rootContext;
 
-    public ImportConfigAction(JFrame mainFrame, ConfigAwareTreeManager configTree, ConfigInitializer configInitializer) {
+    public ImportConfigAction(JFrame mainFrame, TimeSeriousRootContext rootContext, ConfigInitializer configInitializer) {
         super("Import Config...", null);
         this.mainFrame = mainFrame;
-        this.configTree = configTree;
+        this.rootContext = rootContext;
         this.configInitializer = configInitializer;
         super.putValue(SHORT_DESCRIPTION, "Import config from a file");
     }
@@ -52,9 +55,11 @@ public class ImportConfigAction extends ExportImportFileAction {
         int result = f.showOpenDialog(mainFrame);
         if ( result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = f.getSelectedFile();
-            TimeSeriousConfig c = configInitializer.importConfig(mainFrame, selectedFile);
+            ExportableConfig c = configInitializer.importConfig(mainFrame, selectedFile);
             if ( c != null) {
-                configTree.clearAndRestoreConfig(c);
+                //import to main desktop by default, so that imported
+                //charts will appear there
+                rootContext.doImport(mainFrame, Collections.singletonList(c), rootContext.getMainDesktopContext());
             }
         }
     }

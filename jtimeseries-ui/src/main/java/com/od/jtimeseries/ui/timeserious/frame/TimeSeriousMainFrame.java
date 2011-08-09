@@ -98,7 +98,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         exitAction = new ExitAction(this, configTreeManager, configInitializer);
         saveAction = new SaveAction(this, configTreeManager, configInitializer);
         exportConfigAction = new ExportConfigAction(this, configTreeManager, configInitializer);
-        importConfigAction = new ImportConfigAction(this, configTreeManager, configInitializer);
+        importConfigAction = new ImportConfigAction(this, getRootContext(), configInitializer);
         newVisualizerAction = new NewVisualizerAction(
             this,
             getActionModels().getDesktopSelectionActionModel(),

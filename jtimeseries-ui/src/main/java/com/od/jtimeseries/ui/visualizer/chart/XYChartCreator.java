@@ -23,14 +23,21 @@ import com.od.jtimeseries.chart.TimeSeriesXYDataset;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
+import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYDataset;
+import org.jfree.ui.RectangleInsets;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,30 +46,65 @@ import java.util.HashMap;
  * Time: 11:26:46
  * To change this template use File | Settings | File Templates.
  */
-public class ChartSeriesPopulator {
+public abstract class XYChartCreator {
 
     private XYPlot plot;
     private ChartRangeMode chartRangeMode;
     private HashMap<String, NumberAxis> axisBySeriesId = new HashMap<String, NumberAxis>();
     private HashMap<String, Integer> axisIndexBySeriesId = new HashMap<String, Integer>();
     private DomainTimeSelection domainSelection;
+    private boolean showLegend;
+    private String title;
+    private Color chartBackgroundColor;
+    private DateFormat dateFormat = new SimpleDateFormat("MMMdd HH:mm");
+    private java.util.List<ChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
 
-    public ChartSeriesPopulator(XYPlot plot, ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection) {
-        this.plot = plot;
+    public XYChartCreator(ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection, Color chartBackgroundColor, java.util.List<ChartingTimeSeries> timeSeriesList, boolean showLegend, String title) {
+        this.chartBackgroundColor = chartBackgroundColor;
+        this.timeSeriesList = timeSeriesList;
         this.chartRangeMode = chartRangeMode;
         this.domainSelection = domainSelection;
+        this.showLegend = showLegend;
+        this.title = title;
     }
 
-    public void addSeriesToChart(ChartingTimeSeries contextTimeSeries, int seriesId) {
+    public JFreeChart createNewChart() {
+        JFreeChart chart = createChart();
+        plot = (XYPlot)chart.getPlot();
+        plot.setBackgroundPaint(chartBackgroundColor);
+        plot.setAxisOffset(new RectangleInsets(5,5,5,5));
+        addSeries();
+        return chart;
+    }
+
+    private JFreeChart createChart() {
+        final JFreeChart chart = buildChart();
+        chart.getXYPlot().setDomainAxis(new DateAxis());
+        DateAxis dateAxis = (DateAxis)chart.getXYPlot().getDomainAxis();
+        dateAxis.setDateFormatOverride(dateFormat);
+        return chart;
+    }
+
+    protected abstract JFreeChart buildChart();
+
+    private void addSeries() {
+        for ( int loop=0; loop < timeSeriesList.size(); loop++) {
+            ChartingTimeSeries series = timeSeriesList.get(loop);
+            addSeriesToChart(series, loop);
+        }
+    }
+
+    private void addSeriesToChart(ChartingTimeSeries contextTimeSeries, int seriesId) {
         XYDataset dataSet = createDataSet(contextTimeSeries);
         plot.setDataset(seriesId, dataSet);
-        EfficientXYLineAndShapeRenderer renderer2 = new EfficientXYLineAndShapeRenderer();
-//        XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer(true, false);
+        XYItemRenderer renderer = createXYItemRenderer(seriesId);
 
-        plot.setRenderer(seriesId, renderer2);
+        plot.setRenderer(seriesId, renderer);
         createRangeAxes(contextTimeSeries, seriesId, plot);
         setSeriesColor(plot, seriesId, contextTimeSeries);
     }
+
+    protected abstract XYItemRenderer createXYItemRenderer(int seriesId);
 
     private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int seriesId, XYPlot plot) {
         switch(chartRangeMode) {
@@ -121,5 +163,12 @@ public class ChartSeriesPopulator {
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
     }
 
+    protected boolean isShowLegend() {
+        return showLegend;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 
 }

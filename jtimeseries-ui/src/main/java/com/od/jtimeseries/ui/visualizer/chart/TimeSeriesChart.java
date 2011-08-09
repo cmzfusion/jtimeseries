@@ -21,23 +21,16 @@ package com.od.jtimeseries.ui.visualizer.chart;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.ChartChangeEventType;
 import org.jfree.chart.event.ChartChangeListener;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.ui.RectangleInsets;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +53,6 @@ public class TimeSeriesChart extends JPanel {
     private ChartPanel chartPanel;
     private JPanel noChartsPanel = new JPanel();
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
-    private DateFormat dateFormat = new SimpleDateFormat("MMMdd HH:mm");
     private Color chartBackgroundColor = Color.WHITE;
 
     private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
@@ -169,47 +161,14 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void createAndSetChart() {
-        chart = createNewChart();
+        XYChartCreator chartCreator = new XYLineChartCreator(chartRangeMode, domainStartTimeSelection, chartBackgroundColor, timeSeriesList, showLegend, title);
+        chart = chartCreator.createNewChart();
+        addTitleChangeListener(chart);
         if ( chartPanel == null ) {
             chartPanel = new ChartPanel(chart);
         } else {
             chartPanel.setChart(chart);
         }
-    }
-
-    private JFreeChart createNewChart() {
-        JFreeChart chart = createChart();
-        XYPlot plot = (XYPlot)chart.getPlot();
-        XYItemRenderer r = plot.getRenderer();
-        plot.setBackgroundPaint(chartBackgroundColor);
-        plot.setAxisOffset(new RectangleInsets(5,5,5,5));
-        addSeries(chart);
-        return chart;
-    }
-
-    private void addSeries(JFreeChart chart) {
-        ChartSeriesPopulator c = new ChartSeriesPopulator(chart.getXYPlot(), chartRangeMode, domainStartTimeSelection);
-        for ( int loop=0; loop < timeSeriesList.size(); loop++) {
-            ChartingTimeSeries series = timeSeriesList.get(loop);
-            c.addSeriesToChart(series, loop);
-        }
-    }
-
-    private JFreeChart createChart() {
-        final JFreeChart chart = ChartFactory.createTimeSeriesChart(
-            title,
-            "Time of Day",
-            null,
-            null,
-            showLegend,
-            true,
-            false
-        );
-        addTitleChangeListener(chart);
-
-        DateAxis dateAxis = (DateAxis)chart.getXYPlot().getDomainAxis();
-        dateAxis.setDateFormatOverride(dateFormat);
-        return chart;
     }
 
     private void addTitleChangeListener(final JFreeChart chart) {

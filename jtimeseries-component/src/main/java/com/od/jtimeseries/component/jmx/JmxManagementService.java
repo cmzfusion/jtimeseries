@@ -49,7 +49,7 @@ public class JmxManagementService {
             logMethods.logInfo("Starting JMX Management Service on port " + jmxManagementPort);
             LocateRegistry.createRegistry(jmxManagementPort);
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            serviceUrl = "service:jmx:rmi:///jndi/rmi://:" + jmxManagementPort + "/jmxrmi";
+            serviceUrl = "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi";
             JMXServiceURL url = new JMXServiceURL(serviceUrl);
             connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
             connectorServer.start();

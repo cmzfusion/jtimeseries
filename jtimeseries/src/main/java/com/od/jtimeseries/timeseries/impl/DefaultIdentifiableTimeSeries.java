@@ -42,11 +42,6 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         this(id, description, new DefaultTimeSeries());
     }
 
-    public DefaultIdentifiableTimeSeries(Identifiable parent, String id, String description, TimeSeries timeSeries) {
-        this(id, description, timeSeries);
-        setParent(parent);
-    }
-
     public DefaultIdentifiableTimeSeries(String id, String description, TimeSeries timeSeries) {
         super(id, description);
         this.timeSeries = timeSeries;

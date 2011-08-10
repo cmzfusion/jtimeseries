@@ -41,14 +41,6 @@ public abstract class PropertyChangeTimeSeries extends DefaultIdentifiableTimeSe
         super(id, description);
     }
 
-    public PropertyChangeTimeSeries(Identifiable parent, String id, String description, TimeSeries timeSeries) {
-        super(parent, id, description, timeSeries);
-    }
-
-    public PropertyChangeTimeSeries(String id, String description, TimeSeries timeSeries) {
-        super(id, description, timeSeries);
-    }
-
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }

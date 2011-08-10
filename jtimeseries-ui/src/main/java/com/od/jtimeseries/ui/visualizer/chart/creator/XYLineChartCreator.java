@@ -1,11 +1,10 @@
-package com.od.jtimeseries.ui.visualizer.chart;
+package com.od.jtimeseries.ui.visualizer.chart.creator;
 
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 
 import java.awt.*;
@@ -18,8 +17,8 @@ import java.awt.*;
  */
 public class XYLineChartCreator extends XYChartCreator {
 
-    public XYLineChartCreator(ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection, Color chartBackgroundColor, java.util.List<ChartingTimeSeries> timeSeriesList, boolean showLegend, String title) {
-        super(chartRangeMode, domainSelection, chartBackgroundColor, timeSeriesList, showLegend, title);
+    public XYLineChartCreator(ChartCreatorParameters p) {
+        super(p);
     }
 
     protected XYItemRenderer createXYItemRenderer(int seriesId) {
@@ -30,13 +29,13 @@ public class XYLineChartCreator extends XYChartCreator {
 
     protected JFreeChart buildChart() {
         return ChartFactory.createTimeSeriesChart(
-            getTitle(),
-            "Time of Day",
-            null,
-            null,
-            isShowLegend(),
-            true,
-            false
+                getTitle(),
+                "Time of Day",
+                null,
+                null,
+                isShowLegend(),
+                true,
+                false
         );
     }
 }

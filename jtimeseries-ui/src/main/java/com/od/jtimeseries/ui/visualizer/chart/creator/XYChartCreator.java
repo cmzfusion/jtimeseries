@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.visualizer.chart;
+package com.od.jtimeseries.ui.visualizer.chart.creator;
 
 import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
 import com.od.jtimeseries.chart.TimeSeriesXYDataset;
@@ -59,13 +59,13 @@ public abstract class XYChartCreator {
     private DateFormat dateFormat = new SimpleDateFormat("MMMdd HH:mm");
     private java.util.List<ChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
 
-    public XYChartCreator(ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection, Color chartBackgroundColor, java.util.List<ChartingTimeSeries> timeSeriesList, boolean showLegend, String title) {
-        this.chartBackgroundColor = chartBackgroundColor;
-        this.timeSeriesList = timeSeriesList;
-        this.chartRangeMode = chartRangeMode;
-        this.domainSelection = domainSelection;
-        this.showLegend = showLegend;
-        this.title = title;
+    public XYChartCreator(ChartCreatorParameters p) {
+        this.chartBackgroundColor = p.getChartBackgroundColor();
+        this.timeSeriesList = p.getTimeSeriesList();
+        this.chartRangeMode = p.getChartRangeMode();
+        this.domainSelection = p.getDomainSelection();
+        this.showLegend = p.isShowLegend();
+        this.title = p.getTitle();
     }
 
     public JFreeChart createNewChart() {

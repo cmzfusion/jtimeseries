@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer.chart;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.ui.visualizer.chart.creator.*;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartChangeEvent;
@@ -54,6 +55,7 @@ public class TimeSeriesChart extends JPanel {
     private JPanel noChartsPanel = new JPanel();
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
     private Color chartBackgroundColor = Color.WHITE;
+    private ChartType chartType = ChartType.AreaChart;
 
     private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -63,6 +65,7 @@ public class TimeSeriesChart extends JPanel {
     private JFreeChart chart;
     private boolean showLegend = true;
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
+    private final ChartCreatorFactory chartCreatorFactory = new ChartCreatorFactory();
 
     public TimeSeriesChart(String title) {
         this.title = title;
@@ -142,6 +145,17 @@ public class TimeSeriesChart extends JPanel {
         return domainStartTimeSelection;
     }
 
+    public ChartType getChartType() {
+        return chartType;
+    }
+
+    public void setChartType(ChartType chartType) {
+        if ( this.chartType != chartType) {
+            this.chartType = chartType;
+            createAndSetChart();
+        }
+    }
+
     public void setDomainStartTimeSelection(DomainTimeSelection newValue) {
         if ( ! this.domainStartTimeSelection.equals(newValue) ) {
             this.domainStartTimeSelection = newValue;
@@ -161,7 +175,8 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void createAndSetChart() {
-        XYChartCreator chartCreator = new XYLineChartCreator(chartRangeMode, domainStartTimeSelection, chartBackgroundColor, timeSeriesList, showLegend, title);
+        ChartCreatorParameters p = new ChartCreatorParameters(chartRangeMode, domainStartTimeSelection, chartBackgroundColor, timeSeriesList, showLegend, title);
+        XYChartCreator chartCreator = chartCreatorFactory.getChartCreator(chartType, p);
         chart = chartCreator.createNewChart();
         addTitleChangeListener(chart);
         if ( chartPanel == null ) {

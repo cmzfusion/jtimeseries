@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer.chart;
 import com.jidesoft.combobox.ColorComboBox;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,15 +46,26 @@ public class ChartControlPanel extends JPanel {
     private ButtonGroup radioButtonGroup;
     private JCheckBox showLegendCheckbox = new JCheckBox("Legend");
     private RangeSelectorComponent rangeSelectorComponent = new RangeSelectorComponent();
+    private JComboBox chartTypeCombo = new JComboBox(ChartType.values());
 
     public ChartControlPanel(TimeSeriesChart timeSeriesChart) {
         this.timeSeriesChart = timeSeriesChart;
         createColorCombo();
         createShowLegendCheckbox();
         createRangeModeRadioButtons();
+        createChartTypeCombo();
         layoutPanel();
         refreshStateFromChart();
         addRangeSelectorListener();
+    }
+
+    private void createChartTypeCombo() {
+        chartTypeCombo.setMaximumSize(chartTypeCombo.getPreferredSize());
+        chartTypeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                timeSeriesChart.setChartType((ChartType)chartTypeCombo.getSelectedItem());
+            }
+        });
     }
 
     public void refreshStateFromChart() {
@@ -61,6 +73,7 @@ public class ChartControlPanel extends JPanel {
         updateDomainSelection();
         showLegendCheckbox.setSelected(timeSeriesChart.isShowLegend());
         colorComboBox.setSelectedColor(timeSeriesChart.getChartBackgroundColor());
+        chartTypeCombo.setSelectedItem(timeSeriesChart.getChartType());
     }
 
     private void updateDomainSelection() {
@@ -133,18 +146,20 @@ public class ChartControlPanel extends JPanel {
         Box b = Box.createHorizontalBox();
         b.add(Box.createHorizontalGlue());
         b.add(colorComboBox);
-        b.add(Box.createHorizontalStrut(5));
+        b.add(Box.createHorizontalStrut(3));
         b.add(showLegendCheckbox);
-        b.add(Box.createHorizontalStrut(5));
+        b.add(Box.createHorizontalStrut(3));
         b.add(radioButtonBox);
-        b.add(Box.createHorizontalStrut(5));
+        b.add(Box.createHorizontalStrut(3));
         b.add(rangeSelectorComponent);
+        b.add(Box.createHorizontalStrut(3));
+        b.add(chartTypeCombo);
 
         setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
         setLayout(new BorderLayout());
-        JScrollPane scrollPane = new JScrollPane(b);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        add(scrollPane, BorderLayout.CENTER);
+//        JScrollPane scrollPane = new JScrollPane(b);
+//        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        add(b, BorderLayout.CENTER);
     }
 
 }

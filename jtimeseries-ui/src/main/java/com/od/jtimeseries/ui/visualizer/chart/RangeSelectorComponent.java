@@ -53,6 +53,8 @@ public class RangeSelectorComponent extends JPanel {
         add(multipleTextField);
         add(rangeModeList);
         addListeners();
+        setMaximumSize(getPreferredSize());
+        setMinimumSize(getPreferredSize());
     }
 
     private void showCurrentSelection() {

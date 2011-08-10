@@ -73,6 +73,14 @@ public class IdentifiableBase extends LockingIdentifiable {
         } else {
             childrenById.put(identifiable.getId(), identifiable);
         }
+
+        //remove from current parent, if any
+        Identifiable currentParent = identifiable.getParent();
+        if ( currentParent != null) {
+            currentParent.removeChild(identifiable);
+        }
+
+        //set this node as new parent and fire event
         identifiable.setParent(this);
         identifiable.addTreeListener(childEventPropagator);
         fireDescendantsAdded(new IdentifiableTreeEvent(this, "", identifiable));
@@ -352,7 +360,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         return queries.findAll(searchPattern, assignableToClass);
     }
     
-    //receive events from children, propogate them with updated path
+    //receive events from children, propagate them with updated path
     private class ChildTreeEventPropagator implements IdentifiableTreeListener {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {

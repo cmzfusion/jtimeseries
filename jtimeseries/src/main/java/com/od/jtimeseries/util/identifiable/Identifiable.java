@@ -56,6 +56,10 @@ public interface Identifiable {
     Identifiable getParent();
 
     /**
+     * Set the parent of a Identifiable without firing events
+     * n.b. parent is set automatically when you add this node to its parent using parentNode.addChild(), so you should
+     * not usually need to call this method from application code. parent.adChild() is the preferred way to do things, since it will
+     * also fire the appropriate IdentifiableTreeEvent
      * @return old parent or null if no previous parent
      */
     Identifiable setParent(Identifiable parent);

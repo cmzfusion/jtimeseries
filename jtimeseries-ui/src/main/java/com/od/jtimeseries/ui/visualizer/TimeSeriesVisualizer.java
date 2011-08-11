@@ -37,6 +37,7 @@ import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -107,7 +108,8 @@ public class TimeSeriesVisualizer extends JPanel {
             visualizer.getDividerLocation(),
             visualizer.isShowLegendOnChart(),
             visualizer.getChartBackgroundColor(),
-            visualizer.getColumns()
+            visualizer.getColumns(),
+            visualizer.getChartType()
         );
     }
 
@@ -120,6 +122,7 @@ public class TimeSeriesVisualizer extends JPanel {
         visualizer.setDividerLocation(c.getDividorLocation());
         visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
+        visualizer.setChartType(c.getChartType());
 
         //if there are no columns, assume we will use the default column set
         if ( c.getTableColumns().size() > 0) {
@@ -185,16 +188,26 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.setTableSelectorVisible(isVisible);
     }
 
-    public ChartRangeMode getChartRangeMode() {
-        return chart.getChartRangeMode();
-    }
-
     public DomainTimeSelection getDomainStartTimeSelection() {
         return chart.getDomainStartTimeSelection();
     }
 
     public void setDomainStartTimeSelection(DomainTimeSelection domainTimeSelection) {
         chart.setDomainStartTimeSelection(domainTimeSelection);
+        chartControlPanel.refreshStateFromChart();
+    }
+
+    public ChartType getChartType() {
+        return chart.getChartType();
+    }
+
+    public void setChartType(ChartType t) {
+        chart.setChartType(t);
+        chartControlPanel.refreshStateFromChart();
+    }
+
+    public ChartRangeMode getChartRangeMode() {
+        return chart.getChartRangeMode();
     }
 
     public void setChartRangeMode(ChartRangeMode chartRangeMode) {

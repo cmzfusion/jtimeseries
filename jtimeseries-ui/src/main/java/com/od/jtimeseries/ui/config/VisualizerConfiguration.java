@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.ui.config;
 
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private boolean showLegendOnChart = true;
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
+    private ChartType chartType;
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameLocation;
@@ -58,11 +61,12 @@ public class VisualizerConfiguration implements ExportableConfig {
     }
 
     public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
-                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings ) {
+                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings, ChartType chartType ) {
         this.title = chartsTitle;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
         this.domainStartTimeSelection = domainStartTimeSelection;
+        this.chartType = chartType;
         this.chartRangeMode = chartRangeMode.name();
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
@@ -166,6 +170,14 @@ public class VisualizerConfiguration implements ExportableConfig {
         isShown = shown;
     }
 
+    public ChartType getChartType() {
+        return chartType;
+    }
+
+    public void setChartType(ChartType chartType) {
+        this.chartType = chartType;
+    }
+
     public int getZPosition() {
         return zPosition;
     }
@@ -180,6 +192,10 @@ public class VisualizerConfiguration implements ExportableConfig {
     private Object readResolve() {
         if ( domainStartTimeSelection == null) {
             domainStartTimeSelection = new DomainTimeSelection();
+        }
+
+        if ( chartType == null ) {
+            chartType = ChartType.DEFAULT_CHART_TYPE;
         }
         return this;
     }

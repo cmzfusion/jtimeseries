@@ -55,7 +55,7 @@ public class TimeSeriesChart extends JPanel {
     private JPanel noChartsPanel = new JPanel();
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
     private Color chartBackgroundColor = Color.WHITE;
-    private ChartType chartType = ChartType.AreaChart;
+    private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
 
     private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {

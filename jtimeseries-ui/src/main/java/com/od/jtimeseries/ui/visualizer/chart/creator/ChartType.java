@@ -8,7 +8,8 @@ package com.od.jtimeseries.ui.visualizer.chart.creator;
  */
 public enum ChartType {
     LineChart,
-    AreaChart;
+    AreaChart,
+    ScatterChart;
 
     public static final ChartType DEFAULT_CHART_TYPE = AreaChart;
 }

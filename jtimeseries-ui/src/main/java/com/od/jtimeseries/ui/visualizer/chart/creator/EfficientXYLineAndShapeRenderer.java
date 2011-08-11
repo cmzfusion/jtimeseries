@@ -43,8 +43,8 @@ public class EfficientXYLineAndShapeRenderer extends XYLineAndShapeRenderer {
     private boolean storedLine;
     private int linesDrawn;
 
-    public EfficientXYLineAndShapeRenderer() {
-        super(true, false);
+    public EfficientXYLineAndShapeRenderer(boolean lines, boolean shapes) {
+        super(lines, shapes);
         setDrawSeriesLineAsPath(false);
     }
 

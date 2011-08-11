@@ -1,32 +1,29 @@
 package com.od.jtimeseries.ui.visualizer.chart.creator;
 
-import com.od.jtimeseries.ui.config.ChartRangeMode;
-import com.od.jtimeseries.ui.config.DomainTimeSelection;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 09/08/11
- * Time: 09:00
+ * Date: 11/08/11
+ * Time: 13:25
  */
-public class XYLineChartCreator extends XYChartCreator {
+public class XYScatterChartCreator extends XYChartCreator {
 
-    public XYLineChartCreator(ChartCreatorParameters p) {
+    public XYScatterChartCreator(ChartCreatorParameters p) {
         super(p);
     }
 
     protected JFreeChart buildChart() {
-        return ChartFactory.createTimeSeriesChart(
+        return ChartFactory.createScatterPlot(
                 getTitle(),
                 "Time of Day",
+                "Value",
                 null,
-                null,
+                PlotOrientation.VERTICAL,
                 isShowLegend(),
                 true,
                 false
@@ -34,7 +31,7 @@ public class XYLineChartCreator extends XYChartCreator {
     }
 
     protected XYItemRenderer createXYItemRenderer(int seriesId) {
-        return new EfficientXYLineAndShapeRenderer(true, false);
+        return new EfficientXYLineAndShapeRenderer(false, true);
     }
 
 }

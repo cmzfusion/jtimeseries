@@ -14,6 +14,8 @@ public class ChartCreatorFactory {
                 return new XYAreaChartCreator(p);
             case LineChart:
                 return new XYLineChartCreator(p);
+            case ScatterChart:
+                return new XYScatterChartCreator(p);
             default:
                 throw new UnsupportedOperationException("Unsupported ChartType");
         }

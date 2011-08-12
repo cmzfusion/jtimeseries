@@ -43,9 +43,9 @@ public class VisualizerConfiguration implements ExportableConfig {
     private List<UiTimeSeriesConfig> chartConfigs = new ArrayList<UiTimeSeriesConfig>();
     private int dividorLocation = DEFAULT_DIVIDER_LOCATION;
     private boolean showLegendOnChart = true;
-    private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately!
+    private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately! (n.b. no longer a problem now we're using XStream())
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
-    private ChartType chartType;
+    private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameLocation;

@@ -110,7 +110,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
             displayNameCalculator
         );
         newDesktopAction = new NewDesktopAction(this, getRootContext(), getActionModels().getDesktopSelectionActionModel());
-        showAboutDialogAction = new ShowAboutDialogAction(this);
+        showAboutDialogAction = new ShowAboutDialogAction(this, configInitializer.getConfigVersion());
     }
 
     private void addListeners() {

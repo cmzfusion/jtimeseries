@@ -31,17 +31,19 @@ import java.awt.event.ActionEvent;
 */
 class ShowAboutDialogAction extends AbstractAction {
 
-    private JFrame ownerFrame;{ putValue(NAME, "About"); }
+    private JFrame ownerFrame;
+    private long version;{ putValue(NAME, "About"); }
 
-    public ShowAboutDialogAction(JFrame ownerFrame) {
+    public ShowAboutDialogAction(JFrame ownerFrame, long version) {
         this.ownerFrame = ownerFrame;
+        this.version = version;
     }
 
     public void actionPerformed(ActionEvent e) {
         AboutDialog d = new AboutDialog(
             ownerFrame,
             "TimeSerious",
-            "1.0",
+            "version: " + version,
             "JTimeseries Project htp://www.jtimeseries.com",
             "(c) Object Definitions Ltd. LGPL",
             ImageUtils.SPLASH_SCREEN.getImage()

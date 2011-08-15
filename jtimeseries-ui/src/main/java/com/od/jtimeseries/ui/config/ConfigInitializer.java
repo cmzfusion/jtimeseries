@@ -196,4 +196,14 @@ public class ConfigInitializer {
         }
         return result;
     }
+
+    public Long getConfigVersion() {
+        long result = -1;
+        try {
+            result = configManager.getMigrationSource().loadConfigMigrations().lastKey();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 }

@@ -168,7 +168,7 @@ public abstract class AbstractXYChartCreator {
             public Number getY(int series, int item) {
                 Number result = super.getY(series, item);
                 if ( Double.isNaN(result.doubleValue())) {
-                    result = chartDataFilter == ChartDataFilter.TreatNanAsZero ? Double.valueOf(0) : Double.NaN;
+                    result = chartDataFilter == ChartDataFilter.NanAsZero ? Double.valueOf(0) : Double.NaN;
                 }
                 return result;
             }

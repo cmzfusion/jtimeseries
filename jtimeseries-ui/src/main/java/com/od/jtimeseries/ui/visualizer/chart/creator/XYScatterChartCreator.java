@@ -11,7 +11,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
  * Date: 11/08/11
  * Time: 13:25
  */
-public class XYScatterChartCreator extends XYChartCreator {
+public class XYScatterChartCreator extends AbstractXYChartCreator {
 
     public XYScatterChartCreator(ChartCreatorParameters p) {
         super(p);

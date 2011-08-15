@@ -8,7 +8,7 @@ package com.od.jtimeseries.ui.visualizer.chart.creator;
  */
 public class ChartCreatorFactory {
 
-    public XYChartCreator getChartCreator(ChartType chartType, ChartCreatorParameters p) {
+    public AbstractXYChartCreator getChartCreator(ChartType chartType, ChartCreatorParameters p) {
         switch(chartType) {
             case AreaChart:
                 return new XYAreaChartCreator(p);

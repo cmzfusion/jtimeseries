@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer.chart;
 import com.jidesoft.combobox.ColorComboBox;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartDataFilter;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 
 import javax.swing.*;
@@ -47,6 +48,7 @@ public class ChartControlPanel extends JPanel {
     private JCheckBox showLegendCheckbox = new JCheckBox("Legend");
     private RangeSelectorComponent rangeSelectorComponent = new RangeSelectorComponent();
     private JComboBox chartTypeCombo = new JComboBox(ChartType.values());
+    private JComboBox dataFilterCombo = new JComboBox(ChartDataFilter.values());
 
     public ChartControlPanel(TimeSeriesChart timeSeriesChart) {
         this.timeSeriesChart = timeSeriesChart;
@@ -54,6 +56,7 @@ public class ChartControlPanel extends JPanel {
         createShowLegendCheckbox();
         createRangeModeRadioButtons();
         createChartTypeCombo();
+        createChartDataFilterCombo();
         layoutPanel();
         refreshStateFromChart();
         addRangeSelectorListener();
@@ -68,12 +71,22 @@ public class ChartControlPanel extends JPanel {
         });
     }
 
+    private void createChartDataFilterCombo() {
+        dataFilterCombo.setMaximumSize(dataFilterCombo.getPreferredSize());
+        dataFilterCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                timeSeriesChart.setChartDataFilter((ChartDataFilter)dataFilterCombo.getSelectedItem());
+            }
+        });
+    }
+
     public void refreshStateFromChart() {
         updateSelectedRangeMode();
         updateDomainSelection();
         showLegendCheckbox.setSelected(timeSeriesChart.isShowLegend());
         colorComboBox.setSelectedColor(timeSeriesChart.getChartBackgroundColor());
         chartTypeCombo.setSelectedItem(timeSeriesChart.getChartType());
+        dataFilterCombo.setSelectedItem(timeSeriesChart.getChartDataFilter());
     }
 
     private void updateDomainSelection() {
@@ -154,6 +167,8 @@ public class ChartControlPanel extends JPanel {
         b.add(rangeSelectorComponent);
         b.add(Box.createHorizontalStrut(3));
         b.add(chartTypeCombo);
+        b.add(Box.createHorizontalStrut(3));
+        b.add(dataFilterCombo);
 
         setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
         setLayout(new BorderLayout());

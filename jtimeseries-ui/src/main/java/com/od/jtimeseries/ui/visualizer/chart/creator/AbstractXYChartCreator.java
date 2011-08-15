@@ -46,7 +46,7 @@ import java.util.*;
  * Time: 11:26:46
  * To change this template use File | Settings | File Templates.
  */
-public abstract class XYChartCreator {
+public abstract class AbstractXYChartCreator {
 
     private XYPlot plot;
     private ChartRangeMode chartRangeMode;
@@ -58,14 +58,16 @@ public abstract class XYChartCreator {
     private Color chartBackgroundColor;
     private DateFormat dateFormat = new SimpleDateFormat("MMMdd HH:mm");
     private java.util.List<ChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
+    private ChartDataFilter chartDataFilter;
 
-    public XYChartCreator(ChartCreatorParameters p) {
+    public AbstractXYChartCreator(ChartCreatorParameters p) {
         this.chartBackgroundColor = p.getChartBackgroundColor();
         this.timeSeriesList = p.getTimeSeriesList();
         this.chartRangeMode = p.getChartRangeMode();
         this.domainSelection = p.getDomainSelection();
         this.showLegend = p.isShowLegend();
         this.title = p.getTitle();
+        this.chartDataFilter = p.getChartDataFilter();
     }
 
     public JFreeChart createNewChart() {
@@ -160,7 +162,17 @@ public abstract class XYChartCreator {
             domainSelection,
             true
         );
-        return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter);
+
+        //create a TimeSeriesXYDataset which applies TreatNanAsZero filter
+        return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter) {
+            public Number getY(int series, int item) {
+                Number result = super.getY(series, item);
+                if ( Double.isNaN(result.doubleValue())) {
+                    result = chartDataFilter == ChartDataFilter.TreatNanAsZero ? Double.valueOf(0) : Double.NaN;
+                }
+                return result;
+            }
+        };
     }
 
     protected boolean isShowLegend() {

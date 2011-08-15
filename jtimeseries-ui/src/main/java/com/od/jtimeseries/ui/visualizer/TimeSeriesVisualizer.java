@@ -37,6 +37,7 @@ import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartDataFilter;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -109,7 +110,8 @@ public class TimeSeriesVisualizer extends JPanel {
             visualizer.isShowLegendOnChart(),
             visualizer.getChartBackgroundColor(),
             visualizer.getColumns(),
-            visualizer.getChartType()
+            visualizer.getChartType(),
+            visualizer.getChartDataFilter()
         );
     }
 
@@ -123,6 +125,7 @@ public class TimeSeriesVisualizer extends JPanel {
         visualizer.setShowLegendOnChart(c.isShowLegendOnChart());
         visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
         visualizer.setChartType(c.getChartType());
+        visualizer.setChartDataFilter(c.getChartDataFilter());
 
         //if there are no columns, assume we will use the default column set
         if ( c.getTableColumns().size() > 0) {
@@ -203,6 +206,15 @@ public class TimeSeriesVisualizer extends JPanel {
 
     public void setChartType(ChartType t) {
         chart.setChartType(t);
+        chartControlPanel.refreshStateFromChart();
+    }
+
+    public ChartDataFilter getChartDataFilter() {
+        return chart.getChartDataFilter();
+    }
+
+    public void setChartDataFilter(ChartDataFilter f) {
+        chart.setChartDataFilter(f);
         chartControlPanel.refreshStateFromChart();
     }
 

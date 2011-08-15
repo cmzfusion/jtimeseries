@@ -56,6 +56,7 @@ public class TimeSeriesChart extends JPanel {
     private ChartRangeMode chartRangeMode = ChartRangeMode.RangePerId;
     private Color chartBackgroundColor = Color.WHITE;
     private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
+    private ChartDataFilter chartDataFilter = ChartDataFilter.NoFilter;
 
     private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -156,6 +157,19 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
+    public ChartDataFilter getChartDataFilter() {
+        return chartDataFilter;
+    }
+
+
+    public void setChartDataFilter(ChartDataFilter f) {
+        if ( this.chartDataFilter != f) {
+            this.chartDataFilter = f;
+            createAndSetChart();
+        }
+    }
+
+
     public void setDomainStartTimeSelection(DomainTimeSelection newValue) {
         if ( ! this.domainStartTimeSelection.equals(newValue) ) {
             this.domainStartTimeSelection = newValue;
@@ -175,8 +189,8 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void createAndSetChart() {
-        ChartCreatorParameters p = new ChartCreatorParameters(chartRangeMode, domainStartTimeSelection, chartBackgroundColor, timeSeriesList, showLegend, title);
-        XYChartCreator chartCreator = chartCreatorFactory.getChartCreator(chartType, p);
+        ChartCreatorParameters p = new ChartCreatorParameters(chartRangeMode, domainStartTimeSelection, chartBackgroundColor, timeSeriesList, showLegend, title, chartDataFilter);
+        AbstractXYChartCreator chartCreator = chartCreatorFactory.getChartCreator(chartType, p);
         chart = chartCreator.createNewChart();
         addTitleChangeListener(chart);
         if ( chartPanel == null ) {
@@ -188,7 +202,6 @@ public class TimeSeriesChart extends JPanel {
 
     private void addTitleChangeListener(final JFreeChart chart) {
         chart.addChangeListener(new ChartChangeListener() {
-
             public void chartChanged(ChartChangeEvent event) {
                 if ( event.getType() == ChartChangeEventType.GENERAL) {
                     TimeSeriesChart.this.title = chart.getTitle().getText();

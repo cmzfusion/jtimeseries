@@ -1,13 +1,8 @@
 package com.od.jtimeseries.ui.visualizer.chart.creator;
 
-import com.od.jtimeseries.ui.config.ChartRangeMode;
-import com.od.jtimeseries.ui.config.DomainTimeSelection;
-import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-
-import java.awt.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +10,7 @@ import java.awt.*;
  * Date: 09/08/11
  * Time: 09:00
  */
-public class XYLineChartCreator extends XYChartCreator {
+public class XYLineChartCreator extends AbstractXYChartCreator {
 
     public XYLineChartCreator(ChartCreatorParameters p) {
         super(p);

@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.config;
 
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartDataFilter;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 
 import java.awt.*;
@@ -46,6 +47,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private String chartRangeMode = ChartRangeMode.SingleRange.name(); //1.5.x bean persistence does not support enums, unfortunately! (n.b. no longer a problem now we're using XStream())
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
     private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
+    private ChartDataFilter chartDataFilter = ChartDataFilter.NoFilter;
     private Color chartBackgroundColor = Color.BLACK;
     private List<ColumnSettings> tableColumns = new ArrayList<ColumnSettings>();
     private Rectangle frameLocation;
@@ -61,12 +63,13 @@ public class VisualizerConfiguration implements ExportableConfig {
     }
 
     public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
-                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings, ChartType chartType ) {
+                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings, ChartType chartType, ChartDataFilter chartDataFilter ) {
         this.title = chartsTitle;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
         this.domainStartTimeSelection = domainStartTimeSelection;
         this.chartType = chartType;
+        this.chartDataFilter = chartDataFilter;
         this.chartRangeMode = chartRangeMode.name();
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
@@ -178,6 +181,14 @@ public class VisualizerConfiguration implements ExportableConfig {
         this.chartType = chartType;
     }
 
+    public ChartDataFilter getChartDataFilter() {
+        return chartDataFilter;
+    }
+
+    public void setChartDataFilter(ChartDataFilter chartDataFilter) {
+        this.chartDataFilter = chartDataFilter;
+    }
+
     public int getZPosition() {
         return zPosition;
     }
@@ -196,6 +207,10 @@ public class VisualizerConfiguration implements ExportableConfig {
 
         if ( chartType == null ) {
             chartType = ChartType.DEFAULT_CHART_TYPE;
+        }
+
+        if ( chartDataFilter == null ) {
+            chartDataFilter = ChartDataFilter.NoFilter;
         }
         return this;
     }

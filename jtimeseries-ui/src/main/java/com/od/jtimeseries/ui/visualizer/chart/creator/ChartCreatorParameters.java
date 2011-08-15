@@ -16,14 +16,16 @@ public class ChartCreatorParameters {
     private final List<ChartingTimeSeries> timeSeriesList;
     private final boolean showLegend;
     private final String title;
+    private ChartDataFilter chartDataFilter;
 
-    public ChartCreatorParameters(ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection, Color chartBackgroundColor, List<ChartingTimeSeries> timeSeriesList, boolean showLegend, String title) {
+    public ChartCreatorParameters(ChartRangeMode chartRangeMode, DomainTimeSelection domainSelection, Color chartBackgroundColor, List<ChartingTimeSeries> timeSeriesList, boolean showLegend, String title, ChartDataFilter chartDataFilter) {
         this.chartRangeMode = chartRangeMode;
         this.domainSelection = domainSelection;
         this.chartBackgroundColor = chartBackgroundColor;
         this.timeSeriesList = timeSeriesList;
         this.showLegend = showLegend;
         this.title = title;
+        this.chartDataFilter = chartDataFilter;
     }
 
     public ChartRangeMode getChartRangeMode() {
@@ -48,5 +50,9 @@ public class ChartCreatorParameters {
 
     public String getTitle() {
         return title;
+    }
+
+    public ChartDataFilter getChartDataFilter() {
+        return chartDataFilter;
     }
 }

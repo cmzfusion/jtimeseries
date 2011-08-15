@@ -12,7 +12,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
  * Date: 09/08/11
  * Time: 08:59
  */
-public class XYAreaChartCreator extends XYChartCreator {
+public class XYAreaChartCreator extends AbstractXYChartCreator {
 
     public XYAreaChartCreator(ChartCreatorParameters p) {
         super(p);

@@ -7,6 +7,7 @@ import com.od.jtimeseries.ui.util.ImageUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,7 @@ import java.util.Collections;
  * Date: 05/07/11
  * Time: 08:56
  */
-public class CascadeVisualizersAction extends AbstractAction {
+public class CascadeVisualizersAction extends AbstractArrangeInternalFrameAction {
 
     private TimeSeriousDesktopPane desktopPane;
 
@@ -42,8 +43,10 @@ public class CascadeVisualizersAction extends AbstractAction {
         for ( JInternalFrame f : allframes) {
             lastLocation = cascadeCalculator.getNextLocation(lastLocation, desktopPane.getBounds(), f.getWidth(), f.getHeight());
             f.setBounds(lastLocation);
+            deiconify(f);
             desktopPane.setSelectedFrame(f);
         }
     }
+
 }
 

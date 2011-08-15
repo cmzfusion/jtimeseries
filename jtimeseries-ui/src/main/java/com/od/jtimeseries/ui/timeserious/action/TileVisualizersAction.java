@@ -16,7 +16,7 @@ import java.beans.PropertyVetoException;
  * Date: 22/06/11
  * Time: 12:54
  */
-public class TileVisualizersAction extends AbstractAction {
+public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
 
     private TimeSeriousDesktopPane desktopPane;
 
@@ -60,13 +60,7 @@ public class TileVisualizersAction extends AbstractAction {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols && ((i * cols) + j < count); j++) {
                 JInternalFrame f = allframes[(i * cols) + j];
-
-                if (!f.isClosed() && f.isIcon()) {
-                    try {
-                        f.setIcon(false);
-                    } catch (PropertyVetoException ignored) {}
-                }
-
+                deiconify(f);
                 desk.getDesktopManager().resizeFrame(f, x, y, w, h);
                 x += w;
             }

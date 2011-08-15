@@ -36,7 +36,7 @@ import java.util.List;
 public class VisualizerConfiguration implements ExportableConfig {
 
     public static final int DEFAULT_DIVIDER_LOCATION = 245; //default FixedColumn widths + 15
-    public static final int DEFAULT_WIDTH = 850;  //wide enough to stop horizontal scroll bars showing
+    public static final int DEFAULT_WIDTH = 1000;
     public static final int DEFAULT_HEIGHT = 600;
 
     private String title = "Visualizer";

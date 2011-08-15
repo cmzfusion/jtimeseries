@@ -54,5 +54,10 @@
         <string>frameLocation</string>
       </arguments>
     </migration>
+    <migration>
+      <targetVersion>201108151900</targetVersion>
+      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <arguments/>
+    </migration>
   </migrationList>
 </configManager>

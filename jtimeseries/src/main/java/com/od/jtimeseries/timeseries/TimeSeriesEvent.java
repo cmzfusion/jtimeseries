@@ -104,23 +104,11 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     /**
-     * A range of items in the series had values changed
-     * The replacement items in event list may have different timestamp or numeric value but the items must be one to one
-     * replacements for the current items in the affected range - this event cannot be used to add or remove items from the series
-     *
-     * @param source of event
-     * @param items - replacement items for indexes from startIndex to endIndex
-     */
-    public static TimeSeriesEvent createItemsChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ITEM_CHANGE, seriesModCount);
-    }
-
-    /**
      * The time series changed in a way which could not be efficiently
      * represented using the other event types
      *
      * @param source of event
-     * @param items - new items in the series
+     * @param items - items in the series after change
      */
     public static TimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
         return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.SERIES_CHANGE, seriesModCount);

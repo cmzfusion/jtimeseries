@@ -14,5 +14,5 @@ package com.od.jtimeseries.ui.visualizer.chart.creator;
  */
 public enum ChartDataFilter {
     NoFilter,
-    TreatNanAsZero
+    NanAsZero
 }

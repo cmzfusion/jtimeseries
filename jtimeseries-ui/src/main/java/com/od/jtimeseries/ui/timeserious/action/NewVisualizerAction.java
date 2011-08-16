@@ -50,7 +50,7 @@ public class NewVisualizerAction extends ModelDrivenAction<DesktopSelectionActio
         if ( getActionModel().isContextSelected() ) {
             DesktopContext desktopContext = getActionModel().getSelectedContext();
             String name = ContextNameCheckUtility.getNameFromUser(
-                    parentComponent, desktopContext, "Name for visualizer?", "Choose Name", ""
+                    parentComponent, desktopContext, "Name for Visualizer?", "Choose Name for Visualizer", ""
             );
             if ( name != null) { //check if user cancelled
                 VisualizerConfiguration c = new VisualizerConfiguration(name);

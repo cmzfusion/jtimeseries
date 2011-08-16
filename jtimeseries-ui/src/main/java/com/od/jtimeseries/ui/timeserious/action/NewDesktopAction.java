@@ -49,7 +49,7 @@ public class NewDesktopAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        String name = ContextNameCheckUtility.getNameFromUser(component, desktopContainingContext, "Name for Desktop", "Choose Name", "");
+        String name = ContextNameCheckUtility.getNameFromUser(component, desktopContainingContext, "Name for Desktop?", "Choose Name for Desktop", "");
         if ( name != null) { //check if user cancelled
             DesktopConfiguration config = new DesktopConfiguration(name);
             DesktopContext desktopContext = desktopContainingContext.create(name, name, DesktopContext.class, config);

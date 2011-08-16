@@ -50,9 +50,13 @@ public class RenameAction extends AbstractTimeSeriousIdentifiableAction {
     public void actionPerformed(ActionEvent e) {
          java.util.List<HidablePeerContext> serverContexts = getActionModel().getSelected(HidablePeerContext.class);
          for ( HidablePeerContext s : serverContexts ) {
-            String name = JOptionPane.showInputDialog(
+            String name = (String)JOptionPane.showInputDialog(
                     SwingUtilities.getRoot(parent),
                     "Rename " + s.getId() + "?",
+                    "New Name?",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    null,
                     s.getId()
             );
             if ( name != null && name.length() > 0 && ! name.equals(s.getId())) {

@@ -55,7 +55,7 @@
         <dependency>
             <groupId>od</groupId>
             <artifactId>od-swing</artifactId>
-            <version>1.0.9-SNAPSHOT</version>
+            <version>1.0.10-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jidesoft</groupId>

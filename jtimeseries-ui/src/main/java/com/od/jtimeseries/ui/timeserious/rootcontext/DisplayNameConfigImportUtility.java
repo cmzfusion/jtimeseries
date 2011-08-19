@@ -26,6 +26,7 @@ import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -67,7 +68,7 @@ public class DisplayNameConfigImportUtility extends ExportableConfigImportUtilit
     }
 
     protected void doOwnImport(Component component, Identifiable target, ImportItem item) {
-        Window window = SwingUtilities.windowForComponent(component);
+        Window window = UIUtilities.getWindowForComponentOrWindow(component);
         int result = JOptionPane.showConfirmDialog(window, "Import Rules?", "Import Display Name Rules", JOptionPane.OK_CANCEL_OPTION);
         if ( result != JOptionPane.CANCEL_OPTION) {
             List<DisplayNamePattern> current = displayNameCalculator.getDisplayNamePatternConfig().getDisplayNamePatterns();

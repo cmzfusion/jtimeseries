@@ -23,6 +23,7 @@ import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +55,7 @@ public class MainConfigImportUtility extends ExportableConfigImportUtility {
     }
 
     protected void doOwnImport(Component component, Identifiable target, ImportItem item) {
-        int option = JOptionPane.showConfirmDialog(SwingUtilities.windowForComponent(component), "Import Config, lose current workspace and settings?", "Import Config?", JOptionPane.OK_CANCEL_OPTION);
+        int option = JOptionPane.showConfirmDialog(UIUtilities.getWindowForComponentOrWindow(component), "Import Config, lose current workspace and settings?", "Import Config?", JOptionPane.OK_CANCEL_OPTION);
         if ( option == JOptionPane.OK_OPTION) {
             configTreeManager.clearAndRestoreConfig((TimeSeriousConfig)item.getConfigObject());
         }

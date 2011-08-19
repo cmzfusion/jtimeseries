@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.util;
 
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +37,8 @@ public class ContextNameCheckUtility {
      * @return String valid name, or null if User cancelled request for new name
      */
     public static String getNameFromUser(Component parent, Identifiable targetContext, String text, String title, String defaultName) {
-        Object userInput = JOptionPane.showInputDialog(SwingUtilities.windowForComponent(parent), text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
+        Window parentComponent = UIUtilities.getWindowForComponentOrWindow(parent);
+        Object userInput = JOptionPane.showInputDialog(parentComponent, text, title, JOptionPane.QUESTION_MESSAGE, null, null, defaultName);
         String result = null;
         if ( userInput != null) {
             result = userInput.toString();

@@ -20,9 +20,15 @@ package com.od.jtimeseries.ui.visualizer.chart.creator;
 
 import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
 import com.od.jtimeseries.chart.TimeSeriesXYDataset;
+import com.od.jtimeseries.timeseries.TimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
+import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimeSource;
+import com.od.swing.util.AwtSafeListener;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -157,11 +163,30 @@ public abstract class AbstractXYChartCreator {
 
 
     private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
-        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(
-            contextTimeSeries,
-            domainSelection,
-            true
-        );
+//        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(
+//            contextTimeSeries,
+//            domainSelection,
+//            true
+//        );
+        final MovingWindowTimeSeries movingWindowTimeSeries = new MovingWindowTimeSeries(domainSelection, MovingWindowTimeSeries.OPEN_END_TIME, Time.seconds(10));
+        movingWindowTimeSeries.setUpdateWindowInSwingEventThread(true);
+
+        contextTimeSeries.addTimeSeriesListener(AwtSafeListener.getAwtSafeListener(new TimeSeriesListener() {
+            public void itemsAddedOrInserted(TimeSeriesEvent e) {
+                movingWindowTimeSeries.addAll(e.getItems());
+            }
+
+            public void itemsRemoved(TimeSeriesEvent e) {
+                movingWindowTimeSeries.removeAll(e.getItems());
+            }
+
+            public void seriesChanged(TimeSeriesEvent e) {
+                movingWindowTimeSeries.clear();
+                movingWindowTimeSeries.addAll(e.getItems());
+            }
+        }, TimeSeriesListener.class));
+
+        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(movingWindowTimeSeries, contextTimeSeries.getDescription());
 
         //create a TimeSeriesXYDataset which applies TreatNanAsZero filter
         return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter) {

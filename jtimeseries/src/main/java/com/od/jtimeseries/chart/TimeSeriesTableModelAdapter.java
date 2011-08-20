@@ -44,8 +44,8 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     private String[] columnNames;
     private IndexedTimeSeries wrappedSeries = new DefaultTimeSeries();
 
-    public TimeSeriesTableModelAdapter(IdentifiableTimeSeries series) {
-        columnNames = new String[]{"Date Time", series.getDescription()};
+    public TimeSeriesTableModelAdapter(TimeSeries series, String description) {
+        columnNames = new String[]{"Date Time", description};
         wrappedSeries = new DefaultTimeSeries(series.getSnapshot());
     }
 
@@ -78,52 +78,5 @@ public class TimeSeriesTableModelAdapter extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         throw new UnsupportedOperationException();
     }
-//
-//    /**
-//     * Process series events on the swing thread, but only if the modCount of the timeseries event
-//     * is > the modCount of the series at the point the table model was initialized
-//     * (this protects against processing older events queued up from the timeseries event thread)
-//     */
-//    abstract class ModCountAwareSeriesListener implements TimeSeriesListener {
-//
-//        public final void itemsAddedOrInserted(final TimeSeriesEvent e) {
-//            Runnable runnable = new Runnable() {
-//                public void run() {
-//                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
-//                        doItemsAddedOrInserted(e);
-//                    }
-//                }
-//            };
-//            SwingUtilities.invokeLater(runnable);
-//        }
-//
-//        protected abstract void doItemsAddedOrInserted(TimeSeriesEvent e);
-//
-//        public final void itemsRemoved(final TimeSeriesEvent e) {
-//            Runnable runnable = new Runnable() {
-//                public void run() {
-//                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
-//                        doItemsRemoved(e);
-//                    }
-//                }
-//            };
-//            SwingUtilities.invokeLater(runnable);
-//        }
-//
-//        protected abstract void doItemsRemoved(TimeSeriesEvent e);
-//
-//        public final void seriesChanged(final TimeSeriesEvent e) {
-//            Runnable runnable = new Runnable() {
-//                public void run() {
-//                    if (e.getSeriesModCount() > wrappedSeriesModCount) {
-//                        doSeriesChanged(e);
-//                    }
-//                }
-//            };
-//            SwingUtilities.invokeLater(runnable);
-//        }
-//
-//        protected abstract void doSeriesChanged(TimeSeriesEvent e);
-//    }
 
 }

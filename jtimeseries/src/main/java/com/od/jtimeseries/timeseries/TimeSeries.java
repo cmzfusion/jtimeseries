@@ -81,11 +81,22 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
      */
     void addItem(TimeSeriesItem timeSeriesItem);
 
+    /**
+     * Add all the items to the timeseries. The items must be in ascending order by timestamp.
+     * It is better to use this method to add multiple items, since that will result in a single insert event rather than multiple events being fired
+     */
+    void addAll(Iterable<TimeSeriesItem> items);
 
     /**
      * @return true, if item was removed, false if item was not in the timeseries
      */
     boolean removeItem(TimeSeriesItem timeSeriesItem);
+
+    /**
+     * Remove all the items from the timeseries. The items must be in ascending order by timestamp.
+     * It is better to use this method to remove multiple items, since that will result in a single insert event rather than multiple events being fired
+     */
+    void removeAll(Iterable<TimeSeriesItem> items);
 
 
     int size();

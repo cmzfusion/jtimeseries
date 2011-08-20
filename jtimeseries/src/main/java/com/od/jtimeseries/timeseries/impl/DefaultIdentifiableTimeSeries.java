@@ -35,7 +35,7 @@ import java.util.List;
  * A timeseries instance which implements the Identifiable interface
  * TimeSeries functions are delegated to a wrapped TimeSeries implementation, which can be passed into the constructor
  */
-public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
+public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, IndexedTimeSeries {
 
     private TimeSeries timeSeries;
     private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
@@ -100,6 +100,14 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return timeSeries.removeItem(i);
     }
 
+    public void addAll(Iterable<TimeSeriesItem> items) {
+        timeSeries.addAll(items);
+    }
+
+    public void removeAll(Iterable<TimeSeriesItem> items) {
+        timeSeries.removeAll(items);
+    }
+
     public synchronized void clear() {
         timeSeries.clear();
     }
@@ -116,4 +124,7 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return "TimeSeries " + getPath();
     }
 
+    public TimeSeriesItem getItem(int index) {
+        return timeSeries.getItem(index);
+    }
 }

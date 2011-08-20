@@ -37,7 +37,7 @@ import java.util.Collection;
  *
  * The performance for insert operations
  */
-public class DefaultTimeSeries extends AbstractListTimeSeries {
+public class DefaultTimeSeries extends AbstractIndexedTimeSeries {
 
     public DefaultTimeSeries() {
     }

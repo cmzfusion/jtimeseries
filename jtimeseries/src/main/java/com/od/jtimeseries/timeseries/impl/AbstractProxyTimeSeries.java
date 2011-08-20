@@ -75,6 +75,14 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         return wrappedTimeSeries.removeItem(timeSeriesItem);
     }
 
+    public void addAll(Iterable<TimeSeriesItem> items) {
+        wrappedTimeSeries.addAll(items);
+    }
+
+    public void removeAll(Iterable<TimeSeriesItem> items) {
+        wrappedTimeSeries.removeAll(items);
+    }
+
     public synchronized int size() {
         return wrappedTimeSeries.size();
     }

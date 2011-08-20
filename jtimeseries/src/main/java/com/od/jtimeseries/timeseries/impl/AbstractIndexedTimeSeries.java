@@ -36,9 +36,9 @@ import java.util.concurrent.Executor;
  * Abstract superclass for list based TimeSeries
  * Provides a mechanism to queue up change events and notify listeners in a separate thread
  */
-abstract class AbstractListTimeSeries implements IndexedTimeSeries {
+abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractListTimeSeries.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractIndexedTimeSeries.class);
     
     private final RandomAccessDeque<TimeSeriesItem> series;
     private final TimeSeriesListenerSupport timeSeriesListenerSupport = new TimeSeriesListenerSupport();
@@ -48,11 +48,11 @@ abstract class AbstractListTimeSeries implements IndexedTimeSeries {
 
     private final String toStringDescription = "Series-" + getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
 
-    protected AbstractListTimeSeries() {
+    protected AbstractIndexedTimeSeries() {
         series =new RandomAccessDeque<TimeSeriesItem>();
     }
 
-    protected AbstractListTimeSeries(Collection<TimeSeriesItem> items) {
+    protected AbstractIndexedTimeSeries(Collection<TimeSeriesItem> items) {
         series = new RandomAccessDeque<TimeSeriesItem>(items);
     }
 
@@ -87,6 +87,26 @@ abstract class AbstractListTimeSeries implements IndexedTimeSeries {
     }
 
     public synchronized boolean removeItem(TimeSeriesItem o) {
+        boolean result = doRemove(o);
+        if ( result ) {
+            queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, Collections.singletonList((TimeSeriesItem) o), getModCount()));
+        }
+        return result;
+    }
+
+    public synchronized void removeAll(Iterable<TimeSeriesItem> items) {
+        List<TimeSeriesItem> removed = new ArrayList<TimeSeriesItem>();
+        for (TimeSeriesItem i : items) {
+            if ( removeItem(i)) {
+                removed.add(i);
+            }
+        }
+        if ( removed.size() > 0 ) {
+            queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, removed, getModCount()));
+        }
+    }
+
+    private boolean doRemove(TimeSeriesItem o) {
         boolean result = false;
         if ( size() > 0) {
             int firstPossibleIndex = SeriesUtils.getIndexOfFirstItemAtOrAfter(o.getTimestamp(), this);
@@ -105,14 +125,25 @@ abstract class AbstractListTimeSeries implements IndexedTimeSeries {
                 }
             }
         }
-
-        if ( result ) {
-            queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, Collections.singletonList((TimeSeriesItem) o), getModCount()));
-        }
         return result;
     }
 
     public synchronized void addItem(TimeSeriesItem timeSeriesItem) {
+        doAddItem(timeSeriesItem);
+        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount()));
+    }
+
+    //add all, firing just one event
+    public synchronized void addAll(Iterable<TimeSeriesItem> items) {
+        List<TimeSeriesItem> itemsAdded = new ArrayList<TimeSeriesItem>();
+        for (TimeSeriesItem i : items) {
+            doAddItem(i);
+            itemsAdded.add(i);
+        }
+        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, itemsAdded, getModCount()));
+    }
+
+    private void doAddItem(TimeSeriesItem timeSeriesItem) {
         if ( size() == 0 || timeSeriesItem.getTimestamp() >= getLatestTimestamp()) {
             series.add(timeSeriesItem);
         } else {
@@ -121,7 +152,6 @@ abstract class AbstractListTimeSeries implements IndexedTimeSeries {
             int indexToAdd = SeriesUtils.getIndexOfFirstItemAtOrAfter(timeSeriesItem.getTimestamp() + 1, this);
             series.add(indexToAdd, timeSeriesItem);
         }
-        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount()));
     }
 
     public synchronized Iterator<TimeSeriesItem> iterator() {

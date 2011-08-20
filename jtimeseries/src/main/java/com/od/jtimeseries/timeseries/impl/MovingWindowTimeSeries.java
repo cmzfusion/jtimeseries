@@ -54,7 +54,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * This means it is easy, for example, to define a window which shows only the most recent 10 minutes worth of data,
  * the window being dynamically adjusted as time moves inexorably forward.
  */
-public class MovingWindowTimeSeries extends AbstractListTimeSeries {
+public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
     private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowTimeSeries.class.getSimpleName(), 2);
 

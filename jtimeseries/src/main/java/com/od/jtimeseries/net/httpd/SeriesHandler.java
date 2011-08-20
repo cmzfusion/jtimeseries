@@ -22,6 +22,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -144,7 +145,7 @@ public class SeriesHandler extends AbstractHandler {
     }
 
     private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, PrintWriter pw, long lastTimestamp) {
-        Collection<TimeSeriesItem> seriesItems = timeSeries.getSubSeries(lastTimestamp + 1);  //we require anything more recent than last timestamp
+        Collection<TimeSeriesItem> seriesItems = SeriesUtils.getSubSeries(lastTimestamp + 1, timeSeries);  //we require anything more recent than last timestamp
         Date date = new Date();
         for ( TimeSeriesItem h : seriesItems) {
             pw.write("\n<");

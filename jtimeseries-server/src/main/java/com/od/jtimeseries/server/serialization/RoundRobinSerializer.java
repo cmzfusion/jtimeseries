@@ -19,6 +19,7 @@
 package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -197,7 +198,7 @@ public class RoundRobinSerializer {
     /**
      * Append items to the timeseries file and update the header
      */
-    public void append(FileHeader header, List<TimeSeriesItem> l) throws SerializationException {
+    public void append(FileHeader header, IndexedTimeSeries l) throws SerializationException {
         synchronized (writeLock) {
             if ( ! shutdown && l.size() > 0) {
                 File file = getFile(header);
@@ -223,7 +224,7 @@ public class RoundRobinSerializer {
                     r.seek(CURRENT_HEAD_OFFSET);
                     r.writeInt(newHead);
                     r.writeInt(newTail);
-                    long newLastTimestamp = l.get(l.size() - 1).getTimestamp();
+                    long newLastTimestamp = l.getItem(l.size() - 1).getTimestamp();
                     r.writeLong(newLastTimestamp);
 
                     //now update the header with the new values
@@ -337,11 +338,9 @@ public class RoundRobinSerializer {
                 itemsToAdd.add(new DefaultTimeSeriesItem(d.readLong(), DoubleNumeric.valueOf(d.readDouble())));
             }
 
-            for ( TimeSeriesItem i : tailItems) {
-                itemsToAdd.add(i);
-            }
-
-            series.addAll(itemsToAdd);
+            itemsToAdd.addAll(tailItems);
+            //quicker to new up a series with the initial items than add each
+            series = new RoundRobinTimeSeries(itemsToAdd, fileHeader.getSeriesLength());
         }
         return series;
     }

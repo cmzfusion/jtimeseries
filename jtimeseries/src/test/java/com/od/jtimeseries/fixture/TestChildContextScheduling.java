@@ -52,7 +52,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
 
     private void testCapture() {
-        WaitForEndOfCapturePeriodListener countDownListener = getCapturePeriodListener();
+        WaitForEndOfCapturePeriodListener countDownListener = createCapturePeriodListener();
         rootContext.startScheduling().startDataCapture();
 
         //wait for each capture to trigger, so that we are in the first capture period, and record some values

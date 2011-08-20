@@ -24,6 +24,7 @@ import com.od.jtimeseries.timeseries.TimeSeriesListener;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,44 +51,28 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         eventHandler.removeTimeSeriesListener(l);
     }
 
-    public synchronized boolean append(TimeSeriesItem item) {
-        return wrappedTimeSeries.append(item);
-    }
-
-    public synchronized boolean prepend(TimeSeriesItem item) {
-        return wrappedTimeSeries.prepend(item);
-    }
-
-    public synchronized Collection<TimeSeriesItem> getSnapshot() {
-        return wrappedTimeSeries.getSnapshot();
-    }
-
     public synchronized TimeSeriesItem getLatestItem() {
         return wrappedTimeSeries.getLatestItem();
-    }
-
-    public synchronized long getLatestTimestamp() {
-        return wrappedTimeSeries.getLatestTimestamp();
-    }
-
-    public synchronized TimeSeriesItem removeLatestItem() {
-        return wrappedTimeSeries.removeLatestItem();
     }
 
     public synchronized TimeSeriesItem getEarliestItem() {
         return wrappedTimeSeries.getEarliestItem();
     }
 
-    public synchronized long getEarliestTimestamp() {
+    public long getEarliestTimestamp() {
         return wrappedTimeSeries.getEarliestTimestamp();
     }
 
-    public synchronized TimeSeriesItem removeEarliestItem() {
-        return wrappedTimeSeries.removeEarliestItem();
+    public long getLatestTimestamp() {
+        return wrappedTimeSeries.getLatestTimestamp();
     }
 
-    public synchronized boolean isEmpty() {
-        return wrappedTimeSeries.isEmpty();
+    public void addItem(TimeSeriesItem timeSeriesItem) {
+        wrappedTimeSeries.addItem(timeSeriesItem);
+    }
+
+    public boolean removeItem(TimeSeriesItem timeSeriesItem) {
+        return wrappedTimeSeries.removeItem(timeSeriesItem);
     }
 
     public synchronized int size() {
@@ -98,81 +83,15 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         wrappedTimeSeries.clear();
     }
 
-    public synchronized boolean remove(Object o) {
-        return wrappedTimeSeries.remove(o);
-    }
-
-    public synchronized boolean add(TimeSeriesItem timeSeriesItem) {
-        return wrappedTimeSeries.add(timeSeriesItem);
-    }
-
-    public synchronized boolean retainAll(Collection<?> c) {
-        return wrappedTimeSeries.retainAll(c);
-    }
-
-    public synchronized boolean removeAll(Collection<?> c) {
-        return wrappedTimeSeries.removeAll(c);
-    }
-
-    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> c) {
-        return wrappedTimeSeries.addAll(c);
-    }
-
-    public synchronized boolean containsAll(Collection<?> c) {
-        return wrappedTimeSeries.containsAll(c);
-    }
-
-    public synchronized Object[] toArray() {
-        return wrappedTimeSeries.toArray();
-    }
-
-    public synchronized <T> T[] toArray(T[] a) {
-        return wrappedTimeSeries.toArray(a);
-    }
-
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return wrappedTimeSeries.iterator();
-    }
-
-    public synchronized boolean contains(Object o) {
-        return wrappedTimeSeries.contains(o);
-    }
-
-    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return wrappedTimeSeries.getSubSeries(startTimestamp, endTimestamp);
-    }
-
-    public synchronized TimeSeries getSubSeries(long timestamp) {
-        return wrappedTimeSeries.getSubSeries(timestamp);
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return wrappedTimeSeries.getFirstItemAtOrBefore(timestamp);
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return wrappedTimeSeries.getFirstItemAtOrAfter(timestamp);
-    }
-
-    public synchronized long getTimestampAfter(long timestamp) {
-        return wrappedTimeSeries.getTimestampAfter(timestamp);
-    }
-
-    public synchronized long getTimestampBefore(long timestamp) {
-        return wrappedTimeSeries.getTimestampBefore(timestamp);
     }
 
     public synchronized long getModCount() {
         return wrappedTimeSeries.getModCount();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return wrappedTimeSeries.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return wrappedTimeSeries.hashCode();
+    public List<TimeSeriesItem> getSnapshot() {
+        return wrappedTimeSeries.getSnapshot();
     }
 }

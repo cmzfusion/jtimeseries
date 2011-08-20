@@ -19,6 +19,7 @@
 package com.od.jtimeseries.timeseries;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,19 +30,18 @@ import java.util.Collection;
  * A TimeSeries is an ordered sequence of TimeSeriesItems, each representing a value at a point in time
  * The timepoints may or may not be equally spaced / periodic
  *
- * A TimeSeries guarantees an ordering by timestamp, so that during iteration items with an earlier timestamp
- * appear before items with a later timestamp. If an attempt is made to insert, prepend or append items out of
- * order this will result in a TimeSeriesOrderingException.
- *
- * This interface defines a set of common methods, but implementations may be based on varying datastructures,
- * and the choice of implementation may depend on the intended use. For example, a List implementation based
+ * This interface defines a very limited set of common methods, but implementations may be based on varying datastructures,
+ * and the choice of implementation may depend on the intended use. For example, an implementation based
  * on an array may provide rapid random access to the items by index (but may have poor performance for inserting
  * or merging TimeSeriesItems). Alternatively a TimeSeries based on a map or tree may offer fast search for an
- * item with a given timestamp and fast merge, but poor random access.
+ * item with a given timestamp and fast merging, but poor random access.
  *
  * Depending on the implementation, a TimeSeries may or may not allow more than one item with the same timestamp.
  * (Due to the lack of granularity in a system clock, an attempt to add items with a duplicate timestamp may be
  * likely, and it is probably best to let an application/implementation decide how to handle this case).
+ *
+ * In general, to allow eash comparisons, TimeSeries should implement equals and hashCode using the same contract which would be used in a
+ * List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals() and List<TimeSeriesItem>.hashCode()
  *
  * Note on thread safety:
  * 
@@ -53,35 +53,7 @@ import java.util.Collection;
  * classes in general should not change data of the wrapped instance directly - this should be done via the wrapper,
  * since making direct changes in this case would violate the guard provided by the wrapper instance's mutex/lock.
  */
-public interface TimeSeries extends Collection<TimeSeriesItem> {
-
-    /**
-     * Prepend an item to the TimeSeries.
-     * The item should have a timestamp earlier than or equal to the earliest items in the series
-     * If there is already an item with an earlier timestamp, no action will be taken and this method will return false
-     *
-     * @return true, if the item was added
-     */
-    boolean prepend(TimeSeriesItem item);
-
-    /**
-     * Append an item to the TimeSeries.
-     * The item should have a timestamp greater than or equal to the most recent item currently in the series
-     * If there is already an item with a later timestamp, no action will be taken and this method will return false
-     *
-     * @return true, if the item was added
-     */
-    boolean append(TimeSeriesItem value);
-
-    /**
-     * @return A new Timeseries containing all items with timestamps greater than or equal to the supplied timestamp
-     */
-    TimeSeries getSubSeries(long timestamp);
-
-    /**
-     * @return A new TimeSeries containing all items between start and end timestamps, inclusive
-     */
-    TimeSeries getSubSeries(long startTimestamp, long endTimestamp);
+public interface TimeSeries extends Iterable<TimeSeriesItem> {
 
     /**
      * @return the item in the series with the earliest timestamp value, or null if no items exist.
@@ -94,44 +66,29 @@ public interface TimeSeries extends Collection<TimeSeriesItem> {
     TimeSeriesItem getLatestItem();
 
     /**
-     * @return  the item removed, or null if there were no items in this TimeSeries
-     */
-    TimeSeriesItem removeEarliestItem();
-
-    /**
-     * @return  the item removed, or null if there were no items in this TimeSeries
-     */
-    TimeSeriesItem removeLatestItem();
-
-    /**
-     * @return the earliest timestamp associated with a item in the series, or -1 if there are no items in the series.
+     * @return timestamp of earliest item, or -1 if series is empty
      */
     long getEarliestTimestamp();
 
     /**
-     * @return the latest timestamp associated with an item in the series, or -1 if there are no items in the series.
+     * @return timestamp of latest item, or -1 if series is empty
      */
     long getLatestTimestamp();
 
     /**
-     * @return the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
+     * Add an item to the series. In series which support multiple items per timestamp, this item should
+     * appear after any existing items which share its timestamp
      */
-    TimeSeriesItem getFirstItemAtOrBefore(long timestamp);
+    void addItem(TimeSeriesItem timeSeriesItem);
+
 
     /**
-     * @return  first item in the series with a timestamp equal to or later than the supplied timestamp, or null if no such item exists
+     * @return true, if item was removed, false if item was not in the timeseries
      */
-    TimeSeriesItem getFirstItemAtOrAfter(long timestamp);
+    boolean removeItem(TimeSeriesItem timeSeriesItem);
 
-    /**
-     * @return  first timestamp after the supplied timestamp for which there is an item in the series, or -1 if there is no item with a later timestamp
-     */
-    long getTimestampAfter(long timestamp);
 
-    /**
-     * @return  first timestamp before the supplied timestamp for which there is an item in the series, or -1 if there is no item with an earlier timestamp
-     */
-    long getTimestampBefore(long timestamp);
+    int size();
 
     /**
      * note, time series events are fired asynchronously on an event notification thread
@@ -144,10 +101,6 @@ public interface TimeSeries extends Collection<TimeSeriesItem> {
      */
     void removeTimeSeriesListener(TimeSeriesListener l);
 
-
-    Collection<TimeSeriesItem> getSnapshot();
-
-
     /**
      * modCount should increase by at least 1 whenever series data is modified
      * It can be used to detect that changes have occurred
@@ -157,4 +110,10 @@ public interface TimeSeries extends Collection<TimeSeriesItem> {
      * @return the modification count of this timeseries
      */
     long getModCount();
+
+
+    List<TimeSeriesItem> getSnapshot();
+
+
+    void clear();
 }

@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
+import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.util.identifiable.QueryResult;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -81,32 +82,32 @@ public class SummaryStatisticsCalculator {
 
         private void runSummaryStatsLoop() {
             while(true) {
-                QueryResult<IdentifiableTimeSeries> r = rootContext.findAllTimeSeries();
+                QueryResult<FilesystemTimeSeries> r = rootContext.findAll(FilesystemTimeSeries.class);
                 int numberOfSeries = r.getNumberOfMatches();
 
                 if ( numberOfSeries == 0) {
-                    sleepRecalcThread(refreshPeriod.getLengthInMillis());
+                    sleepFor(refreshPeriod.getLengthInMillis());
                 } else {
                     doRecalculations(r, numberOfSeries);
                 }
             }
         }
 
-        private void doRecalculations(QueryResult<IdentifiableTimeSeries> r, int numberOfSeries) {
+        private void doRecalculations(QueryResult<FilesystemTimeSeries> r, int numberOfSeries) {
             long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
             logMethods.logDebug("Summary statistics sleep time to caculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
 
-            for (IdentifiableTimeSeries s : r.getAllMatches()) {
+            for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
                     recalculateStats(s);
                 }
                 s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
 
-                sleepRecalcThread(requiredSleepTime);
+                sleepFor(requiredSleepTime);
             }
         }
 
-        private void sleepRecalcThread(long requiredSleepTime) {
+        private void sleepFor(long requiredSleepTime) {
             try {
                 Thread.sleep(requiredSleepTime);
             } catch (InterruptedException e) {
@@ -132,7 +133,7 @@ public class SummaryStatisticsCalculator {
         /**
          *  No need to recalculate if there hasn't been an update since the last recalculation
          */
-        private boolean requiresRecalculation(IdentifiableTimeSeries s) {
+        private boolean requiresRecalculation(FilesystemTimeSeries s) {
             boolean result = true;
             String lastRecalcValue = s.getProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY);
             if ( lastRecalcValue != null ) {

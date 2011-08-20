@@ -22,6 +22,7 @@ import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.interpolation.InterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +40,7 @@ public class DefaultInterpolatedTimeSeries extends AbstractProxyTimeSeries imple
         this.interpolationFunction = interpolationFunction;
     }
 
-    public TimeSeriesItem getInterpolatedValue(long timestamp) {
+    public synchronized TimeSeriesItem getInterpolatedValue(long timestamp) {
         TimeSeriesItem result = null;
         if ( timestamp >= getEarliestTimestamp() && timestamp <= getLatestTimestamp()) {
             result = calculateInterpolatedValue(timestamp);
@@ -49,14 +50,14 @@ public class DefaultInterpolatedTimeSeries extends AbstractProxyTimeSeries imple
 
     private TimeSeriesItem calculateInterpolatedValue(long timestamp) {
         TimeSeriesItem result;
-        TimeSeriesItem beforeItem = getFirstItemAtOrBefore(timestamp);
+        TimeSeriesItem beforeItem = SeriesUtils.getFirstItemAtOrBefore(timestamp, this);
         if ( beforeItem.getTimestamp() == timestamp) {
             //although the timestamp matches an item in the series exactly, we still use interp function to return a value
             //this is because the function may generate a TimeSeriesItem of a different type - and we want the
             //TimeSeriesItem returned by calculateInterpolatedValue to be consistent in type
             result = interpolationFunction.calculateInterpolatedValue(this, timestamp, beforeItem, beforeItem);
         } else {
-            TimeSeriesItem afterItem = getFirstItemAtOrAfter(timestamp);
+            TimeSeriesItem afterItem = SeriesUtils.getFirstItemAtOrAfter(timestamp, this);
             result = interpolationFunction.calculateInterpolatedValue(this, timestamp, beforeItem, afterItem);
         }
         return result;

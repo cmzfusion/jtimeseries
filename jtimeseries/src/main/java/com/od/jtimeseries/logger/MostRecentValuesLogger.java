@@ -55,14 +55,14 @@ public class MostRecentValuesLogger extends TimeSeriesLogger {
     }
 
     protected void writeToLogs(IdentifiableTimeSeries series) {
-        TimeSeriesItem values = series.getLatestItem();
-        if ( values != null ) {
+        TimeSeriesItem value = series.getLatestItem();
+        if ( value != null ) {
             StringBuilder b = new StringBuilder();
 
             b.append(series.getDescription()).append(" last value at ");
-            b.append(dateFormat.format(new Date(values.getTimestamp())));
+            b.append(dateFormat.format(new Date(value.getTimestamp())));
             b.append(": ");
-            b.append(numberFormat.format(values.getValue()));
+            b.append(numberFormat.format(value.getValue()));
 
             logInfo(b.toString());
         }

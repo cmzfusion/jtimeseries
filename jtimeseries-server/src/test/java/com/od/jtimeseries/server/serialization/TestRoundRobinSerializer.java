@@ -3,8 +3,10 @@ package com.od.jtimeseries.server.serialization;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.ServerDefaults;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
+import com.od.jtimeseries.timeseries.IndexedTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.time.Time;
@@ -60,7 +62,7 @@ public class TestRoundRobinSerializer extends TestCase {
         serializer.updateHeader(fileHeader);
         assertEquals(-1, fileHeader.getCurrentHead());
 
-        List<TimeSeriesItem> l = new ArrayList<TimeSeriesItem>();
+        DefaultTimeSeries l = new DefaultTimeSeries();
         addNewItemsForTimestamps(l,1,2,3);
         serializer.append(fileHeader, l);
         assertEquals(0, fileHeader.getCurrentHead());
@@ -70,7 +72,7 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public void testAppend() throws SerializationException {
-        List<TimeSeriesItem> l = new ArrayList<TimeSeriesItem>();
+        DefaultTimeSeries l = new DefaultTimeSeries();
         addNewItemsForTimestamps(l, 5, 6);
 
         serializer.append(fileHeader, l);
@@ -89,7 +91,7 @@ public class TestRoundRobinSerializer extends TestCase {
 
     public void testAppend2() throws SerializationException {
         //test wrap around - 8 should end up at position zero
-        List<TimeSeriesItem> l = new ArrayList<TimeSeriesItem>();
+        DefaultTimeSeries l = new DefaultTimeSeries();
         addNewItemsForTimestamps(l,5,6,7,8);
 
         serializer.append(fileHeader, l);
@@ -107,14 +109,14 @@ public class TestRoundRobinSerializer extends TestCase {
 
         //rr strucure is now full, both head and tail advance when we add
         l.clear();
-        l.add(createItemForTimestamp(9));
+        l.addItem(createItemForTimestamp(9));
         serializer.append(fileHeader, l);
 
         assertEquals(2, fileHeader.getCurrentHead());
         assertEquals(2, fileHeader.getCurrentTail());
 
         d = serializer.deserialize(fileHeader);
-        c.append(createItemForTimestamp(9));
+        c.addItem(createItemForTimestamp(9));
         assertEquals(c, d);
 
         //try adding a random number of values which may exceed the max capacity
@@ -139,23 +141,24 @@ public class TestRoundRobinSerializer extends TestCase {
         c.addChild(series);
         FileHeader fileHeader = series.getFileHeader();
         assertEquals(4, series.size());
-        assertEquals(4, series.get(3).longValue());
+        assertEquals(4, series.getItem(3).longValue());
 
         addNewItemsForTimestamps(series, 5,6);
         assertEquals(6, series.size());
         series.flush();
-        assertEquals(6, series.get(5).longValue());
+        assertEquals(6, series.getItem(5).longValue());
 
-        ListTimeSeries s = serializer.deserialize(fileHeader);
-        assertEquals(6, s.get(5).longValue());
+        IndexedTimeSeries s = serializer.deserialize(fileHeader);
+        assertEquals(6, s.getItem(5).longValue());
 
-        series.removeAll(Arrays.asList(createItemForTimestamp(3), createItemForTimestamp(4)));
+        series.removeItem(createItemForTimestamp(3));
+        series.removeItem(createItemForTimestamp(4));
         assertEquals(4, series.size());
         series.flush();
 
         s = serializer.deserialize(fileHeader);
         assertEquals(4, s.size());
-        List<TimeSeriesItem> l = new ArrayList<TimeSeriesItem>();
+        DefaultTimeSeries l = new DefaultTimeSeries();
         addNewItemsForTimestamps(l, 1,2,5,6);
         assertEquals(l, s);
     }
@@ -164,7 +167,9 @@ public class TestRoundRobinSerializer extends TestCase {
     public void testAppendSpeed() throws SerializationException {
         long startTime = System.currentTimeMillis();
         for ( int loop=0; loop < 1000; loop++) {
-            serializer.append(fileHeader, Collections.singletonList((TimeSeriesItem)new DefaultTimeSeriesItem(loop, DoubleNumeric.valueOf(loop))));
+            DefaultTimeSeries s = new DefaultTimeSeries();
+            s.addItem(new DefaultTimeSeriesItem(loop, DoubleNumeric.valueOf(loop)));
+            serializer.append(fileHeader, s);
         }
         long endTime = System.currentTimeMillis();
         assertEquals(7, fileHeader.getCurrentSize());
@@ -191,9 +196,9 @@ public class TestRoundRobinSerializer extends TestCase {
         return new RoundRobinSerializer(tmpDir, ServerDefaults.DEFAULT_TIMESERIES_SUFFIX);
     }
 
-    private void addNewItemsForTimestamps(List<TimeSeriesItem> s, long... timestampsForItems) {
+    private void addNewItemsForTimestamps(TimeSeries s, long... timestampsForItems) {
         for (long timestampsForItem : timestampsForItems) {
-            s.add(createItemForTimestamp(timestampsForItem));
+            s.addItem(createItemForTimestamp(timestampsForItem));
         }
     }
 

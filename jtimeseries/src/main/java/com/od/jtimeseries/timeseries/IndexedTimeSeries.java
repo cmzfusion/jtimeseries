@@ -18,22 +18,18 @@
  */
 package com.od.jtimeseries.timeseries;
 
-public interface TimeSeriesListener {
+/**
+ * Created by IntelliJ IDEA.
+ * User: Nick Ebbutt
+ * Date: 06-Jan-2009
+ * Time: 15:17:29
+ *
+ * A TimeSeries which can efficiently return the items at each index
+ *
+ * (This is likely to be possible for series which internally use a structure such as an array to store their items,
+ * but is not necessarily possible for all timeseries implementations)
+ */
+public interface IndexedTimeSeries extends TimeSeries {
 
-    /**
-     * Items were added/inserted to the series
-     */
-    void itemsAddedOrInserted(TimeSeriesEvent e);
-
-    /**
-     * Items in the series were removed
-     */
-    void itemsRemoved(TimeSeriesEvent e);
-
-    /**
-     * The time series changed in a way which could not be efficiently
-     * represented using the other event types
-     */
-    void seriesChanged(TimeSeriesEvent e);
-
+    TimeSeriesItem getItem(int index);
 }

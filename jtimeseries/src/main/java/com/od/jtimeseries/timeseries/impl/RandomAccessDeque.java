@@ -30,7 +30,7 @@ import java.util.*;
  * Date: 30-Dec-2008
  * Time: 10:54:25
  *
- * This is based on the standard java.util.ArrayDeque with just one method added ( get(int index) ) to
+ * This is based on the standard java.util.ArrayDeque with one method added ( get(int index) ) to
  * enable random access of elements in the internal array.
  *
  * ArrayDeque encapsulates it's internal array so there is no way to implement this by extending/wrapping etc.
@@ -42,17 +42,8 @@ import java.util.*;
  * - removing from start of list is very fast (older series items drop off frequently)
  * - access to items by index is very fast (implement RandomAccess)
  *
- * There may well be a better way to accomplish this, if so let me know!
- *
- * Important Notes:
- *
- * In the current implementation, List operations which involve inserting or removing elements in the
- * middle of the data structure are VERY slow. This is particularly true for inserting or removing a
- * range of elements, which will be abysmally, go and make a cup of coffee and come back to replace the
- * cpu fan, slow. More work will be needed to optimise these operations, but if merging series or inserting
- * items is a priority a tree based data structure may work better in any case.
  */
-class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable, RandomAccess, ModCountList<E> {
+class RandomAccessDeque<E> extends AbstractCollection<E> implements Deque<E>, Serializable, RandomAccess, ModCount {
 
     /**
      * The array in which the elements of the deque are stored.
@@ -890,95 +881,8 @@ class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable
         return result;
     }
 
-    public int indexOf(Object o) {
-        int result = -1;
-        if ( o != null ) {
-            for ( int loop=0; loop<size(); loop++) {
-                E e = get(loop);
-                if ( o == e || o.equals(e)) {
-                    result = loop;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    public int lastIndexOf(Object o) {
-        int result = -1;
-        if ( o != null ) {
-            for ( int loop=size()-1; loop>=0; loop--) {
-                E e = get(loop);
-                if ( o == e || o.equals(e)) {
-                    result = loop;
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-
-    //TODO - This will be insanely, horrifically slow - please don't use it
-    //need to improve this to use Array copy
-    public boolean addAll(int index, Collection<? extends E> c) {
-        boolean changed = false;
-        List<E> elements = new ArrayList<E>();
-        for (E e : c) {
-            elements.add(e);
-        }
-        if ( elements.size() > 0 ) {
-            changed = true;
-            ListIterator<E> li = elements.listIterator(elements.size());
-            while( li.hasPrevious()) {
-                add(index, li.previous());
-            }
-        }
-        return changed;
-    }
-
-    public ListIterator<E> listIterator() {
-        return new ModCountListIterator<E>(this);
-    }
-
-    public ListIterator<E> listIterator(int index) {
-        return new ModCountListIterator<E>(this,index);
-    }
-
     public long getModCount() {
         return modCount;
-    }
-
-    public List<E> subList(int fromIndex, int toIndex) {
-        return new ModCountSubList<E>(this, fromIndex, toIndex);
-    }
-
-    //from AbstractList
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof List))
-            return false;
-
-        ListIterator<E> e1 = listIterator();
-        ListIterator e2 = ((List) o).listIterator();
-        while (e1.hasNext() && e2.hasNext()) {
-            E o1 = e1.next();
-            Object o2 = e2.next();
-            if (!(o1 == null ? o2 == null : o1.equals(o2)))
-                return false;
-        }
-        return !(e1.hasNext() || e2.hasNext());
-    }
-
-    //from AbstractList
-    public int hashCode() {
-        int hashCode = 1;
-        Iterator<E> i = iterator();
-            while (i.hasNext()) {
-            E obj = i.next();
-            hashCode = 31*hashCode + (obj==null ? 0 : obj.hashCode());
-        }
-        return hashCode;
     }
 
 }

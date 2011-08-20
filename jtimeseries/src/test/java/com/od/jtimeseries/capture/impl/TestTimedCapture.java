@@ -32,9 +32,8 @@ public class TestTimedCapture extends TestCase {
         latch = new CountDownLatch(1);
         ValueSource valueRecorder = new DefaultValueRecorder("test recorder", "test recorder");
         DefaultIdentifiableTimeSeries timeSeries = new DefaultIdentifiableTimeSeries("timeseries", "timeseries") {
-            public boolean append(TimeSeriesItem value) {
+            public void addItem(TimeSeriesItem value) {
                 latch.countDown();
-                return true;
             }
         };
         timedCapture = new DefaultTimedCapture("test timed capture", valueRecorder, timeSeries, CaptureFunctions.MAX(Time.milliseconds(10)));

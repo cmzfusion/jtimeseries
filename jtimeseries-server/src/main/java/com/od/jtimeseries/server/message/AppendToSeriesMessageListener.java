@@ -101,7 +101,7 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
     private void processNewTimeSeriesValue(TimeSeriesValueMessage v) {
         try {
             TimeSeries s = rootContext.createTimeSeries(v.getContextPath(), v.getDescription());
-            s.append(v.getTimeSeriesItem());
+            s.addItem(v.getTimeSeriesItem());
 
             if ( updateMessagesReceivedCounter != null) {
                 updateMessagesReceivedCounter.incrementCount();

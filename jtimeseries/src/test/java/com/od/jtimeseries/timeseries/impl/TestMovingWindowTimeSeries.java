@@ -1,8 +1,8 @@
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.ListTimeSeries;
-import com.od.jtimeseries.timeseries.ListTimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import junit.framework.TestCase;
 
 import java.util.*;
@@ -21,9 +21,9 @@ public class TestMovingWindowTimeSeries extends TestCase {
     public void setUp() {
         movingWindowSeries = new MovingWindowTimeSeries();
 
-        movingWindowSeries.addAll(TimeSeriesTestUtils.createItemsWithTimestamps(
-                2, 4, 5, 5, 6, 8
-        ));
+        SeriesUtils.addAll(TimeSeriesTestUtils.createItemsWithTimestamps(
+            2, 4, 5, 5, 6, 8
+        ), movingWindowSeries);
 
         setStartAndEndTime(4, 6);
     }
@@ -35,39 +35,12 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals("testGetSnapshot", TimeSeriesTestUtils.createItemsWithTimestamps(5, 5), movingWindowSeries.getSnapshot());
     }
 
-    public void testGetIndexOfFirstItemAtOrBefore() {
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 3, movingWindowSeries.getIndexOfFirstItemAtOrBefore(6));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 2, movingWindowSeries.getIndexOfFirstItemAtOrBefore(5));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 0, movingWindowSeries.getIndexOfFirstItemAtOrBefore(4));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", -1, movingWindowSeries.getIndexOfFirstItemAtOrBefore(2));
-    }
-
-    public void testGetIndexOfFirstItemAtOrAfter() {
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", -1, movingWindowSeries.getIndexOfFirstItemAtOrAfter(2));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 0, movingWindowSeries.getIndexOfFirstItemAtOrAfter(4));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 1, movingWindowSeries.getIndexOfFirstItemAtOrAfter(5));
-        assertEquals("testGetIndexOfFirstItemAtOrBefore", 3, movingWindowSeries.getIndexOfFirstItemAtOrAfter(6));
-    }
-
     public void testSize() {
         assertEquals("testSize", 4, movingWindowSeries.size());
         setStartAndEndTime(5, 5);
         assertEquals("testSize", 2, movingWindowSeries.size());
         setStartAndEndTime(0, Long.MAX_VALUE);
         assertEquals("testSize", 6, movingWindowSeries.size());
-    }
-
-    public void testIsEmpty() {
-        assertFalse("testIsEmpty", movingWindowSeries.isEmpty());
-        movingWindowSeries.clear();
-        assertTrue("testIsEmpty", movingWindowSeries.isEmpty());
-    }
-
-    public void testContains() {
-        assertTrue("testContains", movingWindowSeries.contains(TimeSeriesTestUtils.createItemWithTimestamp(4)));
-        assertTrue("testContains", movingWindowSeries.contains(TimeSeriesTestUtils.createItemWithTimestamp(5)));
-        assertFalse("testContains", movingWindowSeries.contains(TimeSeriesTestUtils.createItemWithTimestamp(1)));
-        assertFalse("testContains", movingWindowSeries.contains(TimeSeriesTestUtils.createItemWithTimestamp(8)));
     }
 
     public void testIterator() {
@@ -89,29 +62,17 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals("testIterator",TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 6), movingWindowSeries.getSnapshot());
     }
 
-    public void testToArray() {
-        Object[] expected = TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5, 6).toArray();
-        assertTrue("testToArray", Arrays.equals(expected, movingWindowSeries.toArray()));
-
-        TimeSeriesItem[] expected2 = TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5, 6).toArray(new TimeSeriesItem[0]);
-        assertTrue("testToArray", Arrays.equals(expected2, movingWindowSeries.toArray(new TimeSeriesItem[0])));
-
-        assertTrue(movingWindowSeries.toArray(new TimeSeriesItem[0]).getClass() == TimeSeriesItem[].class);
-    }
-
     //If the window is set to open end, the addition affects
     //the view and an event is fired
     public void testAddWhenOpenEnded() {
         movingWindowSeries.setEndTime(MovingWindowTimeSeries.OPEN_END_TIME);
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         TimeSeriesItem item9 = TimeSeriesTestUtils.createItemWithTimestamp(9);
-        movingWindowSeries.add(item9);
+        movingWindowSeries.addItem(item9);
         waitForCountdown(countDownListener);
 
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
             movingWindowSeries,
-            5,
-            5,
             Collections.singletonList(item9),
             0
         );
@@ -125,7 +86,7 @@ public class TestMovingWindowTimeSeries extends TestCase {
     public void testAddWhenEndRestricted() {
         movingWindowSeries.setEndTime(6);
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        movingWindowSeries.add(TimeSeriesTestUtils.createItemWithTimestamp(10));
+        movingWindowSeries.addItem(TimeSeriesTestUtils.createItemWithTimestamp(10));
 
         failOnCountdownEvent(countDownListener);
         assertEquals("testAddWhenEndRestricted", 4, movingWindowSeries.size());
@@ -141,36 +102,32 @@ public class TestMovingWindowTimeSeries extends TestCase {
 
         long modCount = movingWindowSeries.getModCount();
         TimeSeriesItem item9 = TimeSeriesTestUtils.createItemWithTimestamp(9);
-        movingWindowSeries.add(item9);
+        movingWindowSeries.addItem(item9);
         assertEquals("testAddWhenNoItemsInWindow", modCount, movingWindowSeries.getModCount());
 
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         TimeSeriesItem item10 = TimeSeriesTestUtils.createItemWithTimestamp(10);
-        movingWindowSeries.add(item10);
+        movingWindowSeries.addItem(item10);
 
         waitForCountdown(countDownListener);
 
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
             movingWindowSeries,
-            0,
-            0,
             Collections.singletonList(item10),
             0
         );
         assertEquals("testAddWhenNoItemsInWindow", expectedEvent, countDownListener.getEvents().get(0));
         assertEquals("testAddWhenNoItemsInWindow", 1, movingWindowSeries.size());
-        assertEquals("testAddWhenNoItemsInWindow", item10, movingWindowSeries.get(0));
+        assertEquals("testAddWhenNoItemsInWindow", item10, movingWindowSeries.getItem(0));
     }
 
     public void testRemove() {
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         TimeSeriesItem item4 = TimeSeriesTestUtils.createItemWithTimestamp(4);
-        movingWindowSeries.remove(item4);
+        movingWindowSeries.removeItem(item4);
         waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsRemovedEvent(
                 movingWindowSeries,
-                0,
-                0,
                 Collections.singletonList(item4),
                 0
         );
@@ -179,12 +136,10 @@ public class TestMovingWindowTimeSeries extends TestCase {
 
         countDownListener = addCountDownListener();
         TimeSeriesItem item6 = TimeSeriesTestUtils.createItemWithTimestamp(6);
-        movingWindowSeries.remove(item6);
+        movingWindowSeries.removeItem(item6);
         waitForCountdown(countDownListener);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
+        expectedEvent = TimeSeriesEvent.createItemsRemovedEvent(
             movingWindowSeries,
-            2,
-            2,
             Collections.singletonList(item6),
             0
         );
@@ -193,12 +148,10 @@ public class TestMovingWindowTimeSeries extends TestCase {
 
         countDownListener = addCountDownListener();
         TimeSeriesItem item5 = TimeSeriesTestUtils.createItemWithTimestamp(5);
-        movingWindowSeries.remove(item5);
+        movingWindowSeries.removeItem(item5);
         waitForCountdown(countDownListener);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
+        expectedEvent = TimeSeriesEvent.createItemsRemovedEvent(
             movingWindowSeries,
-            0,
-            0,
             Collections.singletonList(item5),
             0
         );
@@ -216,7 +169,7 @@ public class TestMovingWindowTimeSeries extends TestCase {
         //remove 2, it should cause an event
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         TimeSeriesItem item2 = TimeSeriesTestUtils.createItemWithTimestamp(2);
-        movingWindowSeries.remove(item2);
+        movingWindowSeries.removeItem(item2);
         failOnCountdownEvent(countDownListener);
 
         //following remove, 2 is no longer present, even when we enlarge the window to include it
@@ -224,148 +177,11 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals("testRemoveOutsideWindow", 4, movingWindowSeries.size());
     }
 
-    public void testRemoveAtIndex()  {
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        movingWindowSeries.remove(0);  //the 2, not currently in window
-        failOnCountdownEvent(countDownListener);
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        countDownListener = addCountDownListener();
-        movingWindowSeries.remove(0);  //this is now the 4, at first index in window
-
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                0,
-                0,
-                Collections.singletonList(TimeSeriesTestUtils.createItemWithTimestamp(4)),
-                0
-        );
-        assertEquals("testRemove", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-    }
-
-    public void testContainsAll() {
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createSeriesWithItems(4, 5, 6);
-        assertTrue("testContainsAll", movingWindowSeries.containsAll(items));
-
-        items.add(TimeSeriesTestUtils.createItemWithTimestamp(8));
-        assertFalse("testContainsAll", movingWindowSeries.containsAll(items));
-    }
-
-    public void testAddAll() {
-        movingWindowSeries.setEndTime(12);
-        assertEquals("testAddAll", 5, movingWindowSeries.size());
-
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createItemsWithTimestamps(10, 12, 14);
-        movingWindowSeries.addAll(items);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                movingWindowSeries,
-                5,
-                6,
-                TimeSeriesTestUtils.createItemsWithTimestamps(10, 12),
-                0
-        );
-        assertEquals("testAddAll", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        assertEquals("testAddAll", 7, movingWindowSeries.size());
-
-        movingWindowSeries.setEndTime(14);
-        assertEquals("testAddAll", 8, movingWindowSeries.size());
-
-        //modCount should not change, and no event if addition outside window
-        long modCount = movingWindowSeries.getModCount();
-        countDownListener = addCountDownListener();
-        movingWindowSeries.addAll(TimeSeriesTestUtils.createItemsWithTimestamps(16, 18));
-        failOnCountdownEvent(countDownListener);
-        assertEquals("testAddAll", modCount, movingWindowSeries.getModCount());
-    }
-
-    public void testAddAllWhenWindowAfterCurrentContents() {
-        setStartAndEndTime(12, 14);
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createItemsWithTimestamps(10, 12, 14, 16);
-        movingWindowSeries.addAll(items);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-            movingWindowSeries,
-            0,
-            1,
-            TimeSeriesTestUtils.createItemsWithTimestamps(12, 14),
-            0
-        );
-        assertEquals("testAddAll", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        assertEquals("testAddAll", 2, movingWindowSeries.size());
-    }
-
-    public void testIndexAddAll() {
-        movingWindowSeries.setEndTime(12);
-
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createItemsWithTimestamps(10, 12, 14);
-        movingWindowSeries.addAll(6, items);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createSeriesChangedEvent(
-                movingWindowSeries,
-                TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5, 6, 8, 10, 12),
-                0
-        );
-        assertEquals("testAddAllAtIndex", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        assertEquals("testAddAllAtIndex", 7, movingWindowSeries.size());
-
-        movingWindowSeries.setEndTime(14);
-        assertEquals("testAddAllAtIndex", 8, movingWindowSeries.size());
-
-        //modCount should not change, and no event if addition outside window
-        long modCount = movingWindowSeries.getModCount();
-        countDownListener = addCountDownListener();
-        movingWindowSeries.addAll(9,  TimeSeriesTestUtils.createItemsWithTimestamps(15, 16));
-        failOnCountdownEvent(countDownListener);
-        assertEquals("testAddAllAtIndex", modCount, movingWindowSeries.getModCount());
-    }
-
-    public void testRemoveAll() {
-        movingWindowSeries.setEndTime(8);
-
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createItemsWithTimestamps(5, 6);
-        movingWindowSeries.removeAll(items);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createSeriesChangedEvent(
-            movingWindowSeries,
-            TimeSeriesTestUtils.createItemsWithTimestamps(4, 8),
-            0
-        );
-        assertEquals("testRemoveAll", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
-    public void testRetainAll() {
-         movingWindowSeries.setEndTime(8);
-
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        List<TimeSeriesItem> items = TimeSeriesTestUtils.createItemsWithTimestamps(5, 6);
-        movingWindowSeries.retainAll(items);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createSeriesChangedEvent(
-            movingWindowSeries,
-            TimeSeriesTestUtils.createItemsWithTimestamps(5, 5, 6),
-            0
-        );
-        assertEquals("testRetainAll", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
     public void testClear() {
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         movingWindowSeries.clear();
         waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createSeriesChangedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createSeriesChangedEvent(
             movingWindowSeries,
             TimeSeriesTestUtils.createItemsWithTimestamps(),
             0
@@ -373,170 +189,8 @@ public class TestMovingWindowTimeSeries extends TestCase {
         assertEquals("testClear", expectedEvent, countDownListener.getEvents().get(0));
     }
 
-    public void testAddAtIndex() {
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        TimeSeriesItem item6 = TimeSeriesTestUtils.createItemWithTimestamp(6);
-        movingWindowSeries.add(4, item6);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-            movingWindowSeries,
-            3,
-            3,
-            Collections.singletonList(item6),
-            0
-        );
-        assertEquals("testAddAtIndex", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
-    public void testAddAtIndexAfterWindow() {
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        TimeSeriesItem item12 = TimeSeriesTestUtils.createItemWithTimestamp(12);
-        movingWindowSeries.add(6, item12);
-        failOnCountdownEvent(countDownListener);
-        assertEquals("testAddAtIndexAfterWindow", 4, movingWindowSeries.size());
-
-        ListTimeSeries expectedItems = TimeSeriesTestUtils.createSeriesWithItems(4, 5, 5, 6);
-        assertEquals("testAddAtIndexAfterWindow", expectedItems, movingWindowSeries.getSnapshot());
-    }
-
-    public void testAddAtIndexBeforeWindow() {
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        TimeSeriesItem item1 = TimeSeriesTestUtils.createItemWithTimestamp(1);
-        movingWindowSeries.add(0, item1);
-        failOnCountdownEvent(countDownListener);
-        assertEquals("testAddAtIndexAfterWindow", 4, movingWindowSeries.size());
-        assertEquals("testAddAtIndexAfterWindow", TimeSeriesTestUtils.createSeriesWithItems(4, 5, 5, 6), movingWindowSeries.getSnapshot());
-    }
-
-    public void testAddAtIndexJustOutsideCurrentMaxIndexButWithinTimeWindow() {
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        TimeSeriesItem item6 = TimeSeriesTestUtils.createItemWithTimestamp(6);
-        movingWindowSeries.add(5, item6);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                movingWindowSeries,
-                4,
-                4,
-                Collections.singletonList(item6),
-                0
-        );
-        assertEquals("testAddAtIndexJustOutsideCurrentWindow", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
-    public void testIndexOf() {
-        assertEquals(0, movingWindowSeries.indexOf(TimeSeriesTestUtils.createItemWithTimestamp(4)));
-        assertEquals(1, movingWindowSeries.indexOf(TimeSeriesTestUtils.createItemWithTimestamp(5)));
-        assertEquals(-1, movingWindowSeries.indexOf(TimeSeriesTestUtils.createItemWithTimestamp(8)));
-    }
-
-    public void testLastIndexOf() {
-        assertEquals(0, movingWindowSeries.lastIndexOf(TimeSeriesTestUtils.createItemWithTimestamp(4)));
-        assertEquals(2, movingWindowSeries.lastIndexOf(TimeSeriesTestUtils.createItemWithTimestamp(5)));
-        assertEquals(-1, movingWindowSeries.indexOf(TimeSeriesTestUtils.createItemWithTimestamp(8)));
-    }
-
-    public void testListIterator() {
-        ListIterator li = movingWindowSeries.listIterator();
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(4),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(6),li.next());
-        assertFalse(li.hasNext());
-
-        li = movingWindowSeries.listIterator();
-        assertEquals(0, li.nextIndex());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(4),li.next());
-        assertEquals(1, li.nextIndex());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.next());
-        assertEquals(1, li.previousIndex());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.previous()); //this seems totally illogical to me, but that's how List iterators are defined to work
-        assertEquals(0, li.previousIndex());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(4),li.previous());
-        assertEquals(-1, li.previousIndex());
-        assertFalse(li.hasPrevious());
-    }
-
-    public void testListIteratorRemove() {
-        //check that calling remove actually fires an event
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        ListIterator li = movingWindowSeries.listIterator();
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(4),li.next());
-        li.remove();
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item4 = TimeSeriesTestUtils.createItemWithTimestamp(4);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                0,
-                0,
-                Collections.singletonList(item4),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        li.next();
-        li.next();
-        li.next();
-        countDownListener = addCountDownListener();
-        li.remove();
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item6 = TimeSeriesTestUtils.createItemWithTimestamp(6);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                2,
-                2,
-                Collections.singletonList(item6),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-
-        assertEquals(2, movingWindowSeries.size());
-    }
-
-    public void testListIteratorAdd() {
-        setStartAndEndTime(4, 7);
-        //check that calling add  actually fires an event
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        ListIterator<TimeSeriesItem> li = movingWindowSeries.listIterator();
-        TimeSeriesItem item3 = TimeSeriesTestUtils.createItemWithTimestamp(3);
-        li.add(item3);
-        failOnCountdownEvent(countDownListener); //3 is outside window
-
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(4),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5),li.next());
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(6),li.next());
-
-        countDownListener = addCountDownListener();
-        TimeSeriesItem item7 = TimeSeriesTestUtils.createItemWithTimestamp(7);
-        li.add(item7);
-        waitForCountdown(countDownListener);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                movingWindowSeries,
-                4,
-                4,
-                Collections.singletonList(item7),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        countDownListener = addCountDownListener();
-        TimeSeriesItem item8 = TimeSeriesTestUtils.createItemWithTimestamp(8);
-        li.add(item8);
-        failOnCountdownEvent(countDownListener); //8 is outside window
-
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-        assertEquals(5, movingWindowSeries.size());
-        setStartAndEndTime(0, 1000);
-        assertEquals(9, movingWindowSeries.size());
-    }
-
     public void testChangingStartAndEndInvalidateIterator() {
-        ListIterator<TimeSeriesItem> li = movingWindowSeries.listIterator();
+        Iterator<TimeSeriesItem> li = movingWindowSeries.iterator();
         li.next();
         movingWindowSeries.setStartTime(1000);
         try {
@@ -545,154 +199,13 @@ public class TestMovingWindowTimeSeries extends TestCase {
         } catch(ConcurrentModificationException c) {}
 
         setStartAndEndTime(4, 6);
-        li = movingWindowSeries.listIterator();
+        li = movingWindowSeries.iterator();
         li.next();
         movingWindowSeries.setEndTime(1000);
         try {
             li.next();
             fail("Should cause concurrent mod");
         } catch(ConcurrentModificationException c) {}
-
-        setStartAndEndTime(4, 6);
-        li = movingWindowSeries.subList(0, movingWindowSeries.size()).listIterator();
-        li.next();
-        movingWindowSeries.setStartTime(1000);
-        try {
-            li.next();
-            fail("Should cause concurrent mod");
-        } catch(ConcurrentModificationException c) {}
-
-        setStartAndEndTime(4, 6);
-        li = movingWindowSeries.subList(0, movingWindowSeries.size()).listIterator();
-        li.next();
-        movingWindowSeries.setEndTime(1000);
-        try {
-            li.next();
-            fail("Should cause concurrent mod");
-        } catch(ConcurrentModificationException c) {}
-
-    }
-
-    public void testSubList() {
-        List l = movingWindowSeries.subList(0, 1);
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(4), l);
-
-        l = movingWindowSeries.subList(1, 2);
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(5), l);
-
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        l.remove(0);
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item5 = TimeSeriesTestUtils.createItemWithTimestamp(5);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                1,
-                1,
-                Collections.singletonList(item5),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-        assertEquals(3, movingWindowSeries.size());
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        try {
-            l = movingWindowSeries.subList(0, 4);
-            fail("There should now be only 3 items it movable window");
-        } catch ( IndexOutOfBoundsException i){}
-
-        l = movingWindowSeries.subList(1, 3);
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(5, 6), l);
-
-        countDownListener = addCountDownListener();
-        l.remove(0);
-        waitForCountdown(countDownListener);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                1,
-                1,
-                Collections.singletonList(item5),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        //test iterator of sublist
-        countDownListener = addCountDownListener();
-        ListIterator<TimeSeriesItem> i = l.listIterator();
-        i.next();
-        i.remove();
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item6 = TimeSeriesTestUtils.createItemWithTimestamp(6);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                1,
-                1,
-                Collections.singletonList(item6),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(4), movingWindowSeries);
-        movingWindowSeries.removeTimeSeriesListener(countDownListener);
-
-        //Test sublist of sublist
-        countDownListener = addCountDownListener();
-        l = movingWindowSeries.subList(0, 1).subList(0, 1);
-        l.subList(0, 1);
-        l.remove(0);
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item4 = TimeSeriesTestUtils.createItemWithTimestamp(4);
-        expectedEvent = ListTimeSeriesEvent.createItemsRemovedEvent(
-                movingWindowSeries,
-                1,
-                1,
-                Collections.singletonList(item4),
-                0
-        );
-        assertEquals(0, movingWindowSeries.size());
-    }
-
-    public void testAppend() {
-        assertFalse(movingWindowSeries.append(TimeSeriesTestUtils.createItemWithTimestamp(4)));
-        assertTrue(movingWindowSeries.append(TimeSeriesTestUtils.createItemWithTimestamp(10)));
-        movingWindowSeries.setEndTime(12);
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        movingWindowSeries.append(TimeSeriesTestUtils.createItemWithTimestamp(12));
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item12 = TimeSeriesTestUtils.createItemWithTimestamp(12);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                movingWindowSeries,
-                6,
-                6,
-                Collections.singletonList(item12),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
-    public void testPrepend() {
-        assertFalse(movingWindowSeries.prepend(TimeSeriesTestUtils.createItemWithTimestamp(4)));
-        assertTrue(movingWindowSeries.prepend(TimeSeriesTestUtils.createItemWithTimestamp(2)));
-        movingWindowSeries.setStartTime(1);
-        CountDownLatchSeriesListener countDownListener = addCountDownListener();
-        movingWindowSeries.prepend(TimeSeriesTestUtils.createItemWithTimestamp(1));
-        waitForCountdown(countDownListener);
-        TimeSeriesItem item1 = TimeSeriesTestUtils.createItemWithTimestamp(1);
-        ListTimeSeriesEvent expectedEvent = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                movingWindowSeries,
-                0,
-                0,
-                Collections.singletonList(item1),
-                0
-        );
-        assertEquals("testListIterator", expectedEvent, countDownListener.getEvents().get(0));
-    }
-
-    public void testSubSeries() {
-        List<TimeSeriesItem> l = movingWindowSeries.getSubSeries(5);
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(5, 5, 6), l);
-
-        l = movingWindowSeries.getSubSeries(5, 5);
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(5, 5), l);
     }
 
     public void testEarliestItem() {
@@ -701,48 +214,6 @@ public class TestMovingWindowTimeSeries extends TestCase {
 
     public void testLatestItem() {
         assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(6), movingWindowSeries.getLatestItem());
-    }
-
-    public void testRemoveEarliestItem() {
-        movingWindowSeries.removeEarliestItem();
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5, 6), movingWindowSeries);
-        movingWindowSeries.removeEarliestItem();
-         assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(5, 5, 6), movingWindowSeries);
-    }
-
-    public void testRemoveLatestItem() {
-        movingWindowSeries.removeLatestItem();
-        assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5, 6), movingWindowSeries);
-        movingWindowSeries.removeLatestItem();
-         assertEquals(TimeSeriesTestUtils.createItemsWithTimestamps(4, 5, 5), movingWindowSeries);
-    }
-
-    public void testGetEarliestTimestamp() {
-        assertEquals((long)4, movingWindowSeries.getEarliestTimestamp());
-    }
-
-    public void testGetLatestTimestamp() {
-        assertEquals((long)6, movingWindowSeries.getLatestTimestamp());
-    }
-
-    public void testGetFirstItemAtOrBefore() {
-        assertNull(movingWindowSeries.getFirstItemAtOrBefore(2));
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(5), movingWindowSeries.getFirstItemAtOrBefore(5));
-    }
-
-    public void testGetFirstItemAtOrAfter() {
-        assertNull(movingWindowSeries.getFirstItemAtOrAfter(8));
-        assertEquals(TimeSeriesTestUtils.createItemWithTimestamp(6), movingWindowSeries.getFirstItemAtOrAfter(6));
-    }
-
-    public void testFirstTimestampAtOrBefore() {
-        assertEquals(-1, movingWindowSeries.getTimestampBefore(2));
-        assertEquals(4, movingWindowSeries.getTimestampBefore(5));
-    }
-
-    public void testFirstTimestampAtOrAfter() {
-        assertEquals(-1, movingWindowSeries.getTimestampAfter(8));
-        assertEquals(6, movingWindowSeries.getTimestampAfter(5));
     }
 
     private void waitForCountdown(CountDownLatchSeriesListener countDownListener) {

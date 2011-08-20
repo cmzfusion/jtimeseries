@@ -58,7 +58,7 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         queueTimer = null;
     }
 
-    protected WaitForEndOfCapturePeriodListener getCapturePeriodListener() {
+    protected WaitForEndOfCapturePeriodListener createCapturePeriodListener() {
         List<ValueSource> l = getListOfSources();
         WaitForEndOfCapturePeriodListener w = new WaitForEndOfCapturePeriodListener(l.size());
         for ( ValueSource v : l) {

@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.util.Collection;
@@ -43,5 +44,9 @@ public class DefaultTimeSeries extends AbstractListTimeSeries {
 
     public DefaultTimeSeries(Collection<TimeSeriesItem> items) {
         super(items);
+    }
+
+     public DefaultTimeSeries(TimeSeries series) {
+        super(series.getSnapshot());
     }
 }

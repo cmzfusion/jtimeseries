@@ -23,6 +23,7 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.interpolation.LinearInterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.timeseries.interpolation.DefaultInterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.InterpolatedTimeSeries;
 
@@ -39,7 +40,8 @@ import java.util.List;
  * series, and aggregates their values using a function.
  * e.g. a timepoint in this series may represent the mean of the values for that timepoint in the associated series.
  *
- * A DefaultTimeSeries instance is used to store the aggregated values - but the time series implementation used to store the aggregated timepoints can be changed - this series proxies for the timeseries instance used to store the aggregated data values
+ * A DefaultTimeSeries instance is used to store the aggregated values - but the time series implementation used to store the aggregated timepoints can be changed -
+ * this series proxies for the timeseries instance used to store the aggregated data values
  */
 public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries implements AggregatedTimeSeries {
 
@@ -108,7 +110,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         aggregateFunction.clear();
         boolean success = addValuesFromChildSeries(nextTimepoint, aggregateFunction);
         if (success) {
-            append(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
+            addItem(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
             lastTimepoint = nextTimepoint;
         }
         return success;
@@ -131,14 +133,16 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
     }
 
     private long getNextTimestampForAggregatedSeries() {
-        return masterSeries.getTimestampAfter(lastTimepoint);
+        synchronized(masterSeries) {
+            return SeriesUtils.getTimestampAfter(lastTimepoint, masterSeries);
+        }
     }
 
     //return first timestamp for which we can obtain a value for all series, or Long.MAX_VALUE
     private long getFirstCommonTimestamp() {
         long earliest = Long.MIN_VALUE;
         for (TimeSeries s : children) {
-            long earliestChildStamp = s.getEarliestTimestamp();
+            long earliestChildStamp = s.getEarliestItem().getTimestamp();
             earliestChildStamp = earliestChildStamp == -1 ? Long.MAX_VALUE : earliestChildStamp;
             earliest = Math.max(earliestChildStamp, earliest );
         }
@@ -161,10 +165,6 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         }
 
         public void itemsRemoved(TimeSeriesEvent h) {
-            addNewValues();
-        }
-
-        public void itemsChanged(TimeSeriesEvent e) {
             addNewValues();
         }
 

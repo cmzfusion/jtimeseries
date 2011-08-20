@@ -159,7 +159,6 @@ public class TimeSeriesEvent implements Cloneable {
     public static enum EventType {
         ADD_OR_INSERT,
         REMOVE,
-        ITEM_CHANGE,
         SERIES_CHANGE
     }
 }

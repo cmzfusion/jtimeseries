@@ -76,7 +76,7 @@ public class ChartPngHandler extends AbstractHandler {
 
     private NanoHTTPD.Response createImageResponse(Properties params, IdentifiableTimeSeries h) {
         NanoHTTPD.Response result;
-        TimeSeriesTableModelAdapter tableModel = new TimeSeriesTableModelAdapter(h, true, false);
+        TimeSeriesTableModelAdapter tableModel = new TimeSeriesTableModelAdapter(h);
         TimeSeriesXYDataset xyDataset = new TimeSeriesXYDataset(h.getId(), tableModel);
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(

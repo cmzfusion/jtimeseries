@@ -45,10 +45,6 @@ class CountDownLatchSeriesListener implements TimeSeriesListener {
         handleCallback(e);
     }
 
-    public void itemsChanged(TimeSeriesEvent e) {
-        handleCallback(e);
-    }
-
     public void seriesChanged(TimeSeriesEvent e) {
         handleCallback(e);
     }

@@ -57,13 +57,6 @@ class TimeSeriesListenerSupport {
         }
     }
 
-    public void fireItemsChanged(TimeSeriesEvent e) {
-        TimeSeriesListener[] listeners = getListenerSnapshot();
-        for (TimeSeriesListener l : listeners) {
-            l.itemsChanged(e);
-        }
-    }
-
     public void fireSeriesChanged(TimeSeriesEvent e) {
         TimeSeriesListener[] listeners = getListenerSnapshot();
         for (TimeSeriesListener l : listeners) {

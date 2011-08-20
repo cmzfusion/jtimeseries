@@ -49,56 +49,23 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
     public RoundRobinTimeSeries(Collection<TimeSeriesItem> items, int maxSize) {
         super(items);
         this.maxSize = maxSize;
+        checkSize();
     }
 
 
     public synchronized void addWithoutFiringEvent(Collection<TimeSeriesItem> i) {
         addAllWithoutFiringEvents(i);
-        checkSize(true);
+        checkSize();
     }
 
-    public synchronized boolean add(TimeSeriesItem i) {
-        boolean result = super.add(i);
-        checkSize(result);
-        return result;
+    public synchronized void addItem(TimeSeriesItem i) {
+        super.addItem(i);
+        checkSize();
     }
 
-    public synchronized boolean append(TimeSeriesItem i) {
-        boolean result = super.append(i);
-        checkSize(result);
-        return result;
-    }
-
-    public synchronized void add(int index, TimeSeriesItem i) {
-        super.add(index, i);
-        checkSize(true);
-    }
-
-    public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> i) {
-        boolean result = super.addAll(index, i);
-        checkSize(result);
-        return result;
-    }
-
-    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> i) {
-        boolean result = super.addAll(i);
-        checkSize(result);
-        return result;
-    }
-
-    public synchronized boolean prepend(TimeSeriesItem i) {
-        boolean result = false;
-        if ( size() < maxSize) {
-            result = super.prepend(i);
-        }
-        return result;
-    }
-
-    private void checkSize(boolean result) {
-        if ( result) {
-            while (size() > maxSize) {
-                removeEarliestItem();
-            }
+    private void checkSize() {
+        while (size() > maxSize) {
+            removeItem(getEarliestItem());
         }
     }
 
@@ -122,4 +89,5 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
             t.printStackTrace();
         }
     }
+
 }

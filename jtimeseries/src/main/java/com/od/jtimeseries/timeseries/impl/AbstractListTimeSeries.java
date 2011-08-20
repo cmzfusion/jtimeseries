@@ -19,8 +19,8 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
 
@@ -36,329 +36,104 @@ import java.util.concurrent.Executor;
  * Abstract superclass for list based TimeSeries
  * Provides a mechanism to queue up change events and notify listeners in a separate thread
  */
-abstract class AbstractListTimeSeries implements ListTimeSeries {
+abstract class AbstractListTimeSeries implements IndexedTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractListTimeSeries.class);
     
-    private final OrderValidatingRandomAccessDeque series;
+    private final RandomAccessDeque<TimeSeriesItem> series;
     private final TimeSeriesListenerSupport timeSeriesListenerSupport = new TimeSeriesListenerSupport();
+
+    private long modCountOnLastHashcode = -1;
+    private int hashCode;
 
     private final String toStringDescription = "Series-" + getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
 
     protected AbstractListTimeSeries() {
-        series = new OrderValidatingRandomAccessDeque(new RandomAccessDeque<TimeSeriesItem>());
+        series =new RandomAccessDeque<TimeSeriesItem>();
     }
 
     protected AbstractListTimeSeries(Collection<TimeSeriesItem> items) {
-        series = new OrderValidatingRandomAccessDeque(new RandomAccessDeque<TimeSeriesItem>(items));
-    }
-
-    public synchronized boolean append(TimeSeriesItem item) {
-        boolean changed = false;
-        if ( size() == 0 || item.getTimestamp() >= getLatestTimestamp()) {
-            changed = true;
-            series.addLast(item);
-            int index = series.size() - 1;
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount());
-            queueItemsAddedOrInsertedEvent(t);
-        }
-        return changed;
-    }
-
-    public synchronized boolean prepend(TimeSeriesItem item) {
-        boolean changed = false;
-        if ( size() == 0 || item.getTimestamp() <= getEarliestTimestamp()) {
-            changed = true;
-            series.addFirst(item);
-            TimeSeriesEvent t = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, 0, 0, Collections.singletonList(item), getModCount());
-            queueItemsAddedOrInsertedEvent(t);
-        }
-        return changed;
-    }
-
-    public synchronized List<TimeSeriesItem> getSnapshot() {
-        //return a defensive copy of the timeseries maintained by this logger
-        return new ArrayList<TimeSeriesItem>(series);
+        series = new RandomAccessDeque<TimeSeriesItem>(items);
     }
 
     public synchronized TimeSeriesItem getLatestItem() {
-        return isEmpty() ? null : series.getLast();
-    }
-
-    public synchronized long getLatestTimestamp() {
-        return isEmpty() ? -1 : series.getLast().getTimestamp();
-    }
-
-    public synchronized TimeSeriesItem removeLatestItem() {
-        TimeSeriesItem result = null;
-        if ( series.size() > 0) {
-            result = series.removeLast();
-            int indexRemoved = series.size();
-            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, indexRemoved, indexRemoved, Collections.singletonList(result), getModCount()));
-        }
-        return result;
+        return size() == 0 ? null : series.getLast();
     }
 
     public synchronized TimeSeriesItem getEarliestItem() {
-        return isEmpty() ? null : series.getFirst();
+        return size() == 0 ? null : series.getFirst();
     }
 
-    public synchronized long getEarliestTimestamp() {
-        return isEmpty() ? -1 : series.getFirst().getTimestamp();
+    public long getEarliestTimestamp() {
+        return size() == 0 ? -1 : getEarliestItem().getTimestamp();
     }
 
-    public synchronized TimeSeriesItem removeEarliestItem() {
-        return series.size() > 0 ? series.removeFirst() : null;
-    }
-
-    public synchronized boolean isEmpty() {
-        return series.size() == 0;
+    public long getLatestTimestamp() {
+        return size() == 0 ? -1 : getLatestItem().getTimestamp();
     }
 
     public synchronized int size() {
         return series.size();
     }
 
-    public synchronized TimeSeriesItem get(int index) {
+    public synchronized TimeSeriesItem getItem(int index) {
         return series.get(index);
     }
 
     public synchronized void clear() {
         series.clear();
-        TimeSeriesEvent e = ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), getModCount());
+        TimeSeriesEvent e = TimeSeriesEvent.createSeriesChangedEvent(this, Collections.<TimeSeriesItem>emptyList(), getModCount());
         queueSeriesChangedEvent(e);
     }
 
-    public synchronized List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
-        return series.subList(fromIndex, toIndex);
-    }
-
-    public synchronized ListIterator<TimeSeriesItem> listIterator() {
-        return series.listIterator();
-    }
-
-    public synchronized ListIterator<TimeSeriesItem> listIterator(int index) {
-        return series.listIterator(index);
-    }
-
-    public synchronized int lastIndexOf(Object o) {
-        return series.lastIndexOf(o);
-    }
-
-    public synchronized int indexOf(Object o) {
-        return series.indexOf(o);
-    }
-
-    public synchronized boolean remove(Object o) {
-        int index = indexOf(o);
-        if ( index != -1) {
-            series.remove(o);
-            queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList((TimeSeriesItem) o), getModCount()));
+    public synchronized boolean removeItem(TimeSeriesItem o) {
+        boolean result = false;
+        if ( size() > 0) {
+            int firstPossibleIndex = SeriesUtils.getIndexOfFirstItemAtOrAfter(o.getTimestamp(), this);
+            if ( firstPossibleIndex > -1 ) {
+                int index = firstPossibleIndex;
+                TimeSeriesItem i = series.get(index);
+                //only worth comparing while timestamp is the same
+                while ( i.getTimestamp() == o.getTimestamp()) {
+                    if (o.equals(i)) {
+                        series.remove(index);
+                        result = true;
+                        break;
+                    }
+                    index++;
+                    i = series.get(index);
+                }
+            }
         }
-        return index != -1;
-    }
 
-    //n.b to obey Collections contract this must throw an IllegalArgumentException rather than handling the case
-    //where the timestamp is out of order and returning false as append() does
-    public synchronized boolean add(TimeSeriesItem timeSeriesItem) {
-        boolean added = series.add(timeSeriesItem);
-        if ( added ) {
-            int index = size() - 1;
-            queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(timeSeriesItem), getModCount()));
-        }
-        return added;
-    }
-
-    public synchronized TimeSeriesItem remove(int index) {
-        TimeSeriesItem removed = series.remove(index);
-        queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(removed), getModCount()));
-        return removed;
-    }
-
-    public synchronized void add(int index, TimeSeriesItem item) {
-        series.add(index, item);
-        queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
-    }
-
-    public synchronized TimeSeriesItem set(int index, TimeSeriesItem item) {
-        TimeSeriesItem replaced = series.set(index, item);
-        //there's no specific event currently to signify a replace, so we represent this as a remove/insert
-        queueItemsRemovedEvent(ListTimeSeriesEvent.createItemsRemovedEvent(this, index, index, Collections.singletonList(replaced), getModCount()));
-        queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index, Collections.singletonList(item), getModCount()));
-
-        return replaced;
-    }
-
-    public synchronized boolean retainAll(Collection<?> c) {
-        boolean changed = series.retainAll(c);
-        queueSeriesChangeEventIfChanged(changed);
-        return changed;
-    }
-
-    public synchronized boolean removeAll(Collection<?> c) {
-        boolean changed = series.removeAll(c);
-        queueSeriesChangeEventIfChanged(changed);
-        return changed;
-    }
-
-    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> c) {
-        int startIndex = size();
-        boolean result = series.addAll(c);
         if ( result ) {
-           queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, startIndex, startIndex + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+            queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, Collections.singletonList((TimeSeriesItem) o), getModCount()));
         }
         return result;
     }
 
-    public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> c) {
-        boolean result = series.addAll(index, c);
-         if ( result ) {
-           queueItemsAddedOrInsertedEvent(ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(this, index, index + c.size() - 1, new ArrayList<TimeSeriesItem>(c), getModCount()));
+    public synchronized void addItem(TimeSeriesItem timeSeriesItem) {
+        if ( size() == 0 || timeSeriesItem.getTimestamp() >= getLatestTimestamp()) {
+            series.add(timeSeriesItem);
+        } else {
+            //if there are already items with this timestamp, add to appear after those items
+            //this will mean that this item is the last one before any item at timestamp + 1
+            int indexToAdd = SeriesUtils.getIndexOfFirstItemAtOrAfter(timeSeriesItem.getTimestamp() + 1, this);
+            series.add(indexToAdd, timeSeriesItem);
         }
-        return result;
-
-    }
-
-    public synchronized boolean containsAll(Collection<?> c) {
-        return series.containsAll(c);
-    }
-
-    public synchronized Object[] toArray() {
-        return series.toArray();
-    }
-
-    public synchronized <T> T[] toArray(T[] a) {
-        return series.toArray(a);
+        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount()));
     }
 
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return series.iterator();
     }
 
-    public synchronized boolean contains(Object o) {
-        return series.contains(o);
-    }
-
-    public synchronized boolean equals(Object o) {
-        return o == this || series.equals(o);
-    }
-
-    public synchronized int hashCode() {
-        return series.hashCode();
-    }
-
-    public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return getItemsInRange(startTimestamp, endTimestamp);
-    }
-
-    public synchronized ListTimeSeries getSubSeries(long timestamp) {
-        return getItemsInRange(timestamp, Long.MAX_VALUE);
-    }
-
-    private ListTimeSeries getItemsInRange(long earliest, long latest) {
-        int startIndex = getIndexOfFirstItemAtOrAfter(earliest);
-        int endIndex = getIndexOfFirstItemAtOrBefore(latest);
-        ListTimeSeries result;
-        if ( startIndex != -1 && endIndex != -1) {
-            result = new DefaultTimeSeries(subList(startIndex,endIndex + 1));
-        } else {
-            result = new DefaultTimeSeries();
-        }
-        return result;
-    }
-
-    int binarySearchForItemWithTimestamp(long timestamp) {
-        return Collections.binarySearch(
-            this,
-            new DefaultTimeSeriesItem(timestamp, DoubleNumeric.valueOf(0)),
-            new Comparator<TimeSeriesItem>() {
-                public int compare(TimeSeriesItem o1, TimeSeriesItem o2) {
-                    return o1.getTimestamp() == o2.getTimestamp() ? 0 :
-                        o1.getTimestamp() < o2.getTimestamp() ? -1 : 1;
-                }
-            }
-        );
-    }
-
-    public synchronized long getTimestampAfter(long timestamp) {
-        TimeSeriesItem item = getFirstItemAtOrAfter(timestamp + 1);
-        return item != null ? item.getTimestamp() : -1;
-    }
-
-    public synchronized long getTimestampBefore(long timestamp) {
-        TimeSeriesItem item = getFirstItemAtOrBefore(timestamp - 1);
-        return item != null ? item.getTimestamp() : -1;
-    }
-    
-    /**
-     * @return  index of the first item in the series with a timestamp equal to or later than the supplied timestamp
-     */
-    public synchronized int getIndexOfFirstItemAtOrAfter(long timestamp) {
-        int index = binarySearchForItemWithTimestamp(timestamp);
-        if ( index >= 0) {
-            index = findLowestIndexSharingTimestamp(timestamp, index);
-        } else {
-            index = -index-1;
-            index = index < size() ? index : -1;
-        }
-        return index;
-    }
-
-    /**
-     * @return  index of the first item in the series with a timestamp equal to or earlier than the supplied timestamp
-     */
-    public synchronized int getIndexOfFirstItemAtOrBefore(long timestamp) {
-        int index = binarySearchForItemWithTimestamp(timestamp);
-        if ( index >= 0) {
-            index = findHighestIndexSharingTimestamp(timestamp, index);
-        } else {
-            index = -index - 2;
-        }
-        return index;
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        TimeSeriesItem result = null;
-        int index = getIndexOfFirstItemAtOrBefore(timestamp);
-        if ( index > -1 ) {
-            result = get(index);
-        }
-        return result;
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        TimeSeriesItem result = null;
-        int index = getIndexOfFirstItemAtOrAfter(timestamp);
-        if ( index > -1 ) {
-            result = get(index);
-        }
-        return result;
+    public List<TimeSeriesItem> getSnapshot() {
+        return new ArrayList<TimeSeriesItem>(series);
     }
 
     public synchronized long getModCount() {
         return series.getModCount();
-    }
-
-    private int findLowestIndexSharingTimestamp(long timestamp, int index) {
-        while ( index > 0) {
-            if ( get(index - 1).getTimestamp() == timestamp) {
-                index--;
-            } else {
-                break;
-            }
-        }
-        return index;
-    }
-
-    private int findHighestIndexSharingTimestamp(long timestamp, int index) {
-        while ( index + 1 < size()) {
-            if ( get(index + 1).getTimestamp() == timestamp) {
-                index++;
-            } else {
-                break;
-            }
-        }
-        return index;
     }
 
     public synchronized void addTimeSeriesListener(final TimeSeriesListener l) {
@@ -380,12 +155,6 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
 
     protected Executor getSeriesEventExecutor() {
         return TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
-    }
-
-    private void queueSeriesChangeEventIfChanged(boolean changed) {
-        if ( changed ) {
-            queueSeriesChangedEvent(ListTimeSeriesEvent.createSeriesChangedEvent(this, getSnapshot(), getModCount()));
-        }
     }
 
     protected void queueSeriesChangedEvent(final TimeSeriesEvent e) {
@@ -424,20 +193,8 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
         );
     }
 
-    protected void queueItemsChangedEvent(final TimeSeriesEvent e) {
-        getSeriesEventExecutor().execute(
-            new Runnable() {
-                public void run() {
-                    logMethods.logDebug("Firing event " + e);
-                    timeSeriesListenerSupport.fireItemsChanged(e);
-                    logMethods.logDebug("Finished firing event " + e);
-                }
-            }
-        );
-    }
-
     //sometimes it is helpful to be able to add items without firing events to listeners.
-    //(e.g. this might be as a performance optimization after construction and before any listners
+    //(e.g. this might be as a performance optimization after construction and before any listeners
     //have been added.)
     protected synchronized void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
         series.addAll(c);
@@ -446,4 +203,21 @@ abstract class AbstractListTimeSeries implements ListTimeSeries {
     public String toString() {
         return toStringDescription;
     }
+
+    public int hashCode() {
+        if ( getModCount() != modCountOnLastHashcode) {
+            hashCode = SeriesUtils.hashCodeByItems(this);
+            modCountOnLastHashcode = getModCount();
+        }
+        return hashCode;
+    }
+
+    public boolean equals(Object o) {
+        if ( o == this ) {
+            return true;
+        } else {
+            return o instanceof TimeSeries && SeriesUtils.areTimeSeriesEqualByItems(this, (TimeSeries) o);
+        }
+    }
+
 }

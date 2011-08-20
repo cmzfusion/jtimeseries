@@ -24,6 +24,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,48 +60,20 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         eventHandler = l;
     }
 
-    public synchronized boolean prepend(TimeSeriesItem item) {
-        return timeSeries.prepend(item);
-    }
-
-    public synchronized boolean append(TimeSeriesItem value) {
-        return timeSeries.append(value);
-    }
-
-    public synchronized Collection<TimeSeriesItem> getSnapshot() {
-        return timeSeries.getSnapshot();
-    }
-
-    public synchronized TimeSeries getSubSeries(long timestamp) {
-        return timeSeries.getSubSeries(timestamp);
-    }
-
-    public synchronized TimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return timeSeries.getSubSeries(startTimestamp, endTimestamp);
-    }
-
     public synchronized TimeSeriesItem getLatestItem() {
         return timeSeries.getLatestItem();
-    }
-
-    public synchronized TimeSeriesItem removeLatestItem() {
-        return timeSeries.removeLatestItem();
-    }
-
-    public synchronized long getLatestTimestamp() {
-        return timeSeries.getLatestTimestamp();
     }
 
     public synchronized TimeSeriesItem getEarliestItem() {
         return timeSeries.getEarliestItem();
     }
 
-    public synchronized TimeSeriesItem removeEarliestItem() {
-        return timeSeries.removeEarliestItem();
+    public long getEarliestTimestamp() {
+        return timeSeries.getEarliestTimestamp();
     }
 
-    public synchronized long getEarliestTimestamp() {
-        return timeSeries.getEarliestTimestamp();
+    public long getLatestTimestamp() {
+        return timeSeries.getLatestTimestamp();
     }
 
     public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
@@ -115,72 +88,28 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return timeSeries.size();
     }
 
-    public synchronized boolean isEmpty() {
-        return timeSeries.isEmpty();
-    }
-
-    public synchronized boolean contains(Object o) {
-        return timeSeries.contains(o);
-    }
-
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return timeSeries.iterator();
     }
 
-    public synchronized Object[] toArray() {
-        return timeSeries.toArray();
+    public synchronized void addItem(TimeSeriesItem i) {
+        timeSeries.addItem(i);
     }
 
-    public synchronized <T> T[] toArray(T[] a) {
-        return timeSeries.toArray(a);
-    }
-
-    public synchronized boolean add(TimeSeriesItem o) {
-        return timeSeries.add(o);
-    }
-
-    public synchronized boolean remove(Object o) {
-        return timeSeries.remove(o);
-    }
-
-    public synchronized boolean containsAll(Collection<?> c) {
-        return timeSeries.containsAll(c);
-    }
-
-    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> c) {
-        return timeSeries.addAll(c);
-    }
-
-    public synchronized boolean removeAll(Collection<?> c) {
-        return timeSeries.removeAll(c);
-    }
-
-    public synchronized boolean retainAll(Collection<?> c) {
-        return timeSeries.retainAll(c);
+    public synchronized boolean removeItem(TimeSeriesItem i) {
+        return timeSeries.removeItem(i);
     }
 
     public synchronized void clear() {
         timeSeries.clear();
     }
 
-    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return timeSeries.getFirstItemAtOrBefore(timestamp);
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return timeSeries.getFirstItemAtOrAfter(timestamp);
-    }
-
-    public synchronized long getTimestampAfter(long timestamp) {
-        return timeSeries.getTimestampAfter(timestamp);
-    }
-
-    public synchronized long getTimestampBefore(long timestamp) {
-        return timeSeries.getTimestampBefore(timestamp);
-    }
-
     public synchronized long getModCount() {
         return timeSeries.getModCount();
+    }
+
+    public List<TimeSeriesItem> getSnapshot() {
+        return timeSeries.getSnapshot();
     }
 
     public String toString() {

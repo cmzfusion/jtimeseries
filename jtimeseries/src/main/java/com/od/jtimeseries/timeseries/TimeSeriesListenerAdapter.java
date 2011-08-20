@@ -32,9 +32,6 @@ public class TimeSeriesListenerAdapter implements TimeSeriesListener {
     public void itemsRemoved(TimeSeriesEvent e) {
     }
 
-    public void itemsChanged(TimeSeriesEvent e) {
-    }
-
     public void seriesChanged(TimeSeriesEvent e) {
     }
 }

@@ -102,7 +102,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             //this way the source is free to update the new function instance while the calculation takes place on the timer thread
             if ( oldFunctionInstance != DUMMY_FUNCTION ) {
                 Numeric value = oldFunctionInstance.calculateAggregateValue();
-                getTimeSeries().append(
+                getTimeSeries().addItem(
                    new DefaultTimeSeriesItem(timestamp, value)
                 );
             }
@@ -115,7 +115,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
     public void start() {
         synchronized (functionLock) {
             if ( getState() == CaptureState.STOPPED) {
-                //although we set the listener here the function we are writting to should be DUMMY_FUNCTION
+                //although we set the listener here the function we are writing to should be DUMMY_FUNCTION
                 //until the first timerTrigger takes place, and we move from STARTING to STARTED
                 valueListener = new FunctionCallingSourceListener();
                 getValueSource().addValueListener(valueListener);

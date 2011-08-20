@@ -49,14 +49,17 @@ import java.util.concurrent.TimeUnit;
  * A series which represents time series data stored on disk.
  * The actual serialization is carried out by RoundRobinSerializer
  *
- * TimeSeriesItem appended using s.append() can be stored in a local cache, and a delayed write performed, to avoid having
+ * TimeSeriesItem appended using s.addItem() can be stored in a local cache, and a delayed write performed, to avoid having
  * to keep all the data for the timeseries in memory at all times. It is expected that the number of appends will vastly
- * outnumber all other operations. Other operations (e.g. iterator) in general require the time series to be deserialized).
+ * outnumber all other operations. Other operations (e.g. iterator) in general require the whole time series to be deserialized,
+ * which is expensive, and are to be avoided where possible.
  *
- * TODO - getLatestItem should probably make use of the cached values where available, instead of kicking off
- * deserialization. There may be other functions we can optimize in this way but need to add tests when we do it.
+ * TODO
+ * It would almost certainly be possible to improve the local WriteBehindCache to hold inserts and removes as well as appends
+ * so that the whole series to be deserialized to support these operations,
+ * but I've left this for another day, I'm really expecting appends only at present
  */
-public class FilesystemTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, ListTimeSeries {
+public class FilesystemTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, IndexedTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
 
@@ -93,12 +96,22 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         lastTimestamp = fileHeader.getMostRecentItemTimestamp();
     }
 
-    public synchronized boolean add(TimeSeriesItem i) {
+    /**
+     * Note, appending data does not require deserialization of the filesystem timeseries, thus preventing the
+     * peformance overhead of having to deserialize to add items. If the series is not already in memory we will append
+     * the item to our write behind cache only (eventually the item will get persisted, depending on the cache flush
+     * scheduling)
+     *
+     * Inserting items is much more expensive, since we have to deserialize to do that
+     */
+    public synchronized void addItem(TimeSeriesItem i) {
         boolean result = doAppend(i);
         if ( ! result ) {
-            throw new TimeSeriesOrderingException(size(), i.getTimestamp());
-        } else {
-            return true;
+            //it is not expected we would usually get inserts - they should be rare events at present
+            //(e.g. a system clock resyncs and goes back in time, so we start to receive values with an earlier timestamp)
+            RoundRobinTimeSeries r = getRoundRobinSeries();
+            r.addItem(i);
+            writeBehindCache.cacheSeriesForRewrite(r);
         }
     }
 
@@ -116,16 +129,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return persistenceStopped;
     }
 
-    /**
-     * Note, appending data does not require deserialization of the filesystem timeseries, thus preventing the
-     * peformance overhead of having to deserialize to add items. If the series is not already in memory we will append
-     * the item to our write behind cache only (eventually the item will get persisted, depending on the cache flush
-     * scheduling)
-     */
-    public synchronized boolean append(TimeSeriesItem i) {
-        return doAppend(i);
-    }
-
     private boolean doAppend(final TimeSeriesItem i) {
         //if the round robin series is in memory, we add the item to the series, but we also add the item to cache's list
         //this is because the round robin series is our primary source for the series data while in memory, but it is soft
@@ -137,7 +140,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             result = true;
             RoundRobinTimeSeries s = getRoundRobinSeries(false);
             if ( s != null) {
-                s.append(i);
+                s.addItem(i);
             } else {
                 //the series has been collected, along with listener registrations, so we need to fire event ourselves
                 fireAddEvent(i);
@@ -148,8 +151,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private void fireAddEvent(final TimeSeriesItem i) {
-        final TimeSeriesEvent e = ListTimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                FilesystemTimeSeries.this, size() - 1, size() - 1, Collections.singletonList(i), ++modCount
+        final TimeSeriesEvent e = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
+                FilesystemTimeSeries.this, Collections.singletonList(i), ++modCount
         );
 
         eventExecutor.execute(new Runnable() {
@@ -157,43 +160,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 timeSeriesEventHandler.fireItemsAddedOrInserted(e);
             }
         });
-    }
-
-
-    public synchronized void add(int index, TimeSeriesItem i) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        r.add(index, i);
-        writeBehindCache.cacheSeriesForRewrite(r);
-        lastTimestamp = r.getLatestTimestamp();
-    }
-
-    public synchronized boolean addAll(int index, Collection<? extends TimeSeriesItem> i) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.addAll(index, i);
-        if ( change ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return change;
-    }
-
-    public synchronized boolean addAll(Collection<? extends TimeSeriesItem> i) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.addAll(i);
-        if ( change ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return change;
-    }
-
-    public synchronized boolean prepend(TimeSeriesItem i) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.prepend(i);
-        if ( change ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        return change;
     }
 
     public synchronized int getMaxSize() {
@@ -205,43 +171,25 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public synchronized TimeSeriesItem getLatestItem() {
-        return getRoundRobinSeries().getLatestItem();
+        //make use of the local write behind cache to do this if possible
+        return writeBehindCache.getAppendListSize() > 0 ?
+            writeBehindCache.getAppendItems().getLatestItem() :
+            getRoundRobinSeries().getLatestItem();
     }
 
+    /**
+     * @return the latest timestamp in the series, without causing a load from the filesystem
+     */
     public long getLatestTimestamp() {
         return lastTimestamp;
-    }
-
-    public synchronized TimeSeriesItem removeLatestItem() {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        TimeSeriesItem i = r.removeLatestItem();
-        if ( i != null ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return i;
-    }
-
-    public synchronized TimeSeriesItem getEarliestItem() {
-        return getRoundRobinSeries().getEarliestItem();
     }
 
     public synchronized long getEarliestTimestamp() {
         return getRoundRobinSeries().getEarliestTimestamp();
     }
 
-    public synchronized TimeSeriesItem removeEarliestItem() {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        TimeSeriesItem i = r.removeEarliestItem();
-        if ( i != null ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return i;
-    }
-
-    public synchronized boolean isEmpty() {
-        return size() == 0;
+    public synchronized TimeSeriesItem getEarliestItem() {
+        return getRoundRobinSeries().getEarliestItem();
     }
 
     public synchronized int size() {
@@ -255,8 +203,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
     }
 
-    public synchronized TimeSeriesItem get(int index) {
-        return getRoundRobinSeries().get(index);
+    public synchronized TimeSeriesItem getItem(int index) {
+        return getRoundRobinSeries().getItem(index);
     }
 
     public synchronized void clear() {
@@ -266,98 +214,22 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         writeBehindCache.cacheSeriesForRewrite(r);
     }
 
-    public synchronized List<TimeSeriesItem> subList(int fromIndex, int toIndex) {
-        return getRoundRobinSeries().subList(fromIndex, toIndex);
-    }
-
-    public synchronized ListIterator<TimeSeriesItem> listIterator() {
-        return getRoundRobinSeries().listIterator();
-    }
-
-    public synchronized ListIterator<TimeSeriesItem> listIterator(int index) {
-        return getRoundRobinSeries().listIterator(index);
-    }
-
-    public synchronized int lastIndexOf(Object o) {
-        return getRoundRobinSeries().lastIndexOf(o);
-    }
-
-    public synchronized int indexOf(Object o) {
-        return getRoundRobinSeries().indexOf(o);
-    }
-
-    public synchronized boolean remove(Object o) {
+    public synchronized boolean removeItem(TimeSeriesItem item) {
         RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.remove(o);
+        boolean change = r.removeItem(item);
         if ( change ) {
             writeBehindCache.cacheSeriesForRewrite(r);
         }
         lastTimestamp = r.getLatestTimestamp();
         return change;
-    }
-
-    public synchronized TimeSeriesItem remove(int index) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        TimeSeriesItem i = r.remove(index);
-        if ( i != null ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return i;
-    }
-
-    public synchronized TimeSeriesItem set(int index, TimeSeriesItem item) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        TimeSeriesItem i = r.set(index, item);
-        if ( i != null ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return i;
-    }
-
-    public synchronized boolean retainAll(Collection<?> c) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.retainAll(c);
-        if ( change ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return change;
-    }
-
-    public synchronized boolean removeAll(Collection<?> c) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.removeAll(c);
-        if ( change ) {
-            writeBehindCache.cacheSeriesForRewrite(r);
-        }
-        lastTimestamp = r.getLatestTimestamp();
-        return change;
-    }
-
-    public synchronized boolean containsAll(Collection<?> c) {
-        return getRoundRobinSeries().containsAll(c);
-    }
-
-    public synchronized Object[] toArray() {
-        return getRoundRobinSeries().toArray();
-    }
-
-    public synchronized <T> T[] toArray(T[] a) {
-        return getRoundRobinSeries().toArray(a);
     }
 
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return getRoundRobinSeries().iterator();
     }
 
-    public synchronized boolean contains(Object o) {
-        return getRoundRobinSeries().contains(o);
-    }
-
     /**
-     * Intentionally break the contract of List.equals() - we shoudln't need to support logical equality of
+     * Intentionally break the contract of List.equals() - we shouldn't need to support logical equality of
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
      */
     public synchronized boolean equals(Object o) {
@@ -365,52 +237,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     /**
-     * Intentionally break the contract of List.hashCode() - we shoudln't need to support logical equality of
+     * Intentionally break the contract of List.hashCode() - we shouldn't need to support logical equality of
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
      */
     public synchronized int hashCode() {
         return super.hashCode();
-    }
-
-    public synchronized ListTimeSeries getSubSeries(long startTimestamp, long endTimestamp) {
-        return getRoundRobinSeries().getSubSeries(startTimestamp, endTimestamp);
-    }
-
-    public synchronized ListTimeSeries getSubSeries(long timestamp) {
-        ListTimeSeries result;
-        //we can try to satisfy this from the list of append items in memory if
-        //possible, to avoid having to deserialize the series every tome
-        //for common 'most recent values' queries which result from polling
-        if ( writeBehindCache.getAppendItems().size() > 0 && writeBehindCache.getAppendItems().getEarliestTimestamp() < timestamp) {
-            result = writeBehindCache.getAppendItems().getSubSeries(timestamp);
-        } else {
-            result = getRoundRobinSeries().getSubSeries(timestamp);
-        }
-        return result;
-    }
-
-    public synchronized long getTimestampAfter(long timestamp) {
-        return getRoundRobinSeries().getTimestampAfter(timestamp);
-    }
-
-    public synchronized long getTimestampBefore(long timestamp) {
-        return getRoundRobinSeries().getTimestampBefore(timestamp);
-    }
-
-    public synchronized int getIndexOfFirstItemAtOrAfter(long timestamp) {
-        return getRoundRobinSeries().getIndexOfFirstItemAtOrAfter(timestamp);
-    }
-
-    public synchronized int getIndexOfFirstItemAtOrBefore(long timestamp) {
-        return getRoundRobinSeries().getIndexOfFirstItemAtOrBefore(timestamp);
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return getRoundRobinSeries().getFirstItemAtOrBefore(timestamp);
-    }
-
-    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return getRoundRobinSeries().getFirstItemAtOrAfter(timestamp);
     }
 
     public long getModCount() {
@@ -448,7 +279,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 //Due to the asynchronous event firing, when we call s.add() we could end
                 //up firing duplicate events when we add these items, even though our propagating listener has not yet
                 //been added - we will probably not receive the events back until the listener has been added.
-                s.addWithoutFiringEvent(writeBehindCache.getAppendItems());
+                s.addWithoutFiringEvent(writeBehindCache.getAppendItems().getSnapshot());
                 //nb. the items stay in the cache append list, so we keep track that we still haven't written them to disk
 
                 s.addTimeSeriesListener(timeSeriesEventHandler);
@@ -461,15 +292,17 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     /**
-     * Holds the data which has changed, which can either be the most recently appended items
-     * or a reference to the whole round robin series for changes which were not appends.
-     * In either case, the wrapped round robin series in local memory should have been updated
-     * already to reflect the changes - the cache just represents what we need to write to the
-     * filesystem to bring the fs up to date.
+     * WriteBehindCache will hold values only if the local series has changed from the version held on disk
+     * Mutator methods on the FilesystemTimeSeries call methods on the WriteBehindCache when the state changes.
      *
-     * In the case we're holding onto a list of appended items, the wrapped series is free to be
-     * reclaimed via the SoftReference (the list contains all the deltas in this case - we have no need
+     * The write behind cache can store either be the most recently appended items or a strong reference to the whole round robin series if there were any changes apart from appends.
+     * In either case, the main softReference series held by FileSystemTimeSeries should always be kept fully up to date, if it exists
+     * - the cache just represents what we need to write to the filesystem to bring the persisted version up to date.
+     *
+     * In the case we're holding onto a list of appended items, the soft referenced wrapped series is free to be
+     * reclaimed (the append list contains all the deltas in this case - we have no need
      * to rewrite the whole series, and there's no urgency to flush the cache.)
+     *
      * If other changes to the wrapped series have been made (not just appends) we hold a reference
      * to the whole series to prevent it being collected, and add a task to try to bring forward the
      * cache flush operation.
@@ -490,7 +323,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         public void addItemForAppend(TimeSeriesItem timeSeriesItem) {
             if ( roundRobinSeries == null) { //only if we are not already going to rewrite the whole series
-                itemsToAppend.add(timeSeriesItem);
+                itemsToAppend.addItem(timeSeriesItem);
                 scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
             }
         }
@@ -616,13 +449,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             h.setSource(FilesystemTimeSeries.this);
             h.setSeriesModCount(++modCount);
             fireItemsRemoved(e);
-        }
-
-        public void itemsChanged(TimeSeriesEvent h) {
-            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-            h.setSource(FilesystemTimeSeries.this);
-            h.setSeriesModCount(++modCount);
-            fireItemsChanged(e);
         }
 
         public void seriesChanged(TimeSeriesEvent h) {

@@ -18,14 +18,12 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
-import java.util.List;
-
 /**
  * Created by IntelliJ IDEA.
 * User: nick
 * Date: 01-Mar-2009
 * Time: 14:40:07
 */
-interface ModCountList<E> extends List<E> {
+interface ModCount {
     long getModCount();
 }

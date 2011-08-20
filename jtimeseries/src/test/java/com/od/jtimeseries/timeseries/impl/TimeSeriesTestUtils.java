@@ -1,8 +1,7 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
-import com.od.jtimeseries.timeseries.ListTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 
@@ -33,10 +32,10 @@ public class TimeSeriesTestUtils {
         return new DefaultTimeSeriesItem(timestamp, LongNumeric.valueOf(value));
     }
 
-    public static ListTimeSeries createSeriesWithItems(int... timestamps) {
-        ListTimeSeries test = new DefaultTimeSeries();
+    public static IndexedTimeSeries createSeriesWithItems(int... timestamps) {
+        IndexedTimeSeries test = new DefaultTimeSeries();
         for (int stamp : timestamps) {
-            test.add(createItemWithTimestamp(stamp));
+            test.addItem(createItemWithTimestamp(stamp));
         }
         return test;
     }

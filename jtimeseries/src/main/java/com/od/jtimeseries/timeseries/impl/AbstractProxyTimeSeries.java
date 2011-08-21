@@ -102,4 +102,16 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
     public List<TimeSeriesItem> getSnapshot() {
         return wrappedTimeSeries.getSnapshot();
     }
+
+    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+        return wrappedTimeSeries.getFirstItemAtOrAfter(timestamp);
+    }
+
+    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+        return wrappedTimeSeries.getFirstItemAtOrBefore(timestamp);
+    }
+
+    public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
+        return wrappedTimeSeries.getItemsInRange(startTime, endTime);
+    }
 }

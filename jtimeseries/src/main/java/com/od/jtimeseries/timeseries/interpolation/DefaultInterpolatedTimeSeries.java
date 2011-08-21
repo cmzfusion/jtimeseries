@@ -50,14 +50,14 @@ public class DefaultInterpolatedTimeSeries extends AbstractProxyTimeSeries imple
 
     private TimeSeriesItem calculateInterpolatedValue(long timestamp) {
         TimeSeriesItem result;
-        TimeSeriesItem beforeItem = SeriesUtils.getFirstItemAtOrBefore(timestamp, this);
+        TimeSeriesItem beforeItem = getFirstItemAtOrBefore(timestamp);
         if ( beforeItem.getTimestamp() == timestamp) {
             //although the timestamp matches an item in the series exactly, we still use interp function to return a value
             //this is because the function may generate a TimeSeriesItem of a different type - and we want the
             //TimeSeriesItem returned by calculateInterpolatedValue to be consistent in type
             result = interpolationFunction.calculateInterpolatedValue(this, timestamp, beforeItem, beforeItem);
         } else {
-            TimeSeriesItem afterItem = SeriesUtils.getFirstItemAtOrAfter(timestamp, this);
+            TimeSeriesItem afterItem = getFirstItemAtOrAfter(timestamp);
             result = interpolationFunction.calculateInterpolatedValue(this, timestamp, beforeItem, afterItem);
         }
         return result;

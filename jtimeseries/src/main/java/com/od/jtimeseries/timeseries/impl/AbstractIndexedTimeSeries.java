@@ -166,6 +166,24 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         return series.getModCount();
     }
 
+    /**
+     * @return starting with most recent item and moving back, return the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
+     */
+    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+        return SeriesUtils.getFirstItemAtOrBefore(timestamp, this);
+    }
+
+    /**
+     * @return starting with earliest item and moving forward, return first item in the series with a timestamp equal to or later than the supplied timestamp, or null if no such item exists
+     */
+    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+        return SeriesUtils.getFirstItemAtOrAfter(timestamp, this);
+    }
+
+    public synchronized List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
+        return SeriesUtils.getItemsInRange(startTime, endTime, this);
+    }
+
     public synchronized void addTimeSeriesListener(final TimeSeriesListener l) {
         //add the listener on the event firing thread
         //this is so that the client doesn't receive any previously fired events

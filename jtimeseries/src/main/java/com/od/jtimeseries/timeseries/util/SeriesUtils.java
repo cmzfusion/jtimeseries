@@ -163,7 +163,7 @@ public class SeriesUtils {
      *  Get all items from TimeSeries which have a timestamp >= t
      */
     public static List<TimeSeriesItem> getSubSeries(long t, IdentifiableTimeSeries timeSeries) {
-        return getItemsInRange(t, Long.MAX_VALUE, timeSeries);
+        return timeSeries.getItemsInRange(t, Long.MAX_VALUE);
     }
 
     /**

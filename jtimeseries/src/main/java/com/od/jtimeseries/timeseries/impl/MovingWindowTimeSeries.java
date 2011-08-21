@@ -262,7 +262,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     }
 
     public synchronized List<TimeSeriesItem> getSnapshot() {
-        return SeriesUtils.getItemsInRange(startTime, endTime, this);
+        return getItemsInRange(startTime, endTime);
     }
 
     /**

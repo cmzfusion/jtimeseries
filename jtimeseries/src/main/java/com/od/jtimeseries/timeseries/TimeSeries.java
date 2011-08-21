@@ -122,6 +122,19 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
      */
     long getModCount();
 
+    /**
+     * @return starting with most recent item and moving back, return the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
+     */
+    TimeSeriesItem getFirstItemAtOrBefore(long timestamp);
+
+    /**
+     * @return starting with earliest item and moving forward, return first item in the series with a timestamp equal to or later than the supplied timestamp, or null if no such item exists
+     */
+    TimeSeriesItem getFirstItemAtOrAfter(long timestamp);
+
+
+    List<TimeSeriesItem> getItemsInRange(long startTime, long endTime);
+
 
     List<TimeSeriesItem> getSnapshot();
 

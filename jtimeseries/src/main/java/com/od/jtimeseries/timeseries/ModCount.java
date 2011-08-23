@@ -16,14 +16,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.timeseries.impl;
+package com.od.jtimeseries.timeseries;
 
 /**
  * Created by IntelliJ IDEA.
 * User: nick
 * Date: 01-Mar-2009
 * Time: 14:40:07
+*
+* Interface to implement for collections which provide a modification count
+* The count should increase (but not necessarily sequentially) every time the collection is modified
 */
-interface ModCount {
+public interface ModCount {
+
     long getModCount();
 }

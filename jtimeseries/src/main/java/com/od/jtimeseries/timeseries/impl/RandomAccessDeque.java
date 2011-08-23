@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.timeseries.ModCount;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

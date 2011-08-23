@@ -26,5 +26,8 @@ package com.od.jtimeseries.util.time;
  */
 public interface TimeSource {
 
+    public static final TimeSource OPEN_END_TIME = new FixedTimeSource(Long.MAX_VALUE); //ending at the end of the epoch
+    public static final TimeSource OPEN_START_TIME = new FixedTimeSource(0);  //starting at the start of the epoch
+
     long getTime();
 }

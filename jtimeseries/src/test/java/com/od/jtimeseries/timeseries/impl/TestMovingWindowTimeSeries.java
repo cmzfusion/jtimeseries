@@ -3,6 +3,7 @@ package com.od.jtimeseries.timeseries.impl;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
+import com.od.jtimeseries.util.time.TimeSource;
 import junit.framework.TestCase;
 
 import java.util.*;
@@ -65,7 +66,7 @@ public class TestMovingWindowTimeSeries extends TestCase {
     //If the window is set to open end, the addition affects
     //the view and an event is fired
     public void testAddWhenOpenEnded() {
-        movingWindowSeries.setEndTime(MovingWindowTimeSeries.OPEN_END_TIME);
+        movingWindowSeries.setEndTime(TimeSource.OPEN_END_TIME);
         CountDownLatchSeriesListener countDownListener = addCountDownListener();
         TimeSeriesItem item9 = TimeSeriesTestUtils.createItemWithTimestamp(9);
         movingWindowSeries.addItem(item9);

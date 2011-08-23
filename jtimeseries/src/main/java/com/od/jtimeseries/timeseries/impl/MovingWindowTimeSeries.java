@@ -58,9 +58,6 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
     private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowTimeSeries.class.getSimpleName(), 2);
 
-    public static final TimeSource OPEN_END_TIME = new FixedTimeSource(Long.MAX_VALUE); //ending at the end of the epoch
-    public static final TimeSource OPEN_START_TIME = new FixedTimeSource(0);  //starting at the start of the epoch
-
     //use this privately owned series to store the items in the full series
     //this MovingWindowTimeSeries provides a movable window onto the items on this wrapped series
     private DefaultTimeSeries wrappedTimeSeries = new DefaultTimeSeries();
@@ -72,17 +69,21 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     private int endIndex = -1;
     private TimeSource endTimeSource;
     private final AtomicLong modCount = new AtomicLong(0);
-    private ScheduledFuture windowCheckFuture;
+    private volatile ScheduledFuture windowCheckFuture;
     private boolean updateWindowInSwingEventThread;
 
     public MovingWindowTimeSeries() {
-        this(OPEN_START_TIME, OPEN_END_TIME, null);
+        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME);
     }
 
-    public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource, TimePeriod frequencyToCheckWindow) {
+    public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource) {
         this.startTimeSource = startTimeSource;
         this.endTimeSource = endTimeSource;
         findStartAndEndAndFireChange();
+    }
+
+    public void startMovingWindow(TimePeriod frequencyToCheckWindow) {
+        stopMovingWindow();
         if ( frequencyToCheckWindow != null) {
             UpdateWindowTask task = new UpdateWindowTask(this);
             windowCheckFuture = scheduledExecutorService.scheduleWithFixedDelay(
@@ -95,9 +96,21 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
+    public void stopMovingWindow() {
+        if ( windowCheckFuture != null) {
+            windowCheckFuture.cancel(false);
+        }
+    }
+
+    public void recalculateWindow() {
+        findStartAndEndAndFireChange();
+    }
+
     //our start and end times are changing, we need to recalculate the window start and end index.
     //If this affects the items which should appear in the window, fire an event
     private void findStartAndEndAndFireChange() {
+        //do this synchronously, unless we are in Swing event thread mode, in which case check we are on
+        //the event thread and if not queue it up
         Runnable runnable = new Runnable() {
             public void run() {
                 synchronized (MovingWindowTimeSeries.this) {
@@ -123,7 +136,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
         if ( updateWindowInSwingEventThread && ! SwingUtilities.isEventDispatchThread()) {
             try {
-                SwingUtilities.invokeAndWait(runnable);
+                SwingUtilities.invokeLater(runnable);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -326,6 +339,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
     private static class UpdateWindowTask implements Runnable {
 
+        //allow the time series to be collected unless strongly referenced elsewhere
         private WeakReference<MovingWindowTimeSeries> series;
         private volatile ScheduledFuture future;
 

@@ -29,12 +29,10 @@ import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimeSource;
 import com.od.swing.util.AwtSafeListener;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.XYDataset;
@@ -168,7 +166,7 @@ public abstract class AbstractXYChartCreator {
 //            domainSelection,
 //            true
 //        );
-        final MovingWindowTimeSeries movingWindowTimeSeries = new MovingWindowTimeSeries(domainSelection, MovingWindowTimeSeries.OPEN_END_TIME, Time.seconds(10));
+        final MovingWindowTimeSeries movingWindowTimeSeries = new MovingWindowTimeSeries(domainSelection, TimeSource.OPEN_END_TIME, Time.seconds(10));
         movingWindowTimeSeries.setUpdateWindowInSwingEventThread(true);
 
         contextTimeSeries.addTimeSeriesListener(AwtSafeListener.getAwtSafeListener(new TimeSeriesListener() {

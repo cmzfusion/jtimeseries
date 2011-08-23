@@ -79,7 +79,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource) {
         this.startTimeSource = startTimeSource;
         this.endTimeSource = endTimeSource;
-        findStartAndEndAndFireChange();
+        recalculateWindow();
     }
 
     public void startMovingWindow(TimePeriod frequencyToCheckWindow) {
@@ -102,47 +102,28 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
-    public void recalculateWindow() {
-        findStartAndEndAndFireChange();
-    }
+    public boolean recalculateWindow() {
+        boolean changed = false;
+        synchronized (MovingWindowTimeSeries.this) {
+            int oldStartIndex = startIndex;
+            int oldEndIndex = endIndex;
 
-    //our start and end times are changing, we need to recalculate the window start and end index.
-    //If this affects the items which should appear in the window, fire an event
-    private void findStartAndEndAndFireChange() {
-        //do this synchronously, unless we are in Swing event thread mode, in which case check we are on
-        //the event thread and if not queue it up
-        Runnable runnable = new Runnable() {
-            public void run() {
-                synchronized (MovingWindowTimeSeries.this) {
-                    int oldStartIndex = startIndex;
-                    int oldEndIndex = endIndex;
+            startTime = startTimeSource.getTime();
+            endTime = endTimeSource.getTime();
+            startIndex = SeriesUtils.getIndexOfFirstItemAtOrAfter(startTime, wrappedTimeSeries);
+            endIndex = SeriesUtils.getIndexOfFirstItemAtOrBefore(endTime, wrappedTimeSeries);
 
-                    startTime = startTimeSource.getTime();
-                    endTime = endTimeSource.getTime();
-                    startIndex = SeriesUtils.getIndexOfFirstItemAtOrAfter(startTime, wrappedTimeSeries);
-                    endIndex = SeriesUtils.getIndexOfFirstItemAtOrBefore(endTime, wrappedTimeSeries);
-
-                    if ( startIndex == -1 || endIndex == -1) {
-                        startIndex = endIndex = -1;
-                    }
-
-                    if ( oldStartIndex != startIndex || oldEndIndex != endIndex ) {
-                        long newModCount = modCount.incrementAndGet();
-                        queueSeriesChangedEvent(TimeSeriesEvent.createSeriesChangedEvent(MovingWindowTimeSeries.this, getSnapshot(), newModCount ));
-                    }
-                }
+            if ( startIndex == -1 || endIndex == -1) {
+                startIndex = endIndex = -1;
             }
-        };
 
-        if ( updateWindowInSwingEventThread && ! SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeLater(runnable);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if ( oldStartIndex != startIndex || oldEndIndex != endIndex ) {
+                long newModCount = modCount.incrementAndGet();
+                queueSeriesChangedEvent(TimeSeriesEvent.createSeriesChangedEvent(MovingWindowTimeSeries.this, getSnapshot(), newModCount ));
+                changed = true;
             }
-        }  else {
-            runnable.run();
         }
+        return changed;
     }
 
     /**
@@ -252,18 +233,16 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         return endTimeSource;
     }
 
-    public synchronized void setEndTime(TimeSource endTimeSource) {
-        this.endTimeSource = endTimeSource;
-        findStartAndEndAndFireChange();
-    }
-
     public synchronized TimeSource getStartTime() {
         return startTimeSource;
     }
 
+    public synchronized void setEndTime(TimeSource endTimeSource) {
+        this.endTimeSource = endTimeSource;
+    }
+
     public synchronized void setStartTime(TimeSource startTimeSource) {
         this.startTimeSource = startTimeSource;
-        findStartAndEndAndFireChange();
     }
 
     public synchronized void setStartTime(long startTime) {
@@ -354,7 +333,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         public void run() {
             final MovingWindowTimeSeries s = series.get();
             if ( s != null ) {
-               s.findStartAndEndAndFireChange();
+               s.recalculateWindow();
             } else {
                 if ( future != null ) {
                     future.cancel(false);

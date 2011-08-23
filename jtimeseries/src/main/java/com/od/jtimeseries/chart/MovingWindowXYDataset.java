@@ -5,12 +5,18 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
 import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
+import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
 import org.jfree.data.general.SeriesChangeEvent;
 import org.jfree.data.xy.AbstractXYDataset;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,67 +36,67 @@ import java.util.List;
  */
 public class MovingWindowXYDataset extends AbstractXYDataset {
 
-    private Object sourceSeriesLock = new Object();
-    private volatile boolean modified;
+    private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowXYDataset.class.getSimpleName(), 2);
 
+    private final Object sourceSeriesLock = new Object();
     private List<WrappedSourceSeries> sourceSeries = new ArrayList<WrappedSourceSeries>();
     private List<List<TimeSeriesItem>> snapshotData = new ArrayList<List<TimeSeriesItem>>();
     private List<String> seriesKeys = new ArrayList<String>();
     private TimeSource startTime = TimeSource.OPEN_START_TIME;
     private TimeSource endTime = TimeSource.OPEN_END_TIME;
-    private boolean forceRefreshAll;
+    private volatile Future movingWindowRefreshTask;
+    private boolean updateOnSwingThread = true;
+
+    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+    }
 
     public synchronized void addTimeSeries(String key, MovingWindowTimeSeries series) {
         synchronized (sourceSeriesLock) {
-            modified = true;
             sourceSeries.add(new WrappedSourceSeries(series));
             seriesKeys.add(key);
         }
+        refresh();
     }
+
+    public void startMovingWindow(TimePeriod timePeriod) {
+        stopMovingWindow();
+        movingWindowRefreshTask = scheduledExecutorService.scheduleWithFixedDelay(
+            new MoveWindowTask(),
+            0,
+            timePeriod.getLengthInMillis(),
+            TimeUnit.MILLISECONDS
+        );
+    }
+
+    public void stopMovingWindow() {
+        if ( movingWindowRefreshTask != null) {
+            movingWindowRefreshTask.cancel(false);
+        }
+    }
+
 
     public void setStartTime(TimeSource s) {
         synchronized (sourceSeriesLock) {
             this.startTime = s;
-            for ( WrappedSourceSeries w : sourceSeries) {
-                w.setStartTime(s);
-            }
         }
-        forceRefreshAll = true;
         refresh();
     }
 
     public void setEndTime(TimeSource s) {
         synchronized (sourceSeriesLock) {
             this.endTime = s;
-            for ( WrappedSourceSeries w : sourceSeries) {
-                w.setEndTime(s);
-            }
         }
-        forceRefreshAll = true;
         refresh();
     }
 
     public void refresh() {
-        boolean changesExist = refreshSnapshotsForChangedSeries(forceRefreshAll);
-        if ( changesExist ) {
-            //fire the jfreechart change
-            seriesChanged(new SeriesChangeEvent(this));
-        }
+        new MoveWindowTask().run();
     }
 
-    private boolean refreshSnapshotsForChangedSeries(boolean forceRefresh) {
-        synchronized (sourceSeriesLock) {
-            boolean changesExist = false;
-            int series = 0;
-            for (WrappedSourceSeries s : sourceSeries) {
-                if ( s.isModified() || forceRefresh) {
-                    snapshotData.set(series, s.getSnapshot());
-                    changesExist = true;
-                }
-                series++;
-            }
-            return changesExist;
-        }
+    public void setUpdateOnSwingThread(boolean updateOnSwingThread) {
+        this.updateOnSwingThread = updateOnSwingThread;
     }
 
     public int getSeriesCount() {
@@ -132,6 +138,10 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
             }
         }
 
+        public boolean recalculateWindow() {
+            return series.recalculateWindow();
+        }
+
         public boolean isModified() {
             return modified;
         }
@@ -151,14 +161,17 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
             series.addTimeSeriesListener(l);
         }
 
-        public void setStartTime(TimeSource s) {
-            series.setStartTime(s);
+        public void setStartTime(long t) {
+            series.setStartTime(t);
         }
 
-        public void setEndTime(TimeSource s) {
-            series.setEndTime(s);
+        public void setEndTime(long t) {
+            series.setEndTime(t);
         }
 
+        public void setModified(boolean isModified) {
+            modified = true;
+        }
 
         private class SetModifiedFlagListener implements TimeSeriesListener {
 
@@ -183,6 +196,58 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
                         modified = true;
                     }
                 }
+            }
+        }
+    }
+
+    private class MoveWindowTask implements Runnable {
+
+        public void run() {
+            long start = startTime.getTime();
+            long end = endTime.getTime();
+
+            //iterate the series moving the window time for each
+            //if any change as a result of moving the window time, set the series as modified
+            synchronized (sourceSeriesLock) {
+                for ( WrappedSourceSeries s : sourceSeries) {
+                    s.setStartTime(start);
+                    s.setEndTime(end);
+                    if( s.recalculateWindow() ) {
+                        s.setModified(true);
+                    }
+                }
+            }
+
+            //call refresh on the swing thread, to update the snapshots for any changed series
+            Runnable refreshRunnable = new Runnable() {
+                public void run() {
+                    boolean changesExist = refreshSnapshotsForChangedSeries();
+                    if ( changesExist ) {
+                        //fire the jfreechart change
+                        seriesChanged(new SeriesChangeEvent(this));
+                    }
+                }
+            };
+
+            if ( updateOnSwingThread && ! SwingUtilities.isEventDispatchThread()) {
+                SwingUtilities.invokeLater(refreshRunnable);
+            } else {
+                refreshRunnable.run();
+            }
+        }
+
+        private boolean refreshSnapshotsForChangedSeries() {
+            synchronized (sourceSeriesLock) {
+                boolean changesExist = false;
+                int series = 0;
+                for (WrappedSourceSeries s : sourceSeries) {
+                    if ( s.isModified()) {
+                        snapshotData.set(series, s.getSnapshot());
+                        changesExist = true;
+                    }
+                    series++;
+                }
+                return changesExist;
             }
         }
     }

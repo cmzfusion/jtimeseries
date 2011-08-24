@@ -18,24 +18,17 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart.creator;
 
-import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
-import com.od.jtimeseries.chart.TimeSeriesXYDataset;
-import com.od.jtimeseries.timeseries.TimeSeriesEvent;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
-import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
+import com.od.jtimeseries.chart.MovingWindowXYDataset;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimeSource;
-import com.od.swing.util.AwtSafeListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleInsets;
 
 import java.awt.*;
@@ -48,7 +41,6 @@ import java.util.*;
  * User: nick
  * Date: 27-Feb-2010
  * Time: 11:26:46
- * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractXYChartCreator {
 
@@ -94,38 +86,40 @@ public abstract class AbstractXYChartCreator {
     protected abstract JFreeChart buildChart();
 
     private void addSeries() {
+        MovingWindowXYDataset dataSet = new MovingWindowXYDataset(domainSelection, TimeSource.OPEN_END_TIME);
         for ( int loop=0; loop < timeSeriesList.size(); loop++) {
             ChartingTimeSeries series = timeSeriesList.get(loop);
-            addSeriesToChart(series, loop);
+            dataSet.addTimeSeries(series.getPath(), series);
         }
+        plot.setDataset(dataSet);
     }
 
-    private void addSeriesToChart(ChartingTimeSeries contextTimeSeries, int seriesId) {
-        XYDataset dataSet = createDataSet(contextTimeSeries);
-        plot.setDataset(seriesId, dataSet);
-        XYItemRenderer renderer = createXYItemRenderer(seriesId);
+    private void addSeriesToChart(MovingWindowXYDataset dataSet, ChartingTimeSeries contextTimeSeries, int datasetIndex) {
+        plot.setDataset(datasetIndex, dataSet);
 
-        plot.setRenderer(seriesId, renderer);
-        createRangeAxes(contextTimeSeries, seriesId, plot);
-        setSeriesColor(plot, seriesId, contextTimeSeries);
+        XYItemRenderer renderer = createXYItemRenderer(datasetIndex);
+        plot.setRenderer(datasetIndex, renderer);
+
+        createRangeAxes(contextTimeSeries, datasetIndex, plot);
+        setSeriesColor(plot, datasetIndex, contextTimeSeries);
     }
 
     protected abstract XYItemRenderer createXYItemRenderer(int seriesId);
 
-    private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int seriesId, XYPlot plot) {
+    private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int datasetId, XYPlot plot) {
         switch(chartRangeMode) {
             case RangePerSeries:
                 NumberAxis axis = new NumberAxis(contextTimeSeries.getDisplayName());
-                plot.setRangeAxis(seriesId, axis);
-                plot.setRangeAxisLocation(seriesId, seriesId % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
-                plot.mapDatasetToRangeAxis(seriesId, seriesId);
+                plot.setRangeAxis(datasetId, axis);
+                plot.setRangeAxisLocation(datasetId, datasetId % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
+                plot.mapDatasetToRangeAxis(datasetId, datasetId);
                 break;
             case RangePerId :
                 String id = contextTimeSeries.getId();
                 axis = getOrCreateAxis(id);
                 int axisIndex = getAxisIndex(id);
                 plot.setRangeAxis(axisIndex, axis);
-                plot.mapDatasetToRangeAxis(seriesId, axisIndex);
+                plot.mapDatasetToRangeAxis(datasetId, axisIndex);
                 break;
             default :
                 plot.setRangeAxis(0, new NumberAxis("values"));
@@ -157,45 +151,6 @@ public abstract class AbstractXYChartCreator {
             plot.getRangeAxis(series).setLabelPaint(seriesColor);
             plot.getRangeAxis(series).setTickLabelPaint(seriesColor);
         }
-    }
-
-
-    private XYDataset createDataSet(ChartingTimeSeries contextTimeSeries) {
-//        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(
-//            contextTimeSeries,
-//            domainSelection,
-//            true
-//        );
-        final MovingWindowTimeSeries movingWindowTimeSeries = new MovingWindowTimeSeries(domainSelection, TimeSource.OPEN_END_TIME, Time.seconds(10));
-        movingWindowTimeSeries.setUpdateWindowInSwingEventThread(true);
-
-        contextTimeSeries.addTimeSeriesListener(AwtSafeListener.getAwtSafeListener(new TimeSeriesListener() {
-            public void itemsAddedOrInserted(TimeSeriesEvent e) {
-                movingWindowTimeSeries.addAll(e.getItems());
-            }
-
-            public void itemsRemoved(TimeSeriesEvent e) {
-                movingWindowTimeSeries.removeAll(e.getItems());
-            }
-
-            public void seriesChanged(TimeSeriesEvent e) {
-                movingWindowTimeSeries.clear();
-                movingWindowTimeSeries.addAll(e.getItems());
-            }
-        }, TimeSeriesListener.class));
-
-        TimeSeriesTableModelAdapter timeSeriesTableModelAdapter = new TimeSeriesTableModelAdapter(movingWindowTimeSeries, contextTimeSeries.getDescription());
-
-        //create a TimeSeriesXYDataset which applies TreatNanAsZero filter
-        return new TimeSeriesXYDataset(contextTimeSeries.getDisplayName(), timeSeriesTableModelAdapter) {
-            public Number getY(int series, int item) {
-                Number result = super.getY(series, item);
-                if ( Double.isNaN(result.doubleValue())) {
-                    result = chartDataFilter == ChartDataFilter.NanAsZero ? Double.valueOf(0) : Double.NaN;
-                }
-                return result;
-            }
-        };
     }
 
     protected boolean isShowLegend() {

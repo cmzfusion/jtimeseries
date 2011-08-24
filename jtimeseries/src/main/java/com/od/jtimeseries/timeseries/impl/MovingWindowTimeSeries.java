@@ -70,7 +70,6 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     private TimeSource endTimeSource;
     private final AtomicLong modCount = new AtomicLong(0);
     private volatile ScheduledFuture windowCheckFuture;
-    private boolean updateWindowInSwingEventThread;
 
     public MovingWindowTimeSeries() {
         this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME);
@@ -79,7 +78,6 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     public MovingWindowTimeSeries(TimeSource startTimeSource, TimeSource endTimeSource) {
         this.startTimeSource = startTimeSource;
         this.endTimeSource = endTimeSource;
-        recalculateWindow();
     }
 
     public void startMovingWindow(TimePeriod frequencyToCheckWindow) {
@@ -124,15 +122,6 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
             }
         }
         return changed;
-    }
-
-    /**
-     * Run tasks to update the window in the swing even thread
-     * If only the event thread is used to call add/remove or otherwise modify the wrapped series, this will ensure
-     * consistency of the model as it appears to the Swing event thread
-     */
-    public void setUpdateWindowInSwingEventThread(boolean updateWindowInSwingEventThread) {
-        this.updateWindowInSwingEventThread = updateWindowInSwingEventThread;
     }
 
     public synchronized int size() {

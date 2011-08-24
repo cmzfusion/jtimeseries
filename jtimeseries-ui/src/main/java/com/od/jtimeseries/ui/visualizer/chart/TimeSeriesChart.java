@@ -107,8 +107,10 @@ public class TimeSeriesChart extends JPanel {
     }
 
     public void setChartBackgroundColor(Color c) {
-        chartBackgroundColor = c;
-        createAndSetChart();
+        if ( chartBackgroundColor != c) {
+            chartBackgroundColor = c;
+            createAndSetChart();
+        }
     }
 
     public Color getChartBackgroundColor() {

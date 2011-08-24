@@ -48,8 +48,6 @@ public abstract class AbstractXYChartCreator {
 
     private XYPlot plot;
     private ChartRangeMode chartRangeMode;
-    private HashMap<String, NumberAxis> axisBySeriesId = new HashMap<String, NumberAxis>();
-    private HashMap<String, Integer> axisIndexBySeriesId = new HashMap<String, Integer>();
     private DomainTimeSelection domainSelection;
     private boolean showLegend;
     private String title;
@@ -93,25 +91,42 @@ public abstract class AbstractXYChartCreator {
             addToDataSet(dataSets, series);
         }
 
-        int index = 0;
+        int dataSetIndex = 0;
         for ( MovingWindowXYDataset<ChartingTimeSeries> d : dataSets.values()) {
-            plot.setDataset(index, d);
+            plot.setDataset(dataSetIndex, d);
 
             XYItemRenderer renderer = createXYItemRenderer(d);
-            plot.setRenderer(index, renderer);
+            plot.setRenderer(dataSetIndex, renderer);
 
             for ( int series=0; series < d.getSeriesCount(); series++) {
-                ChartingTimeSeries c = d.getTimeSeries(series);
-                renderer.setSeriesPaint(series, c.getColor());
+                Color c = d.getTimeSeries(series).getColor();
+                renderer.setSeriesPaint(series, c);
             }
 
+            String axisLabel;
+            switch(chartRangeMode) {
+                case RangePerSeries :
+                    axisLabel = d.getTimeSeries(0).getDisplayName();
+                    break;
+                case RangePerId:
+                    axisLabel = d.getTimeSeries(0).getId();
+                    break;
+                case SingleRange:
+                default:
+                    axisLabel = "values";
+            }
+
+            plot.setRangeAxis(dataSetIndex, new NumberAxis(axisLabel));
+            plot.setRangeAxisLocation(dataSetIndex, dataSetIndex % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
+            plot.mapDatasetToRangeAxis(dataSetIndex, dataSetIndex);
+
             if (chartRangeMode == ChartRangeMode.RangePerSeries) {
-                plot.getRangeAxis(index).setLabelPaint(d.getTimeSeries(0).getColor());
-                plot.getRangeAxis(index).setTickLabelPaint(d.getTimeSeries(0).getColor());
+                plot.getRangeAxis(dataSetIndex).setLabelPaint(d.getTimeSeries(0).getColor());
+                plot.getRangeAxis(dataSetIndex).setTickLabelPaint(d.getTimeSeries(0).getColor());
             }
 
             d.startMovingWindow(Time.seconds(10));
-            index++;
+            dataSetIndex++;
         }
     }
 
@@ -126,12 +141,13 @@ public abstract class AbstractXYChartCreator {
                 break;
             case SingleRange:
             default:
-                key = "SingleRange";
+                key = "values";
         }
-        addSeriesToDataSet(key, dataSets);
+        MovingWindowXYDataset<ChartingTimeSeries> dataSet = getOrCreateXYDataSet(key, dataSets);
+        dataSet.addTimeSeries(series.getDisplayName(), series);
     }
 
-    private MovingWindowXYDataset addSeriesToDataSet(String key, Map<String, MovingWindowXYDataset<ChartingTimeSeries>> dataSets) {
+    private MovingWindowXYDataset getOrCreateXYDataSet(String key, Map<String, MovingWindowXYDataset<ChartingTimeSeries>> dataSets) {
         MovingWindowXYDataset<ChartingTimeSeries> s = dataSets.get(key);
         if ( s == null) {
             s = new MovingWindowXYDataset<ChartingTimeSeries>(domainSelection, TimeSource.OPEN_END_TIME);
@@ -141,53 +157,6 @@ public abstract class AbstractXYChartCreator {
     }
 
     protected abstract XYItemRenderer createXYItemRenderer(XYDataset dataSet);
-
-    private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int datasetId, XYPlot plot) {
-        switch(chartRangeMode) {
-            case RangePerSeries:
-                NumberAxis axis = new NumberAxis(contextTimeSeries.getDisplayName());
-                plot.setRangeAxis(datasetId, axis);
-                plot.setRangeAxisLocation(datasetId, datasetId % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
-                plot.mapDatasetToRangeAxis(datasetId, datasetId);
-                break;
-            case RangePerId :
-                String id = contextTimeSeries.getId();
-                axis = getOrCreateAxis(id);
-                int axisIndex = getAxisIndex(id);
-                plot.setRangeAxis(axisIndex, axis);
-                plot.mapDatasetToRangeAxis(datasetId, axisIndex);
-                break;
-            default :
-                plot.setRangeAxis(0, new NumberAxis("values"));
-        }
-    }
-
-    private NumberAxis getOrCreateAxis(String id) {
-        NumberAxis axis;
-        axis = axisBySeriesId.get(id);
-        if ( axis == null ) {
-            axis = new NumberAxis(id);
-            int newAxisIndex = axisBySeriesId.size();
-            axisIndexBySeriesId.put(id, newAxisIndex);
-            axisBySeriesId.put(id, axis);
-            plot.setRangeAxisLocation(newAxisIndex, newAxisIndex % 2 == 0 ? AxisLocation.BOTTOM_OR_LEFT : AxisLocation.BOTTOM_OR_RIGHT);
-        }
-        return axis;
-    }
-
-    private int getAxisIndex(String id) {
-        return axisIndexBySeriesId.get(id);
-    }
-
-    private void setSeriesColor(XYPlot plot, int series, ChartingTimeSeries remoteChartingTimeSeries) {
-        Color seriesColor = remoteChartingTimeSeries.getColor();
-        XYItemRenderer renderer = plot.getRenderer(series);
-        renderer.setSeriesPaint(0, seriesColor);
-        if (chartRangeMode == ChartRangeMode.RangePerSeries) {
-            plot.getRangeAxis(series).setLabelPaint(seriesColor);
-            plot.getRangeAxis(series).setTickLabelPaint(seriesColor);
-        }
-    }
 
     protected boolean isShowLegend() {
         return showLegend;

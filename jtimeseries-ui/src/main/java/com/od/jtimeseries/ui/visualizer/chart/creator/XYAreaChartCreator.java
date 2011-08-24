@@ -5,6 +5,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYAreaRenderer2;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,7 +32,7 @@ public class XYAreaChartCreator extends AbstractXYChartCreator {
         );
     }
 
-    protected XYItemRenderer createXYItemRenderer(int seriesId) {
+    protected XYItemRenderer createXYItemRenderer(XYDataset dataSet) {
         return new XYAreaRenderer2();
     }
 

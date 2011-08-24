@@ -22,6 +22,7 @@ import com.od.jtimeseries.chart.MovingWindowXYDataset;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimeSource;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
@@ -29,6 +30,7 @@ import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.ui.RectangleInsets;
 
 import java.awt.*;
@@ -86,25 +88,59 @@ public abstract class AbstractXYChartCreator {
     protected abstract JFreeChart buildChart();
 
     private void addSeries() {
-        MovingWindowXYDataset dataSet = new MovingWindowXYDataset(domainSelection, TimeSource.OPEN_END_TIME);
-        for ( int loop=0; loop < timeSeriesList.size(); loop++) {
-            ChartingTimeSeries series = timeSeriesList.get(loop);
-            dataSet.addTimeSeries(series.getPath(), series);
+        Map<String, MovingWindowXYDataset<ChartingTimeSeries>> dataSets = new HashMap<String, MovingWindowXYDataset<ChartingTimeSeries>>();
+        for (ChartingTimeSeries series : timeSeriesList) {
+            addToDataSet(dataSets, series);
         }
-        plot.setDataset(dataSet);
+
+        int index = 0;
+        for ( MovingWindowXYDataset<ChartingTimeSeries> d : dataSets.values()) {
+            plot.setDataset(index, d);
+
+            XYItemRenderer renderer = createXYItemRenderer(d);
+            plot.setRenderer(index, renderer);
+
+            for ( int series=0; series < d.getSeriesCount(); series++) {
+                ChartingTimeSeries c = d.getTimeSeries(series);
+                renderer.setSeriesPaint(series, c.getColor());
+            }
+
+            if (chartRangeMode == ChartRangeMode.RangePerSeries) {
+                plot.getRangeAxis(index).setLabelPaint(d.getTimeSeries(0).getColor());
+                plot.getRangeAxis(index).setTickLabelPaint(d.getTimeSeries(0).getColor());
+            }
+
+            d.startMovingWindow(Time.seconds(10));
+            index++;
+        }
     }
 
-    private void addSeriesToChart(MovingWindowXYDataset dataSet, ChartingTimeSeries contextTimeSeries, int datasetIndex) {
-        plot.setDataset(datasetIndex, dataSet);
-
-        XYItemRenderer renderer = createXYItemRenderer(datasetIndex);
-        plot.setRenderer(datasetIndex, renderer);
-
-        createRangeAxes(contextTimeSeries, datasetIndex, plot);
-        setSeriesColor(plot, datasetIndex, contextTimeSeries);
+    private void addToDataSet(Map<String, MovingWindowXYDataset<ChartingTimeSeries>> dataSets, ChartingTimeSeries series) {
+        String key;
+        switch(chartRangeMode) {
+            case RangePerSeries :
+                key = series.getPath();
+                break;
+            case RangePerId:
+                key = series.getId();
+                break;
+            case SingleRange:
+            default:
+                key = "SingleRange";
+        }
+        addSeriesToDataSet(key, dataSets);
     }
 
-    protected abstract XYItemRenderer createXYItemRenderer(int seriesId);
+    private MovingWindowXYDataset addSeriesToDataSet(String key, Map<String, MovingWindowXYDataset<ChartingTimeSeries>> dataSets) {
+        MovingWindowXYDataset<ChartingTimeSeries> s = dataSets.get(key);
+        if ( s == null) {
+            s = new MovingWindowXYDataset<ChartingTimeSeries>(domainSelection, TimeSource.OPEN_END_TIME);
+            dataSets.put(key, s);
+        }
+        return s;
+    }
+
+    protected abstract XYItemRenderer createXYItemRenderer(XYDataset dataSet);
 
     private void createRangeAxes(ChartingTimeSeries contextTimeSeries, int datasetId, XYPlot plot) {
         switch(chartRangeMode) {

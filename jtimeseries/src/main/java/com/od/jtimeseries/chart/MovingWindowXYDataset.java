@@ -33,12 +33,12 @@ import java.util.concurrent.TimeUnit;
  * on the AWT thread. When we recalculate the window, we create new snapshots if the underlying series data has
  * changed
  */
-public class MovingWindowXYDataset extends AbstractXYDataset {
+public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDataset {
 
     private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowXYDataset.class.getSimpleName(), 2);
 
     private final Object sourceSeriesLock = new Object();
-    private List<WrappedSourceSeries> sourceSeries = new ArrayList<WrappedSourceSeries>();
+    private List<WrappedSourceSeries<E>> sourceSeries = new ArrayList<WrappedSourceSeries<E>>();
     private List<List<TimeSeriesItem>> snapshotData = new ArrayList<List<TimeSeriesItem>>();
     private List<String> seriesKeys = new ArrayList<String>();
     private TimeSource startTime = TimeSource.OPEN_START_TIME;
@@ -94,12 +94,18 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
         new MoveWindowTask().run();
     }
 
+    public E getTimeSeries(int index) {
+        synchronized (sourceSeriesLock) {
+            return sourceSeries.get(index).getSeries();
+        }
+    }
+
     public void setUpdateOnSwingThread(boolean updateOnSwingThread) {
         this.updateOnSwingThread = updateOnSwingThread;
     }
 
     public int getSeriesCount() {
-        return 0;
+        return sourceSeries.size();
     }
 
     public Comparable getSeriesKey(int series) {
@@ -118,13 +124,13 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
         return snapshotData.get(series).get(item).doubleValue();
     }
 
-    private class WrappedSourceSeries {
+    private class WrappedSourceSeries<E extends TimeSeries> {
 
-        private final TimeSeries series;
+        private final E series;
         private final Object modCountLock = new Object();
         private volatile long lastModCountOnRefresh;
 
-        public WrappedSourceSeries(TimeSeries series) {
+        public WrappedSourceSeries(E series) {
             this.series = series;
         }
 
@@ -139,6 +145,10 @@ public class MovingWindowXYDataset extends AbstractXYDataset {
 
         public boolean isModified() {
             return lastModCountOnRefresh != series.getModCount();
+        }
+
+        public E getSeries() {
+            return series;
         }
     }
 

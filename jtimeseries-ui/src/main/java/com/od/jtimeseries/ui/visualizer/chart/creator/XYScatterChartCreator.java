@@ -4,6 +4,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYDataset;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,7 +31,7 @@ public class XYScatterChartCreator extends AbstractXYChartCreator {
         );
     }
 
-    protected XYItemRenderer createXYItemRenderer(int seriesId) {
+    protected XYItemRenderer createXYItemRenderer(XYDataset dataSet) {
         return new EfficientXYLineAndShapeRenderer(false, true);
     }
 

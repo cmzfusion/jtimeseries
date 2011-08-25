@@ -48,7 +48,7 @@ public abstract class AbstractRemoteQuery {
     }
 
     public void runQuery() throws Exception {
-        long time = System.nanoTime();
+        long time = System.currentTimeMillis();
         doBeforeRun();
         XMLReader parser = XMLReaderFactory.createXMLReader();
         String id    = "http://apache.org/xml/properties/input-buffer-size";
@@ -61,7 +61,7 @@ public abstract class AbstractRemoteQuery {
         }
         parser.setContentHandler(getContentHandler());
         parser.parse(url.toString());
-        long timeTaken = (System.nanoTime() - time) / 1000000;
+        long timeTaken = System.currentTimeMillis() - time;
         LocalJmxMetrics.getInstance().getQueryTimesRecorder().newValue(timeTaken);
         LocalJmxMetrics.getInstance().getQueryCounter().incrementCount();
         logMethods.logInfo(getClass().getName() + " query took " + timeTaken + " millis");

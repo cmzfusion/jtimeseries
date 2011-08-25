@@ -115,6 +115,12 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
     }
 
+    public void addAll(Iterable<TimeSeriesItem> items) {
+        for (TimeSeriesItem i : items) {
+        	addItem(i);
+        }
+    }
+
     /**
      * Stop persistence for this Filesystem times series
      */
@@ -224,9 +230,15 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return change;
     }
 
+    public void removeAll(Iterable<TimeSeriesItem> items) {
+        getRoundRobinSeries().removeAll(items);
+    }
+
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return getRoundRobinSeries().iterator();
     }
+
+
 
     /**
      * Intentionally break the contract of List.equals() - we shouldn't need to support logical equality of
@@ -246,6 +258,18 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     public long getModCount() {
         return modCount;
+    }
+
+    public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+        return getRoundRobinSeries().getFirstItemAtOrBefore(timestamp);
+    }
+
+    public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+        return getRoundRobinSeries().getFirstItemAtOrAfter(timestamp);
+    }
+
+    public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
+        return getRoundRobinSeries().getItemsInRange(startTime, endTime);
     }
 
     public FileHeader getFileHeader() {

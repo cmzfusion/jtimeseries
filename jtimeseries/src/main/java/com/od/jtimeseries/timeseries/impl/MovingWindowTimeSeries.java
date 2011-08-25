@@ -100,7 +100,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
-    public boolean recalculateWindow() {
+    public synchronized boolean recalculateWindow() {
         boolean changed = false;
         synchronized (MovingWindowTimeSeries.this) {
             int oldStartIndex = startIndex;
@@ -228,10 +228,12 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
     public synchronized void setEndTime(TimeSource endTimeSource) {
         this.endTimeSource = endTimeSource;
+        recalculateWindow();
     }
 
     public synchronized void setStartTime(TimeSource startTimeSource) {
         this.startTimeSource = startTimeSource;
+        recalculateWindow();
     }
 
     public synchronized void setStartTime(long startTime) {

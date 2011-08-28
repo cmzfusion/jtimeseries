@@ -69,7 +69,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
     }
 
     public Numeric calculateAggregateValue() {
-        Numeric result = Numeric.NaN;
+        Numeric result = DoubleNumeric.NaN;
         if (! Double.isNaN(currentValue) && ! Double.isNaN(initialValue)) {
             result = DoubleNumeric.valueOf(currentValue - initialValue);
         }

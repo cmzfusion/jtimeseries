@@ -18,8 +18,7 @@
  */
 package com.od.jtimeseries.net.httpd;
 
-import com.od.jtimeseries.chart.TimeSeriesTableModelAdapter;
-import com.od.jtimeseries.chart.TimeSeriesXYDataset;
+import com.od.jtimeseries.chart.MovingWindowXYDataset;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import org.jfree.chart.ChartFactory;
@@ -76,8 +75,9 @@ public class ChartPngHandler extends AbstractHandler {
 
     private NanoHTTPD.Response createImageResponse(Properties params, IdentifiableTimeSeries h) {
         NanoHTTPD.Response result;
-        TimeSeriesTableModelAdapter tableModel = new TimeSeriesTableModelAdapter(h, h.getDescription());
-        TimeSeriesXYDataset xyDataset = new TimeSeriesXYDataset(h.getId(), tableModel);
+
+        MovingWindowXYDataset<IdentifiableTimeSeries> xyDataset = new MovingWindowXYDataset<IdentifiableTimeSeries>();
+        xyDataset.addTimeSeries(h.getId(), h);
 
         JFreeChart chart = ChartFactory.createTimeSeriesChart(
                 h.getId(),

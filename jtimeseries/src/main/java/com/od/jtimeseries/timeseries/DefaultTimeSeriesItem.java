@@ -26,12 +26,9 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 03-Dec-2008
  * Time: 15:37:48
  *
- * A TimeSeriesItem with a fixed/immutable timestamp
+ * An immutable TimeSeriesItem with a fixed/immutable timestamp, containing a single Numeric value
  *
  * Equality is defined in terms of both timestamp and value
- *
- * Numeric value is also usually immutable - but if the Numeric value does change, be aware this could invalidate any
- * equality based collection (e.g. Set) in which the TimeSeriesItem is currently stored.
  */
 public class DefaultTimeSeriesItem implements TimeSeriesItem {
 
@@ -43,24 +40,28 @@ public class DefaultTimeSeriesItem implements TimeSeriesItem {
         this.value = value;
     }
 
-    @Override
     public long getTimestamp() {
         return timestamp;
     }
 
-    @Override
     public Numeric getValue() {
         return value;
     }
 
-    @Override
+    public Numeric getValue(int valueIndex) {
+        return valueIndex == 0 ? value : null;
+    }
+
     public double doubleValue() {
         return value.doubleValue();
     }
 
-    @Override
     public long longValue() {
         return value.longValue();
+    }
+
+    public int getValueCount() {
+        return 1;
     }
 
     @Override

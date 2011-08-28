@@ -164,7 +164,7 @@ public class JmxMetric implements ManagedMetric {
 
     private class JmxMeasurementTask implements JmxExecutorTask {
 
-        private Numeric result = Numeric.NaN;
+        private Numeric result = DoubleNumeric.NaN;
         private ValueRecorder valueRecorder;
         private AggregateFunction aggregateFunction;
         private JmxMeasurement measurement;
@@ -176,7 +176,7 @@ public class JmxMetric implements ManagedMetric {
         }
 
         private void processMeasurement() throws JmxExecutionException {
-            result = Numeric.NaN;
+            result = DoubleNumeric.NaN;
             getJmxExecutorService().executeTask(this);
 
             if ( ! result.isNaN() ) {

@@ -24,43 +24,46 @@ package com.od.jtimeseries.util.numeric;
  * Date: 18-Dec-2008
  * Time: 12:30:16
  *
- * Time Series in JTimeseries store Numeric instances against timestamp rather than a standard numeric wrapper type such as Double or Long
- * This is for additional flexibility, since we may wish to store more information against each timepoint than a single number
+ * Timeseries in JTimeseries store Numeric instances against timestamp rather than a Number subtype such as Double or Long
+ * This is for additional flexibility, since it is less restrictive and easier to adapt or extend a class implement the
+ * Numeric interface than it would be to extend java.lang.Number
  *
- * Although the provided LongNumeric and DoubleNumeric are immutable, mutable versions are possible, and may be necessary for certain
- * high performance algorithms where we don't wish to create a new Numeric instance for every calculation.
+ * In general, since it is a multi-threaded library, JTimeseries expects Numeric instances to be immutable
+ * (or at least not to have their value modified once added to a timeseries). Changing a Numeric value after adding
+ * it to a timeseries may produce unpredicatable results in any series which are registered as observers on that
+ * series, or perform calculations using its values.
  *
- * Although each Numeric must at minimum be able to supply a single double value (so that this value may for example be graphed)
- * Numeric classes may be defined which internally store more information, e.g min and max over a time period.
+ * Numeric supports the concept of NaN values. NaN generally means we attempted to calculate a value, but no sensible value could be calculated
+ * (e.g. we record the Mean of zero values captured during a time period as a NaN value). NaN may also be used to represent that no
+ * value exists because no attempt was made to record a value.
+ *
+ * Numeric instances make a distinction between the above cases. Where a value is NaN because no attempt was made to
+ * calculate or record a value, the Numeric instance should return isNull() == true, as well as isNaN() == true. In the case where
+ * an attempt was made but no sensible value could be calculated (e.g. Mean of zero values) isNaN() == true but isNull() == false.
+ *
+ * We have to choose our own value to represent NaN as a long, since there is no formal definition as there is for double in IEEE 754
+ * - the primitive value for a long NaN will be Long.MIN_VALUE
  */
 public interface Numeric {
 
-    public static final Numeric NaN = new Numeric() {
-
-        public double doubleValue() {
-            return Double.NaN;
-        }
-
-        public boolean isNaN() {
-            return true;
-        }
-
-        public long longValue() {
-            return (long)Double.NaN;
-        }
-    };
-
     /**
-     * @return value of this Numeric, as a double
+     * @return value of this Numeric, as a double, Double.NaN if either isNaN() or isNull() is true
      */
     public double doubleValue();
 
+    /**
+     * @return value of this Numeric, as a long, Long.MIN_VALUE if either isNaN() or isNull() is true
+     */
+    long longValue();
 
     /**
-     * @return true, if the value is Double.NaN - which usually indicates a value could not be calculated
+     * @return true, if the value is NaN, which indicates a value is not available (no attempt to record a value) or a value could not be calculated (e.g. the Mean of zero items during a capture period)
      */
     public boolean isNaN();
 
+    /**
+     * @return true, if isNaN() because no value was recorded (e.g because no attempt was made to record a value)
+     */
+    public boolean isNull();
 
-    long longValue();
 }

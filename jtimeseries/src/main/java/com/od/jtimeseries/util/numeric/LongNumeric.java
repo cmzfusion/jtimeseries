@@ -28,7 +28,9 @@ package com.od.jtimeseries.util.numeric;
  */
 public class LongNumeric implements Numeric {
 
-    private static final LongNumeric ZERO = new LongNumeric(0);
+    public static final LongNumeric ZERO = new LongNumeric(0);
+    public static final LongNumeric NaN = new LongNumeric(Long.MIN_VALUE);
+    public static final LongNumeric NULL = new LongNumeric(Long.MIN_VALUE);
 
     private long l;
 
@@ -36,16 +38,16 @@ public class LongNumeric implements Numeric {
         this.l = l;
     }
 
-    private LongNumeric(int l) {
-        this.l = l;
-    }
-
     public double doubleValue() {
-        return l;
+        return isNaN() ? Double.NaN : (double)l;
     }
 
     public boolean isNaN() {
-        return false;
+        return l == Long.MIN_VALUE;
+    }
+
+    public boolean isNull() {
+        return this == NULL;
     }
 
     public long longValue() {
@@ -60,19 +62,20 @@ public class LongNumeric implements Numeric {
 	    return (int)(l ^ (l >>> 32));
     }
 
-    public static LongNumeric valueOf(long i) {
-        if ( i == 0) {
-            return ZERO;
-        } else {
-            return new LongNumeric(i);
-        }
+    public boolean equals(Object obj) {
+        return obj instanceof LongNumeric && l == ((LongNumeric) obj).l;
     }
 
-    public boolean equals(Object obj) {
-	    if (obj instanceof LongNumeric) {
-	        return l == ((LongNumeric)obj).l;
+    public static LongNumeric valueOf(long l) {
+        LongNumeric result;
+        if ( l == 0) {
+            result = ZERO;
+        } else if ( Long.MIN_VALUE == l ) {
+            result = NaN;
+        } else {
+            result = new LongNumeric(l);
         }
-        return false;
+        return result;
     }
 
 }

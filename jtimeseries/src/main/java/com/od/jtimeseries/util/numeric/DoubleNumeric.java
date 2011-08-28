@@ -24,11 +24,13 @@ package com.od.jtimeseries.util.numeric;
  * Date: 18-Dec-2008
  * Time: 12:38:21
  *
- * An immutable Numeric, which uses a double internally
+ * An immutable Numeric, based on a double primitive
  */
 public class DoubleNumeric implements Numeric {
 
-    private static final DoubleNumeric ZERO = new DoubleNumeric(0);
+    public static final DoubleNumeric ZERO = new DoubleNumeric(0);
+    public static final DoubleNumeric NaN = new DoubleNumeric(Double.NaN);
+    public static final DoubleNumeric Null = new DoubleNumeric(Double.NaN);
 
     private final double d;
 
@@ -44,8 +46,12 @@ public class DoubleNumeric implements Numeric {
         return Double.isNaN(d);
     }
 
+    public boolean isNull() {
+        return this == DoubleNumeric.Null;
+    }
+
     public long longValue() {
-        return Double.valueOf(d).longValue();
+        return isNaN() ? Long.MIN_VALUE : (long)d;
     }
 
     public String toString() {
@@ -69,6 +75,8 @@ public class DoubleNumeric implements Numeric {
         DoubleNumeric result;
         if ( d == 0) {
             result = ZERO;
+        } else if ( Double.isNaN(d) ) {
+            result = NaN;
         } else {
             result = new DoubleNumeric(d);
         }

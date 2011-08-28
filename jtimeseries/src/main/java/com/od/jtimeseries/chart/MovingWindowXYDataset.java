@@ -1,7 +1,9 @@
 package com.od.jtimeseries.chart;
 
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
@@ -10,8 +12,7 @@ import org.jfree.data.xy.AbstractXYDataset;
 
 import javax.swing.*;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,13 +46,17 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     private TimeSource endTime = TimeSource.OPEN_END_TIME;
     private volatile Future movingWindowRefreshTask;
 
+    public MovingWindowXYDataset() {
+        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME);
+    }
+
     public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public void addTimeSeries(String key, TimeSeries series) {
-        sourceSeries.add(new WrappedSourceSeries(key, series));
+    public void addTimeSeries(String key, E series) {
+        sourceSeries.add(new WrappedSourceSeries<E>(key, series));
         refresh();
     }
 

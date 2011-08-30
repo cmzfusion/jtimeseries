@@ -18,24 +18,7 @@
                     <constructor-arg value="${environment}.server.${hostname}.io.disk.File Read Bytes/s"/>
                     <constructor-arg value="Bytes read from filesystem per second"/>
                     <constructor-arg value="10"/>
-                    <constructor-arg>
-                        <list>
-                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="1"/>
-                                    </bean>
-                                </constructor-arg>
-                            </bean>
-                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="1"/>
-                                    </bean>
-                                </constructor-arg>
-                            </bean>
-                        </list>
-                    </constructor-arg>
+                    <constructor-arg ref="ninetyPercentileFunctionGroup"/>
                 </bean>
 
                 <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
@@ -43,24 +26,7 @@
                     <constructor-arg value="${environment}.server.${hostname}.io.disk.File Write Bytes/s"/>
                     <constructor-arg value="Bytes written to filesystem per second"/>
                     <constructor-arg value="11"/>
-                    <constructor-arg>
-                        <list>
-                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="1"/>
-                                    </bean>
-                                </constructor-arg>
-                            </bean>
-                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
-                                <constructor-arg>
-                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
-                                        <constructor-arg value="1"/>
-                                    </bean>
-                                </constructor-arg>
-                            </bean>
-                        </list>
-                    </constructor-arg>
+                    <constructor-arg ref="ninetyPercentileFunctionGroup"/>
                 </bean>
 
             </list>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!-- functions which give a 90 percentile and median value over 1min and 30mins -->
+    <bean id="ninetyPercentileFunctionGroup" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="PERCENTILE">
+                    <constructor-arg value="90"/>
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="PERCENTILE">
+                    <constructor-arg value="90"/>
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- functions which give a 10 percentile and median value over 1min and 30mins -->
+    <bean id="tenPercentileFunctionGroup" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="PERCENTILE">
+                    <constructor-arg value="10"/>
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="PERCENTILE">
+                    <constructor-arg value="10"/>
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- functions which give a max and median value over 1min and 30mins -->
+    <bean id="maxFunctionGroup" class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="1"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+                <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                    <constructor-arg>
+                        <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                            <constructor-arg value="30"/>
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+</beans>

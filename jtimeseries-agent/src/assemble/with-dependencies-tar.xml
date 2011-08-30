@@ -1,5 +1,5 @@
 <assembly>
-  <id>bin</id>
+  <id>nix</id>
   <formats>
     <format>tar.gz</format>
   </formats>

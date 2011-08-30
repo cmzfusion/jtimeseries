@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="networkHandler" class="com.od.jtimeseries.agent.input.RegexInputHandler">
+
+        <!-- Match the output of typeperf with 16 numeric counter values -->
+        <!-- "08/30/2011 07:29:23.301","1626.000000","0.000000","11.453673","4.046369","95.953631","2.312140","1.926777","104.000000","0.000000","9198.832625","106998.506822","-1","-1","-1","-1","-1" -->
+        <constructor-arg
+                value="^.*&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;$"/>
+
+        <property name="regexValueHandlers">
+            <list>
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.io.network.Total Bytes Sent and Received/s"/>
+                    <constructor-arg value="Total network bytes sent and received per second"/>
+                    <constructor-arg value="12"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.io.network.Total Bytes Sent /s"/>
+                    <constructor-arg value="Total network bytes sent per second"/>
+                    <constructor-arg value="13"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.io.network.Total Bytes Received/s"/>
+                    <constructor-arg value="Total network bytes received per second"/>
+                    <constructor-arg value="14"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.io.network.Outbound Error Packets/s"/>
+                    <constructor-arg value="Total outbound packets with errors per second"/>
+                    <constructor-arg value="15"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.io.network.Outbound Queue Length"/>
+                    <constructor-arg value="Outbound network queue length"/>
+                    <constructor-arg value="16"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

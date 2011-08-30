@@ -28,10 +28,11 @@
                             <outputDirectory>${basedir}/target</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/etc</directory>
+                                    <directory>src/etc/win</directory>
                                     <includes>
                                         <include>start.bat</include>
-                                        <include>start.sh</include>                                        
+                                        <include>counters.txt</include>
+                                        <include>*.xml</include>
                                     </includes>
                                     <filtering>true</filtering>
                                 </resource>

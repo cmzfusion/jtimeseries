@@ -8,7 +8,7 @@
       <directory>target</directory>
       <outputDirectory></outputDirectory>
       <includes>
-        <include>start.bat</include>
+        <include>win/start.bat</include>
       </includes>
     </fileSet>
     <fileSet>

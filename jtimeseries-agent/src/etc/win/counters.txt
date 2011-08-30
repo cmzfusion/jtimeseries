@@ -1,0 +1,16 @@
+\Memory\Available MBytes
+\Memory\Pages Input/sec
+\Paging File(_Total)\% Usage
+\Processor(_Total)\% Processor Time
+\Processor(_Total)\% Idle Time
+\Processor(_Total)\% User Time
+\Processor(_Total)\% Privileged Time
+\System\Processes
+\System\Processor Queue Length
+\System\File Read Bytes/sec
+\System\File Write Bytes/sec
+\Network Interface(_Total)\Bytes Total/sec
+\Network Interface(_Total)\Bytes Sent/sec
+\Network Interface(_Total)\Bytes Received/sec
+\Network Interface(_Total)\Packets Outbound Errors
+\Network Interface(_Total)\Output Queue Length

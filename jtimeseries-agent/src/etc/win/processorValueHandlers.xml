@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="processorHandler" class="com.od.jtimeseries.agent.input.RegexInputHandler">
+
+        <!-- Match the output of typeperf with 16 numeric counter values -->
+        <!-- "08/30/2011 07:29:23.301","1626.000000","0.000000","11.453673","4.046369","95.953631","2.312140","1.926777","104.000000","0.000000","9198.832625","106998.506822","-1","-1","-1","-1","-1" -->
+        <constructor-arg
+                value="^.*&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;,&quot;(-{0,1}\d+\.{0,1}\d*)&quot;$"/>
+
+        <property name="regexValueHandlers">
+            <list>
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.Utilisation %"/>
+                    <constructor-arg value="Percentage of total available CPU utilised"/>
+                    <constructor-arg value="4"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.Idle %"/>
+                    <constructor-arg value="Percentage of total available CPU Idle"/>
+                    <constructor-arg value="5"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.User Time %"/>
+                    <constructor-arg value="Percentage of total available CPU allocated to user processes"/>
+                    <constructor-arg value="6"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                 <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.System Time %"/>
+                    <constructor-arg value="Percentage of total available CPU allocated to system processes."/>
+                    <constructor-arg value="7"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.Process Count"/>
+                    <constructor-arg value="Number of running processes."/>
+                    <constructor-arg value="8"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+
+                <bean class="com.od.jtimeseries.agent.input.DoubleRegexValueHandler">
+                    <constructor-arg ref="rootContext"/>
+                    <constructor-arg value="${environment}.server.${hostname}.cpu.Processor Queue Length"/>
+                    <constructor-arg value="Number of threads waiting for CPU."/>
+                    <constructor-arg value="9"/>
+                    <constructor-arg>
+                        <list>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MEDIAN">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                            <bean class="com.od.jtimeseries.capture.function.CaptureFunctions" factory-method="MAX">
+                                <constructor-arg>
+                                    <bean class="com.od.jtimeseries.util.time.Time" factory-method="minutes">
+                                        <constructor-arg value="1"/>
+                                    </bean>
+                                </constructor-arg>
+                            </bean>
+                        </list>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+</beans>

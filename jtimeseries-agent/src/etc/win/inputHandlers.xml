@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <import resource="memoryValueHandlers.xml"/>
+    <import resource="processorValueHandlers.xml"/>
+    <import resource="diskValueHandlers.xml"/>
+    <import resource="networkValueHandlers.xml"/>
+
+    <bean id="inputHandlerSource" class="com.od.jtimeseries.agent.input.DefaultInputHandlerSource">
+        <constructor-arg>
+            <!-- A list of InputHandler to process standard input to the agent -->
+            <list>
+                <ref bean="memoryHandler"/>
+                <ref bean="processorHandler"/>
+                <ref bean="diskHandler"/>
+                <ref bean="networkHandler"/>
+            </list>
+        </constructor-arg>
+    </bean>
+	
+</beans>

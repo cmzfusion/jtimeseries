@@ -44,11 +44,15 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     private List<List<TimeSeriesItem>> snapshotData = new ArrayList<List<TimeSeriesItem>>();
     private TimeSource startTime = TimeSource.OPEN_START_TIME;
     private TimeSource endTime = TimeSource.OPEN_END_TIME;
-    private volatile boolean useSwingThread;
+    private volatile boolean useSwingThread = true;
     private volatile Future movingWindowRefreshTask;
 
     public MovingWindowXYDataset() {
         this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME, false);
+    }
+
+    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime) {
+        this(startTime, endTime, true);
     }
 
     public MovingWindowXYDataset(boolean useSwingThread) {

@@ -29,12 +29,20 @@
                             <resources>
                                 <resource>
                                     <directory>src/etc/win</directory>
+                                    <filtering>true</filtering>
                                     <includes>
                                         <include>start.bat</include>
                                         <include>counters.txt</include>
                                         <include>*.xml</include>
                                     </includes>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/resources</directory>
                                     <filtering>true</filtering>
+                                    <includes>
+                                        <include>*.properties</include>
+                                        <include>*.xml</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>

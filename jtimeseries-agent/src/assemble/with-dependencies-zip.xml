@@ -5,22 +5,12 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>src/etc/win</directory>
+      <directory>${basedir}/target</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>start.bat</include>
         <include>*.xml</include>
         <include>counters.txt</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/resources</directory>
-      <outputDirectory></outputDirectory>
-      <includes>
-        <include>*.properties</include>
-        <include>applicationContext.xml</include>
-        <include>logContext.xml</include>
-        <include>managedMetrics.xml</include>
       </includes>
     </fileSet>
     <fileSet>
@@ -30,7 +20,12 @@
   </fileSets>
   <dependencySets>
     <dependencySet>
+      <outputDirectory></outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
       <scope>runtime</scope>
+      <unpack>false</unpack>
     </dependencySet>
   </dependencySets>
 </assembly>
+
+

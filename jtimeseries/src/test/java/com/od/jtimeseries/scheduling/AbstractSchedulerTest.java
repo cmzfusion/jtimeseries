@@ -6,7 +6,6 @@ package com.od.jtimeseries.scheduling;
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.impl.AbstractCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
-import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.Time;
@@ -16,6 +15,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.After;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -30,7 +31,7 @@ public abstract class AbstractSchedulerTest extends Assert {
     protected final TimePeriod CAPTURE_PERIOD_MILLIS = Time.milliseconds(10);
     protected Mockery mockery;
     protected final AtomicLong triggerCount = new AtomicLong();
-    protected TimedCapture triggerCountingCapture;
+    protected LatchedCapture triggerCountingCapture;
 
     @Before
     public void setUp() {
@@ -38,11 +39,7 @@ public abstract class AbstractSchedulerTest extends Assert {
         mockery = new Mockery();
         triggerCount.set(0);
 
-        triggerCountingCapture = new DummyTimedCapture() {
-            public void trigger(long time) {
-                triggerCount.incrementAndGet();
-            }
-        };
+        triggerCountingCapture = new LatchedCapture();
     }
 
     @After
@@ -60,8 +57,11 @@ public abstract class AbstractSchedulerTest extends Assert {
         triggerCountingCapture.start();
         scheduler.addTriggerable(triggerCountingCapture);
         scheduler.start();
-        sleepCapturePeriods(2);
-        assertTrue(triggerCount.longValue() > 0);
+        try {
+            triggerCountingCapture.latch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            fail("Capture not triggered");
+        }
     }
 
     @Test
@@ -69,8 +69,11 @@ public abstract class AbstractSchedulerTest extends Assert {
         triggerCountingCapture.start();
         scheduler.start();
         scheduler.addTriggerable(triggerCountingCapture);
-        sleepCapturePeriods(2);
-        assertTrue(triggerCount.longValue() > 0);
+        try {
+            triggerCountingCapture.latch.await(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            fail("Capture not triggered");
+        }
     }
 
     protected void sleepCapturePeriods(float numberOfPeriods) {
@@ -112,4 +115,13 @@ public abstract class AbstractSchedulerTest extends Assert {
 
     }
 
+    private class LatchedCapture extends DummyTimedCapture {
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        public void trigger(long time) {
+            triggerCount.incrementAndGet();
+            latch.countDown();
+        }
+    }
 }

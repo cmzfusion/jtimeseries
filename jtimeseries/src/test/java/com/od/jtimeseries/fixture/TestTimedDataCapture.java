@@ -44,7 +44,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertNotNull(queueTimer);
 
         WaitForEndOfCapturePeriodListener countDownListener = createCapturePeriodListener();
-        rootContext.startScheduling().startDataCapture();
+        rootContext.startDataCapture().startScheduling();
         countDownListener.waitForAll();
         generateSourceValuesForPeriod();
 

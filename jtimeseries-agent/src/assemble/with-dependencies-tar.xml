@@ -12,7 +12,7 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>src/main/resources</directory>
+      <directory>${basedir}/target</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>*.xml</include>

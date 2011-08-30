@@ -62,6 +62,7 @@ public class InputProcessor {
     private void processLine(BufferedReader in) throws IOException {
         String s = in.readLine();
         if ( s != null && s.length() > 0) {
+            logMethods.logDebug("InputProcessor " + this + " input :='" + s + "'");
             for (InputHandler h : inputHandlerSource.getInputHandlers()) {
                 try {
                     h.parseInput(s);

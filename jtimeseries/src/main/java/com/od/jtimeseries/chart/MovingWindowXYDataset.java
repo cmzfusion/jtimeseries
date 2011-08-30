@@ -44,15 +44,21 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     private List<List<TimeSeriesItem>> snapshotData = new ArrayList<List<TimeSeriesItem>>();
     private TimeSource startTime = TimeSource.OPEN_START_TIME;
     private TimeSource endTime = TimeSource.OPEN_END_TIME;
+    private volatile boolean useSwingThread;
     private volatile Future movingWindowRefreshTask;
 
     public MovingWindowXYDataset() {
-        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME);
+        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME, false);
     }
 
-    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime) {
+    public MovingWindowXYDataset(boolean useSwingThread) {
+        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME, useSwingThread);
+    }
+
+    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime, boolean useSwingThread) {
         this.startTime = startTime;
         this.endTime = endTime;
+        this.useSwingThread = useSwingThread;
     }
 
     public void addTimeSeries(String key, E series) {
@@ -124,7 +130,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
             }
         };
 
-        if (! SwingUtilities.isEventDispatchThread()) {
+        if (! SwingUtilities.isEventDispatchThread() && useSwingThread) {
             SwingUtilities.invokeLater(refreshRunnable);
         } else {
             refreshRunnable.run();

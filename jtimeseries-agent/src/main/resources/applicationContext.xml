@@ -4,7 +4,7 @@
 	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<!-- Configurer that replaces ${...} placeholders with values from properties files or from sys props -->
+	<!-- Configurer that replaces ${...} placeholders with values from properties filFes or from sys props -->
 	<bean id="propertyConfigurer" class="com.od.jtimeseries.component.logging.LoggingPropertyPlaceholderConfigurer">
         <property name="location" value="/jtimeseries-agent.properties"/>
     </bean>
@@ -23,9 +23,11 @@
     </bean>
 
     <bean id="rootContext" class="com.od.jtimeseries.net.udp.UdpPublishingTimeSeriesContext">
+        <constructor-arg ref="udpClient"/>
+        <constructor-arg value="5000"/>
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
-        <constructor-arg ref="udpClient"/>
+        <constructor-arg value="true"/>
         <property name="timeSeriesFactory" ref="timeSeriesFactory"/>
     </bean>
 

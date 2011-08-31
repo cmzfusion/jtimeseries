@@ -18,18 +18,24 @@
  */
 package com.od.jtimeseries.timeseries;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
  * An event representing a change to a TimeSeries
+ *
+ * Future performance enhancements may require the reuse of TimeSeriesEvent instances, which are therefore not guaranteed to be immutable
+ *
+ * Because of this, it is necessary to avoid accessing received TimeSeriesEvent instances outside TimeSeriesListener callback methods.
+ * If it seems necessary to keep a reference to an event outside the listener callback, create a clone of the event and store that instead.
  */
 public class TimeSeriesEvent implements Cloneable {
 
     private final List<TimeSeriesItem> items;
     private final EventType eventType;
-    private Object source;
-    private long seriesModCount;
+    private final Object source;
+    private final long seriesModCount;
 
     /**
      * @param source        - time series source for event
@@ -57,6 +63,8 @@ public class TimeSeriesEvent implements Cloneable {
      * guarantee thread safety the instance should not be used outside the context of the TimeSeriesListener's event handling callback method.
      * (If you need to store the List of items for later processing, please clone it, then store the clone)
      *
+     * You should not modify the contents of the List returned by this method since it may be reused by other TimeSeriesListener
+     *
      * @return items affected in order of timestamp
      */
     public List<TimeSeriesItem> getItems() {
@@ -81,12 +89,8 @@ public class TimeSeriesEvent implements Cloneable {
         return seriesModCount;
     }
 
-    public void setSeriesModCount(long modCount) {
-        this.seriesModCount = modCount;
-    }
-
     public static TimeSeriesEvent createEvent(Object source, List<TimeSeriesItem> items, EventType eventType, long seriesModCount) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), eventType, seriesModCount);
+        return new TimeSeriesEvent(source, items, eventType, seriesModCount);
     }
 
     /**
@@ -96,7 +100,7 @@ public class TimeSeriesEvent implements Cloneable {
      * @param items - items added
      */
     public static TimeSeriesEvent createItemsAddedOrInsertedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.ADD_OR_INSERT, seriesModCount);
+        return new TimeSeriesEvent(source, items, EventType.ADD_OR_INSERT, seriesModCount);
     }
 
     /**
@@ -106,7 +110,7 @@ public class TimeSeriesEvent implements Cloneable {
      * @param items - items removed
      */
     public static TimeSeriesEvent createItemsRemovedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.REMOVE, seriesModCount);
+        return new TimeSeriesEvent(source, items, EventType.REMOVE, seriesModCount);
     }
 
     /**
@@ -117,7 +121,7 @@ public class TimeSeriesEvent implements Cloneable {
      * @param items - items in the series after change
      */
     public static TimeSeriesEvent createSeriesChangedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
-        return new TimeSeriesEvent(source, Collections.unmodifiableList(items), EventType.SERIES_CHANGE, seriesModCount);
+        return new TimeSeriesEvent(source, items, EventType.SERIES_CHANGE, seriesModCount);
     }
 
     @Override
@@ -143,12 +147,7 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     public Object clone() {
-        return new TimeSeriesEvent(
-            source,
-            items,
-            eventType,
-            seriesModCount
-        );
+        return TimeSeriesEvent.createEvent(source, new ArrayList<TimeSeriesItem>(items), eventType, seriesModCount);
     }
 
     public String toString() {
@@ -156,10 +155,6 @@ public class TimeSeriesEvent implements Cloneable {
                 (items.size() < 10 ? ", items " + items : ", first 10 items=" + items.subList(0, 10)) +
                 ", source=" + source + ", modCount=" + seriesModCount +
                 '}';
-    }
-
-    public void setSource(Object proxySource) {
-        this.source = proxySource;
     }
 
     public static enum EventType {

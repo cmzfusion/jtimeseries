@@ -42,20 +42,17 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
     }
 
     public void itemsAddedOrInserted(TimeSeriesEvent h) {
-        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-        h.setSource(proxySource);
+        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
         fireItemsAddedOrInserted(e);
     }
 
     public void itemsRemoved(TimeSeriesEvent h) {
-        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-        h.setSource(proxySource);
+        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
         fireItemsRemoved(e);
     }
 
     public void seriesChanged(TimeSeriesEvent h) {
-        TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-        h.setSource(proxySource);
+        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
         fireSeriesChanged(e);
     }
 }

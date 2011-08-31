@@ -462,23 +462,17 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
 
         public void itemsAddedOrInserted(TimeSeriesEvent h) {
-            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-            h.setSource(FilesystemTimeSeries.this);
-            h.setSeriesModCount(++modCount);
+            TimeSeriesEvent e = TimeSeriesEvent.createEvent(FilesystemTimeSeries.this, h.getItems(), h.getEventType(), ++modCount);
             fireItemsAddedOrInserted(e);
         }
 
         public void itemsRemoved(TimeSeriesEvent h) {
-            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-            h.setSource(FilesystemTimeSeries.this);
-            h.setSeriesModCount(++modCount);
+            TimeSeriesEvent e = TimeSeriesEvent.createEvent(FilesystemTimeSeries.this, h.getItems(), h.getEventType(), ++modCount);
             fireItemsRemoved(e);
         }
 
         public void seriesChanged(TimeSeriesEvent h) {
-            TimeSeriesEvent e = (TimeSeriesEvent)h.clone();
-            h.setSource(FilesystemTimeSeries.this);
-            h.setSeriesModCount(++modCount);
+            TimeSeriesEvent e = TimeSeriesEvent.createEvent(FilesystemTimeSeries.this, h.getItems(), h.getEventType(), ++modCount);
             fireSeriesChanged(e);
         }
     }

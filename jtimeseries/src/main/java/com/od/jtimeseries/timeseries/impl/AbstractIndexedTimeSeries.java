@@ -33,7 +33,7 @@ import java.util.concurrent.Executor;
  * Date: 04-Dec-2008
  * Time: 12:19:35
  *
- * Abstract superclass for list based TimeSeries
+ * Abstract superclass for IndexedTimeSeries based around an array datastructure
  * Provides a mechanism to queue up change events and notify listeners in a separate thread
  */
 abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {

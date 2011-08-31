@@ -51,6 +51,12 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     /**
+     * Get a list of the items affected.
+     *
+     * Possible performance enhancements may require the returned list instance to be reused by subsequent events, so to
+     * guarantee thread safety the instance should not be used outside the context of the TimeSeriesListener's event handling callback method.
+     * (If you need to store the List of items for later processing, please clone it, then store the clone)
+     *
      * @return items affected in order of timestamp
      */
     public List<TimeSeriesItem> getItems() {

@@ -29,14 +29,12 @@ import java.util.Collection;
  * Date: 18-Dec-2008
  * Time: 12:02:05
  *
- * A List based series which has an unlimited length
+ * DefaultTimeSeries is an IndexedTimeSeries based on an array.
+ * It should have good performance for append or prepend operations (and for removing items at either end of the series), and such should
+ * exhibit very good performance for retrieving items based on their index or position in the series
  *
- * This default implementation should have very good performance for appends or prepends
- * (and for removing items at either end), and supports RandomAccess to list elements
- * by list index, since the underlying datastructure is an array-based dequeue
- *
- * The performance for insert operations
- */
+ * Conversely, operations which insert or remove items from the middle of the series will have poor performance
+ **/
 public class DefaultTimeSeries extends AbstractIndexedTimeSeries {
 
     public DefaultTimeSeries() {

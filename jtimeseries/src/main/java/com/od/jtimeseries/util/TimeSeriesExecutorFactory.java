@@ -73,7 +73,7 @@ public class TimeSeriesExecutorFactory {
 
         /**
          * Should return a single threaded executor if the guaranteed ordering of events
-         * is to be preserved
+         * is to be preserved (the same executor to be used for all events fired by a single timeseries)
          */
         Executor getExecutorForTimeSeriesEvents(Object timeSeries);
 
@@ -85,7 +85,7 @@ public class TimeSeriesExecutorFactory {
 
         /**
          * Should return a single threaded executor if the guaranteed ordering of events
-         * is to be preserved
+         * is to be preserved (the same executor instance should be used for each identifiable tree hierarchy)
          */
         Executor getExecutorForIdentifiableTreeEvents(Object identifiable);
     }

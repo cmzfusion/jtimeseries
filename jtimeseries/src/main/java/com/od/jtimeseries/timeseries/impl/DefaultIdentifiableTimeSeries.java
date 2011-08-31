@@ -19,10 +19,8 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.*;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,51 +31,72 @@ import java.util.List;
  * Time: 15:19:46
  *
  * A timeseries instance which implements the Identifiable interface
- * TimeSeries functions are delegated to a wrapped TimeSeries implementation, which can be passed into the constructor
+ *
+ * This class is implemented as a wrapper around another TimeSeries instance to which it delegates all the timeseries
+ * method calls, but provides the additional implementation required to support the Identifiable interface.
+ *
+ * The default implementation for the wrapped series is DefaultTimeSeries, but a RoundRobinTimeSeries could equally
+ * well be used, to make a RoundRobinTimeSeries usable within an Identifiable context tree, for example.
  */
 public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
 
-    private TimeSeries timeSeries;
-    private ProxyTimeSeriesEventHandler eventHandler = new ProxyTimeSeriesEventHandler(this);
+    private TimeSeries wrappedSeries;
+    private ProxyTimeSeriesEventHandler eventHandler;
+
     public DefaultIdentifiableTimeSeries(String id, String description) {
         this(id, description, new DefaultTimeSeries());
     }
 
-    public DefaultIdentifiableTimeSeries(String id, String description, TimeSeries timeSeries) {
+    public DefaultIdentifiableTimeSeries(String id, String description, TimeSeries wrappedSeries) {
         super(id, description);
-        this.timeSeries = timeSeries;
-        setProxyEventHandler(eventHandler);
+        this.wrappedSeries = wrappedSeries;
     }
 
-    //set an alternative handling for wrapped series events
-    protected void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
-        timeSeries.removeTimeSeriesListener(eventHandler);
+    /**
+     * Set the proxy event handler instance which processes events from the wrapped timeseries
+     * and forwards them on to any locally registered listeners with the event source updated
+     */
+    protected synchronized void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
+        if ( eventHandler != null) {
+            wrappedSeries.removeTimeSeriesListener(eventHandler);
+        }
         //add as a weak reference listener, in general we don't want the
         //wrapped series to retain a strong reference to the wrapper.
         WeakReferenceTimeSeriesListener weakReferenceTimeSeriesListener = new
-                WeakReferenceTimeSeriesListener(timeSeries, l);
-        timeSeries.addTimeSeriesListener(weakReferenceTimeSeriesListener);
-        eventHandler = l;
+                WeakReferenceTimeSeriesListener(wrappedSeries, l);
+        wrappedSeries.addTimeSeriesListener(weakReferenceTimeSeriesListener);
+        eventHandler = l; //make sure we keep a strong reference to the real listener
     }
 
     public synchronized TimeSeriesItem getLatestItem() {
-        return timeSeries.getLatestItem();
+        return wrappedSeries.getLatestItem();
     }
 
     public synchronized TimeSeriesItem getEarliestItem() {
-        return timeSeries.getEarliestItem();
+        return wrappedSeries.getEarliestItem();
     }
 
     public long getEarliestTimestamp() {
-        return timeSeries.getEarliestTimestamp();
+        return wrappedSeries.getEarliestTimestamp();
     }
 
     public long getLatestTimestamp() {
-        return timeSeries.getLatestTimestamp();
+        return wrappedSeries.getLatestTimestamp();
     }
 
     public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.addTimeSeriesListener(l);
+        lazyAddEventHandler(l);
+    }
+
+    //lazily add a listener to the wrapped series
+    //this is so the wrapped series implementation does not start to propagate events unless a listener is actually added to
+    //the identifiable series which wraps it
+    private void lazyAddEventHandler(TimeSeriesListener l) {
+        if ( eventHandler == null) {
+            eventHandler = new ProxyTimeSeriesEventHandler(this);
+            eventHandler.addTimeSeriesListener(l);
+            setProxyEventHandler(eventHandler);
+        }
     }
 
     public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
@@ -85,51 +104,51 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
     }
 
     public synchronized int size() {
-        return timeSeries.size();
+        return wrappedSeries.size();
     }
 
     public synchronized Iterator<TimeSeriesItem> iterator() {
-        return timeSeries.iterator();
+        return wrappedSeries.iterator();
     }
 
     public synchronized void addItem(TimeSeriesItem i) {
-        timeSeries.addItem(i);
+        wrappedSeries.addItem(i);
     }
 
     public synchronized boolean removeItem(TimeSeriesItem i) {
-        return timeSeries.removeItem(i);
+        return wrappedSeries.removeItem(i);
     }
 
     public void addAll(Iterable<TimeSeriesItem> items) {
-        timeSeries.addAll(items);
+        wrappedSeries.addAll(items);
     }
 
     public void removeAll(Iterable<TimeSeriesItem> items) {
-        timeSeries.removeAll(items);
+        wrappedSeries.removeAll(items);
     }
 
     public synchronized void clear() {
-        timeSeries.clear();
+        wrappedSeries.clear();
     }
 
     public synchronized long getModCount() {
-        return timeSeries.getModCount();
+        return wrappedSeries.getModCount();
     }
 
     public List<TimeSeriesItem> getSnapshot() {
-        return timeSeries.getSnapshot();
+        return wrappedSeries.getSnapshot();
     }
 
     public TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
-        return timeSeries.getFirstItemAtOrBefore(timestamp);
+        return wrappedSeries.getFirstItemAtOrBefore(timestamp);
     }
 
     public TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
-        return timeSeries.getFirstItemAtOrAfter(timestamp);
+        return wrappedSeries.getFirstItemAtOrAfter(timestamp);
     }
 
     public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
-        return timeSeries.getItemsInRange(startTime, endTime);
+        return wrappedSeries.getItemsInRange(startTime, endTime);
     }
 
     public String toString() {

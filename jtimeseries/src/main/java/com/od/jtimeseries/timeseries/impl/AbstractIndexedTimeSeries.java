@@ -47,6 +47,7 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
     private int hashCode;
 
     private final String toStringDescription = "Series-" + getClass().getSimpleName() + "(" + System.identityHashCode(this) + ")";
+    private boolean listenerAdded;
 
     protected AbstractIndexedTimeSeries() {
         series =new RandomAccessDeque<TimeSeriesItem>();
@@ -185,60 +186,75 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
     }
 
     public synchronized void addTimeSeriesListener(final TimeSeriesListener l) {
+        listenerAdded = true;
         //add the listener on the event firing thread
         //this is so that the client doesn't receive any previously fired events
         //which are still on the event queue waiting to be processed
-        getSeriesEventExecutor().execute(
-            new Runnable() {
-                public void run() {
-                    timeSeriesListenerSupport.addTimeSeriesListener(l);
-                }
+        Runnable t = new Runnable() {
+            public void run() {
+                timeSeriesListenerSupport.addTimeSeriesListener(l);
             }
-        );
+        };
+        fireEvent(t);
     }
 
-    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
-        timeSeriesListenerSupport.removeTimeSeriesListener(l);
-    }
-
-    protected Executor getSeriesEventExecutor() {
-        return TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
+    public synchronized void removeTimeSeriesListener(final TimeSeriesListener l) {
+        if ( listenerAdded ) {
+            Runnable t = new Runnable() {
+                public void run() {
+                    timeSeriesListenerSupport.removeTimeSeriesListener(l);
+                }
+            };
+            fireEvent(t);
+        }
     }
 
     protected void queueSeriesChangedEvent(final TimeSeriesEvent e) {
-        getSeriesEventExecutor().execute(
-            new Runnable() {
+        if ( listenerAdded) {
+            Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
                     timeSeriesListenerSupport.fireSeriesChanged(e);
                     logMethods.logDebug("Finished firing event " + e);
                 }
-            }
-        );
+            };
+            fireEvent(t);
+        }
     }
 
     protected void queueItemsAddedOrInsertedEvent(final TimeSeriesEvent e) {
-        getSeriesEventExecutor().execute(
-            new Runnable() {
+        if ( listenerAdded ) {
+            Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
                     timeSeriesListenerSupport.fireItemsAddedOrInserted(e);
                     logMethods.logDebug("Finished firing event " + e);
                 }
-            }
-        );
+            };
+            fireEvent(t);
+        }
     }
 
     protected void queueItemsRemovedEvent(final TimeSeriesEvent e) {
-        getSeriesEventExecutor().execute(
-            new Runnable() {
+        if ( listenerAdded) {
+            Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
                     timeSeriesListenerSupport.fireItemsRemoved(e);
                     logMethods.logDebug("Finished firing event " + e);
                 }
-            }
-        );
+            };
+            fireEvent(t);
+        }
+    }
+
+    private void fireEvent(Runnable t) {
+        //only fire event if there might be a listener to receive it
+        getSeriesEventExecutor().execute(t);
+    }
+
+    protected Executor getSeriesEventExecutor() {
+        return TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     }
 
     //sometimes it is helpful to be able to add items without firing events to listeners.

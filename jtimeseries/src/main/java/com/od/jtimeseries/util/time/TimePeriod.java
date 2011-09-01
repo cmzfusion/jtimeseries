@@ -23,6 +23,8 @@ package com.od.jtimeseries.util.time;
  * User: Nick Ebbutt
  * Date: 08-Jan-2009
  * Time: 11:20:16
+ *
+ * TimePeriod are expected to be immutable by jtimeseries library
  */
 public interface TimePeriod {
 

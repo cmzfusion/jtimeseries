@@ -32,10 +32,10 @@ import java.util.List;
  */
 public class TimeSeriesEvent implements Cloneable {
 
-    private final List<TimeSeriesItem> items;
-    private final EventType eventType;
-    private final Object source;
-    private final long seriesModCount;
+    private List<TimeSeriesItem> items;
+    private EventType eventType;
+    private Object source;
+    private long seriesModCount;
 
     /**
      * @param source        - time series source for event
@@ -46,6 +46,9 @@ public class TimeSeriesEvent implements Cloneable {
         this.source = source;
         this.eventType = eventType;
         this.seriesModCount = seriesModCount;
+    }
+
+    protected TimeSeriesEvent() {
     }
 
     public long getFirstItemTimestamp() {

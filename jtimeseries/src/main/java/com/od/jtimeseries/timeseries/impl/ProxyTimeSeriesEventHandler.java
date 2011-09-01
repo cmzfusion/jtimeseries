@@ -19,7 +19,10 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,32 +30,81 @@ import com.od.jtimeseries.timeseries.TimeSeriesListener;
  * Date: 22-Jan-2009
  * Time: 12:14:30
  *
- * Utility class used by time series which wrap another time series which
- * stores the actual item data
+ * Utility class used by time series which wrap another time series in order to propagate events from the
+ * wrapped series
  *
  * Listeners which register with the wrapper time series will expect the source of events to be the
  * wrapper instance rather than the wrapped time series implementation
+ *
+ * To achieve this without generating a lot of new event instances we use a thread local event instance which
+ * delegates to the methods on the source event, apart from the getSource() method which always returns the wrapping
+ * timeseries instance.
  */
 public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport implements TimeSeriesListener {
 
     private Object proxySource;
+
+    private ThreadLocal<ProxyTimeSeriesEvent> threadLocalEvent = new ThreadLocal<ProxyTimeSeriesEvent>() {
+        protected ProxyTimeSeriesEvent initialValue() {
+            return new ProxyTimeSeriesEvent();
+        }
+    };
 
     public ProxyTimeSeriesEventHandler(Object proxySource) {
         this.proxySource = proxySource;
     }
 
     public void itemsAddedOrInserted(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
+        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
         fireItemsAddedOrInserted(e);
     }
 
     public void itemsRemoved(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
+        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
         fireItemsRemoved(e);
     }
 
     public void seriesChanged(TimeSeriesEvent h) {
-        TimeSeriesEvent e = TimeSeriesEvent.createEvent(proxySource, h.getItems(), h.getEventType(), h.getSeriesModCount());
+        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
         fireSeriesChanged(e);
+    }
+
+    /**
+     * To avoid creating a lot of chaff objects simply to change the apparent source of the event
+     * we can reuse the same ThreadLocal event instance to wrap each event as it comes through,
+     * delegating all the method calls other than the one which returns the source
+     */
+    private class ProxyTimeSeriesEvent extends TimeSeriesEvent {
+
+        private TimeSeriesEvent sourceEvent;
+
+        ProxyTimeSeriesEvent setSourceEvent(TimeSeriesEvent event) {
+            this.sourceEvent = event;
+            return this;
+        }
+
+        public List<TimeSeriesItem> getItems() {
+            return sourceEvent.getItems();
+        }
+
+        public long getLastItemTimestamp() {
+            return sourceEvent.getLastItemTimestamp();
+        }
+
+        public long getFirstItemTimestamp() {
+            return sourceEvent.getFirstItemTimestamp();
+        }
+
+        public Object getSource() {
+            return ProxyTimeSeriesEventHandler.this.proxySource;
+        }
+
+        public EventType getEventType() {
+            return sourceEvent.getEventType();
+        }
+
+        public long getSeriesModCount() {
+            return sourceEvent.getSeriesModCount();
+        }
     }
 }

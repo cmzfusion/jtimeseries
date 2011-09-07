@@ -83,7 +83,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         //set this node as new parent and fire event
         identifiable.setParent(this);
         identifiable.addTreeListener(childEventPropagator);
-        fireDescendantsAdded(new IdentifiableTreeEvent(this, "", identifiable));
+        fireDescendantsAdded(new IdentifiableTreeEvent(getRoot(), getPath(), identifiable));
     }
 
     protected String getParentPath_Locked() {
@@ -127,7 +127,7 @@ public class IdentifiableBase extends LockingIdentifiable {
             i.setParent(null);
             i.removeTreeListener(childEventPropagator);
             removed = true;
-            fireDescendantsRemoved(new IdentifiableTreeEvent(this, "", i));
+            fireDescendantsRemoved(new IdentifiableTreeEvent(getRoot(), getPath(), i));
         }
         return removed;
     }
@@ -364,37 +364,28 @@ public class IdentifiableBase extends LockingIdentifiable {
     private class ChildTreeEventPropagator implements IdentifiableTreeListener {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            IdentifiableTreeEvent e = new IdentifiableTreeEvent(IdentifiableBase.this, "", node);
+            IdentifiableTreeEvent e = new IdentifiableTreeEvent(getRoot(), getPath(), node);
             for ( IdentifiableTreeListener l : treeListeners) {
                 l.descendantChanged(e);
             }
         }
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-            IdentifiableTreeEvent e = new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes());
             for ( IdentifiableTreeListener l : treeListeners) {
-                l.descendantChanged(e);
+                l.descendantChanged(contextTreeEvent);
             }
         }
 
         public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-            IdentifiableTreeEvent e = new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes());
             for ( IdentifiableTreeListener l : treeListeners) {
-                l.descendantAdded(e);
+                l.descendantAdded(contextTreeEvent);
             }
         }
 
         public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-            IdentifiableTreeEvent e = new IdentifiableTreeEvent(IdentifiableBase.this, getNewPathForEvent(contextTreeEvent), contextTreeEvent.getNodes());
             for ( IdentifiableTreeListener l : treeListeners) {
-                l.descendantRemoved(e);
+                l.descendantRemoved(contextTreeEvent);
             }
-        }
-
-        //add the path to the child node from which we received the event
-        private String getNewPathForEvent(IdentifiableTreeEvent contextTreeEvent) {
-            return contextTreeEvent.getSource().getId() +
-                (contextTreeEvent.getPath().length() > 0 ? NAMESPACE_SEPARATOR + contextTreeEvent.getPath() : "");
         }
     }
 }

@@ -18,43 +18,54 @@
  */
 package com.od.jtimeseries.util.identifiable;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+/**
+ * An event generated when the tree of identifiable nodes changes
+ */
 public class IdentifiableTreeEvent {
 
-    private Identifiable source;
+    private final Identifiable rootNode;
     private final String path;
     private final List<Identifiable> nodes;
 
-    public IdentifiableTreeEvent(Identifiable source, String path, Identifiable node) {
-       this(source, path, Collections.singletonList(node));
+    public IdentifiableTreeEvent(Identifiable rootNode, String path, Identifiable node) {
+       this(rootNode, path, Collections.singletonList(node));
     }
     
     /**
-     * @param source, source of event
-     * @param path, relative path from source to the parent node containing nodes which have changed
+     * @param rootNode, the root node of the tree which is changing
+     * @param path, path to parent node of nodes which have changed
      * @param nodes, nodes which were modified
      */
-    public IdentifiableTreeEvent(Identifiable source, String path, List<Identifiable> nodes) {
-        this.source = source;
+    public IdentifiableTreeEvent(Identifiable rootNode, String path, List<Identifiable> nodes) {
+        this.rootNode = rootNode;
         this.path = path;
-        this.nodes = nodes;
+        this.nodes = new ArrayList<Identifiable>(nodes);
     }
 
+    /**
+     * @return the path to the parent node of the nodes which have changed
+     */
     public String getPath() {
         return path;
     }
 
     /**
-     * @return a list of the nodes affected by the event
+     * @return a list of the nodes affected by the event, you should not modify this list
      */
     public List<Identifiable> getNodes() {
         return nodes;
+    }
+
+    /**
+     * @return the root node of the tree which is changing
+     */
+    public Identifiable getRootNode() {
+        return rootNode;
     }
 
     /**
@@ -66,9 +77,5 @@ public class IdentifiableTreeEvent {
             all.addAll(i.findAll(Identifiable.class).getAllMatches());
         }
         return new ArrayList<Identifiable>(all);
-    }
-
-    public Identifiable getSource() {
-        return source;
     }
 }

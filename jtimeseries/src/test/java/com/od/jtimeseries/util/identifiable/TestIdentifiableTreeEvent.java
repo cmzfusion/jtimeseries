@@ -35,9 +35,9 @@ public class TestIdentifiableTreeEvent extends TestCase {
 
         //paths of events should be relative to grandchild node
         final LinkedList<String[]> expectedGrandChildEvents = new LinkedList<String[]>();
-        expectedGrandChildEvents.add(new String[] {"add", "", "valueSource"});
-        expectedGrandChildEvents.add(new String[] {"change", "", "valueSource"});
-        expectedGrandChildEvents.add(new String[] {"remove", "", "valueSource"});
+        expectedGrandChildEvents.add(new String[] {"add", "test.grandChildContext", "valueSource"});
+        expectedGrandChildEvents.add(new String[] {"change", "test.grandChildContext", "valueSource"});
+        expectedGrandChildEvents.add(new String[] {"remove", "test.grandChildContext", "valueSource"});
 
         //paths of events should be relative to grandchild node
         final LinkedList<String[]> expectedValueRecorderEvents = new LinkedList<String[]>();
@@ -60,11 +60,11 @@ public class TestIdentifiableTreeEvent extends TestCase {
         );
 
         //add listener to grandchild to count local grandchild events
-        grandChild.addTreeListener(new TreeEventTestListener("grandChild", expectedGrandChildEvents, grandChild, multiplexingCounter));
+        grandChild.addTreeListener(new TreeEventTestListener("grandChild", expectedGrandChildEvents, rootContext, multiplexingCounter));
 
         ValueRecorder r = grandChild.createValueRecorder("valueSource", "valueSource");
         //add listener to count local value recorder events
-        r.addTreeListener(new TreeEventTestListener("valueSource", expectedValueRecorderEvents, r, multiplexingCounter));
+        r.addTreeListener(new TreeEventTestListener("valueSource", expectedValueRecorderEvents, rootContext, multiplexingCounter));
 
         r.fireNodeChanged("change");
 
@@ -113,45 +113,45 @@ public class TestIdentifiableTreeEvent extends TestCase {
     private class TreeEventTestListener implements IdentifiableTreeListener {
         private String name;
         private final LinkedList<String[]> expectedEvents;
-        private Identifiable expectedSource;
+        private Identifiable expectedRootContext;
         private MultiplexingCountDownLatch multiplexingCountDownLatch;
         private CountDownLatch countDownLatch;
 
-        public TreeEventTestListener(String name, LinkedList<String[]> expectedEvents, Identifiable expectedSource, MultiplexingCountDownLatch multiplexingCountDownLatch) {
+        public TreeEventTestListener(String name, LinkedList<String[]> expectedEvents, Identifiable expectedRootContext, MultiplexingCountDownLatch multiplexingCountDownLatch) {
             this.name = name;
             this.expectedEvents = expectedEvents;
-            this.expectedSource = expectedSource;
+            this.expectedRootContext = expectedRootContext;
             this.multiplexingCountDownLatch = multiplexingCountDownLatch;
         }
 
-        public TreeEventTestListener(String name, LinkedList<String[]> expectedEvents, Identifiable expectedSource, CountDownLatch countDownLatch) {
+        public TreeEventTestListener(String name, LinkedList<String[]> expectedEvents, Identifiable expectedRootContext, CountDownLatch countDownLatch) {
             this.name = name;
             this.expectedEvents = expectedEvents;
-            this.expectedSource = expectedSource;
+            this.expectedRootContext = expectedRootContext;
             this.countDownLatch = countDownLatch;
         }
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            checkExpectedEvent(name, "change", expectedSource, new IdentifiableTreeEvent(node, "LOCAL", node), expectedEvents);
+            checkExpectedEvent(name, "change", expectedRootContext, new IdentifiableTreeEvent(expectedRootContext, "LOCAL", node), expectedEvents);
         }
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-            checkExpectedEvent(name, "change", expectedSource, contextTreeEvent, expectedEvents);
+            checkExpectedEvent(name, "change", expectedRootContext, contextTreeEvent, expectedEvents);
         }
 
         public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-            checkExpectedEvent(name, "add", expectedSource, contextTreeEvent, expectedEvents);
+            checkExpectedEvent(name, "add", expectedRootContext, contextTreeEvent, expectedEvents);
         }
 
         public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-            checkExpectedEvent(name, "remove", expectedSource, contextTreeEvent, expectedEvents);
+            checkExpectedEvent(name, "remove", expectedRootContext, contextTreeEvent, expectedEvents);
         }
 
         //check this event matches the first in the list of expected events
         //remove the first event from the list
         private void checkExpectedEvent(String name, String type, Identifiable source, IdentifiableTreeEvent contextTreeEvent, LinkedList<String[]> expectedEvents) {
             assertFalse(name, expectedEvents.size() == 0);
-            assertEquals(name, contextTreeEvent.getSource(), source);
+            assertEquals(name, contextTreeEvent.getRootNode(), source);
             String[] event = expectedEvents.removeFirst();
             assertEquals(name, event[0], type);
             assertEquals(name, event[1], contextTreeEvent.getPath());

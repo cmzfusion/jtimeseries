@@ -67,15 +67,4 @@ public class IdentifiableTreeEvent {
     public Identifiable getRootNode() {
         return rootNode;
     }
-
-    /**
-     * @return a unique list of the nodes affected by the event and all their descendants
-     */
-    public List<Identifiable> getNodesWithAllDescendants() {
-        LinkedHashSet<Identifiable> all = new LinkedHashSet<Identifiable>();
-        for ( Identifiable i : nodes) {
-            all.addAll(i.findAll(Identifiable.class).getAllMatches());
-        }
-        return new ArrayList<Identifiable>(all);
-    }
 }

@@ -47,7 +47,9 @@ public enum FixedColumn {
     Url(UIPropertiesTimeSeries.URL_PROPERTY_NAME, "URL", 120, false, "URL for series data subscription"),
     LastRefreshTime(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY, "Last Refresh Time", 120, new TimeRenderer(), false, "Last series data refresh time"),
     StatsRefreshTime(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY, "Stats Refresh Time", 120, new TimeRenderer(), false, "Last refresh time for series stats metadata"),
-    Color(UIPropertiesTimeSeries.COLOUR_PROPERTY, "Colour", 30, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart");
+    Color(UIPropertiesTimeSeries.COLOUR_PROPERTY, "Colour", 30, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart"),
+    IsTicking(UIPropertiesTimeSeries.TICKING_PROPERTY, "Ticking", 30, false, "Is Ticking"),
+    IsLoaded(UIPropertiesTimeSeries.LOADED_PROPERTY, "Loaded", 30, false, "Is Series Data Loaded");
 
     private static Map<String, Integer> columnWidths = new HashMap<String,Integer>();
     static {

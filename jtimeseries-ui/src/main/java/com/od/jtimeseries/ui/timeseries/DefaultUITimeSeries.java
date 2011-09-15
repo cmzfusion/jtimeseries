@@ -20,6 +20,7 @@ package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.util.InternStringFieldOptimiser;
+import com.od.swing.util.UIUtilities;
 
 import java.awt.*;
 import java.net.URL;
@@ -41,6 +42,8 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     private volatile int refreshFrequencySeconds = DEFAULT_REFRESH_FREQUENCY_SECONDS;
     private volatile boolean selected;
     private volatile boolean stale;
+    private volatile boolean loaded;
+    private volatile boolean ticking;
     private volatile String displayName;
     private Date lastRefreshTime;
     private URL timeSeriesUrl;
@@ -59,10 +62,12 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setStale(boolean stale) {
-        boolean oldValue = this.stale;
-        this.stale = stale;
-        firePropertyChange(STALE_PROPERTY, oldValue, stale);
-        fireNodeChanged(UIPropertiesTimeSeries.STALE_PROPERTY);
+        if ( ! UIUtilities.equals(stale, this.stale)) {
+            boolean oldValue = this.stale;
+            this.stale = stale;
+            firePropertyChange(STALE_PROPERTY, oldValue, stale);
+            fireNodeChanged(UIPropertiesTimeSeries.STALE_PROPERTY);
+        }
     }
 
     public boolean isSelected() {
@@ -70,11 +75,41 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setSelected(boolean selected) {
-        boolean oldValue = this.selected;
-        this.selected = selected;
-        firePropertyChange(UIPropertiesTimeSeries.SELECTED_PROPERTY, oldValue, selected);
-        fireNodeChanged(UIPropertiesTimeSeries.SELECTED_PROPERTY);
+        if ( ! UIUtilities.equals(selected, this.selected)) {
+            boolean oldValue = this.selected;
+            this.selected = selected;
+            firePropertyChange(UIPropertiesTimeSeries.SELECTED_PROPERTY, oldValue, selected);
+            fireNodeChanged(UIPropertiesTimeSeries.SELECTED_PROPERTY);
+        }
     }
+
+    public boolean isLoaded() {
+        return loaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        if ( ! UIUtilities.equals(loaded, this.loaded)) {
+            boolean oldValue = this.loaded;
+            this.loaded = loaded;
+            firePropertyChange(UIPropertiesTimeSeries.LOADED_PROPERTY, oldValue, loaded);
+            fireNodeChanged(UIPropertiesTimeSeries.LOADED_PROPERTY);
+        }
+    }
+
+     public boolean isTicking() {
+        return ticking;
+    }
+
+    public void setTicking(boolean ticking) {
+        if ( ! UIUtilities.equals(ticking, this.ticking)) {
+            boolean oldValue = this.ticking;
+            this.ticking = ticking;
+            firePropertyChange(UIPropertiesTimeSeries.TICKING_PROPERTY, oldValue, ticking);
+            fireNodeChanged(UIPropertiesTimeSeries.TICKING_PROPERTY);
+        }
+    }
+
+
 
     public String getDisplayName() {
         if ( displayName == null ) {
@@ -84,10 +119,12 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setDisplayName(String displayName) {
-        String oldValue = this.displayName;
-        this.displayName = displayName;
-        firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, displayName);
-        fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
+        if ( ! UIUtilities.equals(displayName, this.displayName)) {
+            String oldValue = this.displayName;
+            this.displayName = displayName;
+            firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, displayName);
+            fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
+        }
     }
 
     public Date getLastRefreshTime() {
@@ -95,10 +132,12 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setLastRefreshTime(Date time) {
-        Date oldValue = lastRefreshTime;
-        this.lastRefreshTime = time;
-        firePropertyChange(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY, oldValue, time);
-        fireNodeChanged(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY);
+        if ( ! UIUtilities.equals(time, lastRefreshTime)) {
+            Date oldValue = lastRefreshTime;
+            this.lastRefreshTime = time;
+            firePropertyChange(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY, oldValue, time);
+            fireNodeChanged(UIPropertiesTimeSeries.LAST_REFRESH_TIME_PROPERTY);
+        }
     }
 
     public URL getTimeSeriesURL() {
@@ -106,10 +145,13 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setTimeSeriesURL(URL url) {
-        URL oldValue = this.timeSeriesUrl;
-        timeSeriesUrl = url;
-        urlOptimiser.optimise(timeSeriesUrl);
-        firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
+        if ( ! UIUtilities.equals(url,  this.timeSeriesUrl)) {
+            URL oldValue = this.timeSeriesUrl;
+            timeSeriesUrl = url;
+            urlOptimiser.optimise(timeSeriesUrl);
+            firePropertyChange(URL_PROPERTY_NAME, oldValue, url);
+            fireNodeChanged(URL_PROPERTY_NAME);
+        }
     }
 
     public int getRefreshFrequencySeconds() {
@@ -117,10 +159,12 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setRefreshFrequencySeconds(int refreshTimeSeconds) {
-        long oldValue = this.refreshFrequencySeconds;
-        this.refreshFrequencySeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
-        firePropertyChange(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, oldValue, this.refreshFrequencySeconds);
-        fireNodeChanged(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY);
+        if ( ! UIUtilities.equals(refreshTimeSeconds, this.refreshFrequencySeconds)) {
+            long oldValue = this.refreshFrequencySeconds;
+            this.refreshFrequencySeconds = Math.max(refreshTimeSeconds, MIN_REFRESH_TIME_SECONDS);
+            firePropertyChange(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY, oldValue, this.refreshFrequencySeconds);
+            fireNodeChanged(UIPropertiesTimeSeries.REFRESH_FREQUENCY_PROPERTY);
+        }
     }
 
     public Date getStatsRefreshTime() {
@@ -145,9 +189,12 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setStatsRefreshTime(Date statsRefreshTime) {
-        Date oldValue = this.statsRefreshTime;
-        this.statsRefreshTime = statsRefreshTime;
-        firePropertyChange(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY, oldValue, this.statsRefreshTime);
+        if ( ! UIUtilities.equals(statsRefreshTime, this.statsRefreshTime)) {
+            Date oldValue = this.statsRefreshTime;
+            this.statsRefreshTime = statsRefreshTime;
+            firePropertyChange(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY, oldValue, this.statsRefreshTime);
+            fireNodeChanged(UIPropertiesTimeSeries.STATS_REFRESH_TIME_PROPERTY);
+        }
     }
 
     public Color getColor() {
@@ -155,9 +202,11 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     }
 
     public void setColor(Color color) {
-        Color oldColor = this.color;
-        this.color = color;
-        firePropertyChange(UIPropertiesTimeSeries.COLOUR_PROPERTY, oldColor, color);
-        fireNodeChanged(UIPropertiesTimeSeries.COLOUR_PROPERTY);
+        if ( ! UIUtilities.equals(color, this.color)) {
+            Color oldColor = this.color;
+            this.color = color;
+            firePropertyChange(UIPropertiesTimeSeries.COLOUR_PROPERTY, oldColor, color);
+            fireNodeChanged(UIPropertiesTimeSeries.COLOUR_PROPERTY);
+        }
     }
 }

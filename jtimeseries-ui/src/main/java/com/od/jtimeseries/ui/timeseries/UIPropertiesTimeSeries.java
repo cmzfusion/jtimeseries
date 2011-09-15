@@ -47,6 +47,8 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     public static final String STATS_REFRESH_TIME_PROPERTY = "statsRefreshTime";
     public static final String REFRESH_FREQUENCY_PROPERTY = "refreshFrequencySeconds";
     public static final String URL_PROPERTY_NAME = "timeSeriesURL";
+    public static final String LOADED_PROPERTY = "loaded";
+    public static final String TICKING_PROPERTY = "ticking";
 
     boolean isSelected();
 
@@ -55,6 +57,14 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     boolean isStale();
 
     void setStale(boolean stale);
+
+    boolean isLoaded();
+
+    void setLoaded(boolean loaded);
+
+    boolean isTicking();
+
+    void setTicking(boolean ticking);
 
     void addPropertyChangeListener(String selectedProperty, PropertyChangeListener selectionPropertyListener);
 

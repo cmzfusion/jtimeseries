@@ -67,7 +67,6 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private volatile ScheduledFuture refreshTask;
     private volatile int displayedChartCount;
     private volatile int errorCount;
-    private volatile boolean ticking = true;
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
@@ -100,7 +99,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     }
 
     private int calculateRefreshTime() {
-        return ticking ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
+        return isTicking() ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
     }
 
     /**
@@ -114,8 +113,8 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         boolean justStarted = System.currentTimeMillis() - STARTUP_TIME < 60000;
 
         boolean ticking = timeSinceUpdate < Time.hours(TICKING_FLAG_HOURS_SINCE_LAST_UPDATE).getLengthInMillis() || justStarted;
-        boolean result = ticking != this.ticking;
-        this.ticking = ticking;
+        boolean result = ticking != isTicking();
+        setTicking(ticking);
         return result;
     }
 
@@ -184,6 +183,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             //the user will need to re-enable it to start the load off again
             addTaskListener(new SetStaleOnErrorListener());
             addTaskListener(new RescheduleListener());
+            addTaskListener(new SetLoadedListener());
         }
 
         protected Task createTask() {
@@ -234,6 +234,12 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             public void finished(Task task) {
                 setTickingFlag();
                 scheduleRefreshIfDisplayed(false);
+            }
+        }
+
+        private class SetLoadedListener extends TaskListenerAdapter {
+            public void success(Task task) {
+                setLoaded(true);
             }
         }
     }

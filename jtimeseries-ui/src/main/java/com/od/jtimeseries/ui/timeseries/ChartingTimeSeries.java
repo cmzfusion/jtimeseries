@@ -71,6 +71,8 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
         addEventPropagatingListeners(REFRESH_FREQUENCY_PROPERTY);
         addEventPropagatingListeners(STALE_PROPERTY);
         addEventPropagatingListeners(STATS_REFRESH_TIME_PROPERTY);
+        addEventPropagatingListeners(LOADED_PROPERTY);
+        addEventPropagatingListeners(TICKING_PROPERTY);
 
         wrappedSeriesTreeListener = new WrappedSeriesTreeListener();
         WeakReferenceListener l = new WeakReferenceListener(wrappedSeriesTreeListener);
@@ -173,6 +175,22 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
 
     public void setStale(boolean seriesStale) {
         wrappedSeries.setStale(seriesStale);
+    }
+
+    public boolean isLoaded() {
+        return wrappedSeries.isLoaded();
+    }
+
+    public void setLoaded(boolean loaded) {
+        wrappedSeries.setLoaded(loaded);
+    }
+
+    public boolean isTicking() {
+        return wrappedSeries.isTicking();
+    }
+
+    public void setTicking(boolean ticking) {
+        wrappedSeries.setTicking(ticking);
     }
 
     public int getRefreshFrequencySeconds() {

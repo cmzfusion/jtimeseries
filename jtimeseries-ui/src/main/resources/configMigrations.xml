@@ -59,5 +59,10 @@
       <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
+    <migration>
+      <targetVersion>201109151335</targetVersion>
+      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <arguments/>
+    </migration>
   </migrationList>
 </configManager>

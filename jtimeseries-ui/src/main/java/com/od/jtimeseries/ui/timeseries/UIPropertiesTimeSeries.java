@@ -48,20 +48,36 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     public static final String REFRESH_FREQUENCY_PROPERTY = "refreshFrequencySeconds";
     public static final String URL_PROPERTY_NAME = "timeSeriesURL";
     public static final String LOADED_PROPERTY = "loaded";
+    public static final String LOADING_PROPERTY = "loaded";
     public static final String TICKING_PROPERTY = "ticking";
 
     boolean isSelected();
 
     void setSelected(boolean selected);
 
+    /**
+    *  @return true, if queries to load the data for this series failed
+    */
     boolean isStale();
 
     void setStale(boolean stale);
 
+    /**
+     * @return true, if at least one query for series data has completed successfully
+     */
     boolean isLoaded();
 
     void setLoaded(boolean loaded);
 
+    /**
+     * @return true if the query to load or refresh timeseries data is currently running
+     */
+    boolean isLoading();
+
+    void setLoading(boolean loading);
+    /**
+     * @return true, if it this series currently appears to be getting updates
+     */
     boolean isTicking();
 
     void setTicking(boolean ticking);

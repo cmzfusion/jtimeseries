@@ -43,6 +43,7 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
     private volatile boolean selected;
     private volatile boolean stale;
     private volatile boolean loaded;
+    private volatile boolean loading;
     private volatile boolean ticking;
     private volatile String displayName;
     private Date lastRefreshTime;
@@ -93,6 +94,19 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
             this.loaded = loaded;
             firePropertyChange(UIPropertiesTimeSeries.LOADED_PROPERTY, oldValue, loaded);
             fireNodeChanged(UIPropertiesTimeSeries.LOADED_PROPERTY);
+        }
+    }
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        if ( ! UIUtilities.equals(loading, this.loading)) {
+            boolean oldValue = this.loading;
+            this.loading = loading;
+            firePropertyChange(UIPropertiesTimeSeries.LOADING_PROPERTY, oldValue, loading);
+            fireNodeChanged(UIPropertiesTimeSeries.LOADING_PROPERTY);
         }
     }
 

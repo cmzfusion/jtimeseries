@@ -22,6 +22,8 @@ import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.chart.creator.*;
+import com.od.swing.progress.ProgressLayeredPane;
+import com.od.swing.util.AwtSafeListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartChangeEvent;
@@ -47,7 +49,6 @@ public class TimeSeriesChart extends JPanel {
     private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
         ChartingTimeSeries.DISPLAY_NAME_PROPERTY,
         ChartingTimeSeries.COLOUR_PROPERTY,
-        ChartingTimeSeries.LOADED_PROPERTY //always refresh chart when series first loaded
     };
 
     private String title;
@@ -58,22 +59,23 @@ public class TimeSeriesChart extends JPanel {
     private Color chartBackgroundColor = Color.WHITE;
     private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
     private ChartDataFilter chartDataFilter = ChartDataFilter.NoFilter;
-
-    private PropertyChangeListener refreshChartPropertyListener = new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-            createAndSetChart();
-        }
-    };
+    private ProgressLayeredPane progressPane = new ProgressLayeredPane(noChartsPanel, 0.2f, 20, 18);
     private JFreeChart chart;
     private boolean showLegend = true;
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
     private final ChartCreatorFactory chartCreatorFactory = new ChartCreatorFactory();
 
+    private PropertyChangeListener loadedProgressPropertyListener = AwtSafeListener.getAwtSafeListener(
+            new LoadingProgressPropertyChangeListener(), PropertyChangeListener.class);
+
+    private PropertyChangeListener refreshChartPropertyListener = AwtSafeListener.getAwtSafeListener(
+            new RefreshChartPropertyChangeListener(), PropertyChangeListener.class);
+
     public TimeSeriesChart(String title) {
         this.title = title;
         setLayout(new BorderLayout());
         createNoChartsPanel();
-        add(noChartsPanel, BorderLayout.CENTER);
+        add(progressPane, BorderLayout.CENTER);
     }
 
     private void createNoChartsPanel() {
@@ -93,18 +95,34 @@ public class TimeSeriesChart extends JPanel {
         this.timeSeriesList = newSelection;
         if ( timeSeriesList.size() == 0) {
             if ( chartPanel != null) {
-                remove(chartPanel);
                 chartPanel = null;
                 chart = null;
             }
-            add(noChartsPanel, BorderLayout.CENTER);
+            progressPane.setViewComponent(noChartsPanel);
         } else {
             createAndSetChart();
-            remove(noChartsPanel);
-            add(chartPanel, BorderLayout.CENTER);
+            progressPane.setViewComponent(chartPanel);
         }
         validate();
         repaint();
+        showOrStopProgressAnimation();
+    }
+
+    private void showOrStopProgressAnimation() {
+        boolean showProgress = false;
+        for ( ChartingTimeSeries s : timeSeriesList) {
+            if ( s.isLoading() && ! s.isLoaded()) {
+                showProgress = true;
+                break;
+            }
+        }
+
+        if ( showProgress ) {
+            progressPane.startProgressAnimation("Loading Series Data");
+        } else {
+            progressPane.stopProgressAnimation();
+        }
+
     }
 
     public void setChartBackgroundColor(Color c) {
@@ -123,6 +141,7 @@ public class TimeSeriesChart extends JPanel {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.addPropertyChangeListener(property, refreshChartPropertyListener);
             }
+            s.addPropertyChangeListener(ChartingTimeSeries.LOADING_PROPERTY, loadedProgressPropertyListener);
         }
     }
 
@@ -131,6 +150,7 @@ public class TimeSeriesChart extends JPanel {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.removePropertyChangeListener(property, refreshChartPropertyListener);
             }
+            s.removePropertyChangeListener(ChartingTimeSeries.LOADING_PROPERTY, loadedProgressPropertyListener);
         }
     }
 
@@ -171,7 +191,6 @@ public class TimeSeriesChart extends JPanel {
             createAndSetChart();
         }
     }
-
 
     public void setDomainStartTimeSelection(DomainTimeSelection newValue) {
         if ( ! this.domainStartTimeSelection.equals(newValue) ) {
@@ -224,4 +243,18 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
+
+    private class LoadingProgressPropertyChangeListener implements PropertyChangeListener {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            showOrStopProgressAnimation();
+        }
+    }
+
+    private class RefreshChartPropertyChangeListener implements PropertyChangeListener {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            createAndSetChart();
+        }
+    }
 }

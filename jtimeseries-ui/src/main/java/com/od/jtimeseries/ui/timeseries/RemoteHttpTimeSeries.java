@@ -183,13 +183,16 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             //the user will need to re-enable it to start the load off again
             addTaskListener(new SetStaleOnErrorListener());
             addTaskListener(new RescheduleListener());
-            addTaskListener(new SetLoadedListener());
+            addTaskListener(new SetLoadingListener());
         }
 
         protected Task createTask() {
             return new BackgroundTask() {
+
+                boolean stale = isStale();  //this can be changed by user and needs to be consistent while task runs, so take a value up front
+
                 protected void doInBackground() throws Exception {
-                    if ( ! isStale() ) {
+                    if ( ! stale ) {  //if marked stale, user has to select 'refresh series' to try again, so we don't keep running failing queries
                         URL urlForQuery = getUrlWithTimestamp();
                         new DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries.this, urlForQuery).runQuery();
                     }
@@ -211,9 +214,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                     //presently the command still runs even if we are stale, but
                     //if stale the remote call won't take place, so an exception is not thrown
                     //and the doInEventThread will get called
-                    //this doesn't count as a proper refresh
-                    if ( ! isStale()) {
+                    //this doesn't count as a proper refresh, we need to check the stale flag here
+                    if ( ! stale) {
                         setLastRefreshTime(new Date());
+                        setLoaded(true);
                     }
                 }
             };
@@ -237,10 +241,16 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             }
         }
 
-        private class SetLoadedListener extends TaskListenerAdapter {
-            public void success(Task task) {
-                setLoaded(true);
+        private class SetLoadingListener extends TaskListenerAdapter {
+
+            public void pending(Task task) {
+                setLoading(true);
             }
+
+            public void finished(Task task) {
+                setLoading(false);
+            }
+
         }
     }
 

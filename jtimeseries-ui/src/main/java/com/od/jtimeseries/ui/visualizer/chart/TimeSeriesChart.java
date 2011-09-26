@@ -23,6 +23,7 @@ import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.chart.creator.*;
 import com.od.swing.progress.ProgressLayeredPane;
+import com.od.swing.progress.RotatingImageSource;
 import com.od.swing.util.AwtSafeListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -75,6 +76,10 @@ public class TimeSeriesChart extends JPanel {
         this.title = title;
         setLayout(new BorderLayout());
         createNoChartsPanel();
+        progressPane.setIconSource(new RotatingImageSource(
+            "/images/hourglass.png", 32, 32, 32
+        ));
+        progressPane.setDelayBetweenFrames(50);
         add(progressPane, BorderLayout.CENTER);
     }
 

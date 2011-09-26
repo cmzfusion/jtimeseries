@@ -48,7 +48,7 @@ public interface UIPropertiesTimeSeries extends IdentifiableTimeSeries, Displaya
     public static final String REFRESH_FREQUENCY_PROPERTY = "refreshFrequencySeconds";
     public static final String URL_PROPERTY_NAME = "timeSeriesURL";
     public static final String LOADED_PROPERTY = "loaded";
-    public static final String LOADING_PROPERTY = "loaded";
+    public static final String LOADING_PROPERTY = "loading";
     public static final String TICKING_PROPERTY = "ticking";
 
     boolean isSelected();

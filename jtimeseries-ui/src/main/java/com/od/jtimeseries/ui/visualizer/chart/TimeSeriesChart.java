@@ -50,6 +50,7 @@ public class TimeSeriesChart extends JPanel {
     private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
         ChartingTimeSeries.DISPLAY_NAME_PROPERTY,
         ChartingTimeSeries.COLOUR_PROPERTY,
+        ChartingTimeSeries.LOADED_PROPERTY //when initially loading completes, refresh chart
     };
 
     private String title;

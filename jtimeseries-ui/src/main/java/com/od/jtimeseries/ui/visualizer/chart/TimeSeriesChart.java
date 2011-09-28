@@ -117,7 +117,8 @@ public class TimeSeriesChart extends JPanel {
     private void showOrStopProgressAnimation() {
         boolean showProgress = false;
         for ( ChartingTimeSeries s : timeSeriesList) {
-            if ( s.isLoading() && ! s.isLoaded()) {
+            //if not loaded and not stale, should be queued to load
+            if ( ! s.isLoaded() && ! s.isStale()) {
                 showProgress = true;
                 break;
             }
@@ -147,7 +148,8 @@ public class TimeSeriesChart extends JPanel {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.addPropertyChangeListener(property, refreshChartPropertyListener);
             }
-            s.addPropertyChangeListener(ChartingTimeSeries.LOADING_PROPERTY, loadedProgressPropertyListener);
+            s.addPropertyChangeListener(ChartingTimeSeries.LOADED_PROPERTY, loadedProgressPropertyListener);
+            s.addPropertyChangeListener(ChartingTimeSeries.STALE_PROPERTY, loadedProgressPropertyListener);
         }
     }
 
@@ -156,7 +158,8 @@ public class TimeSeriesChart extends JPanel {
             for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
                 s.removePropertyChangeListener(property, refreshChartPropertyListener);
             }
-            s.removePropertyChangeListener(ChartingTimeSeries.LOADING_PROPERTY, loadedProgressPropertyListener);
+            s.addPropertyChangeListener(ChartingTimeSeries.LOADED_PROPERTY, loadedProgressPropertyListener);
+            s.addPropertyChangeListener(ChartingTimeSeries.STALE_PROPERTY, loadedProgressPropertyListener);
         }
     }
 

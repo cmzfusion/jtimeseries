@@ -50,7 +50,8 @@ public enum FixedColumn {
     Color(UIPropertiesTimeSeries.COLOUR_PROPERTY, "Colour", 30, new ColorCellRenderer() {{setColorValueVisible(false);}}, true, "Colour to use for series in chart"),
     IsTicking(UIPropertiesTimeSeries.TICKING_PROPERTY, "Ticking", 30, false, "Is Ticking"),
     IsLoaded(UIPropertiesTimeSeries.LOADED_PROPERTY, "Loaded", 30, false, "Is Series Data Loaded"),
-    IsLoading(UIPropertiesTimeSeries.LOADING_PROPERTY, "Loading", 30, false, "Is Series Query Running");
+    IsLoading(UIPropertiesTimeSeries.LOADING_PROPERTY, "Loading", 30, false, "Is Series Query Running"),
+    Stale(UIPropertiesTimeSeries.STALE_PROPERTY, "Stale", 30, false, "True if data could not be loaded from the server");
 
     private static Map<String, Integer> columnWidths = new HashMap<String,Integer>();
     static {

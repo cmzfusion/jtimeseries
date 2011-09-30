@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.swing.progress.IconComponentAnimator;
+import com.od.swing.progress.RotatingImageSource;
 import com.od.swing.progress.SuffixedImageFileSource;
 
 import javax.swing.*;
@@ -39,13 +40,12 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
 
     private Class seriesClass;
 
-    private SuffixedImageFileSource imageSource = new SuffixedImageFileSource(
-       "/progressAnimation/loading",
-       ".gif",
-       18,
-       1,
+    private RotatingImageSource imageSource = new RotatingImageSource(
+       "/progressAnimation/progress.png",
        16,
-       16
+       16,
+       16,
+       1f
     );
 
     private IconComponentAnimator serverNodeAnimator = new IconComponentAnimator(

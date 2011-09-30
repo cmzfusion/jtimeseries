@@ -22,6 +22,7 @@ import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.visualizer.chart.creator.*;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.swing.progress.ProgressLayeredPane;
 import com.od.swing.progress.RotatingImageSource;
 import com.od.swing.util.AwtSafeListener;
@@ -38,6 +39,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,6 +49,9 @@ import java.util.List;
  * Time: 14:28:23
  */
 public class TimeSeriesChart extends JPanel {
+
+    private static ScheduledExecutorService stopProgressExecutor = NamedExecutors.newSingleThreadScheduledExecutor("TimeSeriesChart-ScheduledExecutor");
+    private static final int MIN_ANIMATION_TIME_MILLIS = 500; //showing for less time than this can just flash the animation on, which looks bad
 
     private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
         ChartingTimeSeries.DISPLAY_NAME_PROPERTY,
@@ -66,6 +72,7 @@ public class TimeSeriesChart extends JPanel {
     private boolean showLegend = true;
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
     private final ChartCreatorFactory chartCreatorFactory = new ChartCreatorFactory();
+    private long animationLastStartedTimestamp;
 
     private PropertyChangeListener loadedProgressPropertyListener = AwtSafeListener.getAwtSafeListener(
             new LoadingProgressPropertyChangeListener(), PropertyChangeListener.class);
@@ -114,6 +121,7 @@ public class TimeSeriesChart extends JPanel {
         showOrStopProgressAnimation();
     }
 
+    //check whether the progress animation should be shown, and if so, show it, if not stop it
     private void showOrStopProgressAnimation() {
         boolean showProgress = false;
         for ( ChartingTimeSeries s : timeSeriesList) {
@@ -125,11 +133,29 @@ public class TimeSeriesChart extends JPanel {
         }
 
         if ( showProgress ) {
+            animationLastStartedTimestamp = System.currentTimeMillis();
             progressPane.startProgressAnimation("Loading Series Data");
         } else {
-            progressPane.stopProgressAnimation();
+            long minAnimationTimeRemaining = MIN_ANIMATION_TIME_MILLIS - (System.currentTimeMillis() - animationLastStartedTimestamp);
+            if ( minAnimationTimeRemaining < 0 ) {
+                progressPane.stopProgressAnimation();
+            } else {
+                scheduleStopProgress(minAnimationTimeRemaining);
+            }
         }
 
+    }
+
+    private void scheduleStopProgress(long minTimeRemaining) {
+        stopProgressExecutor.schedule(new Runnable() {
+            public void run() {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        showOrStopProgressAnimation();
+                    }
+                });
+            }
+        }, minTimeRemaining, TimeUnit.MILLISECONDS);
     }
 
     public void setChartBackgroundColor(Color c) {

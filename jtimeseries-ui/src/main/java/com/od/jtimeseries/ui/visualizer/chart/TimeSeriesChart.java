@@ -61,7 +61,7 @@ public class TimeSeriesChart extends JPanel {
     private Color chartBackgroundColor = Color.WHITE;
     private ChartType chartType = ChartType.DEFAULT_CHART_TYPE;
     private ChartDataFilter chartDataFilter = ChartDataFilter.NoFilter;
-    private ProgressLayeredPane progressPane = new ProgressLayeredPane(noChartsPanel, 0.2f, 20, 18);
+    private ProgressLayeredPane progressPane = new ProgressLayeredPane(noChartsPanel, 0.4f, 20, 18);
     private JFreeChart chart;
     private boolean showLegend = true;
     private DomainTimeSelection domainStartTimeSelection = new DomainTimeSelection();
@@ -78,9 +78,9 @@ public class TimeSeriesChart extends JPanel {
         setLayout(new BorderLayout());
         createNoChartsPanel();
         progressPane.setIconSource(new RotatingImageSource(
-            "/images/hourglass.png", 32, 32, 32
+            "/progressAnimation/progress.png", 16, 80, 80, 0.5f
         ));
-        progressPane.setDelayBetweenFrames(50);
+        progressPane.setDelayBetweenFrames(200);
         add(progressPane, BorderLayout.CENTER);
     }
 

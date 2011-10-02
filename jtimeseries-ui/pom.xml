@@ -69,6 +69,11 @@
         </dependency>
         <dependency>
             <groupId>com.jidesoft</groupId>
+            <artifactId>jide-components</artifactId>
+            <version>2.7.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jidesoft</groupId>
             <artifactId>jide-dialogs</artifactId>
             <version>2.7.5</version>
         </dependency>

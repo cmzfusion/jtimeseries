@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
+import com.jidesoft.pane.CollapsiblePane;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -295,11 +296,14 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private JPanel createChartPanel() {
-        JPanel chartPanel = new JPanel();
-        chartPanel.setLayout(new BorderLayout());
-        chartPanel.add(chart, BorderLayout.CENTER);
-        chartPanel.add(chartControlPanel, BorderLayout.SOUTH);
-        return chartPanel;
+        CollapsiblePane cp = new CollapsiblePane("Controls");
+        cp.setContentPane(chartControlPanel);
+        cp.setContentPaneHeight(70);
+
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(chart, BorderLayout.CENTER);
+        p.add(cp, BorderLayout.SOUTH);
+        return p;
     }
 
     public List<UiTimeSeriesConfig> getChartConfigs() {

@@ -42,10 +42,10 @@ import java.util.Enumeration;
 public class ChartControlPanel extends JPanel {
 
     private TimeSeriesChart timeSeriesChart;
-    private Box radioButtonBox = Box.createHorizontalBox();
+    private Box radioButtonBox = Box.createVerticalBox();
     private ColorComboBox colorComboBox = new ColorComboBox();
     private ButtonGroup radioButtonGroup;
-    private JCheckBox showLegendCheckbox = new JCheckBox("Legend");
+    private JCheckBox showLegendCheckbox = new JCheckBox("Show Legend");
     private RangeSelectorComponent rangeSelectorComponent = new RangeSelectorComponent();
     private JComboBox chartTypeCombo = new JComboBox(ChartType.values());
     private JComboBox dataFilterCombo = new JComboBox(ChartDataFilter.values());
@@ -159,22 +159,29 @@ public class ChartControlPanel extends JPanel {
         Box b = Box.createHorizontalBox();
         b.add(Box.createHorizontalGlue());
         b.add(colorComboBox);
-        b.add(Box.createHorizontalStrut(3));
+        addSpacing(b);
         b.add(showLegendCheckbox);
-        b.add(Box.createHorizontalStrut(3));
+        addSpacing(b);
         b.add(radioButtonBox);
-        b.add(Box.createHorizontalStrut(3));
+        addSpacing(b);
         b.add(rangeSelectorComponent);
-        b.add(Box.createHorizontalStrut(3));
+        addSpacing(b);
         b.add(chartTypeCombo);
-        b.add(Box.createHorizontalStrut(3));
+        addSpacing(b);
         b.add(dataFilterCombo);
+        b.add(Box.createHorizontalGlue());
+
 
         setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
         setLayout(new BorderLayout());
 //        JScrollPane scrollPane = new JScrollPane(b);
 //        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         add(b, BorderLayout.CENTER);
+    }
+
+    private void addSpacing(Box b) {
+        b.add(Box.createHorizontalGlue());
+        b.add(Box.createHorizontalStrut(5));
     }
 
 }

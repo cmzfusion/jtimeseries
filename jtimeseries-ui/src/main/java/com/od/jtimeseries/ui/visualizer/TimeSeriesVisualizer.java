@@ -45,6 +45,7 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +73,11 @@ public class TimeSeriesVisualizer extends JPanel {
     private VisualizerRootContext rootContext;
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private EditDisplayNamePatternsAction editDisplayNameAction;
-    private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-    private final ChartControlPanel chartControlPanel;
+    private JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    private ChartControlPanel chartControlPanel;
     private boolean toolbarVisible = true;
     private DisplayNameCalculator displayNameCalculator;
+    private CollapsiblePane chartControlsCollapsiblePane = new CollapsiblePane("Controls");
 
     public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary) {
         this(title, timeSeriesServerDictionary, new DisplayNameCalculator());
@@ -89,7 +91,7 @@ public class TimeSeriesVisualizer extends JPanel {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.rootContext = new VisualizerRootContext(timeSeriesServerDictionary, displayNameCalculator);
         chart = new TimeSeriesChart(title);
-        chartControlPanel = new ChartControlPanel(chart);
+        createControlPanel();
         createDisplayNameAction();
         JPanel chartPanel = createChartPanel();
         createSeriesSelectionPanel();
@@ -98,6 +100,12 @@ public class TimeSeriesVisualizer extends JPanel {
         layoutVisualizer();
         addSeriesSelectionListener();
         LocalJmxMetrics.getInstance().getVisualizerCount().incrementCount();
+    }
+
+    private void createControlPanel() {
+        chartControlPanel = new ChartControlPanel(chart);
+        chartControlsCollapsiblePane.setSteps(3);
+        chartControlsCollapsiblePane.setStepDelay(100);
     }
 
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
@@ -112,7 +120,8 @@ public class TimeSeriesVisualizer extends JPanel {
             visualizer.getChartBackgroundColor(),
             visualizer.getColumns(),
             visualizer.getChartType(),
-            visualizer.getChartDataFilter()
+            visualizer.getChartDataFilter(),
+            visualizer.isChartControlsVisible()
         );
     }
 
@@ -127,6 +136,7 @@ public class TimeSeriesVisualizer extends JPanel {
         visualizer.setChartBackgroundColor(c.getChartBackgroundColor());
         visualizer.setChartType(c.getChartType());
         visualizer.setChartDataFilter(c.getChartDataFilter());
+        visualizer.setChartControlsVisible(c.isChartControlsVisible());
 
         //if there are no columns, assume we will use the default column set
         if ( c.getTableColumns().size() > 0) {
@@ -236,6 +246,18 @@ public class TimeSeriesVisualizer extends JPanel {
         splitPane.setDividerLocation(location);
     }
 
+    public void setChartControlsVisible(boolean visible) {
+        try {
+            chartControlsCollapsiblePane.setCollapsed(! visible);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isChartControlsVisible() {
+        return ! chartControlsCollapsiblePane.isCollapsed();
+    }
+
     public void setShowLegendOnChart(boolean showLegendOnChart) {
         chart.setShowLegend(showLegendOnChart);
         chartControlPanel.refreshStateFromChart();        
@@ -296,13 +318,12 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private JPanel createChartPanel() {
-        CollapsiblePane cp = new CollapsiblePane("Controls");
-        cp.setContentPane(chartControlPanel);
-        cp.setContentPaneHeight(70);
+        chartControlsCollapsiblePane.setContentPane(chartControlPanel);
+        chartControlsCollapsiblePane.setContentPaneHeight(70);
 
         JPanel p = new JPanel(new BorderLayout());
         p.add(chart, BorderLayout.CENTER);
-        p.add(cp, BorderLayout.SOUTH);
+        p.add(chartControlsCollapsiblePane, BorderLayout.SOUTH);
         return p;
     }
 

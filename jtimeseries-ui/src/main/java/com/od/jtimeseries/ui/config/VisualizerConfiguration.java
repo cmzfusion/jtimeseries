@@ -53,6 +53,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private Rectangle frameLocation;
     private boolean isIcon;
     private boolean isShown = true;
+    private boolean chartControlsVisible = true;
     private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     public VisualizerConfiguration() {
@@ -63,13 +64,14 @@ public class VisualizerConfiguration implements ExportableConfig {
     }
 
     public VisualizerConfiguration(String chartsTitle, boolean tableSelectorVisible, List<UiTimeSeriesConfig> chartConfigs,
-                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings, ChartType chartType, ChartDataFilter chartDataFilter ) {
+                                   ChartRangeMode chartRangeMode, DomainTimeSelection domainStartTimeSelection, int dividorLocation, boolean showLegendOnChart, Color chartBackgroundColor, List<ColumnSettings> columnSettings, ChartType chartType, ChartDataFilter chartDataFilter, boolean chartControlsVisible ) {
         this.title = chartsTitle;
         this.tableSelectorVisible = tableSelectorVisible;
         this.chartConfigs = chartConfigs;
         this.domainStartTimeSelection = domainStartTimeSelection;
         this.chartType = chartType;
         this.chartDataFilter = chartDataFilter;
+        this.chartControlsVisible = chartControlsVisible;
         this.chartRangeMode = chartRangeMode.name();
         this.dividorLocation = dividorLocation;
         this.showLegendOnChart = showLegendOnChart;
@@ -173,6 +175,14 @@ public class VisualizerConfiguration implements ExportableConfig {
         isShown = shown;
     }
 
+    public boolean isChartControlsVisible() {
+        return chartControlsVisible;
+    }
+
+    public void setChartControlsVisible(boolean chartControlsVisible) {
+        this.chartControlsVisible = chartControlsVisible;
+    }
+
     public ChartType getChartType() {
         return chartType;
     }
@@ -212,6 +222,7 @@ public class VisualizerConfiguration implements ExportableConfig {
         if ( chartDataFilter == null ) {
             chartDataFilter = ChartDataFilter.NoFilter;
         }
+
         return this;
     }
 

@@ -36,6 +36,7 @@ import javax.swing.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +58,9 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private final Map<UIPropertiesTimeSeries, String> weakClientSeries = new WeakHashMap<UIPropertiesTimeSeries, String>();
 
-    private static ScheduledExecutorService refreshExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeriesRefresh");
+    private static ScheduledExecutorService scheduleExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeries-Schedule");
+    private static Executor seriesLoadExecutor = NamedExecutors.newFixedThreadPool("RemoteHttpTimeSeries-Query", 3);
+
     private static final int MIN_REFRESH_TIME_SECONDS = 10;
 
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
@@ -66,9 +69,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private volatile int errorCount;
 
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
-    private static final int MAX_ERRORS_BEFORE_DISCONNECT = 4;
-    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 1800; //half an hour
+    private static final int MAX_ERRORS_BEFORE_STALE = 3;
+    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 900; //15 mins
     private static final int TICKING_FLAG_HOURS_SINCE_LAST_UPDATE = 4; //if no new data for this time a series is considered 'not ticking'
+    private static final int NOT_LOADED_REFRESH_TIME_SECONDS = 30;
 
 
     RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
@@ -85,34 +89,37 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     public void setRefreshFrequencySeconds(int seconds) {
         super.setRefreshFrequencySeconds(Math.max(seconds, MIN_REFRESH_TIME_SECONDS));
-        scheduleRefreshIfDisplayed(false);
+        scheduleRefreshIfDisplayedAndNotStale(false);
     }
 
     public void setStale(boolean stale) {
+        super.setStale(stale);
         if (!stale) {
             errorCount = 0;
+            scheduleRefreshIfDisplayedAndNotStale(true);
         }
-        super.setStale(stale);
     }
 
     private int calculateRefreshTime() {
-        return isTicking() ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
+        if ( ! isLoaded() ) {
+            return NOT_LOADED_REFRESH_TIME_SECONDS;  //request failed, want to try again quite soon
+        } else {
+            return isTicking() ? getRefreshFrequencySeconds() : NOT_TICKING_REFRESH_TIME_SECONDS;
+        }
     }
 
     /**
      * A flag which indicates whether a series in the server is currently 'active' / growing
      * If not, we don't want to hit the server frequently to get new data points
      */
-    private boolean setTickingFlag() {
+    private void setTickingFlag() {
         long timeSinceUpdate = System.currentTimeMillis() - getLatestTimestamp();
 
          //enough time for local timeserious generated metrics to start to get datapoints
         boolean justStarted = System.currentTimeMillis() - STARTUP_TIME < 60000;
 
         boolean ticking = timeSinceUpdate < Time.hours(TICKING_FLAG_HOURS_SINCE_LAST_UPDATE).getLengthInMillis() || justStarted;
-        boolean result = ticking != isTicking();
         setTicking(ticking);
-        return result;
     }
 
     public void chartSeriesChanged(ChartSeriesEvent e) {
@@ -130,28 +137,29 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                 break;
             default:
         }
-        scheduleRefreshIfDisplayed(refreshImmediately);
+        scheduleRefreshIfDisplayedAndNotStale(refreshImmediately);
     }
 
     //Cancel any existing task and schedule a new one if series selected
-    private synchronized void scheduleRefreshIfDisplayed(boolean immediateRefresh) {
+    private synchronized void scheduleRefreshIfDisplayedAndNotStale(boolean immediateRefresh) {
         updateDisplayedChartCount();
 
         if ( refreshTask != null) {
             refreshTask.cancel(false);
         }
 
-        if ( displayedChartCount > 0) {
+        if ( displayedChartCount > 0 && ! isStale()) {  //don't refresh if series stale
+
             //A task which doesn't hold a strong reference to this series
             //the series can be collected if no longer referenced elsewhere, even if a refresh is scheduled
             ExecuteWeakReferencedCommandTask runCommandTask = new ExecuteWeakReferencedCommandTask(refreshDataCommand);
 
             if ( immediateRefresh) {
-                refreshExecutor.execute(runCommandTask);
+                scheduleExecutor.execute(runCommandTask);
             }
 
             int refreshTime = calculateRefreshTime();
-            refreshTask = refreshExecutor.schedule(
+            refreshTask = scheduleExecutor.schedule(
                 runCommandTask, refreshTime, TimeUnit.SECONDS
             );
         }
@@ -176,6 +184,12 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
         public RefreshDataCommand() {
 
+            //execute() is called on scheduler thread, the actual execution takes place on
+            //seriesLoadExecutor thread pool, so the tasks will get pending() callback immediately,
+            //and can start showing progress, but will not get started() until a seriesLoadExecutor
+            //thread is free
+            setExecutor(seriesLoadExecutor);
+
             //if we exceed the error count when running the load, set the series to stale
             //the user will need to re-enable it to start the load off again
             addTaskListener(new SetStaleOnErrorListener());
@@ -186,13 +200,9 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         protected Task createTask() {
             return new BackgroundTask() {
 
-                boolean stale = isStale();  //this can be changed by user and needs to be consistent while task runs, so take a value up front
-
                 protected void doInBackground() throws Exception {
-                    if ( ! stale ) {  //if marked stale, user has to select 'refresh series' to try again, so we don't keep running failing queries
-                        URL urlForQuery = getUrlWithTimestamp();
-                        new DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries.this, urlForQuery).runQuery();
-                    }
+                    URL urlForQuery = getUrlWithTimestamp();
+                    new DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries.this, urlForQuery).runQuery();
                 }
 
                 private URL getUrlWithTimestamp() throws MalformedURLException {
@@ -208,14 +218,8 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
                 protected void doInEventThread() throws Exception {
                     errorCount = 0;
-                    //presently the command still runs even if we are stale, but
-                    //if stale the remote call won't take place, so an exception is not thrown
-                    //and the doInEventThread will get called
-                    //this doesn't count as a proper refresh, we need to check the stale flag here
-                    if ( ! stale) {
-                        setLastRefreshTime(new Date());
-                        setLoaded(true);
-                    }
+                    setLastRefreshTime(new Date());
+                    setLoaded(true);
                 }
             };
         }
@@ -225,7 +229,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
             public void error(Task task, Throwable error) {
                 errorCount++;
-                if ( errorCount >= MAX_ERRORS_BEFORE_DISCONNECT) {
+                if ( errorCount >= MAX_ERRORS_BEFORE_STALE) {
                     setStale(true);
                 }
             }
@@ -234,7 +238,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         private class RescheduleListener extends TaskListenerAdapter {
             public void finished(Task task) {
                 setTickingFlag();
-                scheduleRefreshIfDisplayed(false);
+                scheduleRefreshIfDisplayedAndNotStale(false);
             }
         }
 

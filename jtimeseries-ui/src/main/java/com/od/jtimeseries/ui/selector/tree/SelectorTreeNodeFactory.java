@@ -58,7 +58,7 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
 
     public SelectorTreeNodeFactory(Class seriesClass) {
         this.seriesClass = seriesClass;
-        serverNodeAnimator.setBackgroundImage(ImageUtils.PROGRESS_SERVER_IMAGE, 0.9f);
+        serverNodeAnimator.setBackgroundImage(ImageUtils.PROGRESS_SERVER_IMAGE, 1f);
     }
 
     public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {

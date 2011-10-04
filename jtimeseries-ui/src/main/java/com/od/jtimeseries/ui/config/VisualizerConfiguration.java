@@ -53,7 +53,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private Rectangle frameLocation;
     private boolean isIcon;
     private boolean isShown = true;
-    private boolean chartControlsVisible = true;
+    private Boolean chartControlsVisible = true;
     private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     public VisualizerConfiguration() {
@@ -208,7 +208,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     }
 
     //the readResolve method allows us to handle migrations where we add fields which need to
-    //be initialised - xstream sets the fields null even if a default is
+    //be initialised - xstream sets the fields null (and primitive boolean false!) even if a default is
     //assigned when the field is defined
     private Object readResolve() {
         if ( domainStartTimeSelection == null) {
@@ -223,6 +223,9 @@ public class VisualizerConfiguration implements ExportableConfig {
             chartDataFilter = ChartDataFilter.NoFilter;
         }
 
+        if ( chartControlsVisible == null) {
+            chartControlsVisible = true;
+        }
         return this;
     }
 

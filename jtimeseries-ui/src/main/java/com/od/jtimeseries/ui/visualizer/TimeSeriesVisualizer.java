@@ -32,6 +32,7 @@ import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.ImportExportTransferHandler;
+import com.od.jtimeseries.ui.util.FixedIconsCollapsiblePane;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
@@ -77,7 +78,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private ChartControlPanel chartControlPanel;
     private boolean toolbarVisible = true;
     private DisplayNameCalculator displayNameCalculator;
-    private CollapsiblePane chartControlsCollapsiblePane = new CollapsiblePane("Controls");
+    private FixedIconsCollapsiblePane chartControlsCollapsiblePane = new FixedIconsCollapsiblePane("Controls");
 
     public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary) {
         this(title, timeSeriesServerDictionary, new DisplayNameCalculator());
@@ -320,6 +321,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private JPanel createChartPanel() {
         chartControlsCollapsiblePane.setContentPane(chartControlPanel);
         chartControlsCollapsiblePane.setContentPaneHeight(60);
+        chartControlsCollapsiblePane.setEmphasized(true);
 
         JPanel p = new JPanel(new BorderLayout());
         p.add(chart, BorderLayout.CENTER);

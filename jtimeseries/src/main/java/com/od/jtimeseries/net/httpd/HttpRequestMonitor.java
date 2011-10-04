@@ -24,9 +24,9 @@ public interface HttpRequestMonitor {
 
         public void finishedRequest(long requestId, Socket mySocket) {}
 
-        public void handledException(long requestId, Socket mySocket) {}
+        public void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t) {}
 
-        public void unhandledException(long requestId, Socket mySocket, Throwable t) {}
+        public void badRequest(long requestId, Socket mySocket) {}
     };
 
     void requestStarting(long requestId, Socket mySocket);
@@ -35,13 +35,7 @@ public interface HttpRequestMonitor {
 
     void finishedRequest(long requestId, Socket mySocket);
 
-    /**
-     * @param requestId encountered an expected exception processing a request which was handled
-     */
-    void handledException(long requestId, Socket mySocket);
+    void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t);
 
-    /**
-     * @param requestId encountered an unexpected exception processing a request which could not be handled
-     */
-    void unhandledException(long requestId, Socket mySocket, Throwable t);
+    void badRequest(long requestId, Socket mySocket);
 }

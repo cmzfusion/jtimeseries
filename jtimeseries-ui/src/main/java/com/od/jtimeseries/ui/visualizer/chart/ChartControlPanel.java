@@ -25,12 +25,12 @@ import com.od.jtimeseries.ui.visualizer.chart.creator.ChartDataFilter;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Enumeration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,72 +42,77 @@ import java.util.Enumeration;
 public class ChartControlPanel extends JPanel {
 
     private TimeSeriesChart timeSeriesChart;
-    private Box radioButtonBox = Box.createVerticalBox();
     private ColorComboBox colorComboBox = new ColorComboBox();
-    private ButtonGroup radioButtonGroup;
     private JCheckBox showLegendCheckbox = new JCheckBox("Show Legend");
-    private RangeSelectorComponent rangeSelectorComponent = new RangeSelectorComponent();
+    private DomainModeComponent timeSelector = new DomainModeComponent();
     private JComboBox chartTypeCombo = new JComboBox(ChartType.values());
     private JComboBox dataFilterCombo = new JComboBox(ChartDataFilter.values());
+    private JComboBox rangeModeCombo = new JComboBox(ChartRangeMode.values());
 
     public ChartControlPanel(TimeSeriesChart timeSeriesChart) {
         this.timeSeriesChart = timeSeriesChart;
         createColorCombo();
         createShowLegendCheckbox();
-        createRangeModeRadioButtons();
+        createChartRangeModeCombo();
         createChartTypeCombo();
         createChartDataFilterCombo();
         layoutPanel();
+        setComponentSizesRecursive(this);
         refreshStateFromChart();
         addRangeSelectorListener();
     }
 
     private void createChartTypeCombo() {
-        chartTypeCombo.setMaximumSize(chartTypeCombo.getPreferredSize());
         chartTypeCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                timeSeriesChart.setChartType((ChartType)chartTypeCombo.getSelectedItem());
+                timeSeriesChart.setChartType((ChartType) chartTypeCombo.getSelectedItem());
             }
         });
     }
 
     private void createChartDataFilterCombo() {
-        dataFilterCombo.setMaximumSize(dataFilterCombo.getPreferredSize());
         dataFilterCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                timeSeriesChart.setChartDataFilter((ChartDataFilter)dataFilterCombo.getSelectedItem());
+                timeSeriesChart.setChartDataFilter((ChartDataFilter) dataFilterCombo.getSelectedItem());
             }
         });
     }
 
+    private void createChartRangeModeCombo() {
+        rangeModeCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ChartControlPanel.this.timeSeriesChart.setChartRangeMode((ChartRangeMode) rangeModeCombo.getSelectedItem());
+            }
+        });
+    }
+
+    private void setComponentSizesRecursive(JComponent parent) {
+        for ( Component c : parent.getComponents()) {
+            if ( c instanceof JComboBox || c instanceof JTextField) {
+                c.setMaximumSize(c.getPreferredSize());
+            } else if ( c instanceof JComponent) {
+                setComponentSizesRecursive((JComponent) c);
+            }
+        }
+    }
+
     public void refreshStateFromChart() {
-        updateSelectedRangeMode();
         updateDomainSelection();
         showLegendCheckbox.setSelected(timeSeriesChart.isShowLegend());
         colorComboBox.setSelectedColor(timeSeriesChart.getChartBackgroundColor());
         chartTypeCombo.setSelectedItem(timeSeriesChart.getChartType());
         dataFilterCombo.setSelectedItem(timeSeriesChart.getChartDataFilter());
+        rangeModeCombo.setSelectedItem(timeSeriesChart.getChartRangeMode());
     }
 
     private void updateDomainSelection() {
         DomainTimeSelection d = timeSeriesChart.getDomainStartTimeSelection();
-        rangeSelectorComponent.setDomainSelection(d);
-    }
-
-    private void updateSelectedRangeMode() {
-        Enumeration<AbstractButton> e = radioButtonGroup.getElements();
-        while(e.hasMoreElements()) {
-            AbstractButton b = e.nextElement();
-            if (timeSeriesChart.getChartRangeMode().toString().equals(b.getActionCommand())) {
-                b.setSelected(true);
-                break;
-            }
-        }
+        timeSelector.setDomainSelection(d);
     }
 
     private void addRangeSelectorListener() {
-        rangeSelectorComponent.addPropertyChangeListener(
-            RangeSelectorComponent.DOMAIN_SELECTION_PROPERTY,
+        timeSelector.addPropertyChangeListener(
+            DomainModeComponent.DOMAIN_SELECTION_PROPERTY,
             new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     timeSeriesChart.setDomainStartTimeSelection((DomainTimeSelection) evt.getNewValue());
@@ -136,52 +141,52 @@ public class ChartControlPanel extends JPanel {
         });
     }
 
-    private void createRangeModeRadioButtons() {
-        radioButtonGroup = new ButtonGroup();
-        for ( ChartRangeMode m : ChartRangeMode.values()) {
-            JRadioButton b = new JRadioButton(m.toString());
-            radioButtonGroup.add(b);
-            b.setActionCommand(m.toString());
-            addActionListener(b, m);
-            radioButtonBox.add(b);
-        }
-    }
-
-    private void addActionListener(JRadioButton b, final ChartRangeMode m) {
-        b.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ChartControlPanel.this.timeSeriesChart.setChartRangeMode(m);
-            }
-        });
-    }
-
     private void layoutPanel() {
         Box b = Box.createHorizontalBox();
         b.add(Box.createHorizontalGlue());
+
+        JComponent displayControls = createDisplayControls();
+        b.add(createWidgetBox(displayControls, "Display", true));
+        addSpacing(b);
+        b.add(createWidgetBox(rangeModeCombo, "Range", true));
+        addSpacing(b);
+        b.add(createWidgetBox(timeSelector, "Time", true));
+        addSpacing(b);
+        b.add(createWidgetBox(dataFilterCombo, "Filters", true));
+        b.add(Box.createHorizontalGlue());
+
+        setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
+        setLayout(new BorderLayout());
+        add(b, BorderLayout.CENTER);
+    }
+
+    private JComponent createDisplayControls() {
+        Box b = Box.createHorizontalBox();
         b.add(colorComboBox);
         addSpacing(b);
         b.add(showLegendCheckbox);
         addSpacing(b);
-        b.add(radioButtonBox);
-        addSpacing(b);
-        b.add(rangeSelectorComponent);
-        addSpacing(b);
         b.add(chartTypeCombo);
-        addSpacing(b);
-        b.add(dataFilterCombo);
-        b.add(Box.createHorizontalGlue());
+        return b;
+    }
 
+    private JComponent createWidgetBox(JComponent widget, String title, boolean addLowerBorder) {
+        Box b = Box.createVerticalBox();
+        b.add(Box.createVerticalGlue());
+        b.add(widget);
+        if ( addLowerBorder) {
+            b.add(Box.createVerticalStrut(5));
+        }
 
-        setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
-        setLayout(new BorderLayout());
-//        JScrollPane scrollPane = new JScrollPane(b);
-//        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        add(b, BorderLayout.CENTER);
+        TitledBorder border = new TitledBorder(title);
+        border.setTitleFont(border.getTitleFont().deriveFont(9f));
+        b.setBorder(border);
+        return b;
     }
 
     private void addSpacing(Box b) {
         b.add(Box.createHorizontalGlue());
-        b.add(Box.createHorizontalStrut(5));
+        b.add(Box.createRigidArea(new Dimension(5, 0)));
     }
 
 }

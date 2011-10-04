@@ -319,7 +319,7 @@ public class TimeSeriesVisualizer extends JPanel {
 
     private JPanel createChartPanel() {
         chartControlsCollapsiblePane.setContentPane(chartControlPanel);
-        chartControlsCollapsiblePane.setContentPaneHeight(70);
+        chartControlsCollapsiblePane.setContentPaneHeight(60);
 
         JPanel p = new JPanel(new BorderLayout());
         p.add(chart, BorderLayout.CENTER);

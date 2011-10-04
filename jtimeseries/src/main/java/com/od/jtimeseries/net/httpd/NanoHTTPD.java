@@ -19,6 +19,8 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -69,10 +71,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class NanoHTTPD {
 
+    private static LogMethods logMethods = LogUtils.getLogMethods(NanoHTTPD.class);
     private static Executor httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 5, NamedExecutors.DAEMON_THREAD_CONFIGURER);
-
     private static AtomicLong lastRequestId = new AtomicLong();
-
     private volatile HttpRequestMonitor requestMonitor = HttpRequestMonitor.DUMMY_REQUEST_MONITOR;
 
     // ==================================================
@@ -333,13 +334,17 @@ public class NanoHTTPD {
 
                 // Read the request line
                 StringTokenizer st = new StringTokenizer(in.readLine());
-                if (!st.hasMoreTokens())
+                if (!st.hasMoreTokens()) {
                     sendError(HTTP_BADREQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
+                    requestMonitor.badRequest(requestId, mySocket);
+                }
 
                 String method = st.nextToken();
 
-                if (!st.hasMoreTokens())
+                if (!st.hasMoreTokens()) {
                     sendError(HTTP_BADREQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
+                    requestMonitor.badRequest(requestId, mySocket);
+                }
 
                 String uri = st.nextToken();
 
@@ -394,28 +399,22 @@ public class NanoHTTPD {
                 // Ok, now do the serve()
                 Response r = serve(uri, method, header, params);
                 if (r == null) {
-                    sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response.");
+                    sendError(HTTP_INTERNALERROR, "HTTPD ERROR: Serve() returned a null response.");
                 } else {
                     sendResponse(r);
                 }
-            } catch (IOException ioe) {
-                try {
-                    sendError(HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-                } catch (SendErrorException t) {
-                    requestMonitor.handledException(requestId, mySocket);
-                }
-            } catch (SendErrorException ie) {
-                // Thrown by sendError, ignore and exit the thread.
             } catch (Throwable t) {
-                requestMonitor.unhandledException(requestId, mySocket, t);
-                t.printStackTrace();
+                try {
+                    sendError(HTTP_INTERNALERROR, "HTTPD ERROR: Error processing HTTP request");
+                    requestMonitor.exceptionDuringProcessing(requestId, mySocket, t);
+                } catch (SendErrorException e) {
+                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", e);
+                }
             } finally {
-                if ( in != null) {
-                    try {
-                        in.close();
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
+                try {
+                    mySocket.close();
+                } catch (Throwable t) {
+                    logMethods.logWarning("Failed to close client socket, perhaps it was already closed?" + mySocket, t);
                 }
                 requestMonitor.finishedRequest(requestId, mySocket);
             }

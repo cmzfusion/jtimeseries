@@ -43,12 +43,12 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
         }
     }
 
-    public void handledException(long requestId, Socket mySocket) {
-        logMethods.logDebug("Handled error for HTTPD request " + requestId);
+    public void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t) {
+        logMethods.logWarning("Error processing HTTPD request " + requestId, t);
     }
 
-    public void unhandledException(long requestId, Socket mySocket, Throwable t) {
-        logMethods.logError("Unhandled error for HTTPD request " + requestId, t);
+    public void badRequest(long requestId, Socket mySocket) {
+        logMethods.logWarning("Processed invalid http request");
     }
 
     public static void setHtpRequestTimeValueRecorder(ValueRecorder htpRequestTimeValueRecorder) {

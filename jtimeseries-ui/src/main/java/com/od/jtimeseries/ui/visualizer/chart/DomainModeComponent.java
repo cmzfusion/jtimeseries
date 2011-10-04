@@ -35,31 +35,27 @@ import java.text.NumberFormat;
  * Date: 28/01/11
  * Time: 06:47
  */
-public class RangeSelectorComponent extends JPanel {
+public class DomainModeComponent extends JPanel {
 
     public static final String DOMAIN_SELECTION_PROPERTY = "domainSelection";
 
-    private JComboBox rangeModeList = new JComboBox();
+    private JComboBox rangeModeCombo = new JComboBox(ChartDomainMode.values());
     private JFormattedTextField multipleTextField = new JFormattedTextField(NumberFormat.getIntegerInstance());
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private DomainTimeSelection domainSelection = new DomainTimeSelection();
 
-    public RangeSelectorComponent() {
-        setLayout(new FlowLayout());
-        rangeModeList.setModel(new DefaultComboBoxModel(ChartDomainMode.values()));
+    public DomainModeComponent() {
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         multipleTextField.setColumns(3);
         showCurrentSelection();
-
         add(multipleTextField);
-        add(rangeModeList);
+        add(rangeModeCombo);
         addListeners();
-        setMaximumSize(getPreferredSize());
-        setMinimumSize(getPreferredSize());
     }
 
     private void showCurrentSelection() {
         multipleTextField.setText(String.valueOf(domainSelection.getMultiple()));
-        rangeModeList.setSelectedItem(domainSelection.getMode());
+        rangeModeCombo.setSelectedItem(domainSelection.getMode());
         multipleTextField.setEnabled(domainSelection.getMode() != ChartDomainMode.ALL);
     }
 
@@ -81,9 +77,9 @@ public class RangeSelectorComponent extends JPanel {
             }
         });
 
-        rangeModeList.addActionListener(new ActionListener() {
+        rangeModeCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ChartDomainMode selectedMode = (ChartDomainMode) rangeModeList.getSelectedItem();
+                ChartDomainMode selectedMode = (ChartDomainMode) rangeModeCombo.getSelectedItem();
                 setDomainSelection(new DomainTimeSelection(
                         selectedMode,
                         domainSelection.getMultiple()

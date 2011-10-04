@@ -153,7 +153,7 @@ public class ChartControlPanel extends JPanel {
         b.add(createWidgetBox(timeSelector, "Time", true));
         addSpacing(b);
         b.add(createWidgetBox(dataFilterCombo, "Filters", true));
-        b.add(Box.createHorizontalGlue());
+        //b.add(Box.createHorizontalGlue());
 
         setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
         setLayout(new BorderLayout());
@@ -181,12 +181,12 @@ public class ChartControlPanel extends JPanel {
         TitledBorder border = new TitledBorder(title);
         border.setTitleFont(border.getTitleFont().deriveFont(9f));
         b.setBorder(border);
+        b.setMaximumSize(b.getPreferredSize());
         return b;
     }
 
     private void addSpacing(Box b) {
-        b.add(Box.createHorizontalGlue());
-        b.add(Box.createRigidArea(new Dimension(5, 0)));
+        b.add(Box.createRigidArea(new Dimension(20, 0)));
     }
 
 }

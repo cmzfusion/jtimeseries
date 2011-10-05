@@ -40,7 +40,7 @@
                             </bean>
 
                             <!-- Count of UDP updates received -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.HttpCallsMetric">
+                            <bean class="com.od.jtimeseries.server.servermetrics.HttpRequestTimeMetric">
                                 <constructor-arg value="${serverMetricsContextPath}"/>
                             </bean>
 

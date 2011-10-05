@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -59,6 +60,13 @@ public class RoundRobinSerializer {
     //for testing, where we create dozens of serializers
     private static boolean shutdownHandlingDisabled;
 
+    private static Counter fileAppendCounter;
+    private static Counter fileRewriteCounter;
+    private static Counter fileReadCounter;
+    private static Counter fileHeaderReadCounter;
+    private static Counter fileTotalTimeCounter;
+    private static Counter fileErrorCounter;
+
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
     private final Object writeLock = new Object();
@@ -82,6 +90,7 @@ public class RoundRobinSerializer {
      * Serialize the series to the file, and update the fileHeader
      */
     public void serialize(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {
+        fileRewriteCounter.incrementCount();
         synchronized (writeLock) {
             if ( ! shutdown ) {
                 byte[] properties = getBytesForProperties(fileHeader);
@@ -120,8 +129,9 @@ public class RoundRobinSerializer {
                         b.writeLong(i.getTimestamp());
                         b.writeDouble(i.getValue().doubleValue());
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logMethods.logError("Failed to write time series file " + f);
+                    fileErrorCounter.incrementCount();
                     throw new SerializationException("Failed to write time series file " + f, e);
                 } finally {
                     if ( b != null) {
@@ -138,6 +148,7 @@ public class RoundRobinSerializer {
     }
 
     public RoundRobinTimeSeries deserialize(FileHeader fileHeader) throws SerializationException {
+        fileReadCounter.incrementCount();
         synchronized (writeLock) {
             File f = getFile(fileHeader);
             DataInputStream d = null;
@@ -145,7 +156,8 @@ public class RoundRobinSerializer {
                 d = new DataInputStream(new FileInputStream(f));
                 readHeader(fileHeader, d);
                 return readSeriesData(fileHeader, d);
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                fileErrorCounter.incrementCount();
                 throw new SerializationException("Failed to deserialize file " + fileHeader, e);
             } finally {
                 if ( d != null) {
@@ -160,6 +172,7 @@ public class RoundRobinSerializer {
     }
 
     public FileHeader readHeader(File f) throws SerializationException {
+        fileHeaderReadCounter.incrementCount();
         synchronized (writeLock) {
             FileHeader h = new FileHeader();
             doUpdateHeader(h, f);
@@ -199,6 +212,7 @@ public class RoundRobinSerializer {
      * Append items to the timeseries file and update the header
      */
     public void append(FileHeader header, IndexedTimeSeries l) throws SerializationException {
+        fileAppendCounter.incrementCount();
         synchronized (writeLock) {
             if ( ! shutdown && l.size() > 0) {
                 File file = getFile(header);
@@ -243,7 +257,8 @@ public class RoundRobinSerializer {
                         r.writeDouble(i.getValue().doubleValue());
                         currentIndex ++;
                     }
-                } catch ( Exception e) {
+                } catch ( Throwable e) {
+                    fileErrorCounter.incrementCount();
                     throw new SerializationException("Failed to append items to file " + header, e);
                 } finally {
                     try {
@@ -290,7 +305,8 @@ public class RoundRobinSerializer {
         try {
             d = new DataInputStream(new FileInputStream(f));
             readHeader(fileHeader, d);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            fileErrorCounter.incrementCount();
             throw new SerializationException("Failed to deserialize header " + fileHeader, e);
         } finally {
             if ( d != null) {
@@ -453,4 +469,29 @@ public class RoundRobinSerializer {
     public static void setShutdownHandlingDisabled(boolean shutdownHandlingDisabled) {
         RoundRobinSerializer.shutdownHandlingDisabled = shutdownHandlingDisabled;
     }
+
+    public static void setFileAppendCounter(Counter fileAppendCounter) {
+        RoundRobinSerializer.fileAppendCounter = fileAppendCounter;
+    }
+
+    public static void setFileRewriteCounter(Counter fileRewriteCounter) {
+        RoundRobinSerializer.fileRewriteCounter = fileRewriteCounter;
+    }
+
+    public static void setFileReadCounter(Counter fileReaderCounter) {
+        RoundRobinSerializer.fileReadCounter = fileReaderCounter;
+    }
+
+    public static void setFileHeaderReadCounter(Counter fileHeaderReadCounter) {
+        RoundRobinSerializer.fileHeaderReadCounter = fileHeaderReadCounter;
+    }
+
+    public static void setFileTotalTimeCounter(Counter fileTotalTimeCounter) {
+        RoundRobinSerializer.fileTotalTimeCounter = fileTotalTimeCounter;
+    }
+
+    public static void setFileErrorCounter(Counter fileErrorCounter) {
+        RoundRobinSerializer.fileErrorCounter = fileErrorCounter;
+    }
+
 }

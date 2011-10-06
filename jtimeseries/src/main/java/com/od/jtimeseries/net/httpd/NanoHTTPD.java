@@ -324,91 +324,24 @@ public class NanoHTTPD {
 
         public void run() {
             long requestId = lastRequestId.incrementAndGet();
-            BufferedReader in = null;
             try {
-                InputStream is = mySocket.getInputStream();
-                if (is == null) return;
 
-                requestMonitor.requestStarting(requestId, mySocket);
-                in = new BufferedReader(new InputStreamReader(is));
+                //process the request, catching HttpProcessingException for expected errors and Throwable for all other
+                processRequest(requestId);
 
-                // Read the request line
-                StringTokenizer st = new StringTokenizer(in.readLine());
-                if (!st.hasMoreTokens()) {
-                    sendError(HTTP_BADREQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
-                    requestMonitor.badRequest(requestId, mySocket);
-                }
-
-                String method = st.nextToken();
-
-                if (!st.hasMoreTokens()) {
-                    sendError(HTTP_BADREQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
-                    requestMonitor.badRequest(requestId, mySocket);
-                }
-
-                String uri = st.nextToken();
-
-                // Decode parameters from the URI
-                Properties params = new Properties();
-                int qmi = uri.indexOf('?');
-                if (qmi >= 0) {
-                    decodeParms(uri.substring(qmi + 1), params);
-                    uri = decodePercent(uri.substring(0, qmi));
-                } else uri = decodePercent(uri);
-
-
-                // If there's another token, it's protocol version,
-                // followed by HTTP headers. Ignore version but parse headers.
-                // NOTE: this now forces header names uppercase since they are
-                // case insensitive and vary by client.
-                Properties header = new Properties();
-                if (st.hasMoreTokens()) {
-                    String line = in.readLine();
-                    while (line.trim().length() > 0) {
-                        int p = line.indexOf(':');
-                        header.put(line.substring(0, p).trim().toLowerCase(), line.substring(p + 1).trim());
-                        line = in.readLine();
-                    }
-                }
-
-                // If the method is POST, there may be parameters
-                // in data section, too, read it:
-                if (method.equalsIgnoreCase("POST")) {
-                    long size = 0x7FFFFFFFFFFFFFFFl;
-                    String contentLength = header.getProperty("content-length");
-                    if (contentLength != null) {
-                        try {
-                            size = Integer.parseInt(contentLength);
-                        } catch (NumberFormatException ex) {
-                        }
-                    }
-                    String postLine = "";
-                    char buf[] = new char[512];
-                    int read = in.read(buf);
-                    while (read >= 0 && size > 0 && !postLine.endsWith("\r\n")) {
-                        size -= read;
-                        postLine += String.valueOf(buf, 0, read);
-                        if (size > 0)
-                            read = in.read(buf);
-                    }
-                    postLine = postLine.trim();
-                    decodeParms(postLine, params);
-                }
-                requestMonitor.servingRequest(requestId, mySocket, uri, method,  header, params);
-
-                // Ok, now do the serve()
-                Response r = serve(uri, method, header, params);
-                if (r == null) {
-                    sendError(HTTP_INTERNALERROR, "HTTPD ERROR: Serve() returned a null response.");
-                } else {
-                    sendResponse(r);
+            } catch ( HttpProcessingException e) {
+                try {
+                    requestMonitor.badRequest(requestId, mySocket, e.getHttpErrorType(), e.getErrorDescription());
+                    sendError(e.getHttpErrorType(), e.getErrorDescription());
+                } catch (Exception x) {
+                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", x);
                 }
             } catch (Throwable t) {
                 try {
-                    sendError(HTTP_INTERNALERROR, "HTTPD ERROR: Error processing HTTP request");
                     requestMonitor.exceptionDuringProcessing(requestId, mySocket, t);
-                } catch (SendErrorException e) {
-                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", e);
+                    sendError(HTTP_INTERNALERROR, "Unhandled exception processing HTTP Request");
+                } catch (Exception x) {
+                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", x);
                 }
             } finally {
                 try {
@@ -420,11 +353,91 @@ public class NanoHTTPD {
             }
         }
 
+        private void processRequest(long requestId) throws IOException, HttpProcessingException {
+            InputStream is = mySocket.getInputStream();
+            if (is == null) {
+                throw new HttpProcessingException(HTTP_BADREQUEST, "BAD REQUEST: Could not open input stream");
+            }
+
+            requestMonitor.requestStarting(requestId, mySocket);
+            BufferedReader in = new BufferedReader(new InputStreamReader(is));
+
+            // Read the request line
+            StringTokenizer st = new StringTokenizer(in.readLine());
+            if (!st.hasMoreTokens()) {
+                throw new HttpProcessingException(HTTP_BADREQUEST, "BAD REQUEST: Syntax error. Usage: GET /example/file.html");
+            }
+
+            String method = st.nextToken();
+
+            if (!st.hasMoreTokens()) {
+                throw new HttpProcessingException(HTTP_BADREQUEST, "BAD REQUEST: Missing URI. Usage: GET /example/file.html");
+            }
+
+            String uri = st.nextToken();
+
+            // Decode parameters from the URI
+            Properties params = new Properties();
+            int qmi = uri.indexOf('?');
+            if (qmi >= 0) {
+                decodeParms(uri.substring(qmi + 1), params);
+                uri = decodePercent(uri.substring(0, qmi));
+            } else uri = decodePercent(uri);
+
+
+            // If there's another token, it's protocol version,
+            // followed by HTTP headers. Ignore version but parse headers.
+            // NOTE: this now forces header names uppercase since they are
+            // case insensitive and vary by client.
+            Properties header = new Properties();
+            if (st.hasMoreTokens()) {
+                String line = in.readLine();
+                while (line.trim().length() > 0) {
+                    int p = line.indexOf(':');
+                    header.put(line.substring(0, p).trim().toLowerCase(), line.substring(p + 1).trim());
+                    line = in.readLine();
+                }
+            }
+
+            // If the method is POST, there may be parameters
+            // in data section, too, read it:
+            if (method.equalsIgnoreCase("POST")) {
+                long size = 0x7FFFFFFFFFFFFFFFl;
+                String contentLength = header.getProperty("content-length");
+                if (contentLength != null) {
+                    try {
+                        size = Integer.parseInt(contentLength);
+                    } catch (NumberFormatException ex) {
+                    }
+                }
+                String postLine = "";
+                char buf[] = new char[512];
+                int read = in.read(buf);
+                while (read >= 0 && size > 0 && !postLine.endsWith("\r\n")) {
+                    size -= read;
+                    postLine += String.valueOf(buf, 0, read);
+                    if (size > 0)
+                        read = in.read(buf);
+                }
+                postLine = postLine.trim();
+                decodeParms(postLine, params);
+            }
+            requestMonitor.servingRequest(requestId, mySocket, uri, method,  header, params);
+
+            // Ok, now do the serve()
+            Response r = serve(uri, method, header, params);
+            if (r == null) {
+                throw new HttpProcessingException(HTTP_INTERNALERROR, "No response for HTTP request");
+            } else {
+                sendResponse(r);
+            }
+        }
+
         /**
          * Decodes the percent encoding scheme. <br/>
          * For example: "an+example%20string" -> "an example string"
          */
-        private String decodePercent(String str) throws SendErrorException {
+        private String decodePercent(String str) throws HttpProcessingException {
             try {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < str.length(); i++) {
@@ -444,8 +457,7 @@ public class NanoHTTPD {
                 }
                 return new String(sb.toString().getBytes());
             } catch (Exception e) {
-                sendError(HTTP_BADREQUEST, "BAD REQUEST: Bad percent-encoding.");
-                return null;
+                throw new HttpProcessingException(HTTP_BADREQUEST, "BAD REQUEST: Bad percent-encoding.");
             }
         }
 
@@ -454,7 +466,7 @@ public class NanoHTTPD {
          * ( e.g. "name=Jack%20Daniels&pass=Single%20Malt" ) and
          * adds them to given Properties.
          */
-        private void decodeParms(String parms, Properties p) throws SendErrorException {
+        private void decodeParms(String parms, Properties p) throws HttpProcessingException {
             if (parms == null)
                 return;
 
@@ -469,12 +481,10 @@ public class NanoHTTPD {
         }
 
         /**
-         * Returns an error message as a HTTP response and
-         * throws SendErrorException to stop further request processing.
+         * Sends an error message as a TextResponse
          */
-        private void sendError(String status, String msg) throws SendErrorException {
+        private void sendError(String status, String msg) {
             sendResponse(new TextResponse(status, MIME_PLAINTEXT, msg));
-            throw new SendErrorException();
         }
 
         /**
@@ -521,7 +531,28 @@ public class NanoHTTPD {
 
         private Socket mySocket;
 
-        private class SendErrorException extends Exception {}
+
+        /**
+         * An exception raised with a http error type and description
+         */
+        private class HttpProcessingException extends Exception {
+
+            private String httpErrorType;
+            private String errorDescription;
+
+            public HttpProcessingException(String httpErrorType, String errorDescription) {
+                this.httpErrorType = httpErrorType;
+                this.errorDescription = errorDescription;
+            }
+
+            public String getHttpErrorType() {
+                return httpErrorType;
+            }
+
+            public String getErrorDescription() {
+                return errorDescription;
+            }
+        }
     }
 
 

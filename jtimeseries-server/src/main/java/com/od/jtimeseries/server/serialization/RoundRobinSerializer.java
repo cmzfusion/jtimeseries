@@ -19,6 +19,7 @@
 package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -60,12 +61,12 @@ public class RoundRobinSerializer {
     //for testing, where we create dozens of serializers
     private static boolean shutdownHandlingDisabled;
 
-    private static Counter fileAppendCounter;
-    private static Counter fileRewriteCounter;
-    private static Counter fileReadCounter;
-    private static Counter fileHeaderReadCounter;
-    private static Counter fileTotalTimeCounter;
-    private static Counter fileErrorCounter;
+    private static Counter fileAppendCounter = DefaultCounter.NULL_COUNTER;
+    private static Counter fileRewriteCounter = DefaultCounter.NULL_COUNTER;
+    private static Counter fileReadCounter = DefaultCounter.NULL_COUNTER;
+    private static Counter fileHeaderReadCounter = DefaultCounter.NULL_COUNTER;
+    private static Counter fileTotalTimeCounter = DefaultCounter.NULL_COUNTER;
+    private static Counter fileErrorCounter = DefaultCounter.NULL_COUNTER;
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
@@ -81,8 +82,8 @@ public class RoundRobinSerializer {
 
     private void checkRootDirectory(File rootDirectory) {
         if ( ! rootDirectory.canWrite()) {
-            logMethods.logError("Cannot write to Timeseries file directory at " + rootDirectory.getAbsolutePath() + " cannot start server");
-            throw new RuntimeException("Timeseries Directory not writable");
+            logMethods.logError("Timeseries Directory at " + rootDirectory.getAbsolutePath() + " does not exist or is not writable, cannot start server");
+            throw new RuntimeException("Timeseries Directory at " + rootDirectory.getAbsolutePath() + " does not exist or is not writable, cannot start server");
         }
     }
 

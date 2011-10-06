@@ -80,9 +80,9 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void doStartup() throws IOException {
+        setupServerMetrics();
         startSeriesDirectoryManager();
         new JmxManagementService().startJmxManagementService(jmxManagementPort);
-        setupServerMetrics();
         startSummaryStats();
         startUdpServer();
         startServerAnnouncementPings();

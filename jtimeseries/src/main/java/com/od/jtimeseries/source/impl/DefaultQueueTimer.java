@@ -34,6 +34,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DefaultQueueTimer implements QueueTimer {
 
+    private static final QueueTimer NULL_QUEUE_TIMER = new DefaultQueueTimer("Dummy", "Dummy");
+
     private Object queuedTimeEvent;
     private final Object internalLock = new Object();
     private EventTimer timingSource;

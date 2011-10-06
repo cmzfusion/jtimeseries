@@ -26,7 +26,7 @@ public interface HttpRequestMonitor {
 
         public void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t) {}
 
-        public void badRequest(long requestId, Socket mySocket) {}
+        public void badRequest(long requestId, Socket mySocket, String httpErrorType, String errorDescription) {}
     };
 
     void requestStarting(long requestId, Socket mySocket);
@@ -37,5 +37,5 @@ public interface HttpRequestMonitor {
 
     void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t);
 
-    void badRequest(long requestId, Socket mySocket);
+    void badRequest(long requestId, Socket mySocket, String httpErrorType, String errorDescription);
 }

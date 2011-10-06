@@ -28,6 +28,8 @@ import com.od.jtimeseries.source.ValueSourceListener;
  */
 public class DefaultEventTimer extends AbstractValueSource implements EventTimer {
 
+    public static final EventTimer NULL_EVENT_TIMER = new DefaultEventTimer("Dummy", "Dummy");
+
     private long startTime;
     private final Object internalLock = new Object();
 

@@ -48,7 +48,7 @@ public class SeriesHandler extends AbstractHandler {
         }
     };
 
-    private static final DecimalFormat decinalFormat = new DecimalFormat("#.##################");
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.##################");
 
 
     public SeriesHandler(TimeSeriesContext rootContext) {
@@ -161,7 +161,7 @@ public class SeriesHandler extends AbstractHandler {
             pw.write("\" ");
             pw.write(AttributeName.value.toString());
             pw.write("=\"");
-            pw.write(decinalFormat.format(h.getValue().doubleValue()));
+            pw.write(Double.isNaN(h.doubleValue()) ? "NaN" : decimalFormat.format(h.doubleValue()));
             pw.write("\" ");
             pw.write("/>");
         }

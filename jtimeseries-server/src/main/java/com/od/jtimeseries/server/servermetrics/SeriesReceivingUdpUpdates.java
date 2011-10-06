@@ -30,12 +30,12 @@ import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
  * Time: 19:33:20
  * To change this template use File | Settings | File Templates.
  */
-public class LiveSeriesMetric extends AbstractManagedMetric {
+public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
 
-    private static final String id = "TotalLiveSeries";
+    private static final String id = "SeriesReceivingUdpUpdates";
     private String parentContextPath;
 
-    public LiveSeriesMetric(String parentContextPath) {
+    public SeriesReceivingUdpUpdates(String parentContextPath) {
         this.parentContextPath = parentContextPath;
     }
 
@@ -48,7 +48,7 @@ public class LiveSeriesMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.createValueRecorderSeries(id, "A count of the series which have recevied updates during the last " + AppendToSeriesMessageListener.STALE_SERIES_DELAY);
+        ValueRecorder v = metricContext.createValueRecorderSeries(id, "A count of the series which have received UDP updates during the last " + AppendToSeriesMessageListener.STALE_SERIES_DELAY);
         AppendToSeriesMessageListener.setLiveSeriesTotalValueRecorder(v);
     }
 }

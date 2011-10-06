@@ -182,6 +182,8 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
 
     private class RefreshDataCommand extends SwingCommand {
 
+        private URL urlForQuery;
+
         public RefreshDataCommand() {
 
             //execute() is called on scheduler thread, the actual execution takes place on
@@ -201,7 +203,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
             return new BackgroundTask() {
 
                 protected void doInBackground() throws Exception {
-                    URL urlForQuery = getUrlWithTimestamp();
+                    urlForQuery = getUrlWithTimestamp();
                     new DownloadRemoteTimeSeriesDataQuery(RemoteHttpTimeSeries.this, urlForQuery).runQuery();
                 }
 
@@ -221,6 +223,10 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                     setLastRefreshTime(new Date());
                     setLoaded(true);
                 }
+
+                public String toString() {
+                    return "SeriesLoad for URL " + urlForQuery;
+                }
             };
         }
 
@@ -228,6 +234,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         private class SetStaleOnErrorListener extends TaskListenerAdapter {
 
             public void error(Task task, Throwable error) {
+                logMethods.logWarning("Error during series load " + task, error);
                 errorCount++;
                 if ( errorCount >= MAX_ERRORS_BEFORE_STALE) {
                     setStale(true);

@@ -37,6 +37,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DefaultCounter implements Counter {
 
+    public static final Counter NULL_COUNTER = new DefaultCounter("Dummy", "Dummy");
+
     private DefaultValueRecorder simpleSource;
     private final AtomicLong currentValue = new AtomicLong();
 

@@ -9,6 +9,7 @@
         <constructor-arg ref="rootContext"/>
         <constructor-arg>
             <list>
+
                 <!-- A list of ServerMetricSource to supply server metric instances -->
                 <!-- The following DefaultMetricSource defines some useful server monitoring metrics, but you could add other sources
                 or define extra JmxMetric within this source to capture stats from third party processes which support jmx management service,
@@ -20,28 +21,73 @@
 
                             <!-- count of series gc'd, this should happen especially when the server is short of memory -->
                             <bean class="com.od.jtimeseries.server.servermetrics.GarbageCollectedSeriesMetric">
-                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg value="${serverMetricsContextPath}.series"/>
                             </bean>
 
                             <!-- running count of total series in server -->
                             <bean class="com.od.jtimeseries.server.servermetrics.TotalSeriesMetric">
-                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg value="${serverMetricsContextPath}.series"/>
                                 <constructor-arg ref="rootContext"/>
                             </bean>
 
-                            <!-- running count of series for which server is currently receiving updates -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.LiveSeriesMetric">
-                                <constructor-arg value="${serverMetricsContextPath}"/>
+                            <!-- count of series for which server is currently receiving UDP updates -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.SeriesReceivingUdpUpdates">
+                                <constructor-arg value="${serverMetricsContextPath}.udpd"/>
                             </bean>
 
                             <!-- Count of UDP updates received -->
                             <bean class="com.od.jtimeseries.server.servermetrics.UpdatesReceivedMetric">
-                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg value="${serverMetricsContextPath}.udpd"/>
                             </bean>
 
-                            <!-- Count of UDP updates received -->
+                            <!-- Time taken to process http requests in millis -->
                             <bean class="com.od.jtimeseries.server.servermetrics.HttpRequestTimeMetric">
-                                <constructor-arg value="${serverMetricsContextPath}"/>
+                                <constructor-arg value="${serverMetricsContextPath}.httpd"/>
+                            </bean>
+
+                            <!-- Count of invalid http requests handled by server -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.HttpRequestInvalidCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.httpd"/>
+                            </bean>
+
+                            <!-- Count errors while processing http requests -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.HttpRequestErrorCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.httpd"/>
+                            </bean>
+
+                            <!-- Number of http requests processed -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.HttpRequestCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.httpd"/>
+                            </bean>
+
+                            <!-- Count of series file writes / rewrite whole file -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileRewriteMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                            <!-- Count of series file appends -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileAppendsMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                            <!-- Count of series file header reads -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileHeaderReadsMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                            <!-- Count of series file data reads whole file -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileReadsMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                            <!-- Count of errors during file read/write operations -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileOperationErrorCount">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                            <!-- Total time ms taken by file read/write operations -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileOperationTotalTime">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
                             </bean>
 
                              <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
@@ -56,19 +102,19 @@
                                     <list>
                                         <!-- Read memory Usage -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="heapMemoryUsage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${serverMetricsContextPath}.server"/>
                                         </bean>
                                         <!-- Read CPU percentage -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="cpuTimePercentage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${serverMetricsContextPath}.server"/>
                                         </bean>
                                         <!-- Read Percentage time in GC -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="gcTimePercentage">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${serverMetricsContextPath}.server"/>
                                         </bean>
                                         <!-- Read Percentage of Max Memory -->
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
-                                            <constructor-arg value="${serverMetricsContextPath}"/>
+                                            <constructor-arg value="${serverMetricsContextPath}.server"/>
                                         </bean>
                                     </list>
                                 </constructor-arg>

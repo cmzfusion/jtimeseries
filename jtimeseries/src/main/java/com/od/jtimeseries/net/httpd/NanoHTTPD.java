@@ -317,6 +317,9 @@ public class NanoHTTPD {
      */
     private class HTTPSession implements Runnable {
 
+        private boolean responseSent = false;
+        private Response response = new Response(HTTP_INTERNALERROR, "NoResponseCreated");
+
         public HTTPSession(Socket s) {
             mySocket = s;
             httpExecutor.execute(this);
@@ -331,7 +334,6 @@ public class NanoHTTPD {
 
             } catch ( HttpProcessingException e) {
                 try {
-                    requestMonitor.badRequest(requestId, mySocket, e.getHttpErrorType(), e.getErrorDescription());
                     sendError(e.getHttpErrorType(), e.getErrorDescription());
                 } catch (Exception x) {
                     logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", x);
@@ -348,6 +350,10 @@ public class NanoHTTPD {
                     mySocket.close();
                 } catch (Throwable t) {
                     logMethods.logWarning("Failed to close client socket, perhaps it was already closed?" + mySocket, t);
+                }
+
+                if ( ! HTTP_OK.equals(response.status)) {
+                    requestMonitor.invalidRequest(requestId, mySocket, response.status);
                 }
                 requestMonitor.finishedRequest(requestId, mySocket);
             }
@@ -425,11 +431,11 @@ public class NanoHTTPD {
             requestMonitor.servingRequest(requestId, mySocket, uri, method,  header, params);
 
             // Ok, now do the serve()
-            Response r = serve(uri, method, header, params);
-            if (r == null) {
+            Response response = serve(uri, method, header, params);
+            if (response == null) {
                 throw new HttpProcessingException(HTTP_INTERNALERROR, "No response for HTTP request");
             } else {
-                sendResponse(r);
+                sendResponse(response);
             }
         }
 
@@ -483,50 +489,46 @@ public class NanoHTTPD {
         /**
          * Sends an error message as a TextResponse
          */
-        private void sendError(String status, String msg) {
-            sendResponse(new TextResponse(status, MIME_PLAINTEXT, msg));
+        private void sendError(String status, String msg) throws IOException {
+            if (! responseSent) {
+                sendResponse(new TextResponse(status, MIME_PLAINTEXT, msg));
+            }
         }
 
         /**
          * Sends given response to the socket.
          */
-        private void sendResponse(Response response) {
-            try {
-                if (response.status == null)
-                    throw new Error("sendResponse(): Status can't be null.");
+        private void sendResponse(Response response) throws IOException {
+            responseSent = true; //never try to send more than one response
+            this.response = response;
+            if (response.status == null)
+                throw new Error("sendResponse(): Status can't be null.");
 
-                OutputStream out = mySocket.getOutputStream();
-                PrintWriter pw = new PrintWriter(out);
-                pw.print("HTTP/1.0 " + response.status + " \r\n");
+            OutputStream out = mySocket.getOutputStream();
+            PrintWriter pw = new PrintWriter(out);
+            pw.print("HTTP/1.0 " + response.status + " \r\n");
 
-                if (response.mimeType != null)
-                    pw.print("Content-Type: " + response.mimeType + "\r\n");
+            if (response.mimeType != null)
+                pw.print("Content-Type: " + response.mimeType + "\r\n");
 
-                if (response.header == null || response.header.getProperty("Date") == null)
-                    pw.print("Date: " + gmtFrmt.get().format(new Date()) + "\r\n");
+            if (response.header == null || response.header.getProperty("Date") == null)
+                pw.print("Date: " + gmtFrmt.get().format(new Date()) + "\r\n");
 
-                if (response.header != null) {
-                    Enumeration e = response.header.keys();
-                    while (e.hasMoreElements()) {
-                        String key = (String) e.nextElement();
-                        String value = response.header.getProperty(key);
-                        pw.print(key + ": " + value + "\r\n");
-                    }
-                }
-
-                pw.print("\r\n");
-                pw.flush();
-
-                response.writeResponseBody(out, pw);
-                pw.flush();
-                pw.close();
-            } catch (IOException ioe) {
-                // Couldn't write? No can do.
-                try {
-                    mySocket.close();
-                } catch (Throwable t) {
+            if (response.header != null) {
+                Enumeration e = response.header.keys();
+                while (e.hasMoreElements()) {
+                    String key = (String) e.nextElement();
+                    String value = response.header.getProperty(key);
+                    pw.print(key + ": " + value + "\r\n");
                 }
             }
+
+            pw.print("\r\n");
+            pw.flush();
+
+            response.writeResponseBody(out, pw);
+            pw.flush();
+            pw.close();
         }
 
         private Socket mySocket;

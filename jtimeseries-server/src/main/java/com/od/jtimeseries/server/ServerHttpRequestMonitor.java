@@ -38,16 +38,17 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
     }
 
     public void finishedRequest(long requestId, Socket mySocket) {
-        logMethods.logDebug("Fnished HTTPD request " + requestId);
-        logQueryTime();
+        long timeTaken = logQueryTime();
+        logMethods.logDebug("Fnished HTTPD request " + requestId + " in " + timeTaken + " millis");
     }
 
-    private void logQueryTime() {
+    private long logQueryTime() {
         long startTime = requestStartTimes.get();
         long timeTaken = System.currentTimeMillis() - startTime;
         if ( htpRequestTimeValueRecorder != null) {
             htpRequestTimeValueRecorder.newValue(timeTaken);
         }
+        return timeTaken;
     }
 
     public void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t) {
@@ -55,9 +56,9 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
         logMethods.logWarning("Error processing HTTPD request " + requestId, t);
     }
 
-    public void badRequest(long requestId, Socket mySocket, String httpErrorType, String errorDescription) {
+    public void invalidRequest(long requestId, Socket mySocket, String httpErrorType) {
         requestInvalidCounter.incrementCount();
-        logMethods.logWarning("Processed invalid http request, " + httpErrorType + ", " + errorDescription);
+        logMethods.logWarning("Processed invalid HTTPD request " + requestId + " " + httpErrorType);
     }
 
     public static void setHttpRequestTimeValueRecorder(ValueRecorder htpRequestTimeValueRecorder) {

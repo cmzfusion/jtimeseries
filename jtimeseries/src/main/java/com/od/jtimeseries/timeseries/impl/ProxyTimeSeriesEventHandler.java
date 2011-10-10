@@ -36,7 +36,7 @@ import java.util.List;
  * Listeners which register with the wrapper time series will expect the source of events to be the
  * wrapper instance rather than the wrapped time series implementation
  *
- * To achieve this without generating a lot of new event instances we use a thread local event instance which
+ * To achieve this without generating a lot of new event instances we use a proxy event instance which
  * delegates to the methods on the source event, apart from the getSource() method which always returns the wrapping
  * timeseries instance.
  */
@@ -44,29 +44,38 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
 
     private Object proxySource;
 
-    private ThreadLocal<ProxyTimeSeriesEvent> threadLocalEvent = new ThreadLocal<ProxyTimeSeriesEvent>() {
-        protected ProxyTimeSeriesEvent initialValue() {
-            return new ProxyTimeSeriesEvent();
-        }
-    };
+    private ProxyTimeSeriesEvent proxyEvent = new ProxyTimeSeriesEvent();
 
     public ProxyTimeSeriesEventHandler(Object proxySource) {
         this.proxySource = proxySource;
     }
 
     public void itemsAddedOrInserted(TimeSeriesEvent h) {
-        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
-        fireItemsAddedOrInserted(e);
+        ProxyTimeSeriesEvent proxyEvent = getThreadLocalEventAndSetDelegate(h);
+        fireItemsAddedOrInserted(proxyEvent);
+        proxyEvent.clearDelegateValues(); //don't hold a reference
     }
 
     public void itemsRemoved(TimeSeriesEvent h) {
-        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
-        fireItemsRemoved(e);
+        ProxyTimeSeriesEvent proxyEvent = getThreadLocalEventAndSetDelegate(h);
+        fireItemsRemoved(proxyEvent);
+        proxyEvent.clearDelegateValues(); //don't hold a reference
+
     }
 
     public void seriesChanged(TimeSeriesEvent h) {
-        TimeSeriesEvent e = threadLocalEvent.get().setSourceEvent(h);
-        fireSeriesChanged(e);
+        ProxyTimeSeriesEvent proxyEvent = getThreadLocalEventAndSetDelegate(h);
+        fireSeriesChanged(proxyEvent);
+        proxyEvent.clearDelegateValues(); //don't hold a reference
+    }
+
+    private ProxyTimeSeriesEvent getThreadLocalEventAndSetDelegate(TimeSeriesEvent h) {
+        proxyEvent.setDelegateValues(proxySource, h);
+        return proxyEvent;
+    }
+
+    public void finalize() throws Throwable {
+        super.finalize();
     }
 
     /**
@@ -74,13 +83,19 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
      * we can reuse the same ThreadLocal event instance to wrap each event as it comes through,
      * delegating all the method calls other than the one which returns the source
      */
-    private class ProxyTimeSeriesEvent extends TimeSeriesEvent {
+    private static class ProxyTimeSeriesEvent extends TimeSeriesEvent {
 
         private TimeSeriesEvent sourceEvent;
+        private Object source;
 
-        ProxyTimeSeriesEvent setSourceEvent(TimeSeriesEvent event) {
+        public void setDelegateValues(Object source, TimeSeriesEvent event) {
             this.sourceEvent = event;
-            return this;
+            this.source = source;
+        }
+
+        public void clearDelegateValues() {
+            this.source = null;
+            this.sourceEvent = null;
         }
 
         public List<TimeSeriesItem> getItems() {
@@ -96,7 +111,7 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
         }
 
         public Object getSource() {
-            return ProxyTimeSeriesEventHandler.this.proxySource;
+            return source;
         }
 
         public EventType getEventType() {

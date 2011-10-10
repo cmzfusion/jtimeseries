@@ -114,4 +114,8 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
     public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
         return wrappedTimeSeries.getItemsInRange(startTime, endTime);
     }
+
+    public TimeSeriesItem getItem(int index) {
+        return wrappedTimeSeries.getItem(index);
+    }
 }

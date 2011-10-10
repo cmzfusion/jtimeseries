@@ -32,7 +32,7 @@ import java.util.List;
  *
  * A timeseries instance which implements the Identifiable interface
  *
- * This class is implemented as a wrapper around another TimeSeries instance to which it delegates all the timeseries
+ * This class is implemented as a wrapper around another TimeSeries delegate, to which it delegates all the timeseries
  * method calls, but provides the additional implementation required to support the Identifiable interface.
  *
  * The default implementation for the wrapped series is DefaultTimeSeries, but a RoundRobinTimeSeries could equally
@@ -94,13 +94,15 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
     private void lazyAddEventHandler(TimeSeriesListener l) {
         if ( eventHandler == null) {
             eventHandler = new ProxyTimeSeriesEventHandler(this);
-            eventHandler.addTimeSeriesListener(l);
             setProxyEventHandler(eventHandler);
         }
+        eventHandler.addTimeSeriesListener(l);
     }
 
     public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.removeTimeSeriesListener(l);
+        if (eventHandler != null) {
+            eventHandler.removeTimeSeriesListener(l);
+        }
     }
 
     public synchronized int size() {
@@ -131,6 +133,10 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         wrappedSeries.clear();
     }
 
+    public TimeSeriesItem getItem(int index) {
+        return wrappedSeries.getItem(index);
+    }
+
     public synchronized long getModCount() {
         return wrappedSeries.getModCount();
     }
@@ -149,6 +155,13 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
 
     public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
         return wrappedSeries.getItemsInRange(startTime, endTime);
+    }
+
+    /**
+     * @return the wrappedSeries, which holds the data for this DefaultIdentifiableTimeSeries
+     */
+    public TimeSeries getDelegateTimeSeries() {
+        return wrappedSeries;
     }
 
     public String toString() {

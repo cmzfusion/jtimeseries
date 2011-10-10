@@ -64,7 +64,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
             }
 
             public void endDocument() {
-                destinationSeries.addAll(itemsToAdd);
+                destinationSeries.addAll(itemsToAdd);  //add all in one transaction, avoid firing multiple events
                 itemsToAdd.clear();
             }
         };

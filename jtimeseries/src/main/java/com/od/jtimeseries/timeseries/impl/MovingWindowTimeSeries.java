@@ -25,7 +25,6 @@ import com.od.jtimeseries.util.time.FixedTimeSource;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
 
-import javax.swing.*;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;

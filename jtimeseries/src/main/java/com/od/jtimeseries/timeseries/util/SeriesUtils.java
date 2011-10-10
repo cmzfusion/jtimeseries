@@ -10,17 +10,23 @@ import java.util.*;
  * User: Nick Ebbutt
  * Date: 19/08/11
  * Time: 22:56
+ *
+ * Many utility methods on SeriesUtils attempt to get items by index from the source timeSeries, which
+ * would be very inefficient for non-indexed series. Better support for non-indexed series types may be
+ * added in the future.
+ *
+ * Take care that you use SeriesUtils methods only with IndexedTimeSeries, unless you are sure the
+ * utility method in question does not require random access to items
  */
 public class SeriesUtils {
 
-    public static int binarySearch(TimeSeries l, TimeSeriesItem key, Comparator<? super TimeSeriesItem> c) {
-        IndexedTimeSeries i= getIndexedSeries("binarySearch", l);
+    public static int binarySearch(TimeSeries series, TimeSeriesItem key, Comparator<? super TimeSeriesItem> c) {
         int low = 0;
-        int high = l.size()-1;
+        int high = series.size()-1;
 
         while (low <= high) {
             int mid = (low + high) >>> 1;
-            TimeSeriesItem midVal = i.getItem(mid);
+            TimeSeriesItem midVal = series.getItem(mid);
             int cmp = c.compare(midVal, key);
 
             if (cmp < 0)
@@ -61,9 +67,8 @@ public class SeriesUtils {
     }
 
     private static int findLowestIndexWithTimestamp(long timestamp, int index, TimeSeries timeSeries) {
-        IndexedTimeSeries i = getIndexedSeries("findLowestIndexWithTimestamp", timeSeries);
         while ( index > 0) {
-            if ( i.getItem(index - 1).getTimestamp() == timestamp) {
+            if ( timeSeries.getItem(index - 1).getTimestamp() == timestamp) {
                 index--;
             } else {
                 break;
@@ -73,9 +78,8 @@ public class SeriesUtils {
     }
 
     private static int findHighestIndexWithTimestamp(long timestamp, int index, TimeSeries timeSeries) {
-        IndexedTimeSeries i = getIndexedSeries("findHighestIndexWithTimestamp", timeSeries);
         while ( index + 1 < timeSeries.size()) {
-            if ( i.getItem(index + 1).getTimestamp() == timestamp) {
+            if ( timeSeries.getItem(index + 1).getTimestamp() == timestamp) {
                 index++;
             } else {
                 break;
@@ -88,8 +92,7 @@ public class SeriesUtils {
         TimeSeriesItem result = null;
         int index = getIndexOfFirstItemAtOrBefore(timestamp, timeSeries);
         if ( index > -1 ) {
-            IndexedTimeSeries i = getIndexedSeries("getFirstItemAtOrBefore", timeSeries);
-            result = i.getItem(index);
+            result = timeSeries.getItem(index);
         }
         return result;
     }
@@ -98,8 +101,7 @@ public class SeriesUtils {
         TimeSeriesItem result = null;
         int index = getIndexOfFirstItemAtOrAfter(timestamp, timeSeries);
         if ( index > -1 ) {
-            IndexedTimeSeries i = getIndexedSeries("getFirstItemAtOrAfter", timeSeries);
-            result = i.getItem(index);
+            result = timeSeries.getItem(index);
         }
         return result;
     }
@@ -128,9 +130,8 @@ public class SeriesUtils {
 
     private static List<TimeSeriesItem> subList(int startIndex, int endIndex, TimeSeries timeSeries) {
         List<TimeSeriesItem> items = new ArrayList<TimeSeriesItem>();
-        IndexedTimeSeries i = getIndexedSeries("subList", timeSeries);
         for ( int loop=startIndex; loop < endIndex;loop ++) {
-            items.add(i.getItem(loop));
+            items.add(timeSeries.getItem(loop));
         }
         return items;
     }
@@ -146,17 +147,6 @@ public class SeriesUtils {
                 }
             }
         );
-    }
-
-    /**
-     * At present some SeriesUtils methods require an IndexedTimeSeries - if an alternative type becomes available
-     * (e.g. Map) we'll need extend the existing operations to support that too
-     */
-    private static IndexedTimeSeries getIndexedSeries(String operation, TimeSeries l) {
-        if ( ! (l instanceof IndexedTimeSeries)) {
-            throw new UnsupportedOperationException(operation + " not yet implemented for non-IndexedTimeSeries with class type " + l.getClass().getSimpleName());
-        }
-        return (IndexedTimeSeries)l;
     }
 
     /**
@@ -209,5 +199,9 @@ public class SeriesUtils {
            hashCode = 31*hashCode + (obj==null ? 0 : obj.hashCode());
        }
        return hashCode;
+    }
+
+    public static boolean fallsWithinRange(long timeStamp, long startTime, long endTime) {
+        return timeStamp >= startTime && timeStamp <= endTime;
     }
 }

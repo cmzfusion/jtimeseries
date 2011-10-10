@@ -54,7 +54,7 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
     private VisualizerContext visualizerContext;
     private IdentifiableTreeListener frameDisposingContextTreeListener;
 
-    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, JDesktopPane desktopPane, final VisualizerContext visualizerContext) {
+    public VisualizerInternalFrame(final TimeSeriesVisualizer visualizer, final JDesktopPane desktopPane, final VisualizerContext visualizerContext) {
         super(visualizer.getChartsTitle(), true, true, true, true);
         this.visualizer = visualizer;
         this.desktopPane = desktopPane;
@@ -63,12 +63,6 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         setFrameIcon(ImageUtils.FRAME_ICON_16x16);
         getContentPane().add(visualizer);
         setSize(VisualizerConfiguration.DEFAULT_WIDTH, VisualizerConfiguration.DEFAULT_HEIGHT);
-
-        addMouseListener(new MouseAdapter() {
-             public void mouseClicked(MouseEvent e) {
-
-            }
-        });
 
         addInternalFrameListener(new InternalFrameAdapter() {
 
@@ -95,6 +89,10 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
                     }
                 );
                 visualizerContext.setShown(false);
+
+                //workaround for bug where jDesktopPane holds on to internal frame references in its framesCache, after the internal frame is closed
+                //http://stackoverflow.com/questions/4517931/java-swing-jtree-is-not-garbage-collected
+                desktopPane.selectFrame(true);
             }
         });
 

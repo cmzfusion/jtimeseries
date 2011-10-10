@@ -40,8 +40,9 @@ import java.util.List;
  * (Due to the lack of granularity in a system clock, an attempt to add items with a duplicate timestamp may be
  * likely, and it is probably best to let an application/implementation decide how to handle this case).
  *
- * In general, to allow eash comparisons, TimeSeries should implement equals and hashCode using the same contract which would be used in a
- * List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals() and List<TimeSeriesItem>.hashCode()
+ * In general, to allow easy comparison, TimeSeries should implement equals and hashCode using the same contract which would be used in a
+ * List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals() and List<TimeSeriesItem>.hashCode(), but this is
+ * not mandatory and so comparisons must take into account the implementation type
  *
  * Note on thread safety:
  * 
@@ -140,4 +141,11 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
 
 
     void clear();
+
+    /**
+     * This method returns the item at a given index, which will be fast for an IndexedTimeSeries implementation, but may be very slow for alternative
+     * implementations, so the actual implementation should be taken into account when using this method
+     * @return the item at index.
+     */
+    TimeSeriesItem getItem(int index);
 }

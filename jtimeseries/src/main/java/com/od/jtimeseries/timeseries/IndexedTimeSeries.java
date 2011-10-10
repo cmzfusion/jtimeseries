@@ -18,20 +18,18 @@
  */
 package com.od.jtimeseries.timeseries;
 
-import com.od.jtimeseries.util.numeric.Numeric;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
  * Date: 06-Jan-2009
  * Time: 15:17:29
  *
- * IndexedTimeSeries can provide fast random access to the item at each index
+ * IndexedTimeSeries is marker interface for series which can provide fast random access to the TimeSeriesItem at each index
+ * (This is analagous to the RandomAccess interface in Collections API)
  *
  * (This is possible for series which internally use a structure such as an array to store their items, but is not
  * possible for all timeseries implementations)
  */
 public interface IndexedTimeSeries extends TimeSeries {
 
-    TimeSeriesItem getItem(int index);
 }

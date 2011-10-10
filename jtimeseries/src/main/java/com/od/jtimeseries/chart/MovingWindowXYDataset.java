@@ -1,9 +1,9 @@
 package com.od.jtimeseries.chart;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.timeseries.impl.MovingWindowTimeSeries;
+import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
+import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.time.TimeSource;
@@ -38,56 +38,54 @@ import java.util.concurrent.TimeUnit;
  */
 public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDataset {
 
+
     private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowXYDataset.class.getSimpleName(), 2);
 
-    private List<WrappedSourceSeries<E>> sourceSeries = new ArrayList<WrappedSourceSeries<E>>();
-    private List<List<TimeSeriesItem>> snapshotData = new ArrayList<List<TimeSeriesItem>>();
-    private TimeSource startTime = TimeSource.OPEN_START_TIME;
-    private TimeSource endTime = TimeSource.OPEN_END_TIME;
+    private List<WrappedSourceSeries> sourceSeries = new ArrayList<WrappedSourceSeries>();
+    private TimeSource startTimeSource = TimeSource.OPEN_START_TIME;
+    private TimeSource endTimeSource = TimeSource.OPEN_END_TIME;
     private volatile boolean useSwingThread = true;
     private volatile Future movingWindowRefreshTask;
+    private long currentStartTime = -1;
+    private long currentEndTime = -1;
 
     public MovingWindowXYDataset() {
         this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME, false);
     }
 
-    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime) {
-        this(startTime, endTime, true);
+    public MovingWindowXYDataset(TimeSource startTimeSource, TimeSource endTimeSource) {
+        this(startTimeSource, endTimeSource, true);
     }
 
-    public MovingWindowXYDataset(boolean useSwingThread) {
-        this(TimeSource.OPEN_START_TIME, TimeSource.OPEN_END_TIME, useSwingThread);
-    }
-
-    public MovingWindowXYDataset(TimeSource startTime, TimeSource endTime, boolean useSwingThread) {
-        this.startTime = startTime;
-        this.endTime = endTime;
+    public MovingWindowXYDataset(TimeSource startTimeSource, TimeSource endTimeSource, boolean useSwingThread) {
+        this.startTimeSource = startTimeSource;
+        this.endTimeSource = endTimeSource;
         this.useSwingThread = useSwingThread;
     }
 
     public void addTimeSeries(String key, E series) {
-        sourceSeries.add(new WrappedSourceSeries<E>(key, series));
-        refresh();
+        sourceSeries.add(new WrappedSourceSeries(key, series));
+        refresh(false);
     }
 
-    public void setStartTime(TimeSource s) {
-        this.startTime = s;
-        refresh();
+    public void setStartTimeSource(TimeSource s) {
+        this.startTimeSource = s;
+        refresh(true);
     }
 
-    public void setEndTime(TimeSource s) {
-        this.endTime = s;
-        refresh();
+    public void setEndTimeSource(TimeSource s) {
+        this.endTimeSource = s;
+        refresh(true);
     }
 
     public void startMovingWindow(TimePeriod timePeriod) {
         stopMovingWindow();
         MoveWindowTask t = new MoveWindowTask(this);
         movingWindowRefreshTask = scheduledExecutorService.scheduleWithFixedDelay(
-            t,
-            timePeriod.getLengthInMillis(),
-            timePeriod.getLengthInMillis(),
-            TimeUnit.MILLISECONDS
+                t,
+                timePeriod.getLengthInMillis(),
+                timePeriod.getLengthInMillis(),
+                TimeUnit.MILLISECONDS
         );
         t.setFuture(movingWindowRefreshTask);
     }
@@ -99,11 +97,11 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     }
 
     public E getTimeSeries(int index) {
-        return sourceSeries.get(index).getSeries();
+        return sourceSeries.get(index).getSourceSeries();
     }
 
     public int getSeriesCount() {
-        return snapshotData.size();
+        return sourceSeries.size();
     }
 
     public Comparable getSeriesKey(int series) {
@@ -111,22 +109,23 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     }
 
     public int getItemCount(int series) {
-        return snapshotData.get(series).size();
+        return sourceSeries.get(series).size();
     }
 
     public Number getX(int series, int item) {
-        return snapshotData.get(series).get(item).getTimestamp();
+        return sourceSeries.get(series).getItem(item).getTimestamp();
     }
 
     public Number getY(int series, int item) {
-        return snapshotData.get(series).get(item).doubleValue();
+        return sourceSeries.get(series).getItem(item).doubleValue();
     }
 
-    private void refresh() {
+    private void refresh(final boolean forceRebuild) {
         //call refresh on the swing thread, to update the snapshots for any changed series
         Runnable refreshRunnable = new Runnable() {
             public void run() {
-                boolean changesExist = refreshSnapshotsForChangedSeries();
+                boolean changesExist = refreshSnapshotsForChangedSeries(forceRebuild);
+//                System.out.println("Changes " + changesExist);
                 if ( changesExist ) {
                     //fire the jfreechart change
                     seriesChanged(new SeriesChangeEvent(this));
@@ -139,59 +138,155 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
         } else {
             refreshRunnable.run();
         }
+
+
     }
 
-    private boolean refreshSnapshotsForChangedSeries() {
-        long start = startTime.getTime();
-        long end = endTime.getTime();
+    private boolean refreshSnapshotsForChangedSeries(boolean forceRebuild) {
+        currentStartTime = startTimeSource.getTime();
+        currentEndTime = endTimeSource.getTime();
         boolean changesExist = false;
-        int seriesIndex = 0;
         for (WrappedSourceSeries s : sourceSeries) {
-            if ( s.isModified()) {
-                List snapshot = s.getSnapshotAndUpdateLastModCount(start, end);
-                if ( snapshotData.size() <= seriesIndex) {
-                    snapshotData.add(snapshot);
-                } else {
-                    snapshotData.set(seriesIndex, snapshot);
-                }
-                changesExist = true;
-            }
-            seriesIndex++;
+            changesExist |= s.refreshSnapshotData(forceRebuild);
         }
         return changesExist;
     }
 
-    private class WrappedSourceSeries<E extends TimeSeries> {
+    private class WrappedSourceSeries {
 
         private String key;
-        private final E series;
-        private final Object modCountLock = new Object();
-        private volatile long lastModCountOnRefresh = -1;
+        private final E sourceSeries;
+        private IndexedTimeSeries snapshotData = new DefaultTimeSeries();
+        private TimeSeriesListener wrappedSeriesListener = new WrappedSeriesListener();
+        private volatile long lastModCountOnEvent = -1;
+        private volatile long modCountOnLastRefresh = -1;
+        private int lastIndexFromSource = -1;
+        private volatile boolean rebuildSnapshot;
 
-        public WrappedSourceSeries(String key, E series) {
+        public WrappedSourceSeries(String key, E sourceSeries) {
             this.key = key;
-            this.series = series;
+            this.sourceSeries = sourceSeries;
+            //use a weak ref listener, references from source series shouldn't cause this snapshot series / moving window series to be retained
+            WeakReferenceTimeSeriesListener weakRefListener = new WeakReferenceTimeSeriesListener(sourceSeries, wrappedSeriesListener);
+            sourceSeries.addTimeSeriesListener(weakRefListener);
         }
 
-        public List<TimeSeriesItem> getSnapshotAndUpdateLastModCount(long start, long end) {
-            synchronized (modCountLock) {
-                synchronized (series) {
-                    lastModCountOnRefresh = series.getModCount();
-                    return series.getItemsInRange(start, end);
-                }
-            }
-        }
-
-        public boolean isModified() {
-            return lastModCountOnRefresh != series.getModCount();
-        }
-
-        public E getSeries() {
-            return series;
+        public E getSourceSeries() {
+            return sourceSeries;
         }
 
         public String getKey() {
             return key;
+        }
+
+        public int size() {
+            return snapshotData.size();
+        }
+
+        public TimeSeriesItem getItem(int index) {
+            return snapshotData.getItem(index);
+        }
+
+        /**
+         * @return true, if items in snapshot changed as a result of refresh
+         */
+        public boolean refreshSnapshotData(boolean forceRebuild) {
+            boolean modified = false;
+            synchronized (sourceSeries) {
+                if (hasSourceSeriesBeenUpdated()) {
+
+                    //if we haven't yet processed the latest event, we don't know whether that event was an append or a series change.
+                    //Since we can't tell whether the source series has actually changed so much that the snapshot requires a rebuild, assume it has
+                    if ( lastModCountOnEvent != sourceSeries.getModCount()) {
+                        rebuildSnapshot = true;
+                    }
+
+                    if ( rebuildSnapshot || forceRebuild) {  //we need to rebuild completely
+//                        System.out.println("rebuild for " + key);
+                        snapshotData = new DefaultTimeSeries(SeriesUtils.getItemsInRange(currentStartTime, currentEndTime, sourceSeries));
+                        lastIndexFromSource = SeriesUtils.getIndexOfFirstItemAtOrBefore(currentEndTime, sourceSeries);
+                        modified = true;
+                    } else {  //source series changes since the last refresh didn't affect our current snapshot, we can simply remove and append
+//                        System.out.println("Append for " + key);
+                        modified |= removeFromStartOfSnapshotSeries();
+                        modified |= addToEndOfSnapshotSeries();
+                    }
+
+                    //ignore any more events until after this modCount
+                    modCountOnLastRefresh = sourceSeries.getModCount();
+                    rebuildSnapshot = false;
+                }
+            }
+            return modified;
+        }
+
+        private boolean hasSourceSeriesBeenUpdated() {
+            return modCountOnLastRefresh != sourceSeries.getModCount();
+        }
+
+        private boolean addToEndOfSnapshotSeries() {
+            boolean modified = false;
+            for (int loop=lastIndexFromSource + 1; loop < sourceSeries.size(); loop++) {
+                TimeSeriesItem i = sourceSeries.getItem(loop);
+                if ( i.getTimestamp() <= currentEndTime) {
+                    snapshotData.addItem(i);
+                    lastIndexFromSource = loop;
+                    modified = true;
+                } else {
+                    break;
+                }
+            }
+            return modified;
+        }
+
+        private boolean removeFromStartOfSnapshotSeries() {
+            boolean modified = false;
+            Iterator<TimeSeriesItem> i = snapshotData.iterator();
+            while(i.hasNext()) {
+                if ( i.next().getTimestamp() < currentStartTime) {
+                    i.remove();
+                    modified = true;
+                } else {
+                    break;
+                }
+            }
+            return modified;
+        }
+
+        private class WrappedSeriesListener implements TimeSeriesListener {
+
+            public void itemsAddedOrInserted(TimeSeriesEvent e) {
+                if (shouldProcessEvent(e)) {
+                    rebuildIfCurrentSnapshotAffected(e);
+                }
+                lastModCountOnEvent = e.getSeriesModCount();
+            }
+
+            public void itemsRemoved(TimeSeriesEvent e) {
+                if (shouldProcessEvent(e)) {
+                    rebuildIfCurrentSnapshotAffected(e);
+                }
+                lastModCountOnEvent = e.getSeriesModCount();
+            }
+
+            public void seriesChanged(TimeSeriesEvent e) {
+                if (shouldProcessEvent(e)) {
+                    rebuildSnapshot = true;
+                }
+                lastModCountOnEvent = e.getSeriesModCount();
+            }
+
+            private void rebuildIfCurrentSnapshotAffected(TimeSeriesEvent e) {
+                if (SeriesUtils.fallsWithinRange(e.getFirstItemTimestamp(), snapshotData.getEarliestTimestamp(), snapshotData.getLatestTimestamp()) ||
+                    SeriesUtils.fallsWithinRange(e.getLastItemTimestamp(), snapshotData.getEarliestTimestamp(), snapshotData.getLatestTimestamp())) {
+                    rebuildSnapshot = true;
+                }
+            }
+
+            //sometimes a refresh can trigger and we can update snapshot to a later point before receiving event fired asynchronously
+            private boolean shouldProcessEvent(TimeSeriesEvent e) {
+                return modCountOnLastRefresh < e.getSeriesModCount();
+            }
         }
     }
 
@@ -200,7 +295,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
     //cancel the task once the XYDataset is collected
     private static class MoveWindowTask implements Runnable {
 
-        public WeakReference<MovingWindowXYDataset> xyDatasetWeakReference;
+        private WeakReference<MovingWindowXYDataset> xyDatasetWeakReference;
         private Future future;
 
         public MoveWindowTask(MovingWindowXYDataset xyDataset) {
@@ -214,7 +309,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
         public void run() {
             MovingWindowXYDataset d = xyDatasetWeakReference.get();
             if ( d != null) {
-                d.refresh();
+                d.refresh(false);
             } else {
                 //xy dataset is collected, cancel this task
                 future.cancel(false);

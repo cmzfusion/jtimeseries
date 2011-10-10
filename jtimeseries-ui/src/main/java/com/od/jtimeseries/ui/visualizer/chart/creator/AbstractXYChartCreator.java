@@ -125,7 +125,7 @@ public abstract class AbstractXYChartCreator {
                 plot.getRangeAxis(dataSetIndex).setTickLabelPaint(d.getTimeSeries(0).getColor());
             }
 
-            d.startMovingWindow(Time.seconds(10));
+            d.startMovingWindow(Time.seconds(1));
             dataSetIndex++;
         }
     }

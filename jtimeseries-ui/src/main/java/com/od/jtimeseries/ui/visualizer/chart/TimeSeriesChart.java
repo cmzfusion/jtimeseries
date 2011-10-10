@@ -26,6 +26,7 @@ import com.od.jtimeseries.util.NamedExecutors;
 import com.od.swing.progress.ProgressLayeredPane;
 import com.od.swing.progress.RotatingImageSource;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.weakreferencelistener.WeakReferenceListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartChangeEvent;
@@ -36,8 +37,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -52,12 +52,6 @@ public class TimeSeriesChart extends JPanel {
 
     private static ScheduledExecutorService stopProgressExecutor = NamedExecutors.newSingleThreadScheduledExecutor("TimeSeriesChart-ScheduledExecutor");
     private static final int MIN_ANIMATION_TIME_MILLIS = 500; //showing for less time than this can just flash the animation on, which looks bad
-
-    private static final String[] CHART_REFRESH_LISTEN_PROPERTIES = new String[] {
-        ChartingTimeSeries.DISPLAY_NAME_PROPERTY,
-        ChartingTimeSeries.COLOUR_PROPERTY,
-        ChartingTimeSeries.LOADED_PROPERTY //when initially loading completes, refresh chart
-    };
 
     private String title;
     private List<ChartingTimeSeries> timeSeriesList = Collections.EMPTY_LIST;
@@ -74,11 +68,15 @@ public class TimeSeriesChart extends JPanel {
     private final ChartCreatorFactory chartCreatorFactory = new ChartCreatorFactory();
     private long animationLastStartedTimestamp;
 
-    private PropertyChangeListener loadedProgressPropertyListener = AwtSafeListener.getAwtSafeListener(
+    private PropertyChangeListener loadingProgressPropertyChangeListener = AwtSafeListener.getAwtSafeListener(
             new LoadingProgressPropertyChangeListener(), PropertyChangeListener.class);
 
     private PropertyChangeListener refreshChartPropertyListener = AwtSafeListener.getAwtSafeListener(
             new RefreshChartPropertyChangeListener(), PropertyChangeListener.class);
+
+    private ChartTitleListener chartTitleListener = new ChartTitleListener();
+
+    private List<WeakReferenceListener> weakReferencePropertyListeners = new LinkedList<WeakReferenceListener>();
 
     public TimeSeriesChart(String title) {
         this.title = title;
@@ -89,6 +87,15 @@ public class TimeSeriesChart extends JPanel {
         ));
         progressPane.setDelayBetweenFrames(200);
         add(progressPane, BorderLayout.CENTER);
+        createWeakReferenceListeners();
+    }
+
+    private void createWeakReferenceListeners() {
+        //add week reference listeners to the charting time series, so that references back from the model don't retain this timeSeriesChart
+        weakReferencePropertyListeners.add(new WeakReferenceListener(ChartingTimeSeries.DISPLAY_NAME_PROPERTY, refreshChartPropertyListener));
+        weakReferencePropertyListeners.add(new WeakReferenceListener(ChartingTimeSeries.COLOUR_PROPERTY, refreshChartPropertyListener));
+        weakReferencePropertyListeners.add(new WeakReferenceListener(ChartingTimeSeries.LOADED_PROPERTY, loadingProgressPropertyChangeListener));
+        weakReferencePropertyListeners.add(new WeakReferenceListener(ChartingTimeSeries.STALE_PROPERTY, loadingProgressPropertyChangeListener));
     }
 
     private void createNoChartsPanel() {
@@ -171,21 +178,17 @@ public class TimeSeriesChart extends JPanel {
 
     private void addPropertyListener(List<ChartingTimeSeries> newSelection) {
         for ( ChartingTimeSeries s : newSelection) {
-            for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
-                s.addPropertyChangeListener(property, refreshChartPropertyListener);
-            }
-            s.addPropertyChangeListener(ChartingTimeSeries.LOADED_PROPERTY, loadedProgressPropertyListener);
-            s.addPropertyChangeListener(ChartingTimeSeries.STALE_PROPERTY, loadedProgressPropertyListener);
+             for ( WeakReferenceListener l : weakReferencePropertyListeners) {
+                l.addListenerTo(s);
+             }
         }
     }
 
     private void removePropertyListener(List<ChartingTimeSeries> timeSeriesList) {
-        for ( ChartingTimeSeries s : timeSeriesList) {
-            for ( String property : CHART_REFRESH_LISTEN_PROPERTIES) {
-                s.removePropertyChangeListener(property, refreshChartPropertyListener);
-            }
-            s.addPropertyChangeListener(ChartingTimeSeries.LOADED_PROPERTY, loadedProgressPropertyListener);
-            s.addPropertyChangeListener(ChartingTimeSeries.STALE_PROPERTY, loadedProgressPropertyListener);
+         for ( ChartingTimeSeries s : timeSeriesList) {
+             for ( WeakReferenceListener l : weakReferencePropertyListeners) {
+                l.removeListenerFrom(s);
+             }
         }
     }
 
@@ -258,13 +261,8 @@ public class TimeSeriesChart extends JPanel {
     }
 
     private void addTitleChangeListener(final JFreeChart chart) {
-        chart.addChangeListener(new ChartChangeListener() {
-            public void chartChanged(ChartChangeEvent event) {
-                if ( event.getType() == ChartChangeEventType.GENERAL) {
-                    TimeSeriesChart.this.title = chart.getTitle().getText();
-                }
-            }
-        });
+        WeakReferenceListener l = new WeakReferenceListener(chartTitleListener);
+        l.addListenerTo(chart);
     }
 
     public String getTitle() {
@@ -278,7 +276,6 @@ public class TimeSeriesChart extends JPanel {
         }
     }
 
-
     private class LoadingProgressPropertyChangeListener implements PropertyChangeListener {
 
         public void propertyChange(PropertyChangeEvent evt) {
@@ -290,6 +287,15 @@ public class TimeSeriesChart extends JPanel {
 
         public void propertyChange(PropertyChangeEvent evt) {
             createAndSetChart();
+        }
+    }
+
+    private class ChartTitleListener implements ChartChangeListener {
+
+        public void chartChanged(ChartChangeEvent event) {
+            if ( event.getType() == ChartChangeEventType.GENERAL) {
+                TimeSeriesChart.this.title = chart.getTitle().getText();
+            }
         }
     }
 }

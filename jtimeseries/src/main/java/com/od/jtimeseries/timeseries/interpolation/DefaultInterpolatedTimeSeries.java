@@ -22,7 +22,6 @@ import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.interpolation.InterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
-import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 /**
  * Created by IntelliJ IDEA.

@@ -228,11 +228,11 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
             boolean modified = false;
             for (int loop=lastIndexFromSource + 1; loop < sourceSeries.size(); loop++) {
                 TimeSeriesItem i = sourceSeries.getItem(loop);
-                if ( i.getTimestamp() <= currentEndTime) {
+                if ( SeriesUtils.fallsWithinRange(i.getTimestamp(), currentStartTime, currentEndTime)) {
                     snapshotData.addItem(i);
                     lastIndexFromSource = loop;
                     modified = true;
-                } else {
+                } else if ( loop > currentEndTime ) {
                     break;
                 }
             }
@@ -277,7 +277,8 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
             }
 
             private void rebuildIfCurrentSnapshotAffected(TimeSeriesEvent e) {
-                if (SeriesUtils.fallsWithinRange(e.getFirstItemTimestamp(), snapshotData.getEarliestTimestamp(), snapshotData.getLatestTimestamp()) ||
+                if (snapshotData.size() > 0 &&
+                    SeriesUtils.fallsWithinRange(e.getFirstItemTimestamp(), snapshotData.getEarliestTimestamp(), snapshotData.getLatestTimestamp()) ||
                     SeriesUtils.fallsWithinRange(e.getLastItemTimestamp(), snapshotData.getEarliestTimestamp(), snapshotData.getLatestTimestamp())) {
                     rebuildSnapshot = true;
                 }

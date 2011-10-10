@@ -161,7 +161,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
         private volatile long lastModCountOnEvent = -1;
         private volatile long modCountOnLastRefresh = -1;
         private int lastIndexFromSource = -1;
-        private volatile boolean rebuildSnapshot;
+        private volatile boolean rebuildSnapshot = true;
 
         public WrappedSourceSeries(String key, E sourceSeries) {
             this.key = key;

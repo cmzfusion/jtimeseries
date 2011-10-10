@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  *
  * Adapt one or more TimeSeries to the XYDataSet interface so that they can be charted in JFreeChart
  *
- * This class is mainly for use in Swing uis.
+ * This class is mainly for use in Swing UIs.
  * When the moving window is refreshed change events will be fired on the Swing event thread
  * (You could create a MovingWindowXYDataset in another thread as a one off snapshot, and it would be consistent view to the creating thread,
  * but in that case you can't use the moving window functionality.)
@@ -37,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * takes place on AWT thread the snapshots are safe to use for Swing models
  */
 public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDataset {
-
 
     private static ScheduledExecutorService scheduledExecutorService = NamedExecutors.newScheduledThreadPool(MovingWindowXYDataset.class.getSimpleName(), 2);
 
@@ -138,8 +137,6 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
         } else {
             refreshRunnable.run();
         }
-
-
     }
 
     private boolean refreshSnapshotsForChangedSeries(boolean forceRebuild) {

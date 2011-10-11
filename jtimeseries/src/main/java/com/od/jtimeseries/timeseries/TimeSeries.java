@@ -99,7 +99,9 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
      */
     void removeAll(Iterable<TimeSeriesItem> items);
 
-
+    /**
+     * @return number of TimeSeriesItem in this series
+     */
     int size();
 
     /**
@@ -133,13 +135,19 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
      */
     TimeSeriesItem getFirstItemAtOrAfter(long timestamp);
 
-
+    /**
+     * @return a List of all TimeSeriesItem with timestamp between startTime and endTime inclusive
+     */
     List<TimeSeriesItem> getItemsInRange(long startTime, long endTime);
 
-
+    /**
+     * @return a List containing all TimeSeriesItem in series. The list instance returned is not backed by the timeseries, and operations on it should not affect the source series
+     */
     List<TimeSeriesItem> getSnapshot();
 
-
+    /**
+     * Remove all the timeseries items from this timeseries
+     */
     void clear();
 
     /**

@@ -288,7 +288,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
         }
     }
 
-    //a task to fresh the window, keeping only a weak reference to the XYDataset to
+    //a task to refresh the window, keeping only a weak reference to the XYDataset to
     //prevent the executor tasks keeping it in memory once other references have cleared
     //cancel the task once the XYDataset is collected
     private static class MoveWindowTask implements Runnable {

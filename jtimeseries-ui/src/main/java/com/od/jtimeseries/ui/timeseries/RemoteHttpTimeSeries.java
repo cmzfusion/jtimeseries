@@ -66,13 +66,15 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
     private volatile ScheduledFuture refreshTask;
     private volatile int displayedChartCount;
-    private volatile int errorCount;
+    private volatile int failureCount;
 
+    //until series is loaded or becomes stale, try again at this frequency
+    private static final int NOT_LOADED_REFRESH_TIME_SECONDS = 20;
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
-    private static final int MAX_ERRORS_BEFORE_STALE = 3;
+    private static final int MAX_FAILURES_BEFORE_STALE = 2;
+
     private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 900; //15 mins
     private static final int TICKING_FLAG_HOURS_SINCE_LAST_UPDATE = 4; //if no new data for this time a series is considered 'not ticking'
-    private static final int NOT_LOADED_REFRESH_TIME_SECONDS = 30;
 
 
     RemoteHttpTimeSeries(UiTimeSeriesConfig config) throws MalformedURLException {
@@ -95,7 +97,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     public void setStale(boolean stale) {
         super.setStale(stale);
         if (!stale) {
-            errorCount = 0;
+            failureCount = 0;
             scheduleRefreshIfDisplayedAndNotStale(true);
         }
     }
@@ -219,7 +221,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
                 }
 
                 protected void doInEventThread() throws Exception {
-                    errorCount = 0;
+                    failureCount = 0;
                     setLastRefreshTime(new Date());
                     setLoaded(true);
                 }
@@ -234,9 +236,9 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         private class SetStaleOnErrorListener extends TaskListenerAdapter {
 
             public void error(Task task, Throwable error) {
-                logMethods.logWarning("Error during series load " + task, error);
-                errorCount++;
-                if ( errorCount >= MAX_ERRORS_BEFORE_STALE) {
+                logMethods.logWarning("Failed to load series " + task + " " + error.getClass().getSimpleName());
+                failureCount++;
+                if ( failureCount >= MAX_FAILURES_BEFORE_STALE) {
                     setStale(true);
                 }
             }

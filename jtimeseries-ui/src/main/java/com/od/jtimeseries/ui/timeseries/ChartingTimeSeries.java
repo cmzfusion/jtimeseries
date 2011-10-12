@@ -24,6 +24,7 @@ import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.swing.util.UIUtilities;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import java.awt.*;
@@ -39,6 +40,8 @@ import java.util.Properties;
  * Time: 09:43:39
  *
  * A time series used by the visualizer
+ *
+ * Delegates most property handling to the wrapped timeseries, but holds local state for those which are visualizer-local properties
  */
 public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries implements UIPropertiesTimeSeries, Disposable {
 
@@ -94,10 +97,12 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
     }
 
     public void setDisplayName(String displayName) {
-        String oldValue = this.displayName;
-        this.displayName = displayName;
-        firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
-        fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
+        if ( ! UIUtilities.equals(displayName, this.displayName)) {
+            String oldValue = this.displayName;
+            this.displayName = displayName;
+            firePropertyChange(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY, oldValue, this.displayName);
+            fireNodeChanged(UIPropertiesTimeSeries.DISPLAY_NAME_PROPERTY);
+        }
     }
 
 
@@ -106,17 +111,23 @@ public class ChartingTimeSeries extends ProxyingPropertyChangeTimeseries impleme
     }
 
     public void setSelected(boolean selected) {
-        boolean oldValue = this.selected;
-        this.selected = selected;
-        wrappedSeries.chartSeriesChanged(
-            new ChartSeriesEvent(this,
-                selected ?
-                ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_DISPLAYED :
-                ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_HIDDEN
-            )
-        );
-        firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
-        fireNodeChanged(SELECTED_PROPERTY);
+        if (! UIUtilities.equals(selected, this.selected)) {
+            if ( selected) {
+                //clear stale flag, user may be unselecting/reselecting instead of triggering reconnect
+                setStale(false);
+            }
+            boolean oldValue = this.selected;
+            this.selected = selected;
+            wrappedSeries.chartSeriesChanged(
+                new ChartSeriesEvent(this,
+                    selected ?
+                    ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_DISPLAYED :
+                    ChartSeriesEvent.ChartSeriesEventType.SERIES_CHART_HIDDEN
+                )
+            );
+            firePropertyChange(SELECTED_PROPERTY, oldValue, this.selected);
+            fireNodeChanged(SELECTED_PROPERTY);
+        }
     }
 
     //support summary stats properties from wrapped series

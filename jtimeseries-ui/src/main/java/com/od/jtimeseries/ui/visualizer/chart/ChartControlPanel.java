@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.jidesoft.combobox.AbstractComboBox;
 import com.jidesoft.combobox.ColorComboBox;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
@@ -88,8 +89,9 @@ public class ChartControlPanel extends JPanel {
 
     private void setComponentSizesRecursive(JComponent parent) {
         for ( Component c : parent.getComponents()) {
-            if ( c instanceof JComboBox || c instanceof JTextField) {
+            if ( c instanceof AbstractComboBox || c instanceof JTextField) {
                 c.setMaximumSize(c.getPreferredSize());
+                c.setMinimumSize(c.getPreferredSize());
             } else if ( c instanceof JComponent) {
                 setComponentSizesRecursive((JComponent) c);
             }

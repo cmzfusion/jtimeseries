@@ -44,7 +44,13 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
 
     private Object proxySource;
 
-    private ProxyTimeSeriesEvent proxyEvent = new ProxyTimeSeriesEvent();
+    //use a thread local event relative to this instance, in case this listener is handling events
+    //from sources which don't share an event publisher thread
+    private ThreadLocal<ProxyTimeSeriesEvent> proxyEvent = new ThreadLocal<ProxyTimeSeriesEvent>() {
+        public ProxyTimeSeriesEvent initialValue() {
+            return new ProxyTimeSeriesEvent();
+        }
+    };
 
     public ProxyTimeSeriesEventHandler(Object proxySource) {
         this.proxySource = proxySource;
@@ -70,8 +76,9 @@ public class ProxyTimeSeriesEventHandler extends TimeSeriesListenerSupport imple
     }
 
     private ProxyTimeSeriesEvent getThreadLocalEventAndSetDelegate(TimeSeriesEvent h) {
-        proxyEvent.setDelegateValues(proxySource, h);
-        return proxyEvent;
+        ProxyTimeSeriesEvent e = proxyEvent.get();
+        e.setDelegateValues(proxySource, h);
+        return e;
     }
 
     public void finalize() throws Throwable {

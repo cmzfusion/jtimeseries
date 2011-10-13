@@ -181,6 +181,10 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
         public void setLogLevel(LogLevel l) {
             standardOutMethods.setLogLevel(l);
         }
+
+        public LogLevel getLogLevel() {
+            return standardOutMethods.getLogLevel();
+        }
         
         private String addThreadDetails(String s) {
             return "{" + Thread.currentThread().getName() + "} " + " " + s;

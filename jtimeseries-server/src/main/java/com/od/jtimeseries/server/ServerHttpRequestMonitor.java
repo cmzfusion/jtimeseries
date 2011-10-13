@@ -9,6 +9,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.Socket;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -34,12 +35,27 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
     }
 
     public void servingRequest(long requestId, Socket mySocket, String uri, String method, Properties header, Properties params) {
-        logMethods.logInfo("Serving HTTPD request " + requestId + " from client " + mySocket.getInetAddress() + ", URI " + uri);
+        StringBuilder sb = new StringBuilder().append(
+                "Serving HTTPD request ").append(requestId).append(
+                " from client ").append(mySocket.getInetAddress()).append(
+                ", URI ").append(uri);
+
+        if ( logMethods.getLogLevel().equalsOrExceeds(LogMethods.LogLevel.DEBUG)) {
+            logProperties(header, sb, "Header:");
+        }
+        logProperties(params, sb, "Param:");
+        logMethods.logInfo(sb.toString());
+    }
+
+    private void logProperties(Properties header, StringBuilder sb, String keyDescription) {
+        for ( Map.Entry<Object,Object> e : header.entrySet())  {
+            sb.append(keyDescription).append("[").append(e.getKey()).append("=").append(e.getValue()).append("] ");
+        }
     }
 
     public void finishedRequest(long requestId, Socket mySocket) {
         long timeTaken = logQueryTime();
-        logMethods.logDebug("Fnished HTTPD request " + requestId + " in " + timeTaken + " millis");
+        logMethods.logDebug("Finished HTTPD request " + requestId + " in " + timeTaken + " millis");
     }
 
     private long logQueryTime() {

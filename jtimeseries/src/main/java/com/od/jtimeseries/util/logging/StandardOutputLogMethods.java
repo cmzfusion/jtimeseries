@@ -28,7 +28,7 @@ import java.util.Date;
  */
 public class StandardOutputLogMethods implements LogMethods {
 
-    private LogLevel currentLogLevel = LogLevel.INFO;
+    private volatile LogLevel currentLogLevel = LogLevel.INFO;
 
     public void logInfo(String s) {
         System.out.println("JTIMESERIES INFO--> " + new Date() + " " + s);
@@ -79,4 +79,7 @@ public class StandardOutputLogMethods implements LogMethods {
         this.currentLogLevel = l;
     }
 
+    public LogLevel getLogLevel() {
+        return currentLogLevel;
+    }
 }

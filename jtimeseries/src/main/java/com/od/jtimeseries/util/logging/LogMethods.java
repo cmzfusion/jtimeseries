@@ -42,6 +42,8 @@ public interface LogMethods {
 
     void setLogLevel(LogLevel l);
 
+    LogLevel getLogLevel();
+
     static enum LogLevel {
         ERROR(1),
         WARNING(2),

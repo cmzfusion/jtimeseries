@@ -85,8 +85,13 @@
                                 <constructor-arg value="${serverMetricsContextPath}.file"/>
                             </bean>
 
-                            <!-- Total time ms taken by file read/write operations -->
-                            <bean class="com.od.jtimeseries.server.servermetrics.FileOperationTotalTime">
+                            <!-- Total bytes read from timeseries files -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileBytesRead">
+                                <constructor-arg value="${serverMetricsContextPath}.file"/>
+                            </bean>
+
+                             <!-- Total bytes writen to timeseries files -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.FileBytesWritten">
                                 <constructor-arg value="${serverMetricsContextPath}.file"/>
                             </bean>
 

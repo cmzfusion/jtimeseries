@@ -73,7 +73,7 @@ public class RoundRobinSerializer {
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
-    private final Object writeLock = new Object();
+    private final Object readWriteLock = new Object();
     private volatile boolean shutdown;
 
     public RoundRobinSerializer(File rootDirectory, String timeSeriesFileSuffix) {
@@ -95,7 +95,7 @@ public class RoundRobinSerializer {
      */
     public void serialize(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {
         fileRewriteCounter.incrementCount();
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             if ( ! shutdown ) {
                 byte[] properties = getBytesForProperties(fileHeader);
                 int requiredHeaderLength = properties.length + BYTES_IN_HEADER_START;
@@ -154,7 +154,7 @@ public class RoundRobinSerializer {
 
     public RoundRobinTimeSeries deserialize(FileHeader fileHeader) throws SerializationException {
         fileReadCounter.incrementCount();
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             File f = getFile(fileHeader);
             AuditedInputStream d = null;
             try {
@@ -178,7 +178,7 @@ public class RoundRobinSerializer {
 
     public FileHeader readHeader(File f) throws SerializationException {
         fileHeaderReadCounter.incrementCount();
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             FileHeader h = new FileHeader();
             doUpdateHeader(h, f);
             return h;
@@ -186,7 +186,7 @@ public class RoundRobinSerializer {
     }
 
     public boolean fileExists(FileHeader fileHeader) {
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             boolean result = false;
             File f = null;
             try {
@@ -203,7 +203,7 @@ public class RoundRobinSerializer {
      * Update the fileHeader by reading the file header information from disk
      */
     public void updateHeader(FileHeader fileHeader) throws SerializationException {
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             File f = getFile(fileHeader);
             if ( ! f.exists()) {
                 throw new SerializationException("File for header " + fileHeader + " does not exist");
@@ -219,7 +219,7 @@ public class RoundRobinSerializer {
      */
     public void append(FileHeader header, IndexedTimeSeries l) throws SerializationException {
         fileAppendCounter.incrementCount();
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             if ( ! shutdown && l.size() > 0) {
                 File file = getFile(header);
                 checkFileWriteable(file);
@@ -280,7 +280,7 @@ public class RoundRobinSerializer {
     }
 
     public File getFile(FileHeader f) throws SerializationException {
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             if ( f.getPath() == null) {
                 throw new SerializationException("Cannot get File for FileHeader with null context path");
             }
@@ -295,7 +295,7 @@ public class RoundRobinSerializer {
     }
 
     public File createFile(FileHeader fileHeader) throws SerializationException {
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             RoundRobinTimeSeries r = new RoundRobinTimeSeries(fileHeader.getSeriesLength());
             serialize(fileHeader, r);
             return getFile(fileHeader);
@@ -467,7 +467,7 @@ public class RoundRobinSerializer {
     }
 
     private void shutdownNow() {
-        synchronized (writeLock) {
+        synchronized (readWriteLock) {
             shutdown = true;
         }
     }

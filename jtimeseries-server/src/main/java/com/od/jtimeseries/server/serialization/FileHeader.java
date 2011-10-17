@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.Properties;
 
 /**
@@ -31,9 +34,11 @@ import java.util.Properties;
  */
 public class FileHeader {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(FileHeader.class);
     //these properties will be stored in the serialized series files, careful if you change them!
     private static final String PATH_KEY = "CONTEXT_PATH";
     private static final String DESCRIPTION_KEY = "DESCRIPTION";
+    private static int MAX_PROPERTY_LENGTH = 1024;
 
     private int headerLength = 512;  //default start length for header
     private Properties fileProperties = new Properties();
@@ -64,6 +69,25 @@ public class FileHeader {
 
     public Properties getFileProperties() {
         return fileProperties;
+    }
+
+    public static void setMaxPropertyLength(String propertyLength) {
+        MAX_PROPERTY_LENGTH = Integer.valueOf(propertyLength);
+    }
+
+    public String setFileProperty(String key, String value) {
+        String result = null;
+        if ( key.length() > MAX_PROPERTY_LENGTH || value.length() > MAX_PROPERTY_LENGTH) {
+            logMethods.logWarning("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
+                ", start of key " + key.substring(0, Math.min(124, key.length())));
+        } else {
+            result = (String)fileProperties.setProperty(key, value);
+        }
+        return result;
+    }
+
+    public String getFileProperty(String key) {
+        return fileProperties.getProperty(key);
     }
 
     public void setFileProperties(Properties fileProperties) {
@@ -147,4 +171,5 @@ public class FileHeader {
                     currentTail - currentHead :
                     currentTail + (seriesLength - currentHead);
     }
+
 }

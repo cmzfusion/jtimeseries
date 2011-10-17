@@ -62,8 +62,8 @@ import java.util.concurrent.TimeUnit;
 public class FilesystemTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries, IndexedTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(FilesystemTimeSeries.class);
-
     private static ScheduledExecutorService clearCacheExecutor = NamedExecutors.newSingleThreadScheduledExecutor("FilesystemTimeSeriesClearCache");
+
     private Executor eventExecutor = TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     private SoftReference<RoundRobinTimeSeries> softSeriesReference = new SoftReference<RoundRobinTimeSeries>(null);
     private RoundRobinSerializer roundRobinSerializer;
@@ -74,7 +74,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private WriteBehindCache writeBehindCache;
     private long lastTimestamp = -1;
     private ScheduledFuture nextFlushTask;
-    private volatile boolean persistenceStopped = false;
     private volatile long modCount;
 
     public FilesystemTimeSeries(String parentPath, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
@@ -119,20 +118,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         for (TimeSeriesItem i : items) {
         	addItem(i);
         }
-    }
-
-    /**
-     * Stop persistence for this Filesystem times series
-     */
-    public synchronized void stopPersistence() {
-        persistenceStopped = true;
-    }
-
-    /**
-     * @return is persistence stopped
-     */
-    public boolean isPersistenceStopped() {
-        return persistenceStopped;
     }
 
     private boolean doAppend(final TimeSeriesItem i) {
@@ -238,8 +223,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return getRoundRobinSeries().iterator();
     }
 
-
-
     /**
      * Intentionally break the contract of List.equals() - we shouldn't need to support logical equality of
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
@@ -270,6 +253,14 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     public List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
         return getRoundRobinSeries().getItemsInRange(startTime, endTime);
+    }
+
+    public String setProperty_Locked(String key, String value) {
+        return fileHeader.setFileProperty(key, value);
+    }
+
+    public String getProperty_Locked(String key) {
+        return fileHeader.getFileProperty(key);
     }
 
     public FileHeader getFileHeader() {
@@ -357,25 +348,23 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
 
         public void flush() {
-            if ( ! persistenceStopped) {
-                try {
-                    if ( roundRobinSeries != null) {
-                        //we have a local series which contains other changes, as well as possibly some appends
-                        roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
-                    } else {
-                        //only changes are appends
-                        roundRobinSerializer.append(fileHeader, itemsToAppend);
-                    }
-
-                    //clear cache if no exception / write succeeded
-                    //otherwise hold on to changes until we try the write again
-                    clearCache();
-
-                } catch (Throwable t) {
-                    logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying");
-                    logMethods.logDebug("Failed to write to timeseries file " + fileHeader, t);
-                    scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
+            try {
+                if ( roundRobinSeries != null) {
+                    //we have a local series which contains other changes, as well as possibly some appends
+                    roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
+                } else {
+                    //only changes are appends
+                    roundRobinSerializer.append(fileHeader, itemsToAppend);
                 }
+
+                //clear cache if no exception / write succeeded
+                //otherwise hold on to changes until we try the write again
+                clearCache();
+
+            } catch (Throwable t) {
+                logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying");
+                logMethods.logDebug("Failed to write to timeseries file " + fileHeader, t);
+                scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
             }
         }
 

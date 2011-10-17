@@ -100,8 +100,8 @@ public class SummaryStatisticsCalculator {
             for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
                     recalculateStats(s);
+                    s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
                 }
-                s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
 
                 sleepFor(requiredSleepTime);
             }

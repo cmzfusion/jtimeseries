@@ -42,7 +42,7 @@ public class FileHeader {
 
     private int headerLength = 512;  //default start length for header
     private Properties fileProperties = new Properties();
-    private int seriesLength;
+    private int seriesMaxLength;
     private int currentHead;
     private int currentTail;
     private long mostRecentItemTimestamp = -1;
@@ -51,12 +51,12 @@ public class FileHeader {
     }
 
     /**
-     * @param seriesLength, maximum size for this series
+     * @param seriesMaxLength, maximum size for this series
      */
-    public FileHeader(String path, String description, int seriesLength) {
+    public FileHeader(String path, String description, int seriesMaxLength) {
         fileProperties.put(PATH_KEY, path);
         fileProperties.put(DESCRIPTION_KEY, description);
-        this.seriesLength = seriesLength;
+        this.seriesMaxLength = seriesMaxLength;
     }
 
     public String getPath() {
@@ -111,16 +111,16 @@ public class FileHeader {
     /**
      * @return length of round robin series, which is the maximum size this series can obtain
      */
-    public int getSeriesLength() {
-        return seriesLength;
+    public int getSeriesMaxLength() {
+        return seriesMaxLength;
     }
 
-    public void setSeriesLength(int seriesLength) {
-        this.seriesLength = seriesLength;
+    public void setSeriesMaxLength(int seriesLength) {
+        this.seriesMaxLength = seriesLength;
     }
 
     public int getCurrentSize() {
-        return calculateCurrentSize(seriesLength, currentHead, currentTail);
+        return calculateCurrentSize(seriesMaxLength, currentHead, currentTail);
     }
 
     public int getCurrentHead() {

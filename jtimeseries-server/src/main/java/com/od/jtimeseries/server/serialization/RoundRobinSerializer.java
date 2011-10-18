@@ -105,18 +105,19 @@ public class RoundRobinSerializer {
                 int head = t.size() == 0 ? -1 : 0;
                 fileHeader.setCurrentHead(head);
                 fileHeader.setCurrentTail(t.size());
-                fileHeader.setSeriesLength(t.getMaxSize());
+                fileHeader.setSeriesMaxLength(t.getMaxSize());
                 fileHeader.setMostRecentItemTimestamp(t.getLatestTimestamp());
 
                 File f = getFile(fileHeader);
                 AuditedOutputStream b = null;
                 try {
-                    b = new AuditedOutputStream(new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f))));
+                    b = new AuditedOutputStream(new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f))),
+                        fileBytesWritten);
 
                     //BYTES_IN_HEADER_START  (70 bytes)
                     b.writeBytes(VERSION_STRING); //add a version description, to support future versioning
                     b.writeInt(fileHeader.getHeaderLength());  //offset where data will start
-                    b.writeInt(fileHeader.getSeriesLength());
+                    b.writeInt(fileHeader.getSeriesMaxLength());
                     b.writeInt(fileHeader.getCurrentHead());  //start index in rr structure
                     b.writeInt(fileHeader.getCurrentTail());
                     b.writeLong(fileHeader.getMostRecentItemTimestamp());
@@ -158,7 +159,7 @@ public class RoundRobinSerializer {
             File f = getFile(fileHeader);
             AuditedInputStream d = null;
             try {
-                d = new AuditedInputStream(new DataInputStream(new BufferedInputStream(new FileInputStream(f))));
+                d = new AuditedInputStream(new DataInputStream(new BufferedInputStream(new FileInputStream(f))), fileBytesRead);
                 readHeader(fileHeader, d);
                 return readSeriesData(fileHeader, d);
             } catch (Throwable e) {
@@ -225,7 +226,7 @@ public class RoundRobinSerializer {
                 checkFileWriteable(file);
                 AuditedRandomAccessWriter r = null;
                 try {
-                    r = new AuditedRandomAccessWriter(new RandomAccessFile(file, "rw"));
+                    r = new AuditedRandomAccessWriter(new RandomAccessFile(file, "rw"), fileBytesWritten, fileBytesRead);
                     r.seek(VERSION_STRING_LENGTH);
                     int headerLength = r.readInt();
                     int seriesLength = r.readInt();
@@ -296,7 +297,7 @@ public class RoundRobinSerializer {
 
     public File createFile(FileHeader fileHeader) throws SerializationException {
         synchronized (readWriteLock) {
-            RoundRobinTimeSeries r = new RoundRobinTimeSeries(fileHeader.getSeriesLength());
+            RoundRobinTimeSeries r = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
             serialize(fileHeader, r);
             return getFile(fileHeader);
         }
@@ -309,7 +310,7 @@ public class RoundRobinSerializer {
     private void doUpdateHeader(FileHeader fileHeader, File f) throws SerializationException {
         AuditedInputStream d = null;
         try {
-            d = new AuditedInputStream(new DataInputStream(new FileInputStream(f)));
+            d = new AuditedInputStream(new DataInputStream(new FileInputStream(f)), fileBytesRead);
             readHeader(fileHeader, d);
         } catch (Throwable e) {
             fileErrorCounter.incrementCount();
@@ -335,7 +336,7 @@ public class RoundRobinSerializer {
 
 
     private RoundRobinTimeSeries readSeriesData(FileHeader fileHeader, AuditedInputStream d) throws IOException {
-        RoundRobinTimeSeries series = new RoundRobinTimeSeries(fileHeader.getSeriesLength());
+        RoundRobinTimeSeries series = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
         if ( fileHeader.getCurrentHead() != -1) {  //file is not empty
             int itemsRead = 0;
             List<TimeSeriesItem> tailItems = new ArrayList<TimeSeriesItem>();
@@ -351,7 +352,7 @@ public class RoundRobinSerializer {
 
             int itemsToRead = fileHeader.getCurrentTail() > fileHeader.getCurrentHead() ?
                     fileHeader.getCurrentTail() - fileHeader.getCurrentHead() :
-                    fileHeader.getSeriesLength() - fileHeader.getCurrentHead();
+                    fileHeader.getSeriesMaxLength() - fileHeader.getCurrentHead();
 
             //here we read the items into a local list first, then add them all at once
             //this is to avoid triggering an insert event for each time series item when we add them to the series
@@ -362,7 +363,7 @@ public class RoundRobinSerializer {
 
             itemsToAdd.addAll(tailItems);
             //quicker to new up a series with the initial items than add each
-            series = new RoundRobinTimeSeries(itemsToAdd, fileHeader.getSeriesLength());
+            series = new RoundRobinTimeSeries(itemsToAdd, fileHeader.getSeriesMaxLength());
         }
         return series;
     }
@@ -371,7 +372,7 @@ public class RoundRobinSerializer {
     private void readHeader(FileHeader fileHeader, AuditedInputStream d) throws IOException {
         readAndCheckVersion(fileHeader, d);
         fileHeader.setHeaderLength(d.readInt());
-        fileHeader.setSeriesLength(d.readInt());
+        fileHeader.setSeriesMaxLength(d.readInt());
         fileHeader.setCurrentHead(d.readInt());
         fileHeader.setCurrentTail(d.readInt());
         fileHeader.setMostRecentItemTimestamp(d.readLong());
@@ -504,130 +505,4 @@ public class RoundRobinSerializer {
         RoundRobinSerializer.fileBytesRead = v;
     }
 
-    private class AuditedOutputStream {
-
-        private DataOutputStream dataOutputStream;
-        private int bytesWritten = 0;
-
-        public AuditedOutputStream(DataOutputStream dataOutputStream) {
-            this.dataOutputStream = dataOutputStream;
-        }
-
-        public void writeInt(int v) throws IOException {
-            dataOutputStream.writeInt(v);
-            bytesWritten += 4;
-        }
-
-        public void write(byte[] b) throws IOException {
-            dataOutputStream.write(b);
-            bytesWritten += b.length;
-        }
-
-        public void writeBytes(String s) throws IOException {
-            dataOutputStream.writeBytes(s);
-            bytesWritten += s.length();
-        }
-
-        public void writeLong(long v) throws IOException {
-            dataOutputStream.writeLong(v);
-            bytesWritten += 8;
-        }
-
-        public void writeDouble(double v) throws IOException {
-            dataOutputStream.writeDouble(v);
-            bytesWritten += 8;
-        }
-
-        public void flush() throws IOException {
-            dataOutputStream.flush();
-        }
-
-        public void close() throws IOException {
-            fileBytesWritten.newValue(bytesWritten);
-            dataOutputStream.close();
-        }
-    }
-
-    private class AuditedInputStream {
-
-        private DataInputStream dataInputStream;
-        private int bytesRead;
-
-        public AuditedInputStream(DataInputStream dataInputStream) {
-            this.dataInputStream = dataInputStream;
-        }
-
-        public long readLong() throws IOException {
-            bytesRead += 8;
-            return dataInputStream.readLong();
-        }
-
-        public double readDouble() throws IOException {
-            bytesRead += 8;
-            return dataInputStream.readDouble();
-        }
-
-        public int readInt() throws IOException {
-            bytesRead += 4;
-            return dataInputStream.readInt();
-        }
-
-        public long skip(long n) throws IOException {
-            long skipped = dataInputStream.skip(n);
-            bytesRead += skipped;   //treat this as a read, probably the underlying input stream does read but discards
-            return skipped;
-        }
-
-        public int read(byte[] bytes, int offset, int i) throws IOException {
-            int read = dataInputStream.read(bytes, offset, i);
-            bytesRead += read;
-            return read;
-        }
-
-        public void close() throws IOException {
-            fileBytesRead.newValue(bytesRead);
-            dataInputStream.close();
-        }
-    }
-
-    private class AuditedRandomAccessWriter {
-
-        private RandomAccessFile rw;
-        private int bytesRead;
-        private int bytesWritten;
-
-        public AuditedRandomAccessWriter(RandomAccessFile rw) {
-            this.rw = rw;
-        }
-
-        public void seek(int bytes) throws IOException {
-            rw.seek(bytes);
-        }
-
-        public int readInt() throws IOException {
-            bytesRead += 4;
-            return rw.readInt();
-        }
-
-        public void writeInt(int i) throws IOException {
-            bytesWritten += 4;
-            rw.writeInt(i);
-        }
-
-        public void writeLong(long l) throws IOException {
-            bytesWritten += 8;
-            rw.writeLong(l);
-        }
-
-        public void writeDouble(double v) throws IOException {
-            bytesWritten += 8;
-            rw.writeDouble(v);
-        }
-
-        public void close() throws IOException {
-            fileBytesWritten.newValue(bytesWritten);
-            fileBytesRead.newValue(bytesRead);
-            rw.close();
-        }
-    }
 }

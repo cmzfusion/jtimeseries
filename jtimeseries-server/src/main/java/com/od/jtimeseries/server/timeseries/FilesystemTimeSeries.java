@@ -23,7 +23,6 @@ import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
-import com.od.jtimeseries.timeseries.impl.TimeSeriesOrderingException;
 import com.od.jtimeseries.timeseries.impl.ProxyTimeSeriesEventHandler;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
@@ -154,7 +153,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public synchronized int getMaxSize() {
-        return fileHeader.getSeriesLength();
+        return fileHeader.getSeriesMaxLength();
     }
 
     public synchronized List<TimeSeriesItem> getSnapshot() {

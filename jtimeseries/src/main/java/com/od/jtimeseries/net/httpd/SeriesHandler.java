@@ -42,7 +42,7 @@ public class SeriesHandler extends AbstractHandler {
     public static final String SERIES_POSTFIX = ".series";
     public final static String SERIES_XSL_RESOURCE = System.getProperty("JTimeSeriesSeriesXslResource", "series.xsl");
 
-    private ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
+    private static ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
         public SimpleDateFormat initialValue() {
             return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         }

@@ -76,7 +76,8 @@ public class SummaryStatsTableModel<E extends UIPropertiesTimeSeries> extends Dy
     protected Object getValueForDynamicColumn(int rowIndex, int extraColsIndex) {
         String propertyName = propertyNamesList.get(extraColsIndex);
         String propertyValue = getObject(rowIndex).getProperty(propertyName);
-        return propertyValue == null || "?".equals(propertyValue) ? null : Double.valueOf(propertyValue);
+        return propertyValue == null || "?".equals(propertyValue) ? null :
+            "NaN".equals(propertyValue) ? null : Double.valueOf(propertyValue);
     }
 
     protected void doAddDynamicColumn(String columnName) {

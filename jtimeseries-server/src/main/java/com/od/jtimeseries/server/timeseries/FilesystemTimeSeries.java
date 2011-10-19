@@ -254,12 +254,17 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return getRoundRobinSeries().getItemsInRange(startTime, endTime);
     }
 
+    //delegate property handling to FileHeader, so that properties get persisted
     public String setProperty_Locked(String key, String value) {
         return fileHeader.setFileProperty(key, value);
     }
 
     public String getProperty_Locked(String key) {
         return fileHeader.getFileProperty(key);
+    }
+
+    public Properties getProperties_Locked() {
+        return fileHeader.getFileProperties();
     }
 
     public FileHeader getFileHeader() {
@@ -352,7 +357,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                     //we have a local series which contains other changes, as well as possibly some appends
                     roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
                 } else {
-                    //only changes are appends
+                    //only changes are appends, or if the append series is empty there may be
+                    //other changes which require a header rewrite (e.g. properties)
                     roundRobinSerializer.append(fileHeader, itemsToAppend);
                 }
 
@@ -387,33 +393,40 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         public RoundRobinTimeSeries getSeries() {
             return roundRobinSeries;
         }
-    }
 
-    private void scheduleFlushCacheTask(long delayMillis) {
-        //cancel the next flush, and schedule a new one sooner
-        if ( nextFlushTask == null || nextFlushTask.isDone())  {
-            scheduleNewTask(delayMillis);
-        } else if ( nextFlushTask.getDelay(TimeUnit.MILLISECONDS) > delayMillis ) {
-            //bring forward by cancelling and scheduling a new task
-            nextFlushTask.cancel(false);
-            scheduleNewTask(delayMillis);
+        private void scheduleFlushCacheTask(long delayMillis) {
+            //cancel the next flush, and schedule a new one sooner
+            if ( nextFlushTask == null || nextFlushTask.isDone())  {
+                scheduleNewTask(delayMillis);
+            } else if ( nextFlushTask.getDelay(TimeUnit.MILLISECONDS) > delayMillis ) {
+                //bring forward by cancelling and scheduling a new task
+                nextFlushTask.cancel(false);
+                scheduleNewTask(delayMillis);
+            }
+        }
+
+        private void scheduleNewTask(long delayMillis) {
+            nextFlushTask = clearCacheExecutor.schedule(
+                new Runnable() {
+                    public void run() {
+                        //take the lock on the series while we flush the cache so changes are atomic
+                        synchronized(FilesystemTimeSeries.this) {
+                            writeBehindCache.flush();
+                        }
+                    }
+                },
+                delayMillis,
+                TimeUnit.MILLISECONDS
+            );
         }
     }
 
-    private void scheduleNewTask(long delayMillis) {
-        nextFlushTask = clearCacheExecutor.schedule(
-            new Runnable() {
-                public void run() {
-                    synchronized( FilesystemTimeSeries.this) {
-                        writeBehindCache.flush();
-                    }
-                }
-            },
-            delayMillis,
-            TimeUnit.MILLISECONDS
-        );
+    /**
+     * Queue for a rewrite, will be header only unless there are other appends/changes
+     */
+    public synchronized void queueHeaderRewrite() {
+        writeBehindCache.scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
     }
-
 
     //testing hook
     public synchronized void flush() {

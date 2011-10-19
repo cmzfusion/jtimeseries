@@ -28,6 +28,8 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.text.DecimalFormat;
 
@@ -45,6 +47,12 @@ public class SummaryStatisticsCalculator {
     private TimeSeriesContext rootContext;
     private List<SummaryStatistic> statistics;
     private TimePeriod refreshPeriod;
+
+    private static ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
+        public SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss, z");
+        }
+    };
 
     public SummaryStatisticsCalculator(TimeSeriesContext rootContext, TimePeriod refreshPeriod, List<SummaryStatistic> statistics) {
         this.rootContext = rootContext;
@@ -100,7 +108,10 @@ public class SummaryStatisticsCalculator {
             for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
                     recalculateStats(s);
-                    s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY, String.valueOf(System.currentTimeMillis()));
+                    Date d = new Date();
+                    s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY, String.valueOf(d.getTime()));
+                    s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIME_PROPERTY, simpleDateFormat.get().format(d));
+                    s.queueHeaderRewrite();
                 }
 
                 sleepFor(requiredSleepTime);
@@ -122,7 +133,9 @@ public class SummaryStatisticsCalculator {
 
                     //all stats will be doubles currently
                     String propertyName = ContextProperties.createSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
-                    s.setProperty(propertyName, doubleFormat.format(n.doubleValue()));
+                    double value = n.doubleValue();
+                    //always use NaN as the String NaN representation
+                    s.setProperty(propertyName, Double.isNaN(value) ? "NaN" : doubleFormat.format(value));
                 } catch (Throwable t) {
                     logMethods.logError("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);
                 }
@@ -135,7 +148,7 @@ public class SummaryStatisticsCalculator {
          */
         private boolean requiresRecalculation(FilesystemTimeSeries s) {
             boolean result = true;
-            String lastRecalcValue = s.getProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_PROPERTY);
+            String lastRecalcValue = s.getProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY);
             if ( lastRecalcValue != null ) {
                 long lastUpdateTimestamp = s.getLatestTimestamp();
                 long lastRecalc = Long.valueOf(lastRecalcValue);

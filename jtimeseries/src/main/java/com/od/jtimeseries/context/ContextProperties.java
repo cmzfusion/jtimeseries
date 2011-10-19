@@ -42,7 +42,8 @@ public class ContextProperties {
     /**
      * Time summary stats were last updated
      */
-    public static final String SUMMARY_STATS_LAST_UPDATE_PROPERTY = createSummaryStatsPropertyName("lastSummaryStatsUpdate", SummaryStatsDataType.TIMESTAMP);
+    public static final String SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY = createSummaryStatsPropertyName("lastSummaryStatsUpdateTimestamp", SummaryStatsDataType.TIMESTAMP);
+    public static final String SUMMARY_STATS_LAST_UPDATE_TIME_PROPERTY = createSummaryStatsPropertyName("lastSummaryStatsUpdateTime", SummaryStatsDataType.TIMESTAMP);
 
 
     public static String createSummaryStatsPropertyName(String statisticName, SummaryStatsDataType d) {
@@ -65,6 +66,9 @@ public class ContextProperties {
         return sb.toString();
     }
 
+    /**
+     * @return a Properties object populated with summary stats by decoding the summary stats attribute of a time series index query
+     */
     public static Properties createSummaryStatsProperties(String summaryStatsStringRepresentation) {
         Properties p = new Properties();
         StringTokenizer st = new StringTokenizer(summaryStatsStringRepresentation, SUMMARY_STATS_SEPARATOR_TOKEN);
@@ -122,7 +126,8 @@ public class ContextProperties {
         UNKNOWN("unknown"),
         TIMESTAMP("ts"),
         LONG("l"),
-        DOUBLE("d");
+        DOUBLE("d"),
+        STRING("s");
 
         String propertySuffix;
 

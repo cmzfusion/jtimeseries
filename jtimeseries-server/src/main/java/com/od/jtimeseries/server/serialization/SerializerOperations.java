@@ -178,23 +178,24 @@ class SerializerOperations {
             int bytesToWriteAtEnd = Math.min(appendBuffer.capacity(), (header.getSeriesMaxLength() - header.getCurrentTail()) * 16);
             int bytesToWriteAtStart = appendBuffer.capacity() - bytesToWriteAtEnd;
 
-            ByteBuffer startBuffer = ByteBuffer.allocate(bytesToWriteAtStart);
-            ByteBuffer endBuffer = ByteBuffer.allocate(bytesToWriteAtEnd);
-            assert(startBuffer.capacity() + endBuffer.capacity() == toAppend.size());
-
             byte[] appendArray = appendBuffer.array();
-            startBuffer.put(appendArray, appendArray.length - startBuffer.capacity(), startBuffer.capacity());
-            endBuffer.put(appendArray, 0, endBuffer.capacity());
+            if ( bytesToWriteAtStart > 0) {
+                ByteBuffer startBuffer = ByteBuffer.allocate(bytesToWriteAtStart);
+                startBuffer.put(appendArray, appendArray.length - startBuffer.capacity(), startBuffer.capacity());
+                r.position(header.getHeaderLength());
+                r.writeCompletely(startBuffer);
+            }
 
-            r.position(header.getHeaderLength());
-            r.writeCompletely(startBuffer);
+            if ( bytesToWriteAtEnd > 0 ) {
+                ByteBuffer endBuffer = ByteBuffer.allocate(bytesToWriteAtEnd);
+                endBuffer.put(appendArray, 0, endBuffer.capacity());
+                r.position(header.getHeaderLength() + (header.getCurrentTail() * 16));
+                r.writeCompletely(endBuffer);
+            }
 
-            r.position(header.getHeaderLength() + (header.getCurrentTail() * 16));
-            r.writeCompletely(endBuffer);
-
+            //now update header information on disk and in memory
             r.position(CURRENT_HEAD_OFFSET);
             ByteBuffer b = ByteBuffer.allocate(16);
-            //now update header information on disk and in memory
             b.putInt(newHead);
             b.putInt(newTail);
             long newLastTimestamp = toAppend.getItem(toAppend.size() - 1).getTimestamp();

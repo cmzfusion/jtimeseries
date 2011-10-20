@@ -62,10 +62,9 @@ public class AuditedFileChannel {
         b.position(0);
     }
 
-    public void forceAndClose() throws IOException {
+    public void close() throws IOException {
         bytesWrittenValueRecorder.newValue(bytesWritten);
         bytesReadValueRecorder.newValue(bytesRead);
-        channel.force(true);
         channel.close();
     }
 
@@ -83,23 +82,5 @@ public class AuditedFileChannel {
 
     public void position(int headerLength) throws IOException {
         channel.position(headerLength);
-    }
-
-    public ByteBuffer readRemainderOfFile() throws IOException {
-        int remainderOfFile = (int) (channel.size() - channel.position());
-        ByteBuffer b = ByteBuffer.allocate(remainderOfFile);
-
-        long toRead = remainderOfFile;
-        int nread = 0;
-        do {
-            nread += channel.read(b);
-        } while (nread != -1 && nread < toRead);
-
-        bytesRead += b.position();
-        if ( b.position() != toRead) {
-            throw new IOException("Failed to read rest of file from FileChannel");
-        }
-        b.position(0);
-        return b;
     }
 }

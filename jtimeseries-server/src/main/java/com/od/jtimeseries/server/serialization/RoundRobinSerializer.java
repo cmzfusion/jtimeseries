@@ -22,7 +22,6 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;
-import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -287,7 +286,7 @@ public class RoundRobinSerializer {
     private void flushAndClose(File f, AuditedFileChannel c, RandomAccessFile r) {
         if ( c != null) {
             try {
-                c.forceAndClose();
+                c.close();
             } catch (IOException e) {
                 logMethods.logError("Error closing file channel " + f, e);
             }

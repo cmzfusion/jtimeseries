@@ -55,12 +55,12 @@ public class TestFilesystemTimeSeries extends TestCase {
     @Test
     public void testWriteBehindCache() throws Exception  {
         FilesystemTimeSeries series = getTimeSeriesInstance();
-        assertEquals(0, series.getFileHeader().getCurrentSize());
+        assertEquals(0, series.getFileHeader().getCurrentSeriesSize());
 
         //size taken from the soft reference round robin series in memory, but series on disk and file header not yet updated
         series.addItem(TimeSeriesTestUtils.createItemWithTimestamp(1));
         assertEquals(1, series.size());
-        assertEquals(0, series.getFileHeader().getCurrentSize());
+        assertEquals(0, series.getFileHeader().getCurrentSeriesSize());
 
         //we have only appended an item, this can go in the append list, no need to reserialize the whole series
         assertEquals(1, series.getCacheAppendListSize());
@@ -69,7 +69,7 @@ public class TestFilesystemTimeSeries extends TestCase {
         //trigger gc of the main round robin series in memory, the write behind cache values still remain
         series.triggerGarbageCollection();
         assertTrue(series.isSeriesCollected());
-        assertEquals(0, series.getFileHeader().getCurrentSize()); //file header not yet update, file not yet changed
+        assertEquals(0, series.getFileHeader().getCurrentSeriesSize()); //file header not yet update, file not yet changed
         //the appended item still in the append list
         assertEquals(1, series.getCacheAppendListSize());
 
@@ -78,14 +78,14 @@ public class TestFilesystemTimeSeries extends TestCase {
         series.addItem(TimeSeriesTestUtils.createItemWithTimestamp(2));
         assertEquals(2, series.getCacheAppendListSize());
         assertEquals(2, series.size());
-        assertEquals(0, series.getFileHeader().getCurrentSize());
+        assertEquals(0, series.getFileHeader().getCurrentSeriesSize());
         assertTrue(series.isSeriesCollected());
 
         //flush the write behind cache
         series.flush();
         assertTrue(series.isCacheFlushed());
         assertTrue(series.isSeriesCollected());
-        assertEquals(2, series.getFileHeader().getCurrentSize());  //now the header has been updated on the flush/append, so size is updated in the header
+        assertEquals(2, series.getFileHeader().getCurrentSeriesSize());  //now the header has been updated on the flush/append, so size is updated in the header
         assertEquals(2, series.size());
 
         series.addItem(TimeSeriesTestUtils.createItemWithTimestamp(4));  //after this we have one item in our write behind cache
@@ -116,7 +116,7 @@ public class TestFilesystemTimeSeries extends TestCase {
         series.flush();
         assertTrue(series.isSeriesCollected());
         assertFalse(series.isSeriesInWriteCache()); //now series neither soft referenced nor in cache, but header updated
-        assertEquals(4, series.getFileHeader().getCurrentSize());
+        assertEquals(4, series.getFileHeader().getCurrentSeriesSize());
         assertEquals(4, series.size());
         assertTrue(series.isSeriesCollected());  //size read from the header, no need to deserialize
 

@@ -22,19 +22,13 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IndexedTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -55,11 +49,6 @@ public class RoundRobinSerializer {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(RoundRobinSerializer.class);    
 
-    private static final String VERSION_STRING = "TSVERSION001";
-    private static final int VERSION_STRING_LENGTH = 12;
-    private static final int CURRENT_HEAD_OFFSET = 20;
-    private static final int BYTES_IN_HEADER_START = 72;
-
     //for testing, where we create dozens of serializers
     private static boolean shutdownHandlingDisabled;
 
@@ -75,6 +64,7 @@ public class RoundRobinSerializer {
     private final String timeSeriesFileSuffix;
     private final Object readWriteLock = new Object();
     private volatile boolean shutdown;
+    private SerializerOperations serializerOperations = new SerializerOperations();
 
     public RoundRobinSerializer(File rootDirectory, String timeSeriesFileSuffix) {
         this.rootDirectory = rootDirectory;
@@ -97,57 +87,34 @@ public class RoundRobinSerializer {
         fileRewriteCounter.incrementCount();
         synchronized (readWriteLock) {
             if ( ! shutdown ) {
-                byte[] properties = getBytesForProperties(fileHeader);
-                int requiredHeaderLength = properties.length + BYTES_IN_HEADER_START;
-                fileHeader.calculateHeaderLength(requiredHeaderLength);
-        
+                byte[] properties = fileHeader.getPropertiesAsByteArray();
+                int headerBytesToWrite = properties.length + SerializerOperations.BYTES_IN_HEADER_START;
+                int newHeaderLength = fileHeader.calculateNewHeaderLength(headerBytesToWrite);
+
                 //head == -1 is a special convention to indicate the time series is empty
                 int head = t.size() == 0 ? -1 : 0;
-                fileHeader.setCurrentHead(head);
-                fileHeader.setCurrentTail(t.size());
-                fileHeader.setSeriesMaxLength(t.getMaxSize());
-                fileHeader.setMostRecentItemTimestamp(t.getLatestTimestamp());
+                int tail = t.size();
+                fileHeader.updateHeaderFields(newHeaderLength, head, tail, t.getMaxSize(), t.getLatestTimestamp());
 
                 File f = getFile(fileHeader);
-                AuditedOutputStream b = null;
+                AuditedFileChannel b = null;
+                RandomAccessFile r = null;
                 try {
-                    b = new AuditedOutputStream(new DataOutputStream(new BufferedOutputStream(new FileOutputStream(f))),
-                        fileBytesWritten);
+                    r = new RandomAccessFile(f, "rw");
+                    b = new AuditedFileChannel(
+                        r.getChannel(),
+                        fileBytesWritten,
+                        fileBytesRead
+                    );
 
-                    //BYTES_IN_HEADER_START  (70 bytes)
-                    b.writeBytes(VERSION_STRING); //add a version description, to support future versioning
-                    b.writeInt(fileHeader.getHeaderLength());  //offset where data will start
-                    b.writeInt(fileHeader.getSeriesMaxLength());
-                    b.writeInt(fileHeader.getCurrentHead());  //start index in rr structure
-                    b.writeInt(fileHeader.getCurrentTail());
-                    b.writeLong(fileHeader.getMostRecentItemTimestamp());
-                    b.writeInt(properties.length);
-                    //the next 32 bytes are currently undefined, left open for future use
-                    for ( int loop=0; loop<8; loop++) {
-                        b.writeInt(-1);
-                    }
-
-                    //Header Properties
-                    b.write(properties);
-                    byte[] padding = new byte[fileHeader.getHeaderLength() - requiredHeaderLength];
-                    b.write(padding);
-                    for ( TimeSeriesItem i : t) {
-                        b.writeLong(i.getTimestamp());
-                        b.writeDouble(i.getValue().doubleValue());
-                    }
+                    serializerOperations.writeHeader(fileHeader, properties, b);
+                    serializerOperations.writeBody(t, b);
                 } catch (Throwable e) {
                     logMethods.logError("Failed to write time series file " + f);
                     fileErrorCounter.incrementCount();
                     throw new SerializationException("Failed to write time series file " + f, e);
                 } finally {
-                    if ( b != null) {
-                        try {
-                            b.flush();
-                            b.close();
-                        } catch (IOException e) {
-                            logMethods.logError("Error closing file " + f, e);
-                        }
-                    }
+                    flushAndClose(f, b, r);
                 }
             }
         }
@@ -157,28 +124,24 @@ public class RoundRobinSerializer {
         fileReadCounter.incrementCount();
         synchronized (readWriteLock) {
             File f = getFile(fileHeader);
-            AuditedInputStream d = null;
+            RandomAccessFile r = null;
+            AuditedFileChannel c = null;
             try {
-                d = new AuditedInputStream(new DataInputStream(new BufferedInputStream(new FileInputStream(f))), fileBytesRead);
-                readHeader(fileHeader, d);
-                return readSeriesData(fileHeader, d);
+                r = new RandomAccessFile(f, "r");
+                c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
+                serializerOperations.readHeader(fileHeader, c);
+                return serializerOperations.readBody(fileHeader, c);
             } catch (Throwable e) {
                 fileErrorCounter.incrementCount();
                 throw new SerializationException("Failed to deserialize file " + fileHeader, e);
             } finally {
-                if ( d != null) {
-                    try {
-                        d.close();
-                    } catch (IOException e) {
-                        logMethods.logError("Error closing file " + f, e);
-                    }
-                }
+                flushAndClose(f, c, r);
             }
         }
     }
 
+
     public FileHeader readHeader(File f) throws SerializationException {
-        fileHeaderReadCounter.incrementCount();
         synchronized (readWriteLock) {
             FileHeader h = new FileHeader();
             doUpdateHeader(h, f);
@@ -218,63 +181,23 @@ public class RoundRobinSerializer {
     /**
      * Append items to the timeseries file and update the header
      */
-    public void append(FileHeader header, IndexedTimeSeries l) throws SerializationException {
+    public void append(FileHeader header, RoundRobinTimeSeries l) throws SerializationException {
         fileAppendCounter.incrementCount();
         synchronized (readWriteLock) {
             if ( ! shutdown && l.size() > 0) {
                 File file = getFile(header);
                 checkFileWriteable(file);
-                AuditedRandomAccessWriter r = null;
+                RandomAccessFile r = null;
+                AuditedFileChannel c = null;
                 try {
-                    r = new AuditedRandomAccessWriter(new RandomAccessFile(file, "rw"), fileBytesWritten, fileBytesRead);
-                    r.seek(VERSION_STRING_LENGTH);
-                    int headerLength = r.readInt();
-                    int seriesLength = r.readInt();
-                    int currentHead = r.readInt();
-                    int currentTail = r.readInt();
-
-                    int currentSize = FileHeader.calculateCurrentSize(seriesLength, currentHead, currentTail);
-
-                    currentHead = Math.max(currentHead, 0); //manage empty file (head==-1)
-
-                    int newSize = Math.min(currentSize + l.size(), seriesLength);
-                    int headAdjust = l.size() - (newSize - currentSize);
-                    int newHead = (currentHead + headAdjust) % seriesLength;
-                    int newTail = (currentTail + l.size()) % seriesLength;
-
-                    r.seek(CURRENT_HEAD_OFFSET);
-                    r.writeInt(newHead);
-                    r.writeInt(newTail);
-                    long newLastTimestamp = l.getItem(l.size() - 1).getTimestamp();
-                    r.writeLong(newLastTimestamp);
-
-                    //now update the header with the new values
-                    header.setCurrentHead(newHead);
-                    header.setCurrentTail(newTail);
-                    header.setMostRecentItemTimestamp(newLastTimestamp);
-
-                    r.seek(headerLength + (currentTail * 16));
-                    int currentIndex = currentTail;
-                    for ( TimeSeriesItem i : l) {
-                        if ( currentIndex == seriesLength ) {
-                            currentIndex = 0;
-                            r.seek(headerLength);
-                        }
-                        r.writeLong(i.getTimestamp());
-                        r.writeDouble(i.getValue().doubleValue());
-                        currentIndex ++;
-                    }
+                    r = new RandomAccessFile(file, "rw");
+                    c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
+                    serializerOperations.doAppend(header, l, c);
                 } catch ( Throwable e) {
                     fileErrorCounter.incrementCount();
                     throw new SerializationException("Failed to append items to file " + header, e);
                 } finally {
-                    try {
-                        if ( r != null) {
-                            r.close();
-                        }
-                    } catch(IOException e) {
-                        logMethods.logError("Error closing file on append " + header, e);
-                    }
+                    flushAndClose(file, c, r);
                 }
             }
         }
@@ -308,21 +231,19 @@ public class RoundRobinSerializer {
     }
 
     private void doUpdateHeader(FileHeader fileHeader, File f) throws SerializationException {
-        AuditedInputStream d = null;
+        fileHeaderReadCounter.incrementCount();
+
+        RandomAccessFile r = null;
+        AuditedFileChannel c = null;
         try {
-            d = new AuditedInputStream(new DataInputStream(new FileInputStream(f)), fileBytesRead);
-            readHeader(fileHeader, d);
+            r = new RandomAccessFile(f, "r");
+            c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
+            serializerOperations.readHeader(fileHeader, c);
         } catch (Throwable e) {
             fileErrorCounter.incrementCount();
             throw new SerializationException("Failed to deserialize header " + fileHeader, e);
         } finally {
-            if ( d != null) {
-                try {
-                    d.close();
-                } catch (IOException e) {
-                    logMethods.logError("Error closing file on update header " + f, e);
-                }
-            }
+            flushAndClose(f, c, r);
         }
     }
 
@@ -333,119 +254,6 @@ public class RoundRobinSerializer {
             throw new SerializationException(error);
         }
     }
-
-
-    private RoundRobinTimeSeries readSeriesData(FileHeader fileHeader, AuditedInputStream d) throws IOException {
-        RoundRobinTimeSeries series = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
-        if ( fileHeader.getCurrentHead() != -1) {  //file is not empty
-            int itemsRead = 0;
-            List<TimeSeriesItem> tailItems = new ArrayList<TimeSeriesItem>();
-            if ( fileHeader.getCurrentTail() <= fileHeader.getCurrentHead()) {
-                for ( int loop=0; loop < fileHeader.getCurrentTail(); loop++) {
-                    tailItems.add(new DefaultTimeSeriesItem(d.readLong(), DoubleNumeric.valueOf(d.readDouble())));
-                }
-                itemsRead = fileHeader.getCurrentTail();
-            }
-
-            int itemsToSkip = fileHeader.getCurrentHead() - itemsRead;
-            skipItems(d, itemsToSkip, fileHeader);
-
-            int itemsToRead = fileHeader.getCurrentTail() > fileHeader.getCurrentHead() ?
-                    fileHeader.getCurrentTail() - fileHeader.getCurrentHead() :
-                    fileHeader.getSeriesMaxLength() - fileHeader.getCurrentHead();
-
-            //here we read the items into a local list first, then add them all at once
-            //this is to avoid triggering an insert event for each time series item when we add them to the series
-            List<TimeSeriesItem> itemsToAdd = new ArrayList<TimeSeriesItem>();
-            for ( int loop=0; loop < itemsToRead; loop++) {
-                itemsToAdd.add(new DefaultTimeSeriesItem(d.readLong(), DoubleNumeric.valueOf(d.readDouble())));
-            }
-
-            itemsToAdd.addAll(tailItems);
-            //quicker to new up a series with the initial items than add each
-            series = new RoundRobinTimeSeries(itemsToAdd, fileHeader.getSeriesMaxLength());
-        }
-        return series;
-    }
-
-
-    private void readHeader(FileHeader fileHeader, AuditedInputStream d) throws IOException {
-        readAndCheckVersion(fileHeader, d);
-        fileHeader.setHeaderLength(d.readInt());
-        fileHeader.setSeriesMaxLength(d.readInt());
-        fileHeader.setCurrentHead(d.readInt());
-        fileHeader.setCurrentTail(d.readInt());
-        fileHeader.setMostRecentItemTimestamp(d.readLong());
-        int propertiesLength = d.readInt();
-        skipBytes(d, fileHeader, 32); //skip the currently undefined bytes
-        fileHeader.setFileProperties(readProperties(fileHeader, d, propertiesLength));
-
-        //skip to end of header section
-        skipBytes(d, fileHeader, fileHeader.getHeaderLength() - (propertiesLength + BYTES_IN_HEADER_START));
-    }
-
-    private void readAndCheckVersion(FileHeader fileHeader, AuditedInputStream d) throws IOException {
-        byte[] bytes = readBytes(fileHeader, d, VERSION_STRING_LENGTH);
-        String versionString = new String(bytes, "UTF-8");  //one byte per character, ASCII only
-        if ( ! versionString.equals(VERSION_STRING)) {
-            throw new IOException("Wrong timeseries file version, expecting version " + VERSION_STRING + " but was " + versionString);
-        }
-    }
-
-    private void skipItems(AuditedInputStream d, int itemsToSkip, FileHeader fileHeader) throws IOException {
-        int bytesToSkip = itemsToSkip * 16;
-        skipBytes(d, fileHeader, bytesToSkip);
-    }
-
-    private void skipBytes(AuditedInputStream d, FileHeader fileHeader, int bytesToSkip) throws IOException {
-        // Read in the bytes
-        int offset = 0;
-        long numRead = 0;
-        while (offset < bytesToSkip
-               && (numRead=d.skip(bytesToSkip-offset)) >= 0) {
-            offset += numRead;
-        }
-
-        if (offset < bytesToSkip) {
-            throw new IOException("Failed to skip " + bytesToSkip + " bytes in file " + fileHeader);
-        }
-    }
-
-    private Properties readProperties(FileHeader fileHeader, AuditedInputStream d, int propertiesLength) throws IOException {
-        byte[] bytes = readBytes(fileHeader, d, propertiesLength);
-        ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-        Properties p = new Properties();
-        p.load(bis);
-        return p;
-    }
-
-    private byte[] readBytes(FileHeader fileHeader, AuditedInputStream d, int numberOfBytesToRead) throws IOException {
-        byte[] bytes = new byte[numberOfBytesToRead];
-        // Read in the bytes
-        int offset = 0;
-        int numRead = 0;
-        while (offset < bytes.length
-               && (numRead=d.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
-        }
-
-        // Ensure all the bytes have been read in
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file " + fileHeader);
-        }
-        return bytes;
-    }
-
-    private byte[] getBytesForProperties(FileHeader f) throws SerializationException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-        try {
-            f.getFileProperties().store(bos, "TimeSeries");
-        } catch (IOException ioe) {
-            throw new SerializationException("Failed to serialize properties", ioe);
-        }
-        return bos.toByteArray();
-    }
-
 
     //this should ensure no files are corrupted on linux shutdown - although it most likely won't work on Windows, becuase of lack
     //of support for SIGTERM etc. Still, I have yet to see a corrupted file on either!
@@ -470,6 +278,26 @@ public class RoundRobinSerializer {
     private void shutdownNow() {
         synchronized (readWriteLock) {
             shutdown = true;
+        }
+    }
+
+    /**
+     * Safely close a RandomAccessFile and associated channel, forcing channel changes to disk
+     */
+    private void flushAndClose(File f, AuditedFileChannel c, RandomAccessFile r) {
+        if ( c != null) {
+            try {
+                c.forceAndClose();
+            } catch (IOException e) {
+                logMethods.logError("Error closing file channel " + f, e);
+            }
+        }
+        if ( r != null ) {
+            try {
+                r.close();
+            } catch (IOException e) {
+                logMethods.logError("Error closing file " + f, e);
+            }
         }
     }
 

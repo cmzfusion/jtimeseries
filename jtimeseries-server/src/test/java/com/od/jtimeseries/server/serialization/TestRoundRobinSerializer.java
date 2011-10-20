@@ -15,10 +15,6 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import junit.framework.TestCase;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -62,7 +58,7 @@ public class TestRoundRobinSerializer extends TestCase {
         serializer.updateHeader(fileHeader);
         assertEquals(-1, fileHeader.getCurrentHead());
 
-        DefaultTimeSeries l = new DefaultTimeSeries();
+        RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l,1,2,3);
         serializer.append(fileHeader, l);
         assertEquals(0, fileHeader.getCurrentHead());
@@ -72,7 +68,7 @@ public class TestRoundRobinSerializer extends TestCase {
     }
 
     public void testAppend() throws SerializationException {
-        DefaultTimeSeries l = new DefaultTimeSeries();
+        RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l, 5, 6);
 
         serializer.append(fileHeader, l);
@@ -91,7 +87,7 @@ public class TestRoundRobinSerializer extends TestCase {
 
     public void testAppend2() throws SerializationException {
         //test wrap around - 8 should end up at position zero
-        DefaultTimeSeries l = new DefaultTimeSeries();
+        RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l,5,6,7,8);
 
         serializer.append(fileHeader, l);
@@ -167,12 +163,12 @@ public class TestRoundRobinSerializer extends TestCase {
     public void testAppendSpeed() throws SerializationException {
         long startTime = System.currentTimeMillis();
         for ( int loop=0; loop < 1000; loop++) {
-            DefaultTimeSeries s = new DefaultTimeSeries();
+            RoundRobinTimeSeries s = new RoundRobinTimeSeries(7);
             s.addItem(new DefaultTimeSeriesItem(loop, DoubleNumeric.valueOf(loop)));
             serializer.append(fileHeader, s);
         }
         long endTime = System.currentTimeMillis();
-        assertEquals(7, fileHeader.getCurrentSize());
+        assertEquals(7, fileHeader.getCurrentSeriesSize());
         System.out.println("Time to append to 1000 series " + (endTime - startTime));
         //expected more like < 200
         assertTrue("Test append speed", (endTime - startTime) < 5000);

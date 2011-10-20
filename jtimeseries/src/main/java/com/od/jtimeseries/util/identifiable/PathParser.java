@@ -67,7 +67,6 @@ public class PathParser {
         return result;
     }
 
-
     public String getRemainingPath() {
         return path.toString();
     }
@@ -79,6 +78,16 @@ public class PathParser {
 
     public boolean isEmpty() {
         return path.toString().trim().length() == 0;
+    }
+
+    public static String lastNode(String path) {
+        int index = path.lastIndexOf(Identifiable.NAMESPACE_SEPARATOR);
+        return ( index == -1 ) ? path :  path.substring(index + 1, path.length());
+    }
+
+    public static String firstNode(String path) {
+        int index = path.lastIndexOf(Identifiable.NAMESPACE_SEPARATOR);
+        return ( index == -1) ? path : path.substring(0, index);
     }
 
     public static LinkedList<String> splitPath(String path) {

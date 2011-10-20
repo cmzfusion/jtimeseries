@@ -75,23 +75,44 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private ScheduledFuture nextFlushTask;
     private volatile long modCount;
 
+    /**
+     *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader
+     */
+    public FilesystemTimeSeries(FileHeader fileHeader, RoundRobinSerializer roundRobinSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+        super(fileHeader.getId(), fileHeader.getDescription());
+        this.fileHeader = fileHeader;
+        setFields(roundRobinSerializer, appendPeriod, rewritePeriod);
+    }
+
+    /**
+     *  Create a FilesystemTimeSeries for a series
+     *  The series may more may not already exist on disk, if it does exist a FileHeader will be created and synced with existing series, of not a new series file will be
+     *  created
+     */
     public FilesystemTimeSeries(String parentPath, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(id, description);
+        createFileHeader(roundRobinSerializer, parentPath, seriesLength);
+        setFields(roundRobinSerializer, appendPeriod, rewritePeriod);
+    }
+
+    private void setFields(RoundRobinSerializer roundRobinSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) {
         this.roundRobinSerializer = roundRobinSerializer;
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
-        this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + id, description, seriesLength);
-        checkOrCreateFileAndUpdateHeader(fileHeader);
+        this.lastTimestamp = fileHeader.getMostRecentItemTimestamp();
         this.writeBehindCache = new WriteBehindCache();
     }
 
-    private void checkOrCreateFileAndUpdateHeader(FileHeader fileHeader) throws SerializationException {
+    /**
+     *
+     */
+    private void createFileHeader(RoundRobinSerializer roundRobinSerializer, String parentPath, int seriesLength) throws SerializationException {
+        this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + getId(), getDescription(), seriesLength);
         if ( roundRobinSerializer.fileExists(fileHeader) ) {
             roundRobinSerializer.updateHeader(fileHeader);
         } else {
             roundRobinSerializer.createFile(fileHeader);
         }
-        lastTimestamp = fileHeader.getMostRecentItemTimestamp();
     }
 
     /**
@@ -189,7 +210,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         } else {
             //when the cache is flushed, if the cache contains more items than can fit in the series, we will lose the earlist due to round robin
             //so we will end up with maxSize items in the series
-            return Math.min(getMaxSize(), fileHeader.getCurrentSize() + writeBehindCache.getAppendItems().size());
+            return Math.min(getMaxSize(), fileHeader.getCurrentSeriesSize() + writeBehindCache.getAppendItems().size());
         }
     }
 
@@ -256,15 +277,15 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     //delegate property handling to FileHeader, so that properties get persisted
     public String setProperty_Locked(String key, String value) {
-        return fileHeader.setFileProperty(key, value);
+        return fileHeader.setSeriesProperty(key, value);
     }
 
     public String getProperty_Locked(String key) {
-        return fileHeader.getFileProperty(key);
+        return fileHeader.getSeriesProperty(key);
     }
 
     public Properties getProperties_Locked() {
-        return fileHeader.getFileProperties();
+        return fileHeader.getSeriesProperties();
     }
 
     public FileHeader getFileHeader() {

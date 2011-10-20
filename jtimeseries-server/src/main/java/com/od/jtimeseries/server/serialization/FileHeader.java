@@ -18,9 +18,13 @@
  */
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.util.identifiable.PathParser;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -30,7 +34,12 @@ import java.util.Properties;
  * Time: 07:30:42
  *
  * Represents header information stored in a timeseries file
- * Updated when a series is saved, or loaded
+ *
+ * When a timeseries is saved to disk or loaded, the in memory header information is brought up to date
+ * so that it should match the information contained in the file header on disk.
+ *
+ * The information in memory should always match the information on disk, apart from the seriesProperties
+ * which may contain in memory changes which are waiting to be written
  */
 public class FileHeader {
 
@@ -40,72 +49,55 @@ public class FileHeader {
     private static final String DESCRIPTION_KEY = "DESCRIPTION";
     private static int MAX_PROPERTY_LENGTH = 1024;
 
-    private int headerLength = 512;  //default start length for header
-    private Properties fileProperties = new Properties();
-    private int seriesMaxLength;
-    private int currentHead;
-    private int currentTail;
-    private long mostRecentItemTimestamp = -1;
+    private volatile int headerLength = 512;  //default start length for header
+    private volatile int seriesMaxLength;
+    private volatile int currentHead;
+    private volatile int currentTail;
+    private volatile long mostRecentItemTimestamp = -1;
 
-    public FileHeader() {
-    }
+    private SeriesProperties seriesProperties = new SeriesProperties();
+
+    public FileHeader() {}
 
     /**
      * @param seriesMaxLength, maximum size for this series
      */
     public FileHeader(String path, String description, int seriesMaxLength) {
-        fileProperties.put(PATH_KEY, path);
-        fileProperties.put(DESCRIPTION_KEY, description);
+        seriesProperties.setProperty(PATH_KEY, path);
+        seriesProperties.setProperty(DESCRIPTION_KEY, description);
         this.seriesMaxLength = seriesMaxLength;
     }
 
     public String getPath() {
-        return fileProperties.getProperty(PATH_KEY);
+        return seriesProperties.getProperty(PATH_KEY);
     }
 
-    public void setContextPath(String contextPath) {
-        fileProperties.setProperty(PATH_KEY, contextPath);
+    public Properties getSeriesProperties() {
+       return seriesProperties.getSnapshot();
     }
 
-    public Properties getFileProperties() {
-        return fileProperties;
+    void resetSeriesProperties(byte[] serializedProperties) throws IOException {
+        seriesProperties.reset(serializedProperties);
     }
 
-    public static void setMaxPropertyLength(String propertyLength) {
-        MAX_PROPERTY_LENGTH = Integer.valueOf(propertyLength);
+    public String setSeriesProperty(String key, String value) {
+        return seriesProperties.setProperty(key, value);
     }
 
-    public String setFileProperty(String key, String value) {
-        String result = null;
-        if ( key.length() > MAX_PROPERTY_LENGTH || value.length() > MAX_PROPERTY_LENGTH) {
-            logMethods.logWarning("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
-                ", start of key " + key.substring(0, Math.min(124, key.length())));
-        } else {
-            result = (String)fileProperties.setProperty(key, value);
-        }
-        return result;
-    }
-
-    public String getFileProperty(String key) {
-        return fileProperties.getProperty(key);
-    }
-
-    public void setFileProperties(Properties fileProperties) {
-        this.fileProperties = fileProperties;
+    public String getSeriesProperty(String key) {
+        return seriesProperties.getProperty(key);
     }
 
     public int getHeaderLength() {
         return headerLength;
     }
 
-    public void setHeaderLength(int length) {
-        this.headerLength = length;
-    }
-
-    public void calculateHeaderLength(int requiredLength) {
-        while(headerLength < requiredLength) {
-            headerLength *= 2;
+    public int calculateNewHeaderLength(int requiredLength) {
+        int h = this.headerLength;
+        while(h < requiredLength) {
+            h *= 2;
         }
+        return h;
     }
 
     /**
@@ -115,44 +107,38 @@ public class FileHeader {
         return seriesMaxLength;
     }
 
-    public void setSeriesMaxLength(int seriesLength) {
-        this.seriesMaxLength = seriesLength;
-    }
-
-    public int getCurrentSize() {
-        return calculateCurrentSize(seriesMaxLength, currentHead, currentTail);
+    public int getCurrentSeriesSize() {
+        return currentHead == -1 ? 0 :
+                currentTail > currentHead ?
+                    currentTail - currentHead :
+                    currentTail + (seriesMaxLength - currentHead);
     }
 
     public int getCurrentHead() {
         return currentHead;
     }
 
-    public void setCurrentHead(int currentHead) {
-        this.currentHead = currentHead;
-    }
-
     public long getMostRecentItemTimestamp() {
         return mostRecentItemTimestamp;
-    }
-
-    public void setMostRecentItemTimestamp(long mostRecentItemTimestamp) {
-        this.mostRecentItemTimestamp = mostRecentItemTimestamp;
     }
 
     public int getCurrentTail() {
         return currentTail;
     }
 
-    public void setCurrentTail(int currentTail) {
-        this.currentTail = currentTail;
-    }
-
     public String getDescription() {
-        return fileProperties.getProperty(DESCRIPTION_KEY);
+        return seriesProperties.getProperty(DESCRIPTION_KEY);
     }
 
-    public void setDescription(String description) {
-        fileProperties.setProperty(DESCRIPTION_KEY, description);
+    public byte[] getPropertiesAsByteArray() throws SerializationException {
+        return seriesProperties.getPropertiesAsByteArray();
+    }
+
+    /**
+     * @return true, if metadata/properties for this series has changed, and the header needs to be rewritten
+     */
+    public boolean isRewriteRequired() {
+        return seriesProperties.isRewriteRequired();
     }
 
     @Override
@@ -162,14 +148,81 @@ public class FileHeader {
                 '}';
     }
 
-    /**
-     * @return current series size, based on current head, tail and length
-     */
-    public static int calculateCurrentSize(int seriesLength, int currentHead, int currentTail) {
-        return currentHead == -1 ? 0 :
-                currentTail > currentHead ?
-                    currentTail - currentHead :
-                    currentTail + (seriesLength - currentHead);
+    //this is being set from Spring applicationContext.xml
+    public static void setMaxPropertyLength(String propertyLength) {
+        MAX_PROPERTY_LENGTH = Integer.valueOf(propertyLength);
     }
 
+    public String getId() {
+        return PathParser.lastNode(getPath());
+    }
+
+    //update header fields to match the filesystem header, should only be called from RoundRobinSerializer
+    void updateHeaderFields(int newHeaderLength, int head, int tail, int seriesMaxLength, long latestTimestamp) {
+        this.headerLength = newHeaderLength;
+        this.currentHead = head;
+        this.currentTail = tail;
+        this.seriesMaxLength = seriesMaxLength;
+        this.mostRecentItemTimestamp = latestTimestamp;
+    }
+
+    /**
+     * Properties class which keeps a changed flag.
+     * Can be reset with the current set of properties loaded from file header on disk
+     */
+    private class SeriesProperties {
+
+        private Properties wrappedProperties = new Properties();
+
+        //true, if the series properties in memory have changed, and the header properties information needs to be rewritten
+        private boolean seriesPropertiesChanged;
+
+        public synchronized void reset(byte[] serializedProperties) throws IOException {
+            wrappedProperties.clear();
+            Properties p = getProperties(serializedProperties);
+            wrappedProperties.putAll(p);
+            seriesPropertiesChanged = false;
+        }
+
+        private Properties getProperties(byte[] bytes) throws IOException {
+            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+            Properties p = new Properties();
+            p.load(bis);
+            return p;
+        }
+
+        public synchronized String setProperty(String key, String value) {
+            String result = null;
+            if ( key.length() > MAX_PROPERTY_LENGTH || value.length() > MAX_PROPERTY_LENGTH) {
+                logMethods.logWarning("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
+                    ", start of key " + key.substring(0, Math.min(124, key.length())));
+            } else {
+                result = (String) wrappedProperties.setProperty(key, value);
+                seriesPropertiesChanged = true;
+            }
+            return result;
+        }
+
+        public synchronized boolean isRewriteRequired() {
+            return seriesPropertiesChanged;
+        }
+
+        public synchronized String getProperty(String key) {
+            return wrappedProperties.getProperty(key);
+        }
+
+        public synchronized Properties getSnapshot() {
+            return new Properties(wrappedProperties);
+        }
+
+        public synchronized byte[] getPropertiesAsByteArray() throws SerializationException {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
+            try {
+                wrappedProperties.store(bos, "TimeSeries");
+            } catch (IOException ioe) {
+                throw new SerializationException("Failed to serialize properties", ioe);
+            }
+            return bos.toByteArray();
+        }
+    }
 }

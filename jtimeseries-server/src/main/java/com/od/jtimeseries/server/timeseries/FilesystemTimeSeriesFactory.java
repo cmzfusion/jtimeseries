@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
@@ -48,7 +49,15 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
     public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
         if ( classType.isAssignableFrom(FilesystemTimeSeries.class)) {
             try {
-                return (E)new FilesystemTimeSeries(parent.getPath(), id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
+                E result;
+                if ( parameters.length == 1 && parameters[0] instanceof FileHeader) {
+                    FileHeader h = (FileHeader)parameters[0];
+                    //series exists on disk already, we have a header
+                    result = (E)new FilesystemTimeSeries(h, roundRobinSerializer, fileAppendDelay, fileRewriteDelay);
+                } else {
+                    result = (E)new FilesystemTimeSeries(parent.getPath(), id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
+                }
+                return result;
             } catch (SerializationException e) {
                 e.printStackTrace();
                 throw new RuntimeException("Failed to create timeseries", e);

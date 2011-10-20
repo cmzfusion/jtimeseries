@@ -23,6 +23,7 @@ import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.util.FileReaper;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
@@ -65,12 +66,12 @@ public class SeriesDirectoryManager {
 
     private void createFileReaper(File seriesDirectory, String seriesFileSuffix) {
         this.reaper = new FileReaper(
-                "Timeseries File Reaper",
-                seriesDirectory,
-                ".*" + seriesFileSuffix,
-                maxFileCount,
-                maxDiskSpaceForSeriesMb * 1000000,
-                Time.days(maxSeriesFileAgeDays).getLengthInMillis()
+            "Timeseries File Reaper",
+            seriesDirectory,
+            ".*" + seriesFileSuffix,
+            maxFileCount,
+            maxDiskSpaceForSeriesMb * 1000000,
+            Time.days(maxSeriesFileAgeDays).getLengthInMillis()
         );
     }
 
@@ -95,12 +96,12 @@ public class SeriesDirectoryManager {
 
     private void loadTimeSeries(File f) {
         try {
-            FileHeader h = roundRobinSerializer.readHeader(f);
-            logMethods.logInfo("Setting up series " + h.getPath() + " with current size " + h.getCurrentSize());
+            FileHeader header = roundRobinSerializer.readHeader(f);
+            logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
 
             //the type of time series which will be created depends on the TimeSeriesFactory set on the context
-            //we are expecting FilesystemTimeSeries, but it may be something else
-            rootContext.createTimeSeries(h.getPath(), h.getDescription());
+            //we are expecting FilesystemTimeSeries
+            rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
             loadCount++;
         } catch (SerializationException e) {
             logMethods.logError("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);

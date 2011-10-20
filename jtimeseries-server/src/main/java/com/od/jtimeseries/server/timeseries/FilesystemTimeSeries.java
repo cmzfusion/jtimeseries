@@ -388,8 +388,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 clearCache();
 
             } catch (Throwable t) {
-                logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying");
-                logMethods.logDebug("Failed to write to timeseries file " + fileHeader, t);
+                logMethods.logError("Failed to write to timeseries file " + fileHeader + ", cannot bring this series up to date, I'll keep trying", t);
                 scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
             }
         }

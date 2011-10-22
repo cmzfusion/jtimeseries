@@ -41,15 +41,16 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
                 ", URI ").append(uri);
 
         if ( logMethods.getLogLevel().equalsOrExceeds(LogMethods.LogLevel.DEBUG)) {
-            logProperties(header, sb, "Header:");
+            logProperties(header, sb, ", Header:");
         }
-        logProperties(params, sb, "Param:");
+        logProperties(params, sb, ", Param:");
         logMethods.logInfo(sb.toString());
     }
 
     private void logProperties(Properties header, StringBuilder sb, String keyDescription) {
+        sb.append(keyDescription);
         for ( Map.Entry<Object,Object> e : header.entrySet())  {
-            sb.append(keyDescription).append("[").append(e.getKey()).append("=").append(e.getValue()).append("] ");
+            sb.append("[").append(e.getKey()).append("=").append(e.getValue()).append("] ");
         }
     }
 

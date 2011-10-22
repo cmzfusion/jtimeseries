@@ -37,12 +37,16 @@ import java.net.URLEncoder;
  *
  * Handles reading and writing time series data to/from the filesystem
  *
- * There is currently a single lock for both read and write operations
- * This does effectively hamstring performance by limiting both read/write to a single thread, but performance
- * is 'sufficient' at the moment. (our current production server is managing 12000 time series with 30s intervals and
- * there are no problems currently). Memory caching and delayed write for time series appends does help here.
- * Development time allowing it would be better to allow concurrent reads and concurrent writes on different files,
- * or perhaps make use of ReentrantReadWriteLock
+ * nb. The order of taking locks should be
+ * - lock on FileHeader
+ * - RoundRobinSerializer internal lock
+ *
+ * Locks on FileHeader are required since some values (e.g properties) are set outside the serializer, and we need to make
+ * state changes/state reads across FileHeader field changes atomic
+ *
+ * In addition to FileHeader locking there is currently a RoundRobinSerializer internal lock for both read and write operations
+ * In theory, per file locking might be sufficient, but the locking would need to be strengthened to guarantee a
+ * max of one FileHeader instance per series on disk
  */
 public class RoundRobinSerializer {
 
@@ -84,63 +88,70 @@ public class RoundRobinSerializer {
      */
     public void serialize(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {
         fileRewriteCounter.incrementCount();
-        synchronized (readWriteLock) {
-            if ( ! shutdown ) {
-                byte[] properties = fileHeader.getPropertiesAsByteArray();
-                int newHeaderLength = getNewHeaderLength(fileHeader, properties);
+        try {
+            fileHeader.writeLock().lock();
+            synchronized (readWriteLock) {
+                if (!shutdown) {
+                    byte[] properties = fileHeader.getPropertiesAsByteArray();
+                    int newHeaderLength = getNewHeaderLength(fileHeader, properties);
 
-                //head == -1 is a special convention to indicate the time series is empty
-                int head = t.size() == 0 ? -1 : 0;
-                int tail = t.size();
-                fileHeader.updateHeaderFields(newHeaderLength, head, tail, t.getMaxSize(), t.getLatestTimestamp());
+                    //head == -1 is a special convention to indicate the time series is empty
+                    int head = t.size() == 0 ? -1 : 0;
+                    int tail = t.size();
+                    fileHeader.updateHeaderFields(newHeaderLength, head, tail, t.getMaxSize(), t.getLatestTimestamp());
 
-                File f = getFile(fileHeader);
-                AuditedFileChannel b = null;
-                RandomAccessFile r = null;
-                try {
-                    r = new RandomAccessFile(f, "rw");
-                    b = new AuditedFileChannel(
-                        r.getChannel(),
-                        fileBytesWritten,
-                        fileBytesRead
-                    );
+                    File f = getFile(fileHeader);
+                    AuditedFileChannel b = null;
+                    RandomAccessFile r = null;
+                    try {
+                        r = new RandomAccessFile(f, "rw");
+                        b = new AuditedFileChannel(
+                                r.getChannel(),
+                                fileBytesWritten,
+                                fileBytesRead
+                        );
 
-                    serializerOperations.writeHeader(fileHeader, properties, b);
-                    serializerOperations.writeBody(t, b);
-                } catch (Throwable e) {
-                    logMethods.logError("Failed to write time series file " + f);
-                    fileErrorCounter.incrementCount();
-                    throw new SerializationException("Failed to write time series file " + f, e);
-                } finally {
-                    flushAndClose(f, b, r);
+                        serializerOperations.writeHeader(fileHeader, properties, b);
+                        serializerOperations.writeBody(t, b);
+                    } catch (Throwable e) {
+                        logMethods.logError("Failed to write time series file " + f);
+                        fileErrorCounter.incrementCount();
+                        throw new SerializationException("Failed to write time series file " + f, e);
+                    } finally {
+                        flushAndClose(f, b, r);
+                    }
                 }
             }
+        } finally {
+            fileHeader.writeLock().unlock();
         }
-    }
 
-    private int getNewHeaderLength(FileHeader fileHeader, byte[] properties) {
-        int headerBytesToWrite = properties.length + SerializerOperations.PROPERTIES_OFFSET;
-        return fileHeader.calculateNewHeaderLength(headerBytesToWrite);
     }
 
     public RoundRobinTimeSeries deserialize(FileHeader fileHeader) throws SerializationException {
         fileReadCounter.incrementCount();
-        synchronized (readWriteLock) {
-            File f = getFile(fileHeader);
-            RandomAccessFile r = null;
-            AuditedFileChannel c = null;
-            try {
-                r = new RandomAccessFile(f, "r");
-                c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
-                serializerOperations.readHeader(fileHeader, c);
-                return serializerOperations.readBody(fileHeader, c);
-            } catch (Throwable e) {
-                fileErrorCounter.incrementCount();
-                throw new SerializationException("Failed to deserialize file " + fileHeader, e);
-            } finally {
-                flushAndClose(f, c, r);
+        try {
+            fileHeader.writeLock().lock();
+            synchronized (readWriteLock) {
+                File f = getFile(fileHeader);
+                RandomAccessFile r = null;
+                AuditedFileChannel c = null;
+                try {
+                    r = new RandomAccessFile(f, "r");
+                    c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
+                    serializerOperations.readHeader(fileHeader, c);
+                    return serializerOperations.readBody(fileHeader, c);
+                } catch (Throwable e) {
+                    fileErrorCounter.incrementCount();
+                    throw new SerializationException("Failed to deserialize file " + fileHeader, e);
+                } finally {
+                    flushAndClose(f, c, r);
+                }
             }
+        } finally {
+            fileHeader.writeLock().unlock();
         }
+
     }
 
     public FileHeader readHeader(File f) throws SerializationException {
@@ -169,15 +180,21 @@ public class RoundRobinSerializer {
      * Update the fileHeader by reading the file header information from disk
      */
     public void updateHeader(FileHeader fileHeader) throws SerializationException {
-        synchronized (readWriteLock) {
-            File f = getFile(fileHeader);
-            if ( ! f.exists()) {
-                throw new SerializationException("File for header " + fileHeader + " does not exist");
-            } else if ( ! f.canRead()) {
-                throw new SerializationException("File for header " + fileHeader + " is not readable");
+        try {
+            fileHeader.writeLock().lock();
+            synchronized (readWriteLock) {
+                File f = getFile(fileHeader);
+                if (!f.exists()) {
+                    throw new SerializationException("File for header " + fileHeader + " does not exist");
+                } else if (!f.canRead()) {
+                    throw new SerializationException("File for header " + fileHeader + " is not readable");
+                }
+                doUpdateHeader(fileHeader, f);
             }
-            doUpdateHeader(fileHeader, f);
+        } finally {
+            fileHeader.writeLock().unlock();
         }
+
     }
 
     /**
@@ -185,67 +202,90 @@ public class RoundRobinSerializer {
      */
     public void append(FileHeader header, RoundRobinTimeSeries l) throws SerializationException {
         fileAppendCounter.incrementCount();
-        synchronized (readWriteLock) {
-            if ( ! shutdown && l.size() > 0) {
-                File file = getFile(header);
-                checkFileWriteable(file);
-                RandomAccessFile r = null;
-                AuditedFileChannel c = null;
-                try {
-                    r = new RandomAccessFile(file, "rw");
-                    c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
+        try {
+            header.writeLock().lock();
+            synchronized (readWriteLock) {
+                if (!shutdown && l.size() > 0) {
+                    File file = getFile(header);
+                    checkFileWriteable(file);
+                    RandomAccessFile r = null;
+                    AuditedFileChannel c = null;
+                    try {
+                        r = new RandomAccessFile(file, "rw");
+                        c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
 
-                    boolean rewriteProperties = header.isPropertiesRewriteRequired();
-                    if (rewriteProperties) {
-                        byte[] properties = header.getPropertiesAsByteArray();
-                        int newHeaderLength = getNewHeaderLength(header, properties);
-                        if ( newHeaderLength > header.getHeaderLength()) {
-                            //a rewrite is required, the new properties will not fit into the current header and it needs to expand
-                            //read the series from disk, append the append items, and rewrite both the header and body
-                            RoundRobinTimeSeries s = serializerOperations.readBody(header, c);
-                            s.addAll(l);
-                            serialize(header, s);
+                        boolean rewriteProperties = header.isPropertiesRewriteRequired();
+                        if (rewriteProperties) {
+                            byte[] properties = header.getPropertiesAsByteArray();
+                            int newHeaderLength = getNewHeaderLength(header, properties);
+                            if (newHeaderLength > header.getHeaderLength()) {
+                                //a rewrite is required, the new properties will not fit into the current header and it needs to expand
+                                //read the series from disk, append the append items, and rewrite both the header and body
+                                RoundRobinTimeSeries s = serializerOperations.readBody(header, c);
+                                s.addAll(l);
+                                serialize(header, s);
+                            } else {
+                                serializerOperations.doAppend(header, l, true, properties, c);
+                            }
                         } else {
-                            serializerOperations.doAppend(header, l, true, properties, c);
+                            serializerOperations.doAppend(header, l, false, null, c);
                         }
-                    }  else {
-                        serializerOperations.doAppend(header, l, false, null, c);
+                    } catch (Throwable e) {
+                        fileErrorCounter.incrementCount();
+                        throw new SerializationException("Failed to append items to file " + header, e);
+                    } finally {
+                        flushAndClose(file, c, r);
                     }
-                } catch ( Throwable e) {
-                    fileErrorCounter.incrementCount();
-                    throw new SerializationException("Failed to append items to file " + header, e);
-                } finally {
-                    flushAndClose(file, c, r);
                 }
             }
+        } finally {
+            header.writeLock().unlock();
         }
+
     }
 
     public File getFile(FileHeader f) throws SerializationException {
-        synchronized (readWriteLock) {
-            if ( f.getPath() == null) {
-                throw new SerializationException("Cannot get File for FileHeader with null context path");
-            }
+        try {
+            f.readLock().lock();
+            synchronized (readWriteLock) {
+                if (f.getPath() == null) {
+                    throw new SerializationException("Cannot get File for FileHeader with null context path");
+                }
 
-            try {
-                String fileName = URLEncoder.encode(f.getPath(), "UTF-8") + timeSeriesFileSuffix;
-                return new File(rootDirectory, fileName);
-            } catch (UnsupportedEncodingException e) {
-                throw new SerializationException("Failed to encode file name", e);
+                try {
+                    String fileName = URLEncoder.encode(f.getPath(), "UTF-8") + timeSeriesFileSuffix;
+                    return new File(rootDirectory, fileName);
+                } catch (UnsupportedEncodingException e) {
+                    throw new SerializationException("Failed to encode file name", e);
+                }
             }
+        } finally {
+            f.readLock().unlock();
         }
+
     }
 
     public File createFile(FileHeader fileHeader) throws SerializationException {
-        synchronized (readWriteLock) {
-            RoundRobinTimeSeries r = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
-            serialize(fileHeader, r);
-            return getFile(fileHeader);
+        try {
+            fileHeader.writeLock().lock();
+            synchronized (readWriteLock) {
+                RoundRobinTimeSeries r = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
+                serialize(fileHeader, r);
+                return getFile(fileHeader);
+            }
+        } finally {
+            fileHeader.writeLock().unlock();
         }
+
     }
 
     public File getRootDirectory() {
         return rootDirectory;
+    }
+
+    private int getNewHeaderLength(FileHeader fileHeader, byte[] properties) {
+        int headerBytesToWrite = properties.length + SerializerOperations.PROPERTIES_OFFSET;
+        return fileHeader.calculateNewHeaderLength(headerBytesToWrite);
     }
 
     private void doUpdateHeader(FileHeader fileHeader, File f) throws SerializationException {

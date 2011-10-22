@@ -40,8 +40,10 @@ import java.util.Properties;
  *
  * The information in memory should always match the information on disk, apart from the seriesProperties
  * which may contain in memory changes which are waiting to be written
+ *
+ * FileHeader is generally expected to be unique per series file/series path
  */
-public class FileHeader {
+public class FileHeader extends LockingFileHeader {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(FileHeader.class);
     //these properties will be stored in the serialized series files, careful if you change them!
@@ -68,31 +70,31 @@ public class FileHeader {
         this.seriesMaxLength = seriesMaxLength;
     }
 
-    public String getPath() {
+    protected String doGetPath() {
         return seriesProperties.getProperty(PATH_KEY);
     }
 
-    public Properties getSeriesProperties() {
-       return seriesProperties.getSnapshot();
+    protected Properties doGetSnapshot() {
+        return seriesProperties.getSnapshot();
     }
 
-    void resetSeriesProperties(byte[] serializedProperties) throws IOException {
-        seriesProperties.reset(serializedProperties);
+    protected void doSetSeriesProperties(byte[] serializedProperties) throws IOException {
+        seriesProperties.set(serializedProperties);
     }
 
-    public String setSeriesProperty(String key, String value) {
+    protected String doSetProperty(String key, String value) {
         return seriesProperties.setProperty(key, value);
     }
 
-    public String getSeriesProperty(String key) {
+    protected String doGetSeriesProperty(String key) {
         return seriesProperties.getProperty(key);
     }
 
-    public int getHeaderLength() {
+    protected int doGetHeaderLength() {
         return headerLength;
     }
 
-    public int calculateNewHeaderLength(int requiredLength) {
+    protected int doCalculateNewHeaderLength(int requiredLength) {
         int h = this.headerLength;
         while(h < requiredLength) {
             h *= 2;
@@ -100,48 +102,41 @@ public class FileHeader {
         return h;
     }
 
-    /**
-     * @return length of round robin series, which is the maximum size this series can obtain
-     */
-    public int getSeriesMaxLength() {
+    protected int doGetSeriesMaxLength() {
         return seriesMaxLength;
     }
 
-    public int getCurrentSeriesSize() {
+    protected int doGetCurrentSeriesSize() {
         return currentHead == -1 ? 0 :
-                currentTail > currentHead ?
-                    currentTail - currentHead :
-                    currentTail + (seriesMaxLength - currentHead);
+            currentTail > currentHead ?
+                currentTail - currentHead :
+                currentTail + (seriesMaxLength - currentHead);
     }
 
-    public int getCurrentHead() {
+    protected int doGetCurrentHead() {
         return currentHead;
     }
 
-    public long getMostRecentItemTimestamp() {
+    protected long doGetMostRecentTimestamp() {
         return mostRecentItemTimestamp;
     }
 
-    public int getCurrentTail() {
+    protected int doGetCurrentTail() {
         return currentTail;
     }
 
-    public String getDescription() {
+    protected String doGetDescription() {
         return seriesProperties.getProperty(DESCRIPTION_KEY);
     }
 
-    public byte[] getPropertiesAsByteArray() throws SerializationException {
+    protected byte[] doGetPropertiesAsByteArray() throws SerializationException {
         return seriesProperties.getPropertiesAsByteArray();
     }
 
-    /**
-     * @return true, if metadata/properties for this series has changed, and the header needs to be rewritten
-     */
-    public boolean isPropertiesRewriteRequired() {
+    protected boolean doIsPropertiesRewriteRequired() {
         return seriesProperties.isChanged();
     }
 
-    @Override
     public String toString() {
         return "FileHeader{" +
                 "path =" + getPath() +
@@ -157,8 +152,7 @@ public class FileHeader {
         return PathParser.lastNode(getPath());
     }
 
-    //update header fields to match the filesystem header, should only be called from RoundRobinSerializer
-    void updateHeaderFields(int newHeaderLength, int head, int tail, int seriesMaxLength, long latestTimestamp) {
+    void doUpdateHeaderFields(int newHeaderLength, int head, int tail, int seriesMaxLength, long latestTimestamp) {
         this.headerLength = newHeaderLength;
         this.currentHead = head;
         this.currentTail = tail;
@@ -177,7 +171,7 @@ public class FileHeader {
         //true, if the series properties in memory have changed, and the header properties information needs to be rewritten
         private boolean seriesPropertiesChanged;
 
-        public synchronized void reset(byte[] serializedProperties) throws IOException {
+        public synchronized void set(byte[] serializedProperties) throws IOException {
             wrappedProperties.clear();
             Properties p = getProperties(serializedProperties);
             wrappedProperties.putAll(p);
@@ -191,7 +185,7 @@ public class FileHeader {
             return p;
         }
 
-        public synchronized String setProperty(String key, String value) {
+        public String setProperty(String key, String value) {
             String result = null;
             if ( key.length() > MAX_PROPERTY_LENGTH || value.length() > MAX_PROPERTY_LENGTH) {
                 logMethods.logWarning("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
@@ -203,19 +197,19 @@ public class FileHeader {
             return result;
         }
 
-        public synchronized boolean isChanged() {
+        public boolean isChanged() {
             return seriesPropertiesChanged;
         }
 
-        public synchronized String getProperty(String key) {
+        public String getProperty(String key) {
             return wrappedProperties.getProperty(key);
         }
 
-        public synchronized Properties getSnapshot() {
+        public Properties getSnapshot() {
             return new Properties(wrappedProperties);
         }
 
-        public synchronized byte[] getPropertiesAsByteArray() throws SerializationException {
+        public byte[] getPropertiesAsByteArray() throws SerializationException {
             ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
             try {
                 wrappedProperties.store(bos, "TimeSeries");

@@ -76,7 +76,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private volatile long modCount;
 
     /**
-     *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader
+     *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader, which must have been updated to match the latest state of the file
      */
     public FilesystemTimeSeries(FileHeader fileHeader, RoundRobinSerializer roundRobinSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(fileHeader.getId(), fileHeader.getDescription());
@@ -103,9 +103,6 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         this.writeBehindCache = new WriteBehindCache();
     }
 
-    /**
-     *
-     */
     private void createFileHeader(RoundRobinSerializer roundRobinSerializer, String parentPath, int seriesLength) throws SerializationException {
         this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + getId(), getDescription(), seriesLength);
         if ( roundRobinSerializer.fileExists(fileHeader) ) {

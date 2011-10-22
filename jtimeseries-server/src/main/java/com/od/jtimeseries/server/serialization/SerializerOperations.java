@@ -21,7 +21,7 @@ class SerializerOperations {
     static final int PROPERTIES_OFFSET = 72;
     static final String VERSION_STRING = "TSVERSION001";
     static final int VERSION_STRING_LENGTH = 12;
-    static final int VERSION_AND_HEADER_LENGTH = VERSION_STRING_LENGTH + 4;
+    static final int MAX_LENGTH_OFFSET = VERSION_STRING_LENGTH + 4;
     static final int HEADER_SECTION_2_OFFSET = 20;
 
     /**
@@ -88,6 +88,7 @@ class SerializerOperations {
      * Read time series items from file body, c must be positioned at start of body section
      */
     RoundRobinTimeSeries readBody(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
+        assert(c.getPosition() == fileHeader.getHeaderLength());        
         ByteBuffer b = ByteBuffer.allocate((int)(c.size() - c.position()));
         c.readCompletely(b);
 
@@ -132,7 +133,8 @@ class SerializerOperations {
      * Read time series header information, updating fileHeader in memory
      */
     void readHeader(FileHeader fileHeader, AuditedFileChannel d) throws IOException {
-        ByteBuffer b = ByteBuffer.allocate(VERSION_AND_HEADER_LENGTH);
+        assert(d.position() == 0);
+        ByteBuffer b = ByteBuffer.allocate(MAX_LENGTH_OFFSET);
         d.readCompletely(b);
         b.position(0);
 
@@ -144,7 +146,7 @@ class SerializerOperations {
         }
         int headerLength = b.getInt();
 
-        b = ByteBuffer.allocate(headerLength - VERSION_AND_HEADER_LENGTH);
+        b = ByteBuffer.allocate(headerLength - MAX_LENGTH_OFFSET);
         d.readCompletely(b);
         b.position(0);
 
@@ -159,11 +161,11 @@ class SerializerOperations {
         b.get(propertyBytes);
 
         //skip to end of header section
-        int bytesToSkip = fileHeader.getHeaderLength() - (propertiesLength + PROPERTIES_OFFSET);
+        int bytesToSkip = headerLength - (propertiesLength + PROPERTIES_OFFSET);
         b.position(b.position() + bytesToSkip);
 
         //now update header in memory
-        fileHeader.resetSeriesProperties(propertyBytes);
+        fileHeader.setSeriesProperties(propertyBytes);
         fileHeader.updateHeaderFields(headerLength, currentHead, currentTail, seriesMaxLength, mostRecentTimestamp);
     }
 

@@ -137,8 +137,8 @@ public class FileHeader {
     /**
      * @return true, if metadata/properties for this series has changed, and the header needs to be rewritten
      */
-    public boolean isRewriteRequired() {
-        return seriesProperties.isRewriteRequired();
+    public boolean isPropertiesRewriteRequired() {
+        return seriesProperties.isChanged();
     }
 
     @Override
@@ -203,7 +203,7 @@ public class FileHeader {
             return result;
         }
 
-        public synchronized boolean isRewriteRequired() {
+        public synchronized boolean isChanged() {
             return seriesPropertiesChanged;
         }
 

@@ -1,7 +1,6 @@
 package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
-import com.od.jtimeseries.timeseries.IndexedTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -9,7 +8,6 @@ import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -20,37 +18,52 @@ import java.util.List;
  */
 class SerializerOperations {
 
-    static final int BYTES_IN_HEADER_START = 72;
+    static final int PROPERTIES_OFFSET = 72;
     static final String VERSION_STRING = "TSVERSION001";
     static final int VERSION_STRING_LENGTH = 12;
     static final int VERSION_AND_HEADER_LENGTH = VERSION_STRING_LENGTH + 4;
-    static final int CURRENT_HEAD_OFFSET = 20;
+    static final int HEADER_SECTION_2_OFFSET = 20;
 
     /**
      *  Write the in memory header information to the series file, c must be at position zero
      */
     void writeHeader(FileHeader fileHeader, byte[] properties, AuditedFileChannel c) throws IOException {
+        writeHeaderSectionOne(fileHeader, c);
+        writeHeaderSectionTwo(fileHeader, true, properties, c);
+    }
+
+    //properties which are not changed in an 'append'
+    private void writeHeaderSectionOne(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
         assert(c.getPosition() == 0);
-        ByteBuffer b = ByteBuffer.allocate(fileHeader.getHeaderLength());
-        //BYTES_IN_HEADER_START  (70 bytes)
+        ByteBuffer b = ByteBuffer.allocate(HEADER_SECTION_2_OFFSET);
         b.put(VERSION_STRING.getBytes()); //add a version description, to support future versioning
         b.putInt(fileHeader.getHeaderLength());  //offset where data will start
         b.putInt(fileHeader.getSeriesMaxLength());
+        c.writeCompletely(b);
+    }
+
+    //properties which can be changed in an 'append', the current head and tail, and optionally the properties section
+    private void writeHeaderSectionTwo(FileHeader fileHeader, boolean writeProperties, byte[] properties, AuditedFileChannel c) throws IOException {
+        assert(c.getPosition() == HEADER_SECTION_2_OFFSET);
+        int toWrite = writeProperties ? (fileHeader.getHeaderLength() - HEADER_SECTION_2_OFFSET) : 16;
+        ByteBuffer b = ByteBuffer.allocate(toWrite);
         b.putInt(fileHeader.getCurrentHead());  //start index in rr structure
         b.putInt(fileHeader.getCurrentTail());
         b.putLong(fileHeader.getMostRecentItemTimestamp());
-        b.putInt(properties.length);
-        //the next 32 bytes are currently undefined, left open for future use
-        for ( int loop=0; loop<8; loop++) {
-            b.putInt(-1);
-        }
+        if ( writeProperties) {
+            b.putInt(properties.length);
+            //the next 32 bytes are currently undefined, left open for future use
+            for ( int loop=0; loop<8; loop++) {
+                b.putInt(-1);
+            }
 
-        //Header Properties
-        b.put(properties);
-        int bytesWritten = properties.length + BYTES_IN_HEADER_START;
-        byte[] padding = new byte[fileHeader.getHeaderLength() - bytesWritten];
-        b.put(padding);
-        b.position(0);
+            //Header Properties
+            b.put(properties);
+            int bytesWritten = properties.length + PROPERTIES_OFFSET;
+            int paddingBytes = fileHeader.getHeaderLength() - bytesWritten;
+            byte[] padding = new byte[paddingBytes];
+            b.put(padding);
+        }
         c.writeCompletely(b);
     }
 
@@ -142,20 +155,22 @@ class SerializerOperations {
         int propertiesLength = b.getInt();
         b.position(b.position() + 32); //skip the currently undefined bytes
 
-        fileHeader.updateHeaderFields(headerLength, currentHead, currentTail, seriesMaxLength, mostRecentTimestamp);
         byte[] propertyBytes = new byte[propertiesLength];
         b.get(propertyBytes);
-        fileHeader.resetSeriesProperties(propertyBytes);
 
         //skip to end of header section
-        int bytesToSkip = fileHeader.getHeaderLength() - (propertiesLength + BYTES_IN_HEADER_START);
+        int bytesToSkip = fileHeader.getHeaderLength() - (propertiesLength + PROPERTIES_OFFSET);
         b.position(b.position() + bytesToSkip);
+
+        //now update header in memory
+        fileHeader.resetSeriesProperties(propertyBytes);
+        fileHeader.updateHeaderFields(headerLength, currentHead, currentTail, seriesMaxLength, mostRecentTimestamp);
     }
 
     /**
      * Append items to filesystem, updating fileHeader in memory with new series length, head and tail offset
      */
-    void doAppend(FileHeader header, RoundRobinTimeSeries toAppend, AuditedFileChannel r) throws IOException {
+    void doAppend(FileHeader header, RoundRobinTimeSeries toAppend, boolean writeProperties, byte[] properties, AuditedFileChannel c) throws IOException {
         if ( toAppend.size() > 0) {
 
             //work out new size, new head and tail offsets
@@ -182,27 +197,24 @@ class SerializerOperations {
             if ( bytesToWriteAtStart > 0) {
                 ByteBuffer startBuffer = ByteBuffer.allocate(bytesToWriteAtStart);
                 startBuffer.put(appendArray, appendArray.length - startBuffer.capacity(), startBuffer.capacity());
-                r.position(header.getHeaderLength());
-                r.writeCompletely(startBuffer);
+                c.position(header.getHeaderLength());
+                c.writeCompletely(startBuffer);
             }
 
             if ( bytesToWriteAtEnd > 0 ) {
                 ByteBuffer endBuffer = ByteBuffer.allocate(bytesToWriteAtEnd);
                 endBuffer.put(appendArray, 0, endBuffer.capacity());
-                r.position(header.getHeaderLength() + (header.getCurrentTail() * 16));
-                r.writeCompletely(endBuffer);
+                c.position(header.getHeaderLength() + (header.getCurrentTail() * 16));
+                c.writeCompletely(endBuffer);
             }
 
-            //now update header information on disk and in memory
-            r.position(CURRENT_HEAD_OFFSET);
-            ByteBuffer b = ByteBuffer.allocate(16);
-            b.putInt(newHead);
-            b.putInt(newTail);
             long newLastTimestamp = toAppend.getItem(toAppend.size() - 1).getTimestamp();
-            b.putLong(newLastTimestamp);
-            r.writeCompletely(b);
-
             header.updateHeaderFields(header.getHeaderLength(), newHead, newTail, header.getSeriesMaxLength(), newLastTimestamp);
+        }
+
+        if ( toAppend.size() > 0 || writeProperties ) {
+            c.position(HEADER_SECTION_2_OFFSET);
+            writeHeaderSectionTwo(header, writeProperties, properties, c);
         }
     }
 

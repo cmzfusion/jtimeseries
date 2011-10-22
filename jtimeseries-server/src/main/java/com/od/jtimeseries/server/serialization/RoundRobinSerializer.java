@@ -87,8 +87,7 @@ public class RoundRobinSerializer {
         synchronized (readWriteLock) {
             if ( ! shutdown ) {
                 byte[] properties = fileHeader.getPropertiesAsByteArray();
-                int headerBytesToWrite = properties.length + SerializerOperations.BYTES_IN_HEADER_START;
-                int newHeaderLength = fileHeader.calculateNewHeaderLength(headerBytesToWrite);
+                int newHeaderLength = getNewHeaderLength(fileHeader, properties);
 
                 //head == -1 is a special convention to indicate the time series is empty
                 int head = t.size() == 0 ? -1 : 0;
@@ -119,6 +118,11 @@ public class RoundRobinSerializer {
         }
     }
 
+    private int getNewHeaderLength(FileHeader fileHeader, byte[] properties) {
+        int headerBytesToWrite = properties.length + SerializerOperations.PROPERTIES_OFFSET;
+        return fileHeader.calculateNewHeaderLength(headerBytesToWrite);
+    }
+
     public RoundRobinTimeSeries deserialize(FileHeader fileHeader) throws SerializationException {
         fileReadCounter.incrementCount();
         synchronized (readWriteLock) {
@@ -138,7 +142,6 @@ public class RoundRobinSerializer {
             }
         }
     }
-
 
     public FileHeader readHeader(File f) throws SerializationException {
         synchronized (readWriteLock) {
@@ -191,7 +194,23 @@ public class RoundRobinSerializer {
                 try {
                     r = new RandomAccessFile(file, "rw");
                     c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
-                    serializerOperations.doAppend(header, l, c);
+
+                    boolean rewriteProperties = header.isPropertiesRewriteRequired();
+                    if (rewriteProperties) {
+                        byte[] properties = header.getPropertiesAsByteArray();
+                        int newHeaderLength = getNewHeaderLength(header, properties);
+                        if ( newHeaderLength > header.getHeaderLength()) {
+                            //a rewrite is required, the new properties will not fit into the current header and it needs to expand
+                            //read the series from disk, append the append items, and rewrite both the header and body
+                            RoundRobinTimeSeries s = serializerOperations.readBody(header, c);
+                            s.addAll(l);
+                            serialize(header, s);
+                        } else {
+                            serializerOperations.doAppend(header, l, true, properties, c);
+                        }
+                    }  else {
+                        serializerOperations.doAppend(header, l, false, null, c);
+                    }
                 } catch ( Throwable e) {
                     fileErrorCounter.incrementCount();
                     throw new SerializationException("Failed to append items to file " + header, e);

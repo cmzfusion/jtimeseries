@@ -158,6 +158,10 @@ public class DefaultCounter implements Counter {
         return simpleSource.getProperty(propertyName);
     }
 
+    public String removeProperty(String propertyName) {
+        return simpleSource.removeProperty(propertyName);
+    }
+
     public Properties getProperties() {
         return simpleSource.getProperties();
     }

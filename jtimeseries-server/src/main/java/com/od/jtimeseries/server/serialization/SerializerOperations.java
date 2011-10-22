@@ -34,7 +34,7 @@ class SerializerOperations {
 
     //properties which are not changed in an 'append'
     private void writeHeaderSectionOne(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
-        assert(c.getPosition() == 0);
+        c.position(0);
         ByteBuffer b = ByteBuffer.allocate(HEADER_SECTION_2_OFFSET);
         b.put(VERSION_STRING.getBytes()); //add a version description, to support future versioning
         b.putInt(fileHeader.getHeaderLength());  //offset where data will start
@@ -44,7 +44,7 @@ class SerializerOperations {
 
     //properties which can be changed in an 'append', the current head and tail, and optionally the properties section
     private void writeHeaderSectionTwo(FileHeader fileHeader, boolean writeProperties, byte[] properties, AuditedFileChannel c) throws IOException {
-        assert(c.getPosition() == HEADER_SECTION_2_OFFSET);
+        c.position(HEADER_SECTION_2_OFFSET);
         int toWrite = writeProperties ? (fileHeader.getHeaderLength() - HEADER_SECTION_2_OFFSET) : 16;
         ByteBuffer b = ByteBuffer.allocate(toWrite);
         b.putInt(fileHeader.getCurrentHead());  //start index in rr structure
@@ -88,7 +88,7 @@ class SerializerOperations {
      * Read time series items from file body, c must be positioned at start of body section
      */
     RoundRobinTimeSeries readBody(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
-        assert(c.getPosition() == fileHeader.getHeaderLength());        
+        c.position(fileHeader.getHeaderLength());
         ByteBuffer b = ByteBuffer.allocate((int)(c.size() - c.position()));
         c.readCompletely(b);
 
@@ -132,10 +132,10 @@ class SerializerOperations {
     /**
      * Read time series header information, updating fileHeader in memory
      */
-    void readHeader(FileHeader fileHeader, AuditedFileChannel d) throws IOException {
-        assert(d.position() == 0);
+    void readHeader(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
+        c.position(0);
         ByteBuffer b = ByteBuffer.allocate(MAX_LENGTH_OFFSET);
-        d.readCompletely(b);
+        c.readCompletely(b);
         b.position(0);
 
         byte[] versionBytes = new byte[VERSION_STRING_LENGTH];
@@ -147,7 +147,7 @@ class SerializerOperations {
         int headerLength = b.getInt();
 
         b = ByteBuffer.allocate(headerLength - MAX_LENGTH_OFFSET);
-        d.readCompletely(b);
+        c.readCompletely(b);
         b.position(0);
 
         int seriesMaxLength = b.getInt();

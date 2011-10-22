@@ -277,6 +277,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return fileHeader.setSeriesProperty(key, value);
     }
 
+    //delegate property handling to FileHeader, so that properties get persisted
+    public String removeProperty_Locked(String key) {
+        return fileHeader.removeSeriesProperty(key);
+    }
+
     public String getProperty_Locked(String key) {
         return fileHeader.getSeriesProperty(key);
     }

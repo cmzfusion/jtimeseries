@@ -234,19 +234,19 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, (Object[])getFunctions(captureFunctions));
     }
 
     public final QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, QueueTimer.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, QueueTimer.class, (Object[])getFunctions(captureFunctions));
     }
 
     public final Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, Counter.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, Counter.class, (Object[])getFunctions(captureFunctions));
     }
 
     public final EventTimer createEventTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, EventTimer.class, getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, EventTimer.class, (Object[])getFunctions(captureFunctions));
     }
 
     public final TimedValueSupplier createTimedValueSupplierSeries(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {

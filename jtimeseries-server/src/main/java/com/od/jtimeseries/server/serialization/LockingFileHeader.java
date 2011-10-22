@@ -73,6 +73,17 @@ public abstract class LockingFileHeader {
 
     protected abstract String doGetSeriesProperty(String key);
 
+    public String removeSeriesProperty(String key) {
+       try {
+           headerLock.readLock().lock();
+           return doRemoveSeriesProperty(key);
+       } finally {
+           headerLock.readLock().unlock();
+       }
+    }
+
+    protected abstract String doRemoveSeriesProperty(String key);
+
     public int getHeaderLength() {
         try {
             headerLock.readLock().lock();

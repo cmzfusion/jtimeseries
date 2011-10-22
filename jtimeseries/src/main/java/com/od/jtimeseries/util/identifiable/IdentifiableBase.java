@@ -170,6 +170,10 @@ public class IdentifiableBase extends LockingIdentifiable {
         return (String)properties.setProperty(propertyName,  value);
     }
 
+    protected String removeProperty_Locked(String propertyName) {
+        return (String)properties.remove(propertyName);
+    }
+
     protected List<Identifiable> getChildren_Locked() {
         List<Identifiable> children = new ArrayList<Identifiable>();
         children.addAll(this. childrenById.values());

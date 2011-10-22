@@ -126,6 +126,12 @@ public interface Identifiable {
      */
     String setProperty(String propertyName, String value);
 
+    /**
+     * Remove the property with key propertyName
+     * @return the previous value for propertyName, or null if property was not set
+     */
+    String removeProperty(String propertyName);
+
     Identifiable addChild(Identifiable... identifiables);
 
     <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);

@@ -90,6 +90,10 @@ public class FileHeader extends LockingFileHeader {
         return seriesProperties.getProperty(key);
     }
 
+    protected String doRemoveSeriesProperty(String key) {
+        return seriesProperties.removeProperty(key);
+    }
+
     protected int doGetHeaderLength() {
         return headerLength;
     }
@@ -195,6 +199,14 @@ public class FileHeader extends LockingFileHeader {
                 seriesPropertiesChanged = true;
             }
             return result;
+        }
+
+        public String removeProperty(String key) {
+            String removed = (String)wrappedProperties.remove(key);
+            if ( removed != null) {
+                seriesPropertiesChanged = true;
+            }
+            return removed;
         }
 
         public boolean isChanged() {

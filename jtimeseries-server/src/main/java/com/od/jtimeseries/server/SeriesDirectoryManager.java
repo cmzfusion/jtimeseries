@@ -76,6 +76,7 @@ public class SeriesDirectoryManager {
     }
 
     public void loadExistingSeries() {
+        logMethods.logInfo("Loading series from directory " + seriesDirectory);
         File[] candidateFiles = getCandidateSeriesFiles();
         logMethods.logInfo("Found " + candidateFiles.length + " possible timeseries files, about to commence loading..");
         long startTime = System.currentTimeMillis();

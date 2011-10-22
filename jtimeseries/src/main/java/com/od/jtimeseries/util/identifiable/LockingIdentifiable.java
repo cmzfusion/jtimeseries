@@ -247,6 +247,18 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract String setProperty_Locked(String propertyName, String value);
 
+
+    public final String removeProperty(String propertyName) {
+        try {
+            getTreeLock().writeLock().lock();
+            return removeProperty_Locked(propertyName);
+        } finally {
+            getTreeLock().writeLock().unlock();
+        }
+    }
+
+    protected abstract String removeProperty_Locked(String propertyName);
+
     public final Identifiable addChild(Identifiable... identifiables) {
         try {
             getTreeLock().writeLock().lock();

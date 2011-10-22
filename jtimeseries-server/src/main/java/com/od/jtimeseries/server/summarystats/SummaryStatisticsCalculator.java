@@ -32,6 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.text.DecimalFormat;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -103,7 +105,7 @@ public class SummaryStatisticsCalculator {
 
         private void doRecalculations(QueryResult<FilesystemTimeSeries> r, int numberOfSeries) {
             long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
-            logMethods.logDebug("Summary statistics sleep time to caculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
+            logMethods.logDebug("Summary statistics sleep time to calculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
 
             for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
@@ -127,6 +129,16 @@ public class SummaryStatisticsCalculator {
         }
 
         private void recalculateStats(IdentifiableTimeSeries s) {
+            //first remove all current summary properties, these may include legacy properties which are
+            //no longer in server config - we are not going to recalculate those
+            Properties p = s.getProperties();
+            for ( Object o : p.keySet() ) {
+                String key = (String)o;
+                if ( ContextProperties.isSummaryStatsProperty(key)) {
+                    s.removeProperty(key);
+                }
+            }
+
             for ( SummaryStatistic stat : statistics) {
                 try {
                     Numeric n = stat.calculateSummaryStatistic(s);

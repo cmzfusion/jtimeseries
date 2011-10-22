@@ -146,6 +146,10 @@ public class DefaultQueueTimer implements QueueTimer {
         return timingSource.getProperty(propertyName);
     }
 
+    public String removeProperty(String propertyName) {
+        return timingSource.removeProperty(propertyName);
+    }
+
     public String findProperty(String propertyName) {
         return timingSource.findProperty(propertyName);
     }

@@ -64,7 +64,7 @@ public abstract class AbstractRemoteQuery {
         long timeTaken = System.currentTimeMillis() - time;
         LocalJmxMetrics.getInstance().getQueryTimesRecorder().newValue(timeTaken);
         LocalJmxMetrics.getInstance().getQueryCounter().incrementCount();
-        logMethods.logInfo(getClass().getName() + " query took " + timeTaken + " millis");
+        logMethods.logDebug(getClass().getName() + " query took " + timeTaken + " millis");
     }
 
     protected void doBeforeRun() {

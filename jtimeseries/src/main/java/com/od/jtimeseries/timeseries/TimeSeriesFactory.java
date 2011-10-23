@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.timeseries;
 
+import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
 import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
@@ -26,12 +27,12 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  * Date: 31-Dec-2008
  * Time: 11:14:26
  */
-public interface TimeSeriesFactory extends Identifiable {
+public interface TimeSeriesFactory extends IdentifiableFactory {
 
     /**
      * All TimeSeriesFactory should use this ID, to make sure only one TimeSeriesFactory can exist per context
      */
     public static final String ID = "TimeSeriesFactory";
     
-    <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> clazzType, Object... parameters);
+    IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description, Class clazzType, Object... parameters);
 }

@@ -31,16 +31,16 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  *
  * A factory for contexts, which can be added to a context to handle the creation of child contexts
  */
-public class DefaultContextFactory extends IdentifiableBase implements ContextFactory{
+public class DefaultContextFactory extends IdentifiableBase implements ContextFactory {
 
     public DefaultContextFactory() {
         super(ID, ID);
         setDescription(getClass().getName());
     }
 
-    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
+    public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description, Class classType, Object... parameters) {
         if (classType.isAssignableFrom(DefaultTimeSeriesContext.class)) {
-            return (E)new DefaultTimeSeriesContext(id, description, false);
+            return new DefaultTimeSeriesContext(id, description, false);
         } else {
             throw new UnsupportedOperationException("Cannot create a context of type " + classType);
         }

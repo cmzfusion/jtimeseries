@@ -21,6 +21,7 @@ package com.od.jtimeseries.server.timeseries;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.identifiable.Identifiable;
@@ -46,16 +47,16 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
         this.seriesLength = seriesLength;
     }
 
-    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
         if ( classType.isAssignableFrom(FilesystemTimeSeries.class)) {
             try {
-                E result;
+                IdentifiableTimeSeries result;
                 if ( parameters.length == 1 && parameters[0] instanceof FileHeader) {
                     FileHeader h = (FileHeader)parameters[0];
                     //series exists on disk already, we have a header
-                    result = (E)new FilesystemTimeSeries(h, roundRobinSerializer, fileAppendDelay, fileRewriteDelay);
+                    result = new FilesystemTimeSeries(h, roundRobinSerializer, fileAppendDelay, fileRewriteDelay);
                 } else {
-                    result = (E)new FilesystemTimeSeries(parent.getPath(), id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
+                    result = new FilesystemTimeSeries(parent.getPath(), id, description, roundRobinSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
                 }
                 return result;
             } catch (SerializationException e) {

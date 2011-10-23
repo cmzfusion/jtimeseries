@@ -28,9 +28,9 @@ import java.util.List;
  * Time: 16:15:57
  *
  * A TimeSeries is an ordered sequence of TimeSeriesItems, each representing a value at a point in time
- * The timepoints may or may not be equally spaced / periodic
+ * The time points may or may not be equally spaced / periodic
  *
- * This interface defines a very limited set of common methods, but implementations may be based on varying datastructures,
+ * This interface defines a limited set of useful methods, but implementations may be based on varying datastructures,
  * and the choice of implementation may depend on the intended use. For example, an implementation based
  * on an array may provide rapid random access to the items by index (but may have poor performance for inserting
  * or merging TimeSeriesItems). Alternatively a TimeSeries based on a map or tree may offer fast search for an

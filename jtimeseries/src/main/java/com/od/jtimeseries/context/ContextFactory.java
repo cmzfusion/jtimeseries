@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +26,7 @@ import com.od.jtimeseries.util.identifiable.Identifiable;
  * Date: 17-Feb-2009
  * Time: 13:51:19
  */
-public interface ContextFactory extends Identifiable {
+public interface ContextFactory extends IdentifiableFactory {
 
     /**
      * All ContextFactory should use this ID, to make sure only one ContextFactory can exist per context
@@ -36,6 +36,6 @@ public interface ContextFactory extends Identifiable {
     /**
      * @param parent, may be null in which case a root context should be created.
      */
-    <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters);
+    TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description, Class classType, Object... parameters);
 
 }

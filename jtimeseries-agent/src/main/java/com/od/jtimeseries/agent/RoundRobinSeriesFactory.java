@@ -38,9 +38,9 @@ public class RoundRobinSeriesFactory extends DefaultTimeSeriesFactory {
         this.maxSeriesSize = maxSeriesSize;
     }
 
-    public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+    public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
         if ( classType.isAssignableFrom(IdentifiableTimeSeries.class)) {
-            return (E)new DefaultIdentifiableTimeSeries(
+            return new DefaultIdentifiableTimeSeries(
                 id,
                 description,
                 new RoundRobinTimeSeries(maxSeriesSize)

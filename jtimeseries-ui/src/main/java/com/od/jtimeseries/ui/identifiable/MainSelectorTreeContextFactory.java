@@ -36,19 +36,18 @@ public class MainSelectorTreeContextFactory extends DefaultContextFactory {
     private DisplayNameCalculator displayNameCalculator;
 
     public MainSelectorTreeContextFactory(DisplayNameCalculator displayNameCalculator) {
-
         this.displayNameCalculator = displayNameCalculator;
     }
 
-    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
+    public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description, Class classType, Object... parameters) {
         if ( VisualizerContext.class.isAssignableFrom(classType)) {
-            return (E)new VisualizerContext((VisualizerConfiguration)parameters[0]);
+            return new VisualizerContext((VisualizerConfiguration)parameters[0]);
         }  else if ( DesktopContext.class.isAssignableFrom(classType)) {
-            return (E)new DesktopContext((DesktopConfiguration)parameters[0], displayNameCalculator);
+            return new DesktopContext((DesktopConfiguration)parameters[0], displayNameCalculator);
         } else if ( SettingsContext.class.isAssignableFrom(classType)) {
-            return (E)new SettingsContext();
+            return new SettingsContext();
         } else if ( DisplayNamesContext.class.isAssignableFrom(classType)) {
-            return (E)new DisplayNamesContext(displayNameCalculator);
+            return new DisplayNamesContext(displayNameCalculator);
         } else {
             return super.createContext(parent, id, description, classType, parameters);
         }

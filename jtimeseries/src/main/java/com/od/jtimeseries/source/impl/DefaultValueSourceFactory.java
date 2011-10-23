@@ -50,17 +50,17 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
         return new DefaultTimedValueSupplier(id, description, valueSupplier, timePeriod);
     }
 
-    public <E extends Identifiable> E createValueSource(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+    public ValueSource createValueSource(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
         if ( classType.isAssignableFrom(ValueRecorder.class)) {
-            return (E)createValueRecorder(parent, path, id, description, parameters);
+            return createValueRecorder(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(QueueTimer.class)) {
-            return (E)createQueueTimer(parent, path, id, description, parameters);
+            return createQueueTimer(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(Counter.class)) {
-            return (E)createCounter(parent, path, id, description, parameters);
+            return createCounter(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(EventTimer.class)) {
-            return (E)createEventTimer(parent, path, id, description, parameters);
+            return createEventTimer(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(TimedValueSupplier.class)) {
-            return (E) createTimedValueSupplier(parent, path, id, description, (ValueSupplier)parameters[0], (TimePeriod)parameters[1], parameters);
+            return createTimedValueSupplier(parent, path, id, description, (ValueSupplier)parameters[0], (TimePeriod)parameters[1], parameters);
         } else {
             throw new UnsupportedOperationException("Cannot create ValueSource of class type " + classType);
         }

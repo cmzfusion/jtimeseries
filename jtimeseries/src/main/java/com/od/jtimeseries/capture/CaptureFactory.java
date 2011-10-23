@@ -19,10 +19,10 @@
 package com.od.jtimeseries.capture;
 
 import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,12 +31,12 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  * Time: 10:03:02
  * To change this template use File | Settings | File Templates.
  */
-public interface CaptureFactory extends Identifiable {
+public interface CaptureFactory extends IdentifiableFactory {
 
      /**
      * All CaptureFactory should use this ID, to make sure only one CaptureFactory can exist per context
      */
     public static final String ID = "CaptureFactory";
 
-    <E extends Identifiable> E createCapture(Identifiable parent, String pathForChild, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters);
+    Capture createCapture(Identifiable parent, String pathForChild, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class classType, Object[] parameters);
 }

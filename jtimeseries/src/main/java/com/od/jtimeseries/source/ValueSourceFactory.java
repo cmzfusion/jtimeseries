@@ -19,15 +19,14 @@
 package com.od.jtimeseries.source;
 
 import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
 
-public interface ValueSourceFactory extends Identifiable {
+public interface ValueSourceFactory extends IdentifiableFactory {
 
     /**
      * All ValueSourceFactory should use this ID, to make sure only one ValueSourceFactory can exist per context
      */
     public static final String ID = "ValueSourceFactory";
 
-    <E extends Identifiable> E createValueSource(Identifiable parent, String pathForChild, String id, String description, Class<E> clazz, Object... parameters);
+    ValueSource createValueSource(Identifiable parent, String path, String id, String description, Class classType, Object... parameters);
 }

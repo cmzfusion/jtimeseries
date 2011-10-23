@@ -39,5 +39,5 @@ public interface ContextMetricCreator {
     public static final String SOURCE_SUFFIX = "_Source";
     public static final String CAPTURE_SUFFIX = "_Capture";
 
-    <E extends Identifiable> E createValueSourceSeries(Identifiable defaultTimeSeriesContext, String pathForChild, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters);
+    ValueSource createSourceCaptureAndSeries(Identifiable defaultTimeSeriesContext, String pathForChild, String id, String description, Class classType, List<CaptureFunction> functions, Object[] parameters);
 }

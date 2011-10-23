@@ -53,8 +53,8 @@ class DefaultMetricCreator implements ContextMetricCreator {
         this.timeSeriesContext = timeSeriesContext;
     }
 
-    public <E extends Identifiable> E createValueSourceSeries(Identifiable parent, String path, String id, String description, Class<E> classType, List<CaptureFunction> functions, Object[] parameters) {
-        E result = timeSeriesContext.getValueSourceFactory().createValueSource(parent, path, id, description, classType, parameters);
+    public ValueSource createSourceCaptureAndSeries(Identifiable parent, String path, String id, String description, Class classType, List<CaptureFunction> functions, Object[] parameters) {
+        ValueSource result = timeSeriesContext.getValueSourceFactory().createValueSource(parent, path, id, description, classType, parameters);
         String seriesId = id.substring(0, id.length() - SOURCE_SUFFIX.length());
         createSeriesAndCapturesForSource(seriesId, description, (ValueSource)result, functions);
         return result;

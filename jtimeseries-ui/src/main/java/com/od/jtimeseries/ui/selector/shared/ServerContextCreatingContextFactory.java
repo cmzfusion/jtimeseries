@@ -65,14 +65,14 @@ public class ServerContextCreatingContextFactory extends DefaultContextFactory {
     //if we are creating a context in this tree we may be able to use the information from the parameter to
     //help us create a more specific type of context locally -
     //in this case we can recreate the TimeSeriesServerContext from the original context
-    public <E extends Identifiable> E createContext(TimeSeriesContext parent, String id, String description, Class<E> classType, Object... parameters) {
-        E result = null;
+    public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description, Class classType, Object... parameters) {
+        TimeSeriesContext result = null;
         if (classType.isAssignableFrom(TimeSeriesServerContext.class)) {
             if (parent == rootContext && parameters.length == 1) {
                 if (parameters[0] instanceof UiTimeSeriesConfig) {
                     try {
                         TimeSeriesServer server = getTimeSeriesServer(((UiTimeSeriesConfig)parameters[0]), id, serverDictionary);
-                        result = (E)new TimeSeriesServerContext(server);
+                        result = new TimeSeriesServerContext(server);
                     } catch (Exception e) {
                        logMethods.logError("Failed to create ServerContext for " + id, e);
                     }

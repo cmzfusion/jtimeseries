@@ -43,11 +43,11 @@ public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFa
         setDescription(getClass().getName());
     }
 
-    public <E extends Identifiable> E createCapture(Identifiable parent, String path, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class<E> classType, Object[] parameters) {
+    public Capture createCapture(Identifiable parent, String path, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class classType, Object[] parameters) {
         if ( captureFunction == CaptureFunctions.RAW_VALUES ) {
-            return (E)new DefaultCapture(id, valueSource, identifiableTimeSeries);
+            return new DefaultCapture(id, valueSource, identifiableTimeSeries);
         } else {
-            return (E)new DefaultTimedCapture(id, valueSource, identifiableTimeSeries, captureFunction);
+            return new DefaultTimedCapture(id, valueSource, identifiableTimeSeries, captureFunction);
         }
     }
 }

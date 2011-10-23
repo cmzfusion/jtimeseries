@@ -184,16 +184,16 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     protected <E extends Identifiable> E doCreate(String id, String description, Class<E> classType, Object... parameters) {
         E result;
         if ( IdentifiableTimeSeries.class.isAssignableFrom(classType)) {
-            result = getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, classType, parameters);
+            result = (E)getTimeSeriesFactory().createTimeSeries(this, getPathForChild(id), id, description, classType, parameters);
         }
         else if ( ValueSource.class.isAssignableFrom(classType) ) {
             result = createValueSource(id, description, classType, parameters);
         }
         else if ( Capture.class.isAssignableFrom(classType)) {
-            result = getCaptureFactory().createCapture(this, getPathForChild(id), id, (ValueSource)parameters[0], (IdentifiableTimeSeries)parameters[1], (CaptureFunction)parameters[2], classType, parameters);
+            result = (E)getCaptureFactory().createCapture(this, getPathForChild(id), id, (ValueSource)parameters[0], (IdentifiableTimeSeries)parameters[1], (CaptureFunction)parameters[2], classType, parameters);
         }
         else if ( Identifiable.class.isAssignableFrom(classType)) { //default to creating a child context so recursive creation works
-            result = getContextFactory().createContext(this, id, description, classType, parameters);
+            result = (E)getContextFactory().createContext(this, id, description, classType, parameters);
         }
         else {
             throw new UnsupportedOperationException("Cannot create identifiable of class " + classType);
@@ -206,7 +206,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     private <E extends Identifiable> E createValueSource(String id, String description, Class<E> classType, Object... parameters) {
         E result;
         if ( parameters.length == 0 || ! (parameters[0] instanceof CaptureFunction)) {
-            result = getValueSourceFactory().createValueSource(this, getPathForChild(id), id, description, classType, parameters);
+            result = (E)getValueSourceFactory().createValueSource(this, getPathForChild(id), id, description, classType, parameters);
         } else {
             List<CaptureFunction> functions = new ArrayList<CaptureFunction>();
             List<Object> params = new ArrayList<Object>();
@@ -217,7 +217,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
                     params.add(o);
                 }
             }
-            result = defaultMetricCreator.createValueSourceSeries(this, getPathForChild(id), id, description, classType, functions, params.toArray(new Object[params.size()]));
+            result = (E)defaultMetricCreator.createSourceCaptureAndSeries(this, getPathForChild(id), id, description, classType, functions, params.toArray(new Object[params.size()]));
         }
         return result;
     }

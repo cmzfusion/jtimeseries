@@ -13,6 +13,10 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import java.util.List;
 import java.util.Iterator;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MIN;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -24,16 +28,16 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description",
-                CaptureFunctions.COUNT(capturePeriod),
+                CaptureFunctions.COUNT_OVER(capturePeriod),
                 CaptureFunctions.CHANGE(capturePeriod),
                 CaptureFunctions.MEAN_CHANGE(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
-                CaptureFunctions.MEAN_COUNT(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
+                CaptureFunctions.MEAN_COUNT_OVER(Time.milliseconds((int) capturePeriod.getLengthInMillis() / 5), capturePeriod),
                 CaptureFunctions.RAW_VALUES()
         );
 
-        valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder", CaptureFunctions.MEAN(capturePeriod));
-        eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer", CaptureFunctions.MAX(capturePeriod));
-        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer", CaptureFunctions.MIN(capturePeriod));
+        valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder", MEAN(capturePeriod));
+        eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer", MAX(capturePeriod));
+        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer", MIN(capturePeriod));
     }
 
     @Test
@@ -76,13 +80,13 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(2, i1.longValue());
         assertEquals(2, i2.longValue());
 
-        //this series is the absolute count of values collected over the period, which is 4
+        //this series is the change in the counter value (the count during the period)
         s = rootContext.findTimeSeries("TestCounter \\(Count " + capturePeriod).getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(4, i1.longValue());
-        assertEquals(4, i2.longValue());
+        assertEquals(2, i1.longValue());
+        assertEquals(2, i2.longValue());
 
         //this series is the mean change over capturePeriod / 5
         s = rootContext.findTimeSeries("TestCounter \\(Change Per").getFirstMatch();
@@ -92,13 +96,13 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(0.4, i1.doubleValue(), 0.0001);
         assertEquals(0.4, i2.doubleValue(), 0.0001);
 
-        //this series is the mean count over capturePeriod / 5
+        //this series is the mean change in the counter value (the count during the period)
         s = rootContext.findTimeSeries("TestCounter \\(Count Per").getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(0.8, i1.doubleValue(), 0.0001);
-        assertEquals(0.8, i2.doubleValue(), 0.0001);
+        assertEquals(0.4, i1.doubleValue(), 0.0001);
+        assertEquals(0.4, i2.doubleValue(), 0.0001);
 
         s = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
         i = s.iterator();

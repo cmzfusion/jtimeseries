@@ -71,7 +71,7 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, from a starting value of zero
      */
     public static CaptureFunction CHANGE(TimePeriod timePeriod) {
-        return CHANGE(timePeriod, LongNumeric.valueOf(0));
+        return CHANGE(timePeriod, LongNumeric.ZERO);
     }
 
     /**
@@ -85,8 +85,8 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, starting from zero, expressed
      * as a mean change over timeIntervalToExpressCount
      */
-    public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-        return MEAN_CHANGE(timeIntervalToExpressCount, timePeriod, LongNumeric.valueOf(0));
+    public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressChange, TimePeriod timePeriod) {
+        return MEAN_CHANGE(timeIntervalToExpressChange, timePeriod, LongNumeric.ZERO);
     }
 
     /**
@@ -97,14 +97,36 @@ public class CaptureFunctions {
         return new DefaultCaptureFunction(timePeriod, new MeanChangeAggregateFunction(initialValue, timeIntervalToExpressCount, timePeriod));
     }
 
-    public static CaptureFunction COUNT(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT());
+    /**
+     * @return a function which measures the number of values received from ValueSource over the period, a true count rather than the sum of the values received
+     */
+    public static CaptureFunction VALUE_COUNT(TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT()) {
+            protected String doGetDescription() {
+                return "ValueCount" + " " + getCapturePeriod();
+            }
+        };
     }
 
-    public static CaptureFunction MEAN_COUNT(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, new MeanCountAggregateFunction(timeIntervalToExpressCount, timePeriod));
+    /**
+     * @return a function which measures the change in a counter over a time period, eg my overall count to date is 1000, the count over the
+     * last minute was 50. This function is intended for use with Counter value source.
+     */
+    public static CaptureFunction COUNT_OVER(TimePeriod timePeriod) {
+        return new CountOverAggregateFunction(timePeriod);
     }
 
+    /**
+     * @return a function which measures the change in a count over a time period, expressed as a mean change per timeIntervalToExpressCount over that period
+     * eg my overall count to date is 1000, the mean count per second over the last minute was 5. This function is intended for use with Counter value source
+     */
+    public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+        return new DefaultCaptureFunction(timePeriod, new MeanCountOverAggregateFunction(LongNumeric.ZERO, timeIntervalToExpressCount, timePeriod));
+    }
+
+    /**
+     * @return a function which records the latest (most recent value) at the end of each time period, eg the latest value of a Counter
+     */
     public static CaptureFunction LATEST(TimePeriod timePeriod) {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST());
     }
@@ -127,14 +149,29 @@ public class CaptureFunctions {
         }
     }
 
-    private static class MeanCountAggregateFunction extends MeanPerXTimeOverYTimeFunction {
+    /**
+     * This function is intended to be used with Counter and is logically identical to 'Change' function, but labelled as a 'Count' rather than 'Change'
+     * It seems to be more intuitive to describe a metric as a 'count over 5 minutes' rather than a 'the change in value of a counter over five minutes'.
+     */
+    private static class CountOverAggregateFunction extends DefaultCaptureFunction {
 
-        public MeanCountAggregateFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-            super(AggregateFunctions.COUNT(), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
+        public CountOverAggregateFunction(TimePeriod timePeriod) {
+            super(timePeriod, AggregateFunctions.CHANGE(LongNumeric.ZERO));
+        }
+
+        protected String doGetDescription() {
+            return "Count" + " " + getCapturePeriod();
+        }
+    }
+
+    private static class MeanCountOverAggregateFunction extends MeanPerXTimeOverYTimeFunction {
+
+        public MeanCountOverAggregateFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
         }
 
         public AggregateFunction next() {
-            return new MeanCountAggregateFunction(getTimeIntervalToExpressCount(), getTimePeriod());
+            return new MeanCountOverAggregateFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
         }
     }
 
@@ -169,4 +206,5 @@ public class CaptureFunctions {
             return timePeriod;
         }
     }
+
 }

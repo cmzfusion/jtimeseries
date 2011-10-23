@@ -204,8 +204,9 @@ public class RoundRobinSerializer {
         fileAppendCounter.incrementCount();
         try {
             header.writeLock().lock();
+            boolean rewriteProperties = header.isPropertiesRewriteRequired();
             synchronized (readWriteLock) {
-                if (!shutdown && l.size() > 0) {
+                if (!shutdown && ( l.size() > 0 || rewriteProperties )) {
                     File file = getFile(header);
                     checkFileWriteable(file);
                     RandomAccessFile r = null;
@@ -214,7 +215,6 @@ public class RoundRobinSerializer {
                         r = new RandomAccessFile(file, "rw");
                         c = new AuditedFileChannel(r.getChannel(), fileBytesWritten, fileBytesRead);
 
-                        boolean rewriteProperties = header.isPropertiesRewriteRequired();
                         if (rewriteProperties) {
                             byte[] properties = header.getPropertiesAsByteArray();
                             int newHeaderLength = getNewHeaderLength(header, properties);

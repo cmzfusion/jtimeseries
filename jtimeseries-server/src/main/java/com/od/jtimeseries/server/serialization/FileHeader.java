@@ -46,12 +46,14 @@ import java.util.Properties;
 public class FileHeader extends LockingFileHeader {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(FileHeader.class);
+    public static final int DEFAULT_HEADER_START_LENGTH = 756;
+
     //these properties will be stored in the serialized series files, careful if you change them!
     private static final String PATH_KEY = "CONTEXT_PATH";
     private static final String DESCRIPTION_KEY = "DESCRIPTION";
     private static int MAX_PROPERTY_LENGTH = 1024;
 
-    private volatile int headerLength = 512;  //default start length for header
+    private volatile int headerLength = DEFAULT_HEADER_START_LENGTH;  //default start length for header
     private volatile int seriesMaxLength;
     private volatile int currentHead;
     private volatile int currentTail;

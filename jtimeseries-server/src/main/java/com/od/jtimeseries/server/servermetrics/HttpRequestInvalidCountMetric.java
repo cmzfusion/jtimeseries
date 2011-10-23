@@ -7,6 +7,8 @@ import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -37,7 +39,7 @@ public class HttpRequestInvalidCountMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Count of invalid HTTP requests", CaptureFunctions.COUNT(captureTime));
+        Counter c = metricContext.createCounterSeries(id, "Count of invalid HTTP requests", COUNT_OVER(captureTime));
         ServerHttpRequestMonitor.setHttpRequestInvalidCounter(c);
     }
 }

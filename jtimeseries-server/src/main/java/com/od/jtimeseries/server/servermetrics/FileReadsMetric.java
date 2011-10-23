@@ -7,6 +7,8 @@ import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -36,7 +38,7 @@ public class FileReadsMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Count of series data file read operations", CaptureFunctions.COUNT(captureTime));
+        Counter c = metricContext.createCounterSeries(id, "Count of series data file read operations", COUNT_OVER(captureTime));
         RoundRobinSerializer.setFileReadCounter(c);
     }
 }

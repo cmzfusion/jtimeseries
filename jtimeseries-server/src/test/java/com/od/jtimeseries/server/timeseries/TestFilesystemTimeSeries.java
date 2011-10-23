@@ -1,5 +1,6 @@
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
@@ -202,6 +203,19 @@ public class TestFilesystemTimeSeries extends TestCase {
         FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
         context.addChild(s);
         assertEquals(3, s.getLatestTimestamp());
+    }
+
+    @Test
+    //test we can persist a lot of properties, which should force the header to expand
+    public void testPersistingNewProperties() throws Exception {
+        FilesystemTimeSeries series = getTimeSeriesInstance();
+        for ( int loop = 0; loop <= 500; loop++) {
+            series.setProperty("Property" + loop, "Property " + loop);
+        }
+        series.flush();
+        FileHeader h = new FileHeader(series.getFileHeader().getPath(), series.getFileHeader().getDescription(), 10000);
+        roundRobinSerializer.deserialize(h);
+        assertTrue(h.getSeriesProperty("Property500") != null);
     }
 
 }

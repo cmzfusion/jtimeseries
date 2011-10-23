@@ -19,7 +19,6 @@
 package com.od.jtimeseries.ui.util;
 
 import com.od.jtimeseries.JTimeSeries;
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.DefaultMetricSource;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
@@ -42,6 +41,8 @@ import com.od.jtimeseries.util.time.Time;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -70,27 +71,27 @@ public class LocalJmxMetrics {
         queryTimesRecorder = rootContext.createValueRecorderSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Series Query Time",
                 "Time taken by queries to load series data in milliseconds",
-                CaptureFunctions.RAW_VALUES(),
-                CaptureFunctions.MEAN(Time.minutes(1)),
-                CaptureFunctions.MAX(Time.minutes(1))
+                RAW_VALUES(),
+                MEAN(Time.minutes(1)),
+                MAX(Time.minutes(1))
         );
 
         queryCounter = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Series Query Count",
                 "Number of queries executed",
-                CaptureFunctions.COUNT(Time.minutes(1))
+                COUNT_OVER(Time.minutes(1))
         );
 
         httpSeriesCount = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "RemoteHttpTimeSeries Count",
                 "Number of memory resident RemoteHttpTimeSeries",
-                CaptureFunctions.LATEST(Time.minutes(1))
+                LATEST(Time.minutes(1))
         );
 
         visualizerCount = rootContext.createCounterSeries(
                 metricRootPath + Identifiable.NAMESPACE_SEPARATOR + "Visualizer Count",
                 "Number of memory resident TimeSeriesVisualizer",
-                CaptureFunctions.LATEST(Time.minutes(1))
+                LATEST(Time.minutes(1))
         );
     }
 

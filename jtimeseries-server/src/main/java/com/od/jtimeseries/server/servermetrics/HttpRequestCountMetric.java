@@ -5,8 +5,9 @@ import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
+
+import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,7 +39,7 @@ public class HttpRequestCountMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Count of HTTP requests", CaptureFunctions.COUNT(captureTime));
+        Counter c = metricContext.createCounterSeries(id, "Count of HTTP requests", COUNT_OVER(captureTime));
         ServerHttpRequestMonitor.setHttpRequestCounter(c);
     }
 }

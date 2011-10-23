@@ -27,6 +27,10 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 import javax.swing.*;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -59,14 +63,14 @@ public class BenchmarkingRepaintManager extends RepaintManager {
                 REPAINT_EVENT_DURATION_METRIC_ID,
                 "Length of time taken by each screen repainting operation in ms - lower is better. " +
                         "Anything more than 50ms will result in noticible sluggishness.",
-                CaptureFunctions.MEAN(timePeriod),
-                CaptureFunctions.MAX(timePeriod)
+                MEAN(timePeriod),
+                MAX(timePeriod)
         );
 
         count = context.createCounterSeries(
                 NUMBER_OF_REPAINT_EVENTS_METRIC_ID,
                 "Number of repaint events",
-                CaptureFunctions.MEAN_COUNT(Time.seconds(1), timePeriod)
+                MEAN_COUNT_OVER(Time.seconds(1), timePeriod)
         );
     }
 

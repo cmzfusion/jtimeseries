@@ -8,6 +8,8 @@ import com.od.jtimeseries.source.Counter;
 import org.junit.Test;
 import org.junit.After;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -26,9 +28,9 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
         childContext = rootContext.createContext("child");
         grandchildContext = childContext.createContext("granchild");
 
-        counter = rootContext.createCounterSeries("counter", "counter", CaptureFunctions.MEAN(capturePeriod));
-        childcounter = childContext.createCounterSeries("childcounter", "childcounter", CaptureFunctions.MEAN(capturePeriod));
-        grandchildCounter = grandchildContext.createCounterSeries("grandchildCounter", "grandchildCounter", CaptureFunctions.MEAN(capturePeriod));
+        counter = rootContext.createCounterSeries("counter", "counter", MEAN(capturePeriod));
+        childcounter = childContext.createCounterSeries("childcounter", "childcounter", MEAN(capturePeriod));
+        grandchildCounter = grandchildContext.createCounterSeries("grandchildCounter", "grandchildCounter", MEAN(capturePeriod));
     }
 
     @After

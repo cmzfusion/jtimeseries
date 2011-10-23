@@ -36,7 +36,7 @@ public class FileHeaderReadsMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Count of file header read operations", CaptureFunctions.COUNT(captureTime));
+        Counter c = metricContext.createCounterSeries(id, "Count of file header read operations", CaptureFunctions.COUNT_OVER(captureTime));
         RoundRobinSerializer.setFileHeaderReadCounter(c);
     }
 }

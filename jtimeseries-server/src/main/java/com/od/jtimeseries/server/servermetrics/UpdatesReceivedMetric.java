@@ -59,7 +59,7 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
         Counter counter = metricContext.createCounterSeries(
             SERIES_ID,
             "A count of series data update UDP datagram messages received",
-            CaptureFunctions.COUNT(countPeriod)
+            CaptureFunctions.COUNT_OVER(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

@@ -31,6 +31,7 @@ import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
@@ -158,9 +159,9 @@ public class LocalJmxMetrics {
 
         private static final int ROUND_ROBIN_TIME_SERIES_MAX_SIZE = 1440;
 
-        public <E extends Identifiable> E createTimeSeries(Identifiable parent, String path, String id, String description, Class<E> classType, Object... parameters) {
+        public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
             if (classType.isAssignableFrom(DefaultIdentifiableTimeSeries.class)) {
-                return (E) new DefaultIdentifiableTimeSeries(id, description, new RoundRobinTimeSeries(ROUND_ROBIN_TIME_SERIES_MAX_SIZE));
+                return new DefaultIdentifiableTimeSeries(id, description, new RoundRobinTimeSeries(ROUND_ROBIN_TIME_SERIES_MAX_SIZE));
             }
             throw new UnsupportedOperationException("Cannot create time series of class " + classType);
         }

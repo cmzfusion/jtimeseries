@@ -26,6 +26,9 @@ import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +39,7 @@ import java.util.concurrent.Executor;
  * Abstract superclass for IndexedTimeSeries based around an array datastructure
  * Provides a mechanism to queue up change events and notify listeners in a separate thread
  */
-abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
+abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implements IndexedTimeSeries {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractIndexedTimeSeries.class);
     
@@ -57,37 +60,37 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         series = new RandomAccessDeque<TimeSeriesItem>(items);
     }
 
-    public synchronized TimeSeriesItem getLatestItem() {
+    protected TimeSeriesItem locked_getLatestItem() {
         return size() == 0 ? null : series.getLast();
     }
 
-    public synchronized TimeSeriesItem getEarliestItem() {
+    protected TimeSeriesItem locked_getEarliestItem() {
         return size() == 0 ? null : series.getFirst();
     }
 
-    public long getEarliestTimestamp() {
+    protected long locked_getEarliestTimestamp() {
         return size() == 0 ? -1 : getEarliestItem().getTimestamp();
     }
 
-    public long getLatestTimestamp() {
+    protected long locked_getLatestTimestamp() {
         return size() == 0 ? -1 : getLatestItem().getTimestamp();
     }
 
-    public synchronized int size() {
+    protected int locked_size() {
         return series.size();
     }
 
-    public synchronized TimeSeriesItem getItem(int index) {
+    protected TimeSeriesItem locked_getItem(int index) {
         return series.get(index);
     }
 
-    public synchronized void clear() {
+    protected void locked_clear() {
         series.clear();
         TimeSeriesEvent e = TimeSeriesEvent.createSeriesChangedEvent(this, Collections.<TimeSeriesItem>emptyList(), getModCount());
         queueSeriesChangedEvent(e);
     }
 
-    public synchronized boolean removeItem(TimeSeriesItem o) {
+    protected boolean locked_removeItem(TimeSeriesItem o) {
         boolean result = doRemove(o);
         if ( result ) {
             queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, Collections.singletonList((TimeSeriesItem) o), getModCount()));
@@ -95,7 +98,7 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         return result;
     }
 
-    public synchronized void removeAll(Iterable<TimeSeriesItem> items) {
+    protected void locked_removeAll(Iterable<TimeSeriesItem> items) {
         List<TimeSeriesItem> removed = new ArrayList<TimeSeriesItem>();
         for (TimeSeriesItem i : items) {
             if ( removeItem(i)) {
@@ -129,13 +132,12 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         return result;
     }
 
-    public synchronized void addItem(TimeSeriesItem timeSeriesItem) {
+    protected void locked_addItem(TimeSeriesItem timeSeriesItem) {
         doAddItem(timeSeriesItem);
         queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount()));
     }
 
-    //add all, firing just one event
-    public synchronized void addAll(Iterable<TimeSeriesItem> items) {
+    protected void locked_addAll(Iterable<TimeSeriesItem> items) {
         List<TimeSeriesItem> itemsAdded = new ArrayList<TimeSeriesItem>();
         for (TimeSeriesItem i : items) {
             doAddItem(i);
@@ -155,37 +157,31 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         }
     }
 
-    public synchronized Iterator<TimeSeriesItem> iterator() {
+    protected Iterator<TimeSeriesItem> locked_iterator() {
         return series.iterator();
     }
 
-    public List<TimeSeriesItem> getSnapshot() {
+    protected List<TimeSeriesItem> locked_getSnapshot() {
         return new ArrayList<TimeSeriesItem>(series);
     }
 
-    public synchronized long getModCount() {
+    protected long locked_getModCount() {
         return series.getModCount();
     }
 
-    /**
-     * @return starting with most recent item and moving back, return the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
-     */
-    public synchronized TimeSeriesItem getFirstItemAtOrBefore(long timestamp) {
+    protected TimeSeriesItem locked_getFirstItemAtOrBefore(long timestamp) {
         return SeriesUtils.getFirstItemAtOrBefore(timestamp, this);
     }
 
-    /**
-     * @return starting with earliest item and moving forward, return first item in the series with a timestamp equal to or later than the supplied timestamp, or null if no such item exists
-     */
-    public synchronized TimeSeriesItem getFirstItemAtOrAfter(long timestamp) {
+    protected TimeSeriesItem locked_getFirstItemAtOrAfter(long timestamp) {
         return SeriesUtils.getFirstItemAtOrAfter(timestamp, this);
     }
 
-    public synchronized List<TimeSeriesItem> getItemsInRange(long startTime, long endTime) {
+    protected List<TimeSeriesItem> locked_getItemsInRange(long startTime, long endTime) {
         return SeriesUtils.getItemsInRange(startTime, endTime, this);
     }
 
-    public synchronized void addTimeSeriesListener(final TimeSeriesListener l) {
+    protected void locked_addTimeSeriesListener(final TimeSeriesListener l) {
         listenerAdded = true;
         //add the listener on the event firing thread
         //this is so that the client doesn't receive any previously fired events
@@ -198,7 +194,7 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         fireEvent(t);
     }
 
-    public synchronized void removeTimeSeriesListener(final TimeSeriesListener l) {
+    protected void locked_removeTimeSeriesListener(final TimeSeriesListener l) {
         if ( listenerAdded ) {
             Runnable t = new Runnable() {
                 public void run() {
@@ -257,18 +253,15 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         return TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     }
 
-    //sometimes it is helpful to be able to add items without firing events to listeners.
-    //(e.g. this might be as a performance optimization after construction and before any listeners
-    //have been added.)
-    protected synchronized void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
+    protected void locked_addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
         series.addAll(c);
     }
 
-    public String toString() {
+    protected String locked_toString() {
         return toStringDescription;
     }
 
-    public int hashCode() {
+    protected int locked_hashCode() {
         if ( getModCount() != modCountOnLastHashcode) {
             hashCode = SeriesUtils.hashCodeByItems(this);
             modCountOnLastHashcode = getModCount();
@@ -276,7 +269,7 @@ abstract class AbstractIndexedTimeSeries implements IndexedTimeSeries {
         return hashCode;
     }
 
-    public boolean equals(Object o) {
+    protected boolean locked_equals(Object o) {
         if ( o == this ) {
             return true;
         } else {

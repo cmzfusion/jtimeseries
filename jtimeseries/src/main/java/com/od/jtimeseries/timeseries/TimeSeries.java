@@ -20,6 +20,8 @@ package com.od.jtimeseries.timeseries;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,9 +42,10 @@ import java.util.List;
  * (Due to the lack of granularity in a system clock, an attempt to add items with a duplicate timestamp may be
  * likely, and it is probably best to let an application/implementation decide how to handle this case).
  *
- * In general, to allow easy comparison, TimeSeries should implement equals and hashCode using the same contract which would be used in a
- * List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals() and List<TimeSeriesItem>.hashCode(), but this is
- * not mandatory and so comparisons must take into account the implementation type
+ * To allow easy comparison, it is useful if TimeSeries implement equals and hashCode using the same contract
+ * which would be used in a List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals()
+ * and List<TimeSeriesItem>.hashCode(), but this is not mandatory and so comparisons must take into account the
+ * implementation type
  *
  * Note on thread safety:
  * 
@@ -54,7 +57,7 @@ import java.util.List;
  * classes in general should not change data of the wrapped instance directly - this should be done via the wrapper,
  * since making direct changes in this case would violate the guard provided by the wrapper instance's mutex/lock.
  */
-public interface TimeSeries extends Iterable<TimeSeriesItem> {
+public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
 
     /**
      * @return the item in the series with the earliest timestamp value, or null if no items exist.
@@ -156,4 +159,5 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
      * @return the item at index.
      */
     TimeSeriesItem getItem(int index);
+
 }

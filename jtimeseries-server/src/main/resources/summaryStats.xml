@@ -8,13 +8,15 @@
     <bean id="summaryStatsCalculator" class="com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator">
         <constructor-arg ref="rootContext"/>
         <constructor-arg>
-            <!-- recalculate the stats for all the timeseries over this period -->
-            <bean class="com.od.jtimeseries.util.time.Time" factory-method="seconds">
-                <constructor-arg value="15"/>
+            <!-- Pause for this long after recalculating the summary stats for each series -->
+            <!-- Be careful with this value since recalculations will trigger persistence/appends for timeseries which
+            have had no new timepoints since the last recalculation, and this value limits these operations -->
+            <bean class="com.od.jtimeseries.util.time.Time" factory-method="milliseconds">
+                <constructor-arg value="200"/>
             </bean>
         </constructor-arg>
         <constructor-arg>
-            <!-- list of SummaryStatistics to calculate for each series -->
+            <!-- list of SummaryStatistics to calculate for each series, remove all items to turn off summary stats calculation -->
             <!-- by default, the median, median today, 90th percentile, 90th percentile today -->
             <list>
                 <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEDIAN"/>

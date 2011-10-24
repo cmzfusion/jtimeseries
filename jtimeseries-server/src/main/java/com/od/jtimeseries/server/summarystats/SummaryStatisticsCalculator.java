@@ -32,7 +32,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.text.DecimalFormat;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -48,7 +47,7 @@ public class SummaryStatisticsCalculator {
 
     private TimeSeriesContext rootContext;
     private List<SummaryStatistic> statistics;
-    private TimePeriod refreshPeriod;
+    private TimePeriod summaryRecalculationSleepTime;
 
     private static ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
         public SimpleDateFormat initialValue() {
@@ -56,15 +55,15 @@ public class SummaryStatisticsCalculator {
         }
     };
 
-    public SummaryStatisticsCalculator(TimeSeriesContext rootContext, TimePeriod refreshPeriod, List<SummaryStatistic> statistics) {
+    public SummaryStatisticsCalculator(TimeSeriesContext rootContext, TimePeriod summaryRecalculationSleepTime, List<SummaryStatistic> statistics) {
         this.rootContext = rootContext;
-        this.refreshPeriod = refreshPeriod;
+        this.summaryRecalculationSleepTime = summaryRecalculationSleepTime;
         this.statistics = statistics;
     }
 
     public void start() {
         if ( statistics.size() > 0) {
-            logMethods.logInfo("Starting summary statistics calculation every " + refreshPeriod);
+            logMethods.logInfo("Starting summary statistics calculation every " + summaryRecalculationSleepTime);
             Thread t = new Thread(new SummaryStatisticsRecalculator());
             t.setDaemon(true);
             t.setName("SummaryStatsRecalculation");
@@ -92,31 +91,35 @@ public class SummaryStatisticsCalculator {
 
         private void runSummaryStatsLoop() {
             while(true) {
+                //if there are no series requiring recalc we still need to pause between runs or we'll max out cpu
+                sleepFor(5000);
+
                 QueryResult<FilesystemTimeSeries> r = rootContext.findAll(FilesystemTimeSeries.class);
                 int numberOfSeries = r.getNumberOfMatches();
-
-                if ( numberOfSeries == 0) {
-                    sleepFor(refreshPeriod.getLengthInMillis());
-                } else {
-                    doRecalculations(r, numberOfSeries);
-                }
+                doRecalculations(r, numberOfSeries);
             }
         }
 
         private void doRecalculations(QueryResult<FilesystemTimeSeries> r, int numberOfSeries) {
-            long requiredSleepTime = refreshPeriod.getLengthInMillis() / numberOfSeries;
-            logMethods.logDebug("Summary statistics sleep time to calculate " + numberOfSeries + " series for this run will be " + requiredSleepTime);
+            long requiredSleepTime = summaryRecalculationSleepTime.getLengthInMillis();
+            logMethods.logDebug("Summary statistics calculator sleep time is " + requiredSleepTime +
+                ", it will take at least " + (numberOfSeries * requiredSleepTime / 1000) + " seconds to " +
+                "recalculate all series stats for this run");
 
             for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
+                    long startTime = System.currentTimeMillis();
                     recalculateStats(s);
                     Date d = new Date();
                     s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY, String.valueOf(d.getTime()));
                     s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIME_PROPERTY, simpleDateFormat.get().format(d));
                     s.queueHeaderRewrite();
-                }
 
-                sleepFor(requiredSleepTime);
+                    long timeTaken = System.currentTimeMillis() - startTime;
+                    if ( timeTaken < requiredSleepTime) {
+                        sleepFor(requiredSleepTime - timeTaken);
+                    }
+                }
             }
         }
 

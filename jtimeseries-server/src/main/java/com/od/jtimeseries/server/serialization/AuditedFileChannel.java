@@ -1,5 +1,6 @@
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 
 import java.io.IOException;
@@ -17,12 +18,12 @@ import java.nio.channels.FileChannel;
 public class AuditedFileChannel {
 
     private FileChannel channel;
-    private ValueRecorder bytesWrittenValueRecorder;
-    private ValueRecorder bytesReadValueRecorder;
+    private Counter bytesWrittenValueRecorder;
+    private Counter bytesReadValueRecorder;
     private int bytesRead;
     private int bytesWritten;
 
-    public AuditedFileChannel(FileChannel channel, ValueRecorder bytesWrittenValueRecorder, ValueRecorder bytesReadValueRecorder) {
+    public AuditedFileChannel(FileChannel channel, Counter bytesWrittenValueRecorder, Counter bytesReadValueRecorder) {
         this.channel = channel;
         this.bytesWrittenValueRecorder = bytesWrittenValueRecorder;
         this.bytesReadValueRecorder = bytesReadValueRecorder;
@@ -63,8 +64,8 @@ public class AuditedFileChannel {
     }
 
     public void close() throws IOException {
-        bytesWrittenValueRecorder.newValue(bytesWritten);
-        bytesReadValueRecorder.newValue(bytesRead);
+        bytesWrittenValueRecorder.incrementCount(bytesWritten);
+        bytesReadValueRecorder.incrementCount(bytesRead);
         channel.close();
     }
 

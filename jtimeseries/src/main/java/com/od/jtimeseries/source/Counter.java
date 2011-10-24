@@ -28,7 +28,11 @@ public interface Counter extends ValueSource {
     
     void incrementCount();
 
+    void incrementCount(long n);
+
     void decrementCount();
+
+    void decrementCount(long n);
 
     void reset();
 }

@@ -4,6 +4,7 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
 
@@ -37,7 +38,7 @@ public class FileBytesWritten extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.createValueRecorderSeries(id, "Bytes written to timeseries files", CaptureFunctions.SUM(captureTime));
-        RoundRobinSerializer.setFileBytesWritten(v);
+        Counter c = metricContext.createCounterSeries(id, "Bytes written to timeseries files", CaptureFunctions.COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
+        RoundRobinSerializer.setFileBytesWritten(c);
     }
 }

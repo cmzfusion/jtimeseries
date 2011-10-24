@@ -25,6 +25,8 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -59,7 +61,7 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
         Counter counter = metricContext.createCounterSeries(
             SERIES_ID,
             "A count of series data update UDP datagram messages received",
-            CaptureFunctions.COUNT_OVER(countPeriod)
+            COUNT_OVER(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

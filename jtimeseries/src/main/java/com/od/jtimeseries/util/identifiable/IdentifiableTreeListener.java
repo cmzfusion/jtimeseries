@@ -25,11 +25,19 @@ package com.od.jtimeseries.util.identifiable;
  * Time: 20:38:44
  *
  * This listener will receive events when an identifiable/context tree changes
- * The important thing to note is that the context tree is a data structure which changes asynchronously, and these tree listener events are received asynchronously, after the tree structure has changed. The structure may have undergone subsequent changes by the time these events are received.
  *
- * Therefore, when you receive events notifying the addition or removal of nodes (possibly with their associated subtree/descendants), those nodes themselves may have changed (had more descendants added, for example) since the event was fired. When you interrogate the nodes referenced in the event you are looking at the current state of those nodes in the context tree, rather than the state when the event was fired. An alternative design would involve cloning the subtree structure for the changed nodes to use within the event - but that would have severe performance implications.  It is better to make listeners responsible for handling this.
+ * Since event firing is performed asynchronously, the context tree may have undergone subsequent changes by the time
+ * tree events are received. When you receive events, the affected nodes or their parents may have changed (had more
+ * descendants added, for example) since the event was fired.
  *
- * In general, any traversal of the context tree, or subtrees within it, should be done while holding the context tree lock, to ensure that the structure does not change while traversal is taking place.
+ * When you examine the nodes referenced in the event you are looking at the current state of those nodes, rather
+ * than their state at the point the event was fired. (An alternative design would involve cloning the affected nodes
+ * at the time an event is fired and passing the cloned instances - but that would impose severe performance penalties)
+ * It is better to make listeners responsible for syncing with the current state of the source nodes where required.)
+ *
+ * In general, any traversal of the context tree, or subtrees within it, including the nodes which form part of a
+ * IdentifiableTreeEvent, should be done while holding the tree lock of the nodes in question, to ensure that
+ * the structure does not change while traversal is taking place (Identifiable.getTreeLock())
  */
 public interface IdentifiableTreeListener {
 

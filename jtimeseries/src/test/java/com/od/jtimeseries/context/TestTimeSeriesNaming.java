@@ -68,6 +68,7 @@ public class TestTimeSeriesNaming extends TestCase {
                 PERCENTILE(Time.seconds(10),15),
                 MEAN_CHANGE(Time.minutes(1), Time.minutes(30)),
                 MEAN_COUNT_OVER(Time.seconds(30), Time.hours(1)),
+                TOTAL_COUNT(Time.minutes(240)),
                 SUM(Time.hours(3)),
                 MIN(Time.minutes(120)),
                 LATEST(Time.seconds(10)),
@@ -83,9 +84,10 @@ public class TestTimeSeriesNaming extends TestCase {
         assertNotNull(rootContext.get("Login Attempts (15 Percentile 10s)"));
         assertNotNull(rootContext.get("Login Attempts (Change Per 1min Over 30min)"));
         assertNotNull(rootContext.get("Login Attempts (Count Per 30s Over 1hr)"));
+        assertNotNull(rootContext.get("Login Attempts (Total)"));
         assertNotNull(rootContext.get("Login Attempts (Sum 3hr)"));
         assertNotNull(rootContext.get("Login Attempts (Min 120min)"));
-        assertNotNull(rootContext.get("Login Attempts (Latest 10s)"));
+        assertNotNull(rootContext.get("Login Attempts (Latest)"));
         assertNotNull(rootContext.get("Login Attempts (ValueCount 1hr)"));
         assertNotNull(rootContext.get("Login Attempts")); //the raw values
     }

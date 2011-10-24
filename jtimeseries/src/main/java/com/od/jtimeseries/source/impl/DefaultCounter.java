@@ -58,8 +58,16 @@ public class DefaultCounter implements Counter {
         simpleSource.newValue(currentValue.incrementAndGet());
     }
 
+    public void incrementCount(long n) {
+        simpleSource.newValue(currentValue.addAndGet(n));
+    }
+
     public void decrementCount() {
         simpleSource.newValue(currentValue.decrementAndGet());
+    }
+
+    public void decrementCount(long n) {
+        simpleSource.newValue(currentValue.addAndGet(-n));
     }
 
     public void reset() {

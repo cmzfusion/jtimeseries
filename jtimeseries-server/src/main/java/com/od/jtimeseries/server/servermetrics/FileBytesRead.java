@@ -4,8 +4,11 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
+
+import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,7 +40,7 @@ public class FileBytesRead extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.createValueRecorderSeries(id, "Bytes read from timeseries files", CaptureFunctions.SUM(captureTime));
-        RoundRobinSerializer.setFileBytesRead(v);
+        Counter c = metricContext.createCounterSeries(id, "Bytes read from timeseries files", COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
+        RoundRobinSerializer.setFileBytesRead(c);
     }
 }

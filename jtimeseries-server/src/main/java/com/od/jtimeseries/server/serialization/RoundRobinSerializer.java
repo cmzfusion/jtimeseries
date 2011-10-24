@@ -60,8 +60,8 @@ public class RoundRobinSerializer {
     private static Counter fileReadCounter = DefaultCounter.NULL_COUNTER;
     private static Counter fileHeaderReadCounter = DefaultCounter.NULL_COUNTER;
     private static Counter fileErrorCounter = DefaultCounter.NULL_COUNTER;
-    private static ValueRecorder fileBytesWritten = DefaultValueRecorder.NULL_VALUE_RECORDER;
-    private static ValueRecorder fileBytesRead = DefaultValueRecorder.NULL_VALUE_RECORDER;
+    private static Counter fileBytesWritten = DefaultCounter.NULL_COUNTER;
+    private static Counter fileBytesRead = DefaultCounter.NULL_COUNTER;
 
     private final File rootDirectory;
     private final String timeSeriesFileSuffix;
@@ -383,11 +383,11 @@ public class RoundRobinSerializer {
         RoundRobinSerializer.fileErrorCounter = fileErrorCounter;
     }
 
-    public static void setFileBytesWritten(ValueRecorder v) {
+    public static void setFileBytesWritten(Counter v) {
         RoundRobinSerializer.fileBytesWritten = v;
     }
 
-    public static void setFileBytesRead(ValueRecorder v) {
+    public static void setFileBytesRead(Counter v) {
         RoundRobinSerializer.fileBytesRead = v;
     }
 

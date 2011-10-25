@@ -498,7 +498,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         private boolean isFlushRequired() {
             return roundRobinSeries != null ||
-                itemsToAppend.size() == 0 ||
+                itemsToAppend.size() > 0 ||
                 fileHeader.isPropertiesRewriteRequired();
         }
 

@@ -207,13 +207,13 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
     public void locked_addTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
-        super.addTimeSeriesListener(l);
+        super.locked_addTimeSeriesListener(l);
     }
 
     public void locked_removeTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
-        super.removeTimeSeriesListener(l);
+        super.locked_removeTimeSeriesListener(l);
     }
 
     //the apparent modCount of the window/view

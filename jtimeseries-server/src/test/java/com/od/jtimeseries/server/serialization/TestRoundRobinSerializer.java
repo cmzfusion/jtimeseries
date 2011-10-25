@@ -47,7 +47,7 @@ public class TestRoundRobinSerializer extends TestCase {
 
     public void testReadHeader() throws SerializationException {
         serializer.updateHeader(fileHeader);
-        assertEquals(512, fileHeader.getHeaderLength());
+        assertEquals(FileHeader.DEFAULT_HEADER_START_LENGTH, fileHeader.getHeaderLength());
     }
 
     public void testWriteEmptyFile() throws SerializationException {

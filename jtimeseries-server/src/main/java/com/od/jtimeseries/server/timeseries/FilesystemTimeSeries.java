@@ -38,6 +38,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -71,9 +73,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private FileHeader fileHeader;
     private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new LocalModCountProxyTimeSeriesEventHandler(this);
     private WriteBehindCache writeBehindCache;
-    private long lastTimestamp = -1;
+    private volatile long lastTimestamp = -1;
     private ScheduledFuture nextFlushTask;
     private volatile long modCount;
+    private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
     /**
      *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader, which must have been updated to match the latest state of the file
@@ -120,21 +123,33 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      *
      * Inserting items is much more expensive, since we have to deserialize to do that
      */
-    public synchronized void addItem(TimeSeriesItem i) {
-        boolean result = doAppend(i);
-        if ( ! result ) {
-            //it is not expected we would usually get inserts - they should be rare events at present
-            //(e.g. a system clock resyncs and goes back in time, so we start to receive values with an earlier timestamp)
-            RoundRobinTimeSeries r = getRoundRobinSeries();
-            r.addItem(i);
-            writeBehindCache.cacheSeriesForRewrite(r);
+    public void addItem(TimeSeriesItem i) {
+        try {
+            this.writeLock().lock();
+            boolean result = doAppend(i);
+            if (!result) {
+                //it is not expected we would usually get inserts - they should be rare events at present
+                //(e.g. a system clock resyncs and goes back in time, so we start to receive values with an earlier timestamp)
+                RoundRobinTimeSeries r = getRoundRobinSeries();
+                r.addItem(i);
+                writeBehindCache.cacheSeriesForRewrite(r);
+            }
+        } finally {
+            this.writeLock().unlock();
         }
+
     }
 
     public void addAll(Iterable<TimeSeriesItem> items) {
-        for (TimeSeriesItem i : items) {
-        	addItem(i);
+        try {
+            this.writeLock().lock();
+            for (TimeSeriesItem i : items) {
+                addItem(i);
+            }
+        } finally {
+            this.writeLock().unlock();
         }
+
     }
 
     private boolean doAppend(final TimeSeriesItem i) {
@@ -170,19 +185,31 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         });
     }
 
-    public synchronized int getMaxSize() {
+    public int getMaxSize() {
         return fileHeader.getSeriesMaxLength();
     }
 
-    public synchronized List<TimeSeriesItem> getSnapshot() {
-        return getRoundRobinSeries().getSnapshot();
+    public List<TimeSeriesItem> getSnapshot() {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().getSnapshot();
+        } finally {
+            this.readLock().unlock();
+        }
+
     }
 
-    public synchronized TimeSeriesItem getLatestItem() {
+    public TimeSeriesItem getLatestItem() {
         //make use of the local write behind cache to do this if possible
-        return writeBehindCache.getAppendListSize() > 0 ?
-            writeBehindCache.getAppendItems().getLatestItem() :
-            getRoundRobinSeries().getLatestItem();
+        try {
+            this.readLock().lock();
+            return writeBehindCache.getAppendListSize() > 0 ?
+                    writeBehindCache.getAppendItems().getLatestItem() :
+                    getRoundRobinSeries().getLatestItem();
+        } finally {
+            this.readLock().unlock();
+        }
+
     }
 
     /**
@@ -192,59 +219,107 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         return lastTimestamp;
     }
 
-    public synchronized long getEarliestTimestamp() {
-        return getRoundRobinSeries().getEarliestTimestamp();
-    }
-
-    public synchronized TimeSeriesItem getEarliestItem() {
-        return getRoundRobinSeries().getEarliestItem();
-    }
-
-    public synchronized int size() {
-        RoundRobinTimeSeries r = getRoundRobinSeries(false);
-        if ( r != null ) {
-            return r.size();
-        } else {
-            //when the cache is flushed, if the cache contains more items than can fit in the series, we will lose the earlist due to round robin
-            //so we will end up with maxSize items in the series
-            return Math.min(getMaxSize(), fileHeader.getCurrentSeriesSize() + writeBehindCache.getAppendItems().size());
+    public long getEarliestTimestamp() {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().getEarliestTimestamp();
+        } finally {
+            this.readLock().unlock();
         }
+
     }
 
-    public synchronized TimeSeriesItem getItem(int index) {
-        return getRoundRobinSeries().getItem(index);
+    public TimeSeriesItem getEarliestItem() {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().getEarliestItem();
+        } finally {
+            this.readLock().unlock();
+        }
+
     }
 
-    public synchronized void clear() {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        r.clear();
-        lastTimestamp = -1;
-        writeBehindCache.cacheSeriesForRewrite(r);
+    public int size() {
+        try {
+            this.readLock().lock();
+            RoundRobinTimeSeries r = getRoundRobinSeries(false);
+            if (r != null) {
+                return r.size();
+            } else {
+                //when the cache is flushed, if the cache contains more items than can fit in the series, we will lose the earlist due to round robin
+                //so we will end up with maxSize items in the series
+                return Math.min(getMaxSize(), fileHeader.getCurrentSeriesSize() + writeBehindCache.getAppendItems().size());
+            }
+        } finally {
+            this.readLock().unlock();
+        }
+
     }
 
-    public synchronized boolean removeItem(TimeSeriesItem item) {
-        RoundRobinTimeSeries r = getRoundRobinSeries();
-        boolean change = r.removeItem(item);
-        if ( change ) {
+    public TimeSeriesItem getItem(int index) {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().getItem(index);
+        } finally {
+            this.readLock().unlock();
+        }
+
+    }
+
+    public void clear() {
+        try {
+            this.writeLock().lock();
+            RoundRobinTimeSeries r = getRoundRobinSeries();
+            r.clear();
+            lastTimestamp = -1;
             writeBehindCache.cacheSeriesForRewrite(r);
+        } finally {
+            this.writeLock().unlock();
         }
-        lastTimestamp = r.getLatestTimestamp();
-        return change;
+
+    }
+
+    public boolean removeItem(TimeSeriesItem item) {
+        try {
+            this.writeLock().lock();
+            RoundRobinTimeSeries r = getRoundRobinSeries();
+            boolean change = r.removeItem(item);
+            if (change) {
+                writeBehindCache.cacheSeriesForRewrite(r);
+            }
+            lastTimestamp = r.getLatestTimestamp();
+            return change;
+        } finally {
+            this.writeLock().unlock();
+        }
+
     }
 
     public void removeAll(Iterable<TimeSeriesItem> items) {
-        getRoundRobinSeries().removeAll(items);
+        try {
+            this.writeLock().lock();
+            getRoundRobinSeries().removeAll(items);
+        } finally {
+            this.writeLock().unlock();
+        }
+
     }
 
-    public synchronized Iterator<TimeSeriesItem> iterator() {
-        return getRoundRobinSeries().iterator();
+    public Iterator<TimeSeriesItem> iterator() {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().iterator();
+        } finally {
+            this.readLock().unlock();
+        }
+
     }
 
     /**
      * Intentionally break the contract of List.equals() - we shouldn't need to support logical equality of
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
      */
-    public synchronized boolean equals(Object o) {
+    public boolean equals(Object o) {
         return o == this;
     }
 
@@ -252,7 +327,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      * Intentionally break the contract of List.hashCode() - we shouldn't need to support logical equality of
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
      */
-    public synchronized int hashCode() {
+    public int hashCode() {
         return super.hashCode();
     }
 
@@ -321,7 +396,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 //Due to the asynchronous event firing, when we call s.add() we could end
                 //up firing duplicate events when we add these items, even though our propagating listener has not yet
                 //been added - we will probably not receive the events back until the listener has been added.
-                s.addWithoutFiringEvent(writeBehindCache.getAppendItems().getSnapshot());
+                s.addAllWithoutFiringEvents(writeBehindCache.getAppendItems().getSnapshot());
                 //nb. the items stay in the cache append list, so we keep track that we still haven't written them to disk
 
                 s.addTimeSeriesListener(timeSeriesEventHandler);
@@ -376,7 +451,19 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
         public void flush() {
             try {
-                if ( roundRobinSeries != null) {
+                FilesystemTimeSeries.this.writeLock().lock();
+                if ( isFlushRequired()) {
+                    doFlush();
+                }
+            } finally {
+                FilesystemTimeSeries.this.writeLock().unlock();
+            }
+
+        }
+
+        private void doFlush() {
+            try {
+                if (roundRobinSeries != null) {
                     //we have a local series which contains other changes, as well as possibly some appends
                     roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
                 } else {
@@ -400,8 +487,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             itemsToAppend.clear();
         }
 
-        private boolean isFlushed() {
-            return roundRobinSeries == null && itemsToAppend.size() == 0;
+        private boolean isFlushRequired() {
+            return roundRobinSeries != null ||
+                itemsToAppend.size() == 0 ||
+                fileHeader.isPropertiesRewriteRequired();
         }
 
         private boolean isSeriesInCache() {
@@ -431,10 +520,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             nextFlushTask = clearCacheExecutor.schedule(
                 new Runnable() {
                     public void run() {
-                        //take the lock on the series while we flush the cache so changes are atomic
-                        synchronized(FilesystemTimeSeries.this) {
-                            writeBehindCache.flush();
-                        }
+                        writeBehindCache.flush();
                     }
                 },
                 delayMillis,
@@ -446,36 +532,63 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     /**
      * Queue for a rewrite, will be header only unless there are other appends/changes
      */
-    public synchronized void queueHeaderRewrite() {
-        writeBehindCache.scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
+    public void queueHeaderRewrite() {
+        try {
+            readWriteLock.writeLock().lock();
+            writeBehindCache.scheduleFlushCacheTask(appendPeriod.getLengthInMillis());
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+
     }
 
-    //testing hook
-    public synchronized void flush() {
+    /**
+     * Write all in-memory changes to the FilesystemTimeSeries to disk
+     */
+    public void flush() {
         writeBehindCache.flush();
     }
 
-    //testing hook
-    synchronized boolean isCacheFlushed() {
-        return writeBehindCache.isFlushed();
+    /**
+     * @return true, if the series has in-memory changes
+     */
+    public boolean isFlushRequired() {
+        return writeBehindCache.isFlushRequired();
     }
 
-    synchronized boolean isSeriesInWriteCache() {
+    boolean isSeriesInWriteCache() {
         return writeBehindCache.isSeriesInCache();
     }
 
-    synchronized int getCacheAppendListSize() {
-        return writeBehindCache.getAppendListSize();
+    int getCacheAppendListSize() {
+        try {
+            readWriteLock.readLock().lock();
+            return writeBehindCache.getAppendListSize();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
     }
 
     //testing hook, trigger the garbage collection of the soft referenced series
-    synchronized void triggerGarbageCollection() {
-        softSeriesReference.clear();
+    void triggerGarbageCollection() {
+        try {
+            readWriteLock.writeLock().lock();
+            softSeriesReference.clear();
+        } finally {
+            readWriteLock.writeLock().unlock();
+        }
+
     }
 
     //testing hook
-    synchronized boolean isSeriesCollected() {
-        return softSeriesReference.get() == null;
+    boolean isSeriesCollected() {
+        try {
+            readWriteLock.readLock().lock();
+            return softSeriesReference.get() == null;
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+
     }
 
     private class LocalModCountProxyTimeSeriesEventHandler extends ProxyTimeSeriesEventHandler {
@@ -500,4 +613,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         }
     }
 
+    public Lock writeLock() {
+        return readWriteLock.writeLock();
+    }
+
+    public Lock readLock() {
+        return readWriteLock.readLock();
+    }
 }

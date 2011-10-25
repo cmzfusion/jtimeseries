@@ -84,7 +84,7 @@ public class TestFilesystemTimeSeries extends TestCase {
 
         //flush the write behind cache
         series.flush();
-        assertTrue(series.isCacheFlushed());
+        assertTrue(series.isFlushRequired());
         assertTrue(series.isSeriesCollected());
         assertEquals(2, series.getFileHeader().getCurrentSeriesSize());  //now the header has been updated on the flush/append, so size is updated in the header
         assertEquals(2, series.size());

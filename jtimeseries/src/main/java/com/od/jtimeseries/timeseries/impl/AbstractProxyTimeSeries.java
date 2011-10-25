@@ -25,6 +25,7 @@ import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -117,5 +118,13 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
 
     public TimeSeriesItem getItem(int index) {
         return wrappedTimeSeries.getItem(index);
+    }
+
+    public Lock readLock() {
+        return wrappedTimeSeries.readLock();
+    }
+
+    public Lock writeLock() {
+        return wrappedTimeSeries.writeLock();
     }
 }

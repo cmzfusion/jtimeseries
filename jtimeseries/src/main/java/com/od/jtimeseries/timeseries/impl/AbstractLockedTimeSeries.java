@@ -267,7 +267,7 @@ public abstract class AbstractLockedTimeSeries implements TimeSeries {
     //sometimes it is helpful to be able to add items without firing events to listeners.
     //(e.g. this might be as a performance optimization after construction and before any listeners
     //have been added.)
-    protected final void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
+    public final void addAllWithoutFiringEvents(Collection<TimeSeriesItem> c) {
         try {
             this.writeLock().lock();
             locked_addAllWithoutFiringEvents(c);

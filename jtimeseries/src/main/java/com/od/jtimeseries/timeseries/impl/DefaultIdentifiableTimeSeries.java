@@ -23,6 +23,7 @@ import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -162,6 +163,14 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
      */
     public TimeSeries getDelegateTimeSeries() {
         return wrappedSeries;
+    }
+
+    public Lock readLock() {
+        return wrappedSeries.readLock();
+    }
+
+    public Lock writeLock() {
+        return wrappedSeries.writeLock();
     }
 
     public String toString() {

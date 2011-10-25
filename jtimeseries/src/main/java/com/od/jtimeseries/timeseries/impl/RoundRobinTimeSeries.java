@@ -22,6 +22,7 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,14 +53,13 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
         checkSize();
     }
 
-
-    public synchronized void addWithoutFiringEvent(Collection<TimeSeriesItem> i) {
-        addAllWithoutFiringEvents(i);
+    public void locked_addAllWithoutFiringEvents(Collection<TimeSeriesItem> i) {
+        super.locked_addAllWithoutFiringEvents(i);
         checkSize();
     }
 
-    public synchronized void addItem(TimeSeriesItem i) {
-        super.addItem(i);
+    public void locked_addItem(TimeSeriesItem i) {
+        super.locked_addItem(i);
         checkSize();
     }
 

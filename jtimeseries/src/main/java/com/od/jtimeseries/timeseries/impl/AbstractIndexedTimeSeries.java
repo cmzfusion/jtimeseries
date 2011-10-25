@@ -143,7 +143,10 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
             doAddItem(i);
             itemsAdded.add(i);
         }
-        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, itemsAdded, getModCount()));
+
+        if ( itemsAdded.size() > 0) {
+            queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, itemsAdded, getModCount()));
+        }
     }
 
     private void doAddItem(TimeSeriesItem timeSeriesItem) {

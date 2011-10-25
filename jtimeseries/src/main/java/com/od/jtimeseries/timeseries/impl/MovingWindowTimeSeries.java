@@ -63,10 +63,10 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
 
     private long startTime;
     private int startIndex = -1;
-    private TimeSource startTimeSource;
     private long endTime;
     private int endIndex = -1;
-    private TimeSource endTimeSource;
+    private volatile TimeSource startTimeSource;
+    private volatile TimeSource endTimeSource;
     private final AtomicLong modCount = new AtomicLong(0);
     private volatile ScheduledFuture windowCheckFuture;
 
@@ -99,9 +99,10 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
-    public synchronized boolean recalculateWindow() {
+    public boolean recalculateWindow() {
         boolean changed = false;
-        synchronized (MovingWindowTimeSeries.this) {
+        try {
+            this.writeLock().lock();
             int oldStartIndex = startIndex;
             int oldEndIndex = endIndex;
 
@@ -110,28 +111,31 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
             startIndex = SeriesUtils.getIndexOfFirstItemAtOrAfter(startTime, wrappedTimeSeries);
             endIndex = SeriesUtils.getIndexOfFirstItemAtOrBefore(endTime, wrappedTimeSeries);
 
-            if ( startIndex == -1 || endIndex == -1) {
+            if (startIndex == -1 || endIndex == -1) {
                 startIndex = endIndex = -1;
             }
 
-            if ( oldStartIndex != startIndex || oldEndIndex != endIndex ) {
+            if (oldStartIndex != startIndex || oldEndIndex != endIndex) {
                 long newModCount = modCount.incrementAndGet();
-                queueSeriesChangedEvent(TimeSeriesEvent.createSeriesChangedEvent(MovingWindowTimeSeries.this, getSnapshot(), newModCount ));
+                queueSeriesChangedEvent(TimeSeriesEvent.createSeriesChangedEvent(MovingWindowTimeSeries.this, getSnapshot(), newModCount));
                 changed = true;
             }
+        } finally {
+            this.writeLock().unlock();
         }
+
         return changed;
     }
 
-    public synchronized int size() {
+    public int locked_size() {
         return startIndex >= 0 && endIndex >= 0 ? (endIndex - startIndex) + 1 : 0;
     }
 
-    public synchronized Iterator<TimeSeriesItem> iterator() {
+    public Iterator<TimeSeriesItem> locked_iterator() {
         return new WindowIterator();
     }
 
-    public synchronized void addItem(TimeSeriesItem timeSeriesItem) {
+    public void locked_addItem(TimeSeriesItem timeSeriesItem) {
         wrappedTimeSeries.addItem(timeSeriesItem);
         if (isInWindow(timeSeriesItem)) {
 
@@ -154,7 +158,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
-    public synchronized boolean removeItem(TimeSeriesItem timeSeriesItem) {
+    public boolean locked_removeItem(TimeSeriesItem timeSeriesItem) {
         boolean removed = wrappedTimeSeries.removeItem(timeSeriesItem);
         if ( removed && isInWindow(timeSeriesItem)) {
             endIndex--;
@@ -173,7 +177,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         return removed;
     }
 
-    public synchronized void clear() {
+    public void locked_clear() {
         wrappedTimeSeries.clear();
         queueSeriesChangedEvent(
             TimeSeriesEvent.createSeriesChangedEvent(
@@ -184,7 +188,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         );
     }
 
-    public synchronized TimeSeriesItem getItem(int index) {
+    public TimeSeriesItem locked_getItem(int index) {
         if (index >= -1 && index < size() ) {
             return wrappedTimeSeries.getItem(getRealIndex(index));
         } else {
@@ -192,58 +196,58 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         }
     }
 
-    public synchronized TimeSeriesItem getEarliestItem() {
+    public TimeSeriesItem locked_getEarliestItem() {
         return size() == 0 ? null : wrappedTimeSeries.getItem(startIndex);
     }
 
-    public synchronized TimeSeriesItem getLatestItem() {
+    public TimeSeriesItem locked_getLatestItem() {
         return size() == 0 ? null : wrappedTimeSeries.getItem(endIndex);
     }
 
-    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
+    public void locked_addTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
         super.addTimeSeriesListener(l);
     }
 
-    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
+    public void locked_removeTimeSeriesListener(TimeSeriesListener l) {
         //we manage our own listeners and events, don't delegate this
         //to the wrapped series
         super.removeTimeSeriesListener(l);
     }
 
     //the apparent modCount of the window/view
-    public synchronized long getModCount() {
+    public long locked_getModCount() {
         return modCount.get();
     }
 
-    public synchronized TimeSource getEndTime() {
+    public TimeSource getEndTime() {
         return endTimeSource;
     }
 
-    public synchronized TimeSource getStartTime() {
+    public TimeSource getStartTime() {
         return startTimeSource;
     }
 
-    public synchronized void setEndTime(TimeSource endTimeSource) {
+    public void setEndTime(TimeSource endTimeSource) {
         this.endTimeSource = endTimeSource;
         recalculateWindow();
     }
 
-    public synchronized void setStartTime(TimeSource startTimeSource) {
+    public void setStartTime(TimeSource startTimeSource) {
         this.startTimeSource = startTimeSource;
         recalculateWindow();
     }
 
-    public synchronized void setStartTime(long startTime) {
+    public void setStartTime(long startTime) {
         setStartTime(new FixedTimeSource(startTime));
     }
 
-    public synchronized void setEndTime(long endTime) {
+    public void setEndTime(long endTime) {
         setEndTime(new FixedTimeSource(endTime));
     }
 
-    public synchronized List<TimeSeriesItem> getSnapshot() {
+    public List<TimeSeriesItem> locked_getSnapshot() {
         return getItemsInRange(startTime, endTime);
     }
 
@@ -255,11 +259,7 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
         return wrappedTimeSeries;
     }
 
-    private boolean isInWindow(int realIndex) {
-        return realIndex >= startIndex && realIndex <= endIndex;
-    }
-
-    public synchronized boolean isInWindow(TimeSeriesItem item) {
+    private boolean isInWindow(TimeSeriesItem item) {
         long timeStamp = item.getTimestamp();
         return timeStamp >= startTime && timeStamp <= endTime;
     }

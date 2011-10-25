@@ -59,13 +59,19 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         this.aggregateFunction = aggregateFunction;
     }
 
-    public synchronized void addTimeSeries(TimeSeries... timeSeries) {
-        for ( TimeSeries s : timeSeries) {
-            children.add(new DefaultInterpolatedTimeSeries(s, new LinearInterpolationFunction()));
+    public void addTimeSeries(TimeSeries... timeSeries) {
+        try {
+            this.writeLock().lock();
+            for (TimeSeries s : timeSeries) {
+                children.add(new DefaultInterpolatedTimeSeries(s, new LinearInterpolationFunction()));
+            }
+            addChildViewListeners(timeSeries);
+            masterSeries = children.get(0);
+            recalculateView();
+        } finally {
+            this.writeLock().unlock();
         }
-        addChildViewListeners(timeSeries);
-        masterSeries = children.get(0);
-        recalculateView();
+
     }
 
     private void addChildViewListeners(TimeSeries... timeSeries) {

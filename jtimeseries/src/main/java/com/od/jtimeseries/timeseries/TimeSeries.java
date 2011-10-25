@@ -54,8 +54,8 @@ import java.util.concurrent.locks.Lock;
  *
  * TimeSeries are observable, and TimeSeriesEvent are fired to TimeSeriesListener on a separate event thread.
  * Events from a time series instance should have thread affinity (events from a timeseries instance should always be
- * received on the same event thread, but the library may be configured to propagate events for different series instances
- * on different threads)
+ * received on the same event thread, to guarantee ordering, but the library may be configured to propagate events
+ * for different series instances on different threads)
  */
 public interface TimeSeries extends Iterable<TimeSeriesItem> {
 

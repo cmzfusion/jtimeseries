@@ -18,7 +18,10 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Iterator;
@@ -33,11 +36,13 @@ import java.util.concurrent.locks.Lock;
  *
  * A timeseries instance which implements the Identifiable interface
  *
- * This class is implemented as a wrapper around another TimeSeries delegate, to which it delegates all the timeseries
- * method calls, but provides the additional implementation required to support the Identifiable interface.
+ * This class is implemented as a wrapper around another TimeSeries delegate, to which it delegates all the Timeseries
+ * interface method calls, but provides the additional implementation required to support the Identifiable interface.
  *
  * The default implementation for the wrapped series is DefaultTimeSeries, but a RoundRobinTimeSeries could equally
- * well be used, to make a RoundRobinTimeSeries usable within an Identifiable context tree, for example.
+ * well be used, to make a RoundRobinTimeSeries usable within an Identifiable tree, for example.
+ *
+ * DefaultIdentifiableTimeSeries shares the ReadWriteLock of its wrapped TimeSeries
  */
 public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements IdentifiableTimeSeries {
 
@@ -57,23 +62,29 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
      * Set the proxy event handler instance which processes events from the wrapped timeseries
      * and forwards them on to any locally registered listeners with the event source updated
      */
-    protected synchronized void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
-        if ( eventHandler != null) {
-            wrappedSeries.removeTimeSeriesListener(eventHandler);
+    protected void setProxyEventHandler(ProxyTimeSeriesEventHandler l) {
+        try {
+            this.writeLock().lock();
+            if (eventHandler != null) {
+                wrappedSeries.removeTimeSeriesListener(eventHandler);
+            }
+            //add as a weak reference listener, in general we don't want the
+            //wrapped series to retain a strong reference to the wrapper.
+            WeakReferenceTimeSeriesListener weakReferenceTimeSeriesListener = new
+                    WeakReferenceTimeSeriesListener(wrappedSeries, l);
+            wrappedSeries.addTimeSeriesListener(weakReferenceTimeSeriesListener);
+            eventHandler = l; //make sure we keep a strong reference to the real listener
+        } finally {
+            this.writeLock().unlock();
         }
-        //add as a weak reference listener, in general we don't want the
-        //wrapped series to retain a strong reference to the wrapper.
-        WeakReferenceTimeSeriesListener weakReferenceTimeSeriesListener = new
-                WeakReferenceTimeSeriesListener(wrappedSeries, l);
-        wrappedSeries.addTimeSeriesListener(weakReferenceTimeSeriesListener);
-        eventHandler = l; //make sure we keep a strong reference to the real listener
+
     }
 
-    public synchronized TimeSeriesItem getLatestItem() {
+    public TimeSeriesItem getLatestItem() {
         return wrappedSeries.getLatestItem();
     }
 
-    public synchronized TimeSeriesItem getEarliestItem() {
+    public TimeSeriesItem getEarliestItem() {
         return wrappedSeries.getEarliestItem();
     }
 
@@ -100,25 +111,35 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         eventHandler.addTimeSeriesListener(l);
     }
 
-    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
-        if (eventHandler != null) {
-            eventHandler.removeTimeSeriesListener(l);
+    public void removeTimeSeriesListener(TimeSeriesListener l) {
+        try {
+            this.writeLock().lock();
+            if (eventHandler != null) {
+                eventHandler.removeTimeSeriesListener(l);
+            }
+        } finally {
+            this.writeLock().unlock();
         }
+
     }
 
-    public synchronized int size() {
+    public int size() {
         return wrappedSeries.size();
     }
 
-    public synchronized Iterator<TimeSeriesItem> iterator() {
+    public Iterator<TimeSeriesItem> iterator() {
         return wrappedSeries.iterator();
     }
 
-    public synchronized void addItem(TimeSeriesItem i) {
+    public Iterator<TimeSeriesItem> unsafeIterator() {
+        return wrappedSeries.unsafeIterator();
+    }
+
+    public void addItem(TimeSeriesItem i) {
         wrappedSeries.addItem(i);
     }
 
-    public synchronized boolean removeItem(TimeSeriesItem i) {
+    public boolean removeItem(TimeSeriesItem i) {
         return wrappedSeries.removeItem(i);
     }
 
@@ -130,7 +151,7 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         wrappedSeries.removeAll(items);
     }
 
-    public synchronized void clear() {
+    public void clear() {
         wrappedSeries.clear();
     }
 
@@ -138,7 +159,7 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return wrappedSeries.getItem(index);
     }
 
-    public synchronized long getModCount() {
+    public long getModCount() {
         return wrappedSeries.getModCount();
     }
 

@@ -238,14 +238,19 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
 
         private boolean removeFromStartOfSnapshotSeries() {
             boolean modified = false;
-            Iterator<TimeSeriesItem> i = snapshotData.iterator();
-            while(i.hasNext()) {
-                if ( i.next().getTimestamp() < currentStartTime) {
-                    i.remove();
-                    modified = true;
-                } else {
-                    break;
+            try {
+                snapshotData.writeLock().lock();
+                Iterator<TimeSeriesItem> i = snapshotData.unsafeIterator();
+                while (i.hasNext()) {
+                    if (i.next().getTimestamp() < currentStartTime) {
+                        i.remove();
+                        modified = true;
+                    } else {
+                        break;
+                    }
                 }
+            } finally {
+                snapshotData.writeLock().unlock();
             }
             return modified;
         }

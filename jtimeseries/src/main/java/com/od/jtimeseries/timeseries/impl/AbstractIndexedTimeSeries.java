@@ -26,9 +26,6 @@ import com.od.jtimeseries.util.logging.LogMethods;
 
 import java.util.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -160,7 +157,15 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         }
     }
 
+    //return an iterator based on a snapshot, to guarantee thread safety
+    //this imposes a performance penalty in creating the snapshot but there is otherwise too much risk
+    //of forgetting to take the readLock while iterating, and introducing bugs
+    //The alternative is to hold the read lock and call 'rawIterator()'
     protected Iterator<TimeSeriesItem> locked_iterator() {
+        return new NoRemovalSnapshotIterator<TimeSeriesItem>(locked_getSnapshot().iterator());
+    }
+
+    protected Iterator<TimeSeriesItem> locked_unsafeIterator() {
         return series.iterator();
     }
 
@@ -194,22 +199,22 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
                 timeSeriesListenerSupport.addTimeSeriesListener(l);
             }
         };
-        fireEvent(t);
+        queueEvent(t);
     }
 
     protected void locked_removeTimeSeriesListener(final TimeSeriesListener l) {
-        if ( listenerAdded ) {
+        if ( listenerAdded ) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
                     timeSeriesListenerSupport.removeTimeSeriesListener(l);
                 }
             };
-            fireEvent(t);
+            queueEvent(t);
         }
     }
 
     protected void queueSeriesChangedEvent(final TimeSeriesEvent e) {
-        if ( listenerAdded) {
+        if ( listenerAdded) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
@@ -217,12 +222,12 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
                     logMethods.logDebug("Finished firing event " + e);
                 }
             };
-            fireEvent(t);
+            queueEvent(t);
         }
     }
 
     protected void queueItemsAddedOrInsertedEvent(final TimeSeriesEvent e) {
-        if ( listenerAdded ) {
+        if ( listenerAdded ) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
@@ -230,12 +235,12 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
                     logMethods.logDebug("Finished firing event " + e);
                 }
             };
-            fireEvent(t);
+            queueEvent(t);
         }
     }
 
     protected void queueItemsRemovedEvent(final TimeSeriesEvent e) {
-        if ( listenerAdded) {
+        if ( listenerAdded) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
                     logMethods.logDebug("Firing event " + e);
@@ -243,12 +248,11 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
                     logMethods.logDebug("Finished firing event " + e);
                 }
             };
-            fireEvent(t);
+            queueEvent(t);
         }
     }
 
-    private void fireEvent(Runnable t) {
-        //only fire event if there might be a listener to receive it
+    private void queueEvent(Runnable t) {
         getSeriesEventExecutor().execute(t);
     }
 
@@ -277,6 +281,28 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
             return true;
         } else {
             return o instanceof TimeSeries && SeriesUtils.areTimeSeriesEqualByItems(this, (TimeSeries) o);
+        }
+    }
+
+    private static class NoRemovalSnapshotIterator<E> implements Iterator<E> {
+
+        private Iterator<E> iterator;
+
+        public NoRemovalSnapshotIterator(Iterator<E> iterator) {
+            this.iterator = iterator;
+        }
+
+        public E next() {
+            return iterator.next();
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("This iterator is backed by a snapshot and does not support removal, " +
+                    "instead consider using timeseries.unsafeIterator() and using writeLock().lock()/writeLock.unlock()");
+        }
+
+        public boolean hasNext() {
+            return iterator.hasNext();
         }
     }
 

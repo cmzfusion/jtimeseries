@@ -44,19 +44,29 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         wrappedTimeSeries.addTimeSeriesListener(eventHandler);        
     }
 
-    public synchronized void addTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.addTimeSeriesListener(l);
+    public void addTimeSeriesListener(TimeSeriesListener l) {
+        try {
+            writeLock().lock();
+            eventHandler.addTimeSeriesListener(l);
+        } finally {
+            writeLock().unlock();
+        }
     }
 
-    public synchronized void removeTimeSeriesListener(TimeSeriesListener l) {
-        eventHandler.removeTimeSeriesListener(l);
+    public void removeTimeSeriesListener(TimeSeriesListener l) {
+        try {
+            writeLock().lock();
+            eventHandler.removeTimeSeriesListener(l);
+        } finally {
+            writeLock().unlock();
+        }
     }
 
-    public synchronized TimeSeriesItem getLatestItem() {
+    public TimeSeriesItem getLatestItem() {
         return wrappedTimeSeries.getLatestItem();
     }
 
-    public synchronized TimeSeriesItem getEarliestItem() {
+    public TimeSeriesItem getEarliestItem() {
         return wrappedTimeSeries.getEarliestItem();
     }
 
@@ -94,6 +104,10 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
 
     public synchronized Iterator<TimeSeriesItem> iterator() {
         return wrappedTimeSeries.iterator();
+    }
+
+    public Iterator<TimeSeriesItem> unsafeIterator() {
+        return wrappedTimeSeries.unsafeIterator();
     }
 
     public synchronized long getModCount() {

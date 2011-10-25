@@ -27,27 +27,12 @@ import java.util.concurrent.Executors;
  * User: Nick Ebbutt
  * Date: 24-Feb-2009
  * Time: 17:53:04
+ *
+ * Controls the Executors/threads used for various library level tasks, such as event propagation
  */
 public class TimeSeriesExecutorFactory {
 
-    private static volatile ExecutorSource executorSource = new ExecutorSource() {
-
-        private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
-        private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
-        private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");        
-
-        public Executor getExecutorForTimeSeriesEvents(Object timeSeries) {
-            return timeSeriesEventExecutor;
-        }
-
-        public Executor getExecutorForCaptureEvents(Object capture) {
-            return captureEventExecutor;
-        }
-
-        public Executor getExecutorForIdentifiableTreeEvents(Object identifiable) {
-            return identifiableEventExecutor;
-        }
-    };
+    private static volatile ExecutorSource executorSource = new DefaultExecutorSource();
 
     public static Executor getExecutorForTimeSeriesEvents(Object timeSeries) {
         return executorSource.getExecutorForTimeSeriesEvents(timeSeries);
@@ -88,5 +73,24 @@ public class TimeSeriesExecutorFactory {
          * is to be preserved (the same executor instance should be used for each identifiable tree hierarchy)
          */
         Executor getExecutorForIdentifiableTreeEvents(Object identifiable);
+    }
+
+    private static class DefaultExecutorSource implements ExecutorSource {
+
+        private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
+        private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
+        private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");
+
+        public Executor getExecutorForTimeSeriesEvents(Object timeSeries) {
+            return timeSeriesEventExecutor;
+        }
+
+        public Executor getExecutorForCaptureEvents(Object capture) {
+            return captureEventExecutor;
+        }
+
+        public Executor getExecutorForIdentifiableTreeEvents(Object identifiable) {
+            return identifiableEventExecutor;
+        }
     }
 }

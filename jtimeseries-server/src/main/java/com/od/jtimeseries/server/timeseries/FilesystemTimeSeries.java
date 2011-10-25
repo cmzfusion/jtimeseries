@@ -312,6 +312,15 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         } finally {
             this.readLock().unlock();
         }
+    }
+
+     public Iterator<TimeSeriesItem> unsafeIterator() {
+        try {
+            this.readLock().lock();
+            return getRoundRobinSeries().unsafeIterator();
+        } finally {
+            this.readLock().unlock();
+        }
 
     }
 

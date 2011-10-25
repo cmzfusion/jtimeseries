@@ -18,10 +18,9 @@
  */
 package com.od.jtimeseries.timeseries;
 
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,22 +41,23 @@ import java.util.concurrent.locks.ReadWriteLock;
  * (Due to the lack of granularity in a system clock, an attempt to add items with a duplicate timestamp may be
  * likely, and it is probably best to let an application/implementation decide how to handle this case).
  *
- * To allow easy comparison, it is useful if TimeSeries implement equals and hashCode using the same contract
- * which would be used in a List implementation, e.g. the same as one would expect for List<TimeSeriesItem>.equals()
- * and List<TimeSeriesItem>.hashCode(), but this is not mandatory and so comparisons must take into account the
- * implementation type
+ * TimeSeries may implement equals and hashCode using the same contract which would be expected in a
+ * List implementation, e.g. the same as one would expect for List<TimeSeriesItem>, but this is not mandatory,
+ * and so comparisons must take into account the implementation type
  *
  * Note on thread safety:
- * 
- * TimeSeries implementations are in general intended to be thread safe (if not, this should be documented).
- * Furthermore, the guard used to guarantee thread safety should be the monitor/mutex of the time series instance
- * itself rather than that of an encapsulated private lock object. This is to enable client classes to safely
- * implement operations involving more than one method call by holding the lock on a series instance while the
- * operation takes place. In cases where the a timeseries implementation wraps another time series instance, client
- * classes in general should not change data of the wrapped instance directly - this should be done via the wrapper,
- * since making direct changes in this case would violate the guard provided by the wrapper instance's mutex/lock.
+ *
+ * TimeSeries implementations should be be thread safe, and the methods readLock() and writeLock() return
+ * reentrant lock instances which can be used to guarantee atomicity for operations which span multiple method calls
+ * Iteration of TimeSeries is thread safe because iteration is performed on a snapshot of series data. To avoid the
+ * performance penalty inherent in this, use unsafeIterator(), but hold the readLock while iterating.
+ *
+ * TimeSeries are observable, and TimeSeriesEvent are fired to TimeSeriesListener on a separate event thread.
+ * Events from a time series instance should have thread affinity (events from a timeseries instance should always be
+ * received on the same event thread, but the library may be configured to propagate events for different series instances
+ * on different threads)
  */
-public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
+public interface TimeSeries extends Iterable<TimeSeriesItem> {
 
     /**
      * @return the item in the series with the earliest timestamp value, or null if no items exist.
@@ -87,7 +87,8 @@ public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
 
     /**
      * Add all the items to the timeseries. The items must be in ascending order by timestamp.
-     * It is better to use this method to add multiple items, since that will result in a single insert event rather than multiple events being fired
+     * It is better to use this method to add multiple items, since that will result in a single
+     * insert event rather than multiple events being fired
      */
     void addAll(Iterable<TimeSeriesItem> items);
 
@@ -98,7 +99,8 @@ public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
 
     /**
      * Remove all the items from the timeseries. The items must be in ascending order by timestamp.
-     * It is better to use this method to remove multiple items, since that will result in a single insert event rather than multiple events being fired
+     * It is better to use this method to remove multiple items, since that will result in a single
+     * insert event rather than multiple events being fired
      */
     void removeAll(Iterable<TimeSeriesItem> items);
 
@@ -129,12 +131,14 @@ public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
     long getModCount();
 
     /**
-     * @return starting with most recent item and moving back, return the first item in the series with a timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
+     * @return starting with most recent item and moving back, return the first item in the series with a
+     * timestamp equal to or earlier than the supplied timestamp, or null if no such item exists
      */
     TimeSeriesItem getFirstItemAtOrBefore(long timestamp);
 
     /**
-     * @return starting with earliest item and moving forward, return first item in the series with a timestamp equal to or later than the supplied timestamp, or null if no such item exists
+     * @return starting with earliest item and moving forward, return first item in the series with a timestamp
+     * equal to or later than the supplied timestamp, or null if no such item exists
      */
     TimeSeriesItem getFirstItemAtOrAfter(long timestamp);
 
@@ -144,7 +148,8 @@ public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
     List<TimeSeriesItem> getItemsInRange(long startTime, long endTime);
 
     /**
-     * @return a List containing all TimeSeriesItem in series. The list instance returned is not backed by the timeseries, and operations on it should not affect the source series
+     * @return a List containing all TimeSeriesItem in series. The list instance returned is not backed by the
+     * timeseries, and operations on it should not affect the source series
      */
     List<TimeSeriesItem> getSnapshot();
 
@@ -154,10 +159,29 @@ public interface TimeSeries extends Iterable<TimeSeriesItem>, ReadWriteLock {
     void clear();
 
     /**
-     * This method returns the item at a given index, which will be fast for an IndexedTimeSeries implementation, but may be very slow for alternative
-     * implementations, so the actual implementation should be taken into account when using this method
+     * This method returns the item at a given index, which will be fast for an IndexedTimeSeries implementation,
+     * but may be very slow for alternative implementations, so the actual implementation should be taken into
+     * account when using this method
+     *
      * @return the item at index.
      */
     TimeSeriesItem getItem(int index);
+
+    /**
+     * @return an Iterator based on a snapshot of current series data, which provides thread safe iteration but no remove
+     */
+    Iterator<TimeSeriesItem> iterator();
+
+    /**
+     * @return an Iterator which is backed by the series internal state, providing more efficient iteration and supporting
+     * removes, but is not thread safe unless you hold the readLock while iterating (and writeLock if removing items)
+     */
+    Iterator<TimeSeriesItem> unsafeIterator();
+
+
+    Lock readLock();
+
+
+    Lock writeLock();
 
 }

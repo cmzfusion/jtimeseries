@@ -1,6 +1,6 @@
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import org.junit.After;
@@ -49,7 +49,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForGrandchildPicksUpTheGrandchildCaptures() {
-        grandchildContext.setScheduler(new DefaultScheduler());
+        grandchildContext.setScheduler(new NonGroupingScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertFalse(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
         assertTrue(grandchildContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
@@ -57,7 +57,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForChildPicksUpTheChildAndGrandchildCapturesIfGranchildDoesNotHaveItsOwnScheduler() {
-        childContext.setScheduler(new DefaultScheduler());
+        childContext.setScheduler(new NonGroupingScheduler());
 
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
@@ -73,8 +73,8 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testSettingNewSchedulerForChildDoesNotPickUpGrandchildCapturesIfGrandchildHasItsOwnScheduler() {
-        grandchildContext.setScheduler(new DefaultScheduler());
-        childContext.setScheduler(new DefaultScheduler());
+        grandchildContext.setScheduler(new NonGroupingScheduler());
+        childContext.setScheduler(new NonGroupingScheduler());
 
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
@@ -91,8 +91,8 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
    @Test
     public void testStartAndStoppingSchedulingAffectsLocalSchedulerAndThoseForChildNodes() {
-        grandchildContext.setScheduler(new DefaultScheduler());
-        childContext.setScheduler(new DefaultScheduler());
+        grandchildContext.setScheduler(new NonGroupingScheduler());
+        childContext.setScheduler(new NonGroupingScheduler());
         childContext.startScheduling();
 
         assertFalse(rootContext.getScheduler().isStarted());

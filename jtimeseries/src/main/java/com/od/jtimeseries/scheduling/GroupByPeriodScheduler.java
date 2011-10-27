@@ -27,10 +27,10 @@ import java.util.concurrent.TimeUnit;
  * Date: 20-Jan-2009
  * Time: 13:59:32
  *
- * A scheduler which groups by scheduling period, so that all triggerables with the same period are executed togeter.
+ * A scheduler which groups by scheduling period, so that all triggerables with the same period are executed together.
  *
  * This may mean that captures added or started after the scheduler is running do not trigger immediately, leading to a delay
- * before values start to be recorded. This is becuase other captures in the same group by capture period may already be running,
+ * before values start to be recorded. This is because other captures in the same group by capture period may already be running,
  * and the timer for that group may be in mid-period.
  */
 public class GroupByPeriodScheduler extends AbstractScheduler {

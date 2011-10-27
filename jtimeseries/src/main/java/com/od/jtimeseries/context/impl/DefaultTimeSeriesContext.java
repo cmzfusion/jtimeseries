@@ -29,7 +29,7 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.identifiable.QueryResult;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.scheduling.GroupByPeriodScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueSource;
@@ -84,7 +84,7 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     }
 
     private void createRootContextResources() {
-        setScheduler(new DefaultScheduler());
+        setScheduler(new GroupByPeriodScheduler());
         setTimeSeriesFactory(new DefaultTimeSeriesFactory());
         setValueSourceFactory(new DefaultValueSourceFactory());
         setCaptureFactory(new DefaultCaptureFactory());

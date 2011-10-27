@@ -10,9 +10,9 @@ package com.od.jtimeseries.scheduling;
  * Date: 19-Feb-2009
  * Time: 17:34:57
  */
-public class TestDefaultScheduler extends AbstractSchedulerTest {
+public class TestNonGroupingScheduler extends AbstractSchedulerTest {
 
     protected Scheduler createCaptureScheduler() {
-        return new DefaultScheduler();
+        return new NonGroupingScheduler();
     }
 }

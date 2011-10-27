@@ -34,15 +34,15 @@ import java.util.concurrent.TimeUnit;
  * Captures are not grouped by capture period, e.g. two captures with a capture period of 30s will be
  * triggered at different times, depending on when they or the scheduler were stopped/started
  */
-public class DefaultScheduler extends AbstractScheduler {
+public class NonGroupingScheduler extends AbstractScheduler {
 
     private Map<Triggerable, TriggerableTimerTask> tasks = Collections.synchronizedMap(new HashMap<Triggerable, TriggerableTimerTask>());
 
-    public DefaultScheduler() {
+    public NonGroupingScheduler() {
         this(3);
     }
 
-    public DefaultScheduler(int threadCount) {
+    public NonGroupingScheduler(int threadCount) {
         super(threadCount);
     }
 

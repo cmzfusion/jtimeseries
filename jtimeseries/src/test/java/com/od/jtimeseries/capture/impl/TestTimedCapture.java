@@ -2,7 +2,7 @@ package com.od.jtimeseries.capture.impl;
 
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;
@@ -23,12 +23,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestTimedCapture extends TestCase {
 
-    private Scheduler s = new DefaultScheduler();
+    private Scheduler s = new NonGroupingScheduler();
     public TimedCapture timedCapture;
     public CountDownLatch latch;
 
     public void setUp() {
-        s = new DefaultScheduler();
+        s = new NonGroupingScheduler();
         latch = new CountDownLatch(1);
         ValueSource valueRecorder = new DefaultValueRecorder("test recorder", "test recorder");
         DefaultIdentifiableTimeSeries timeSeries = new DefaultIdentifiableTimeSeries("timeseries", "timeseries") {

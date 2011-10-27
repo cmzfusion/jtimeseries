@@ -6,7 +6,7 @@ import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.identifiable.WrongClassTypeException;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceFactory;
@@ -214,7 +214,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     public void testCannotChangesSchedulerIfSchedulerStarted() {
         rootContext.startScheduling();
         try {
-            rootContext.setScheduler(new DefaultScheduler());
+            rootContext.setScheduler(new NonGroupingScheduler());
             fail("Should not be able to set scheduler");
         } catch (RuntimeException r) {
         }

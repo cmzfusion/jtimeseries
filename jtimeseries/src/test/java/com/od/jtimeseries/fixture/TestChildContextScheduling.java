@@ -2,7 +2,7 @@ package com.od.jtimeseries.fixture;
 
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
     public void whenAChildContextHasItsOwnSchedulerStartingParentContextSchedulingAlsoStartsTheChildScheduler() {
 
         //set a new child scheduler on context2
-        childContext2.setScheduler(new DefaultScheduler());
+        childContext2.setScheduler(new NonGroupingScheduler());
 
         //the new scheduler should now own the eventTimer capture
         assertTrue(childContext2.getScheduler().containsTriggerable(

@@ -21,6 +21,8 @@ package com.od.jtimeseries.demo;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.net.udp.UdpClientConfig;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.Time;
 
@@ -45,7 +47,7 @@ public class TimeSeriesUdpClient {
         ));
 
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
-        rootContext.setTimeSeriesFactory(new UdpRemoteTimeSeriesFactory(udpClient));
+//        rootContext.setTimeSeriesFactory(new UdpRemoteTimeSeriesFactory(udpClient));
 
         TimeSeriesContext fooContext = rootContext.createContext("Udp Context", "A context for foo");
         TimeSeriesContext testContext = rootContext.createContext("Udp Context.test");

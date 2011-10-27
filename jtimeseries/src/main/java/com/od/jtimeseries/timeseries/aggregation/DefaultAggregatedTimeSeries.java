@@ -23,6 +23,8 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.interpolation.LinearInterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
+import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.timeseries.interpolation.DefaultInterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.InterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
@@ -49,6 +51,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
     private List<InterpolatedTimeSeries> children = new ArrayList<InterpolatedTimeSeries>();
     private long lastTimepoint;
     private TimeSeries masterSeries;
+    private AggregateViewListener childTimeSeriesListener = new AggregateViewListener();
 
     public DefaultAggregatedTimeSeries(AggregateFunction aggregateFunction) {
         this(new DefaultTimeSeries(), aggregateFunction);
@@ -76,7 +79,9 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
 
     private void addChildViewListeners(TimeSeries... timeSeries) {
         for ( TimeSeries s : timeSeries) {
-            s.addTimeSeriesListener(new AggregateViewListener());
+            //use a weak ref listner, don't want the child series to hold strong references to aggregated series
+            WeakReferenceTimeSeriesListener w = new WeakReferenceTimeSeriesListener(s, childTimeSeriesListener);
+            s.addTimeSeriesListener(w);
         }
     }
 
@@ -148,7 +153,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
     private long getFirstCommonTimestamp() {
         long earliest = Long.MIN_VALUE;
         for (TimeSeries s : children) {
-            long earliestChildStamp = s.getEarliestItem().getTimestamp();
+            long earliestChildStamp = s.getEarliestTimestamp();
             earliestChildStamp = earliestChildStamp == -1 ? Long.MAX_VALUE : earliestChildStamp;
             earliest = Math.max(earliestChildStamp, earliest );
         }
@@ -167,15 +172,24 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
     private class AggregateViewListener implements TimeSeriesListener {
 
         public void itemsAddedOrInserted(TimeSeriesEvent h) {
-            addNewValues();
+
+            if ( h.isAppend()) {
+                addNewValues();
+            } else {
+                //TODO improve efficiency
+                recalculateView();
+            }
         }
 
         public void itemsRemoved(TimeSeriesEvent h) {
-            addNewValues();
+            //TODO improve efficiency
+            recalculateView();
         }
 
         public void seriesChanged(TimeSeriesEvent e) {
-            addNewValues();
+
+            //TODO improve efficiency
+            recalculateView();
         }
     }
 

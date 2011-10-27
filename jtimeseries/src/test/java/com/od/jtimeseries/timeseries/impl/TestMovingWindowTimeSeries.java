@@ -75,10 +75,11 @@ public class TestMovingWindowTimeSeries extends TestCase {
         movingWindowSeries.addItem(item9);
         waitForCountdown(countDownListener);
 
-        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAppendedOrInsertedEvent(
             movingWindowSeries,
             Collections.singletonList(item9),
-            0
+            0,
+            true
         );
         assertEquals("testAddWhenOpenEnded", expectedEvent, countDownListener.getEvents().get(0));
         assertEquals("testAddWhenOpenEnded", 6, movingWindowSeries.size());
@@ -115,10 +116,11 @@ public class TestMovingWindowTimeSeries extends TestCase {
 
         waitForCountdown(countDownListener);
 
-        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
+        TimeSeriesEvent expectedEvent = TimeSeriesEvent.createItemsAppendedOrInsertedEvent(
             movingWindowSeries,
             Collections.singletonList(item10),
-            0
+            0,
+            true
         );
         assertEquals("testAddWhenNoItemsInWindow", expectedEvent, countDownListener.getEvents().get(0));
         assertEquals("testAddWhenNoItemsInWindow", 1, movingWindowSeries.size());

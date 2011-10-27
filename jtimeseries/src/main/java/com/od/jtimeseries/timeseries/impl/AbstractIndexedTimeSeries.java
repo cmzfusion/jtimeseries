@@ -130,31 +130,36 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
     }
 
     protected void locked_addItem(TimeSeriesItem timeSeriesItem) {
-        doAddItem(timeSeriesItem);
-        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount()));
+        boolean isAppend = doAddItem(timeSeriesItem);
+        queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAppendedOrInsertedEvent(this, Collections.singletonList(timeSeriesItem), getModCount(), isAppend));
     }
 
     protected void locked_addAll(Iterable<TimeSeriesItem> items) {
+        boolean isAppend = true;
         List<TimeSeriesItem> itemsAdded = new ArrayList<TimeSeriesItem>();
         for (TimeSeriesItem i : items) {
             doAddItem(i);
-            itemsAdded.add(i);
+            isAppend &= itemsAdded.add(i);
         }
 
         if ( itemsAdded.size() > 0) {
-            queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAddedOrInsertedEvent(this, itemsAdded, getModCount()));
+            queueItemsAddedOrInsertedEvent(TimeSeriesEvent.createItemsAppendedOrInsertedEvent(this, itemsAdded, getModCount(), isAppend));
         }
     }
 
-    private void doAddItem(TimeSeriesItem timeSeriesItem) {
+    private boolean doAddItem(TimeSeriesItem timeSeriesItem) {
+        boolean isAppend;
         if ( size() == 0 || timeSeriesItem.getTimestamp() >= getLatestTimestamp()) {
             series.add(timeSeriesItem);
+            isAppend = true;
         } else {
             //if there are already items with this timestamp, add to appear after those items
             //this will mean that this item is the last one before any item at timestamp + 1
             int indexToAdd = SeriesUtils.getIndexOfFirstItemAtOrAfter(timeSeriesItem.getTimestamp() + 1, this);
             series.add(indexToAdd, timeSeriesItem);
+            isAppend = false;
         }
+        return isAppend;
     }
 
     //return an iterator based on a snapshot, to guarantee thread safety

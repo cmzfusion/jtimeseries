@@ -87,6 +87,10 @@ public class TimeSeriesEvent implements Cloneable {
         return eventType;
     }
 
+    public boolean isAppend() {
+        return eventType == EventType.APPEND;
+    }
+
     public long getSeriesModCount() {
         return seriesModCount;
     }
@@ -96,13 +100,13 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     /**
-     * A range of items was added/inserted into the series
+     * A range of items was appended to the series
      *
      * @param source of event
      * @param items - items added
      */
-    public static TimeSeriesEvent createItemsAddedOrInsertedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount) {
-        return new TimeSeriesEvent(source, items, EventType.ADD_OR_INSERT, seriesModCount);
+    public static TimeSeriesEvent createItemsAppendedOrInsertedEvent(Object source, List<TimeSeriesItem> items, long seriesModCount, boolean isAppend) {
+        return new TimeSeriesEvent(source, items, isAppend ? EventType.APPEND : EventType.INSERT, seriesModCount);
     }
 
     /**
@@ -160,7 +164,8 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     public static enum EventType {
-        ADD_OR_INSERT,
+        APPEND,
+        INSERT,
         REMOVE,
         SERIES_CHANGE
     }

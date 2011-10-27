@@ -22,12 +22,14 @@ import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
+import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.aggregation.AggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.util.BenchmarkingRepaintManager;
+import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
 import com.od.jtimeseries.util.time.Time;
 
@@ -77,7 +79,8 @@ public class JTimeSeriesDemo {
     }
 
     private void start() throws IOException {
-        
+
+        JideInitialization.applyLicense();
         DemoMainFrame frame = new DemoMainFrame();
 
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();

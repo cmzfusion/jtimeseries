@@ -151,11 +151,13 @@ public class MovingWindowTimeSeries extends AbstractIndexedTimeSeries {
                 startIndex = endIndex;
             }
 
+            boolean isAppend = getLatestTimestamp() == timeSeriesItem.getTimestamp();
             queueItemsAddedOrInsertedEvent(
-                TimeSeriesEvent.createItemsAddedOrInsertedEvent(
+                TimeSeriesEvent.createItemsAppendedOrInsertedEvent(
                     this,
                     Collections.singletonList(timeSeriesItem),
-                    modCount.incrementAndGet()
+                    modCount.incrementAndGet(),
+                    isAppend
                 )
             );
         }

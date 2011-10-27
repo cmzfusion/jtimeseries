@@ -18,15 +18,17 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
+import com.od.jtimeseries.util.NamedExecutors;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;

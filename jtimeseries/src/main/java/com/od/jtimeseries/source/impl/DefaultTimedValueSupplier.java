@@ -21,8 +21,8 @@ package com.od.jtimeseries.source.impl;
 import com.od.jtimeseries.source.TimedValueSupplier;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.source.ValueSupplier;
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.

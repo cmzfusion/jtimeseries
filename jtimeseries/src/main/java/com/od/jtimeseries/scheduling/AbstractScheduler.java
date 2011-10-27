@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
+import com.od.jtimeseries.util.NamedExecutors;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;

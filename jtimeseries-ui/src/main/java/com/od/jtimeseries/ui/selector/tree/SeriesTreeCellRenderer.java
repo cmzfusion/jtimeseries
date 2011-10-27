@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.ui.selector.tree;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.Displayable;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;

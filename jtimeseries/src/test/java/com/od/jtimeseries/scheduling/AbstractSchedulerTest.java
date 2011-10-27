@@ -3,17 +3,17 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.capture.TimedCapture;
-import com.od.jtimeseries.capture.impl.AbstractCapture;
-import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.CaptureState;
-import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.capture.function.CaptureFunction;
+import com.od.jtimeseries.capture.impl.AbstractCapture;
 import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
 import org.jmock.Mockery;
-import org.junit.Test;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.After;
+import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

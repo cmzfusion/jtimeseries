@@ -1,12 +1,10 @@
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
-import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.Counter;
-import org.junit.Test;
+import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import org.junit.After;
+import org.junit.Test;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
 

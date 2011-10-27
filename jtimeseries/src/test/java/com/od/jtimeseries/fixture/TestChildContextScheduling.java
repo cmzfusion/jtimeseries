@@ -1,11 +1,10 @@
 package com.od.jtimeseries.fixture;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
-
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
 import org.junit.Test;
 
 /**

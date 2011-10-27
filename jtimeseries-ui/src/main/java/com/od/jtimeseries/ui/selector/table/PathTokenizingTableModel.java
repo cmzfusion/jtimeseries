@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.ui.selector.table;
 
-import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.identifiable.PathParser;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
 import java.util.List;
 

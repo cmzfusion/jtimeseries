@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.net.httpd;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
@@ -28,7 +28,10 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.

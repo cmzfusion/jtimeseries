@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.timeseries.function.aggregate;
 
-import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.Numeric;
 
 /**
  * Created by IntelliJ IDEA.

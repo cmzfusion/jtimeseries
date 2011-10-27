@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.capture;
 
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 /**
  * Created by IntelliJ IDEA.

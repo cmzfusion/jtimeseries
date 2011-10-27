@@ -1,8 +1,8 @@
 package com.od.jtimeseries.timeseries.function;
 
-import junit.framework.TestCase;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import junit.framework.TestCase;
 
 /**
  * Created by IntelliJ IDEA.

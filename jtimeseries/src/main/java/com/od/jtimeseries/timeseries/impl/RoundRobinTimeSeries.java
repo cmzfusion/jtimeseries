@@ -22,7 +22,6 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

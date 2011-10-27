@@ -1,7 +1,5 @@
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.scheduling.Scheduler;
-import com.od.jtimeseries.scheduling.GroupByPeriodScheduler;
 import com.od.jtimeseries.util.time.TimePeriod;
 import org.junit.Test;
 

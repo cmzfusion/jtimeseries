@@ -19,11 +19,11 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
+import com.od.jtimeseries.ui.util.Disposable;
 import com.od.swing.util.UIUtilities;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 

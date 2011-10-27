@@ -1,5 +1,7 @@
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
 import com.od.jtimeseries.server.util.ServerDefaults;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
@@ -10,8 +12,6 @@ import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.context.TimeSeriesContext;
 import junit.framework.TestCase;
 
 import java.io.File;

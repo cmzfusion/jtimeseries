@@ -18,11 +18,10 @@
  */
 package com.od.jtimeseries.demo;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.JTimeSeries;
-import com.od.jtimeseries.source.ValueRecorder;
-import com.od.jtimeseries.net.udp.*;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.Time;
 
 import java.net.InetAddress;

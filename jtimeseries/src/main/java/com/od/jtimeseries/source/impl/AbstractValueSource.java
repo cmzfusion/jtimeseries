@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.source.impl;
 
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
-import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.numeric.Numeric;
 
 import java.util.Arrays;

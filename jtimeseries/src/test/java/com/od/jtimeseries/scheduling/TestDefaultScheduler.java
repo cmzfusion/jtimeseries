@@ -4,9 +4,6 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.scheduling.Scheduler;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt

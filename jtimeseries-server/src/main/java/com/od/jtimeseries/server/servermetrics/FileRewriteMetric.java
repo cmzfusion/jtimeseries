@@ -1,6 +1,5 @@
 package com.od.jtimeseries.server.servermetrics;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;

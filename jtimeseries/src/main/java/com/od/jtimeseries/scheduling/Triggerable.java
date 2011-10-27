@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.

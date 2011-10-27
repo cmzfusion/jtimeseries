@@ -19,13 +19,12 @@
 package com.od.jtimeseries.server.util;
 
 import com.od.jtimeseries.util.NamedExecutors;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;

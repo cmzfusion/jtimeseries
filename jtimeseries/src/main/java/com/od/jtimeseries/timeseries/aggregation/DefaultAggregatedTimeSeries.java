@@ -23,9 +23,9 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.interpolation.LinearInterpolationFunction;
 import com.od.jtimeseries.timeseries.impl.AbstractProxyTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeries;
-import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.timeseries.interpolation.DefaultInterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.InterpolatedTimeSeries;
+import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.util;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.EventTimer;
@@ -27,9 +26,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 import javax.swing.*;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
 
 /**
  * Created by IntelliJ IDEA.

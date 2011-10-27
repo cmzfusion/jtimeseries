@@ -1,21 +1,21 @@
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.identifiable.WrongClassTypeException;
-import org.junit.Test;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
-import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesFactory;
-import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.scheduling.DefaultScheduler;
-import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.CaptureState;
+import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
+import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.identifiable.WrongClassTypeException;
+import com.od.jtimeseries.scheduling.DefaultScheduler;
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceFactory;
-import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
+import org.junit.Test;
 
 /**
  * Created by IntelliJ IDEA.

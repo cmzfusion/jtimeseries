@@ -1,8 +1,5 @@
 package com.od.jtimeseries.util;
 
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.time.Time;
-
 /**
  * Created by IntelliJ IDEA.
  * User: nick

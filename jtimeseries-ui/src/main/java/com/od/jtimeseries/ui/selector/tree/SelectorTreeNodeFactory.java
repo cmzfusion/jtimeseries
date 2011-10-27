@@ -19,10 +19,10 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.progress.IconComponentAnimator;
 import com.od.swing.progress.RotatingImageSource;
 

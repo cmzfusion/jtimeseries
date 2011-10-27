@@ -18,10 +18,10 @@
  */
 package com.od.jtimeseries.net.httpd;
 
-import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;

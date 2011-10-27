@@ -21,12 +21,12 @@ package com.od.jtimeseries.context.impl;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.source.*;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.source.ValueSource;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by IntelliJ IDEA.

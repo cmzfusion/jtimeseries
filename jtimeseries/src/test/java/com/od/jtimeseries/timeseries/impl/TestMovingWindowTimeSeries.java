@@ -6,7 +6,10 @@ import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.util.time.TimeSource;
 import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 /**

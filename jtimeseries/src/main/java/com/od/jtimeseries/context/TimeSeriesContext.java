@@ -26,7 +26,7 @@ import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.util.List;

@@ -19,8 +19,8 @@
 package com.od.jtimeseries.source.impl;
 
 import com.od.jtimeseries.source.*;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 public class DefaultValueSourceFactory extends IdentifiableBase implements ValueSourceFactory {

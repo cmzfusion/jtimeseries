@@ -16,9 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.util.identifiable;
-
-import com.od.jtimeseries.util.identifiable.Identifiable;
+package com.od.jtimeseries.identifiable;
 
 import java.util.List;
 

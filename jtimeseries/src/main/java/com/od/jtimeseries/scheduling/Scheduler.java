@@ -18,9 +18,7 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.capture.TimedCapture;
-import com.od.jtimeseries.capture.Capture;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.util.List;
 

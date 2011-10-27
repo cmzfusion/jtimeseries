@@ -20,8 +20,7 @@ package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 
 /**
  * Created by IntelliJ IDEA.

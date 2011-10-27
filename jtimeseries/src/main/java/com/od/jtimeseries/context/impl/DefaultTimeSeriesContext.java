@@ -32,9 +32,9 @@ import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.QueryResult;
 
 import java.util.*;
 

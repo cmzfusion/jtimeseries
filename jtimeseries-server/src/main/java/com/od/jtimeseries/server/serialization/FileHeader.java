@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.server.serialization;
 
-import com.od.jtimeseries.util.identifiable.PathParser;
+import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

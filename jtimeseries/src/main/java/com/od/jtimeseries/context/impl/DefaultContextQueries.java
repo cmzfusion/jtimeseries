@@ -21,13 +21,13 @@ package com.od.jtimeseries.context.impl;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.context.ContextQueries;
-import com.od.jtimeseries.util.identifiable.DefaultIdentifiableQueries;
-import com.od.jtimeseries.util.identifiable.DefaultQueryResult;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.DefaultIdentifiableQueries;
+import com.od.jtimeseries.identifiable.DefaultQueryResult;
+import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 

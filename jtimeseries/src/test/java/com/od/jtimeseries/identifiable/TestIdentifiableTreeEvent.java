@@ -1,4 +1,4 @@
-package com.od.jtimeseries.util.identifiable;
+package com.od.jtimeseries.identifiable;
 
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.context.TimeSeriesContext;

@@ -20,9 +20,9 @@ package com.od.jtimeseries.source.impl;
 
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueSourceListener;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.QueryResult;
 
 import java.util.List;
 import java.util.Properties;

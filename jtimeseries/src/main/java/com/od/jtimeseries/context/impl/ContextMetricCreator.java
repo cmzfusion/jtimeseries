@@ -20,8 +20,7 @@ package com.od.jtimeseries.context.impl;
 
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.source.*;
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.util.List;
 

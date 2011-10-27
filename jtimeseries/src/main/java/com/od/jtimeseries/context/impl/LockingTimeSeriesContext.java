@@ -24,15 +24,14 @@ import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.ContextFactory;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.util.List;

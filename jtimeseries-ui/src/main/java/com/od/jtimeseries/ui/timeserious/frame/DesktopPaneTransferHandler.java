@@ -22,7 +22,7 @@ import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.ImportExportTransferHandler;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 

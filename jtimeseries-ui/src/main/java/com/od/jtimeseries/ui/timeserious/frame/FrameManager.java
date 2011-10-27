@@ -28,10 +28,10 @@ import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.mainselector.MainSeriesSelector;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
 
 import java.awt.event.WindowAdapter;

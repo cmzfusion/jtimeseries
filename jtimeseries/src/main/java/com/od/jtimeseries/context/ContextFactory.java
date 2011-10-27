@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
+import com.od.jtimeseries.identifiable.IdentifiableFactory;
 
 /**
  * Created by IntelliJ IDEA.

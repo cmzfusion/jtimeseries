@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.ui.util;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
 import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;

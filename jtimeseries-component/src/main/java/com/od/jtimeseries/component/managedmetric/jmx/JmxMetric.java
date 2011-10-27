@@ -26,7 +26,7 @@ import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;

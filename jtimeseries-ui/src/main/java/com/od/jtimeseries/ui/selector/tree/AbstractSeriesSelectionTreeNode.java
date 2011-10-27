@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.ui.util.IdentifiableSource;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

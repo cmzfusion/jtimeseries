@@ -27,7 +27,7 @@ import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.NoImportsSelectorTransferHandler;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;

@@ -19,7 +19,7 @@
 package com.od.jtimeseries.server.summarystats;
 
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;

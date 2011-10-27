@@ -23,8 +23,8 @@ import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.IdentifiableQueries;
-import com.od.jtimeseries.util.identifiable.QueryResult;
+import com.od.jtimeseries.identifiable.IdentifiableQueries;
+import com.od.jtimeseries.identifiable.QueryResult;
 
 /**
  * There is a many to many relationship between ValueSource and TimeSeries - the Capture is the mapping entity

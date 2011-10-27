@@ -25,7 +25,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;

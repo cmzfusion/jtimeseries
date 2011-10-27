@@ -25,7 +25,7 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 

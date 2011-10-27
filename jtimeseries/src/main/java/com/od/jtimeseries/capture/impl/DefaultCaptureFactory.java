@@ -20,14 +20,12 @@ package com.od.jtimeseries.capture.impl;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
-import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.

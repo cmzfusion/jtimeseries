@@ -20,9 +20,9 @@ package com.od.jtimeseries.ui.timeserious.rootcontext;
 
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 
 import java.util.List;
 

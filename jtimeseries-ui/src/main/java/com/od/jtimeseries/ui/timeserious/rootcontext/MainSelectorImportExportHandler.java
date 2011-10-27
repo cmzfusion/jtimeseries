@@ -32,7 +32,7 @@ import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;

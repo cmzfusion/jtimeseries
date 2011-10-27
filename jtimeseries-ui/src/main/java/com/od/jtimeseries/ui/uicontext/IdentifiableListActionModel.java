@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.uicontext;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.action.ListSelectionActionModel;
 
 import java.util.HashMap;

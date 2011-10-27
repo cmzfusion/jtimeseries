@@ -30,7 +30,7 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
 import com.od.jtimeseries.ui.uicontext.*;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;

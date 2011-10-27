@@ -24,7 +24,7 @@ import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.ui.util.CascadeLocationCalculator;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.awt.*;

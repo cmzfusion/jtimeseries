@@ -27,7 +27,7 @@ import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.ContextUpdatingBusListener;
 import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.util.identifiable.PathParser;
+import com.od.jtimeseries.identifiable.PathParser;
 
 import java.util.List;
 

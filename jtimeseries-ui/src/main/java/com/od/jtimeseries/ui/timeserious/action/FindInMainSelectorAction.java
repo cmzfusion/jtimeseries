@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.timeserious.action;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

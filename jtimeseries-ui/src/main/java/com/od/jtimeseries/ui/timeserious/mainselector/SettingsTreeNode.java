@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.timeserious.mainselector;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 

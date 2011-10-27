@@ -21,7 +21,7 @@ package com.od.jtimeseries.agent;
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
-import com.od.jtimeseries.util.identifiable.PathParser;
+import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.net.udp.UdpClient;

@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.util.Comparator;
 

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.selector.shared;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;

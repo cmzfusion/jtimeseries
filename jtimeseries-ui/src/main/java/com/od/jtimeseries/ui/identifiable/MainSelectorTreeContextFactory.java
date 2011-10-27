@@ -23,7 +23,6 @@ import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.ui.config.DesktopConfiguration;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
 * Created by IntelliJ IDEA.

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.net.udp;
 
-import com.od.jtimeseries.util.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

@@ -23,7 +23,7 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;

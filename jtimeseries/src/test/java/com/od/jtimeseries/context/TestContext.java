@@ -1,6 +1,6 @@
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.util.identifiable.WrongClassTypeException;
+import com.od.jtimeseries.identifiable.WrongClassTypeException;
 import org.junit.Test;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;

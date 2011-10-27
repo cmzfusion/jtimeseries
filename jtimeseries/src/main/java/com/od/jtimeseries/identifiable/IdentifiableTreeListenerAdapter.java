@@ -16,17 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.util.identifiable;
+package com.od.jtimeseries.identifiable;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 08/01/11
- * Time: 23:16
+ * Date: 08/03/11
+ * Time: 07:04
  */
-public interface IdentifiableQueries {
+public class IdentifiableTreeListenerAdapter implements IdentifiableTreeListener {
 
-    <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass);
+    public void nodeChanged(Identifiable node, Object changeDescription) {
+    }
 
-    <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
+    public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
+    }
+
+    public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
+    }
+
+    public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+    }
 }

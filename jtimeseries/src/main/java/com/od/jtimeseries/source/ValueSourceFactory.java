@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.source;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableFactory;
 
 public interface ValueSourceFactory extends IdentifiableFactory {
 

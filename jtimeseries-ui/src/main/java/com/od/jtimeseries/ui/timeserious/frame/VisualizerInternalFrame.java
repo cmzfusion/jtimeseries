@@ -26,9 +26,9 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
@@ -37,8 +37,6 @@ import com.od.swing.weakreferencelistener.WeakReferenceListener;
 import javax.swing.*;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package com.od.jtimeseries.util.identifiable;
+package com.od.jtimeseries.identifiable;
 
 /**
  * Created by IntelliJ IDEA.

@@ -19,10 +19,10 @@
 package com.od.jtimeseries.capture;
 
 import com.od.jtimeseries.capture.function.CaptureFunction;
-import com.od.jtimeseries.util.identifiable.IdentifiableFactory;
+import com.od.jtimeseries.identifiable.IdentifiableFactory;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.

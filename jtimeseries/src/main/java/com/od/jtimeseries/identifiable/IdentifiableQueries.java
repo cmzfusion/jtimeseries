@@ -16,19 +16,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.util.identifiable;
+package com.od.jtimeseries.identifiable;
 
 /**
  * Created by IntelliJ IDEA.
-* User: nick
-* Date: 29-Nov-2009
-* Time: 16:18:09
-*
-* Thrown when you try to add an item to a context which has the same id as another item already present.
-*/
-public class DuplicateIdException extends RuntimeException {
+ * User: Nick Ebbutt
+ * Date: 08/01/11
+ * Time: 23:16
+ */
+public interface IdentifiableQueries {
 
-    public DuplicateIdException(String message) {
-        super(message);
-    }
+    <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass);
+
+    <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
 }

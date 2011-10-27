@@ -18,13 +18,10 @@
  */
 package com.od.jtimeseries.scheduling;
 
-import com.od.jtimeseries.scheduling.Scheduler;
-import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.util.NamedExecutors;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 

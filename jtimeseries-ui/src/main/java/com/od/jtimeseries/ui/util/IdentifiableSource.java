@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.util;
 
-import com.od.jtimeseries.util.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.

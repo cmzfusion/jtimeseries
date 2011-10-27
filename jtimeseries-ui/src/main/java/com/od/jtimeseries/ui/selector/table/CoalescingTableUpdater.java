@@ -20,9 +20,9 @@ package com.od.jtimeseries.ui.selector.table;
 
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.util.NamedExecutors;
-import com.od.jtimeseries.util.identifiable.Identifiable;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.util.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 
 import javax.swing.*;
 import java.awt.*;

@@ -24,7 +24,7 @@ import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 
 import java.util.ArrayList;
 import java.util.Collections;

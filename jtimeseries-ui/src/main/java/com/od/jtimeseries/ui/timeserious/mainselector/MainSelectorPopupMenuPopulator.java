@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.mainselector;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
@@ -32,7 +33,6 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 import java.util.List;

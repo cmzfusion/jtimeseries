@@ -18,20 +18,20 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
-import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
+import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.QueryResult;
-import com.od.jtimeseries.util.time.TimePeriod;
+import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.text.DecimalFormat;
 import java.util.Properties;
 
 /**

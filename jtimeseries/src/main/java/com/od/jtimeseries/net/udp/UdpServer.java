@@ -20,8 +20,8 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * Created by IntelliJ IDEA.

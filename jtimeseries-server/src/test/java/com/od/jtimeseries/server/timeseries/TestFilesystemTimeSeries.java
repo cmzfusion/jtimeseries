@@ -1,18 +1,17 @@
 package com.od.jtimeseries.server.timeseries;
 
-import com.od.jtimeseries.server.serialization.FileHeader;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
-import com.od.jtimeseries.server.serialization.SerializationException;
-import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-
-import java.io.File;
-
+import com.od.jtimeseries.server.serialization.FileHeader;
+import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
+import com.od.jtimeseries.server.serialization.SerializationException;
+import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
+import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
+import com.od.jtimeseries.util.time.Time;
 import junit.framework.TestCase;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Created by IntelliJ IDEA.

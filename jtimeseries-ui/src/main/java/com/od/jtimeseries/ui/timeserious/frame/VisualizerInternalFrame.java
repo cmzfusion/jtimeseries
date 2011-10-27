@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.ui.timeserious.frame;
 
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
@@ -26,9 +29,6 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
-import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;

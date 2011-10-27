@@ -21,8 +21,8 @@ package com.od.jtimeseries.timeseries.impl;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.util.*;
 import java.util.concurrent.Executor;

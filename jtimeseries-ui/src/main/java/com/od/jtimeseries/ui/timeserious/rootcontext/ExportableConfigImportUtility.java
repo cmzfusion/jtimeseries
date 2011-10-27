@@ -18,10 +18,10 @@
  */
 package com.od.jtimeseries.ui.timeserious.rootcontext;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.awt.*;
 

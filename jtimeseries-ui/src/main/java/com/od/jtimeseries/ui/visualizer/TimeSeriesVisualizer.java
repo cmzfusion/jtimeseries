@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
-import com.jidesoft.pane.CollapsiblePane;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -27,17 +26,15 @@ import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
-import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.ImportExportTransferHandler;
 import com.od.jtimeseries.ui.util.FixedIconsCollapsiblePane;
 import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.ui.visualizer.chart.ChartControlPanel;
-import com.od.jtimeseries.ui.config.ChartRangeMode;
-import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.visualizer.chart.TimeSeriesChart;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartDataFilter;
 import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;

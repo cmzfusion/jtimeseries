@@ -21,10 +21,10 @@ package com.od.jtimeseries.ui.uicontext;
 import com.od.jtimeseries.context.ContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

@@ -19,6 +19,7 @@
 package com.od.jtimeseries.ui.timeserious.rootcontext;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
@@ -32,7 +33,6 @@ import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
 import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;

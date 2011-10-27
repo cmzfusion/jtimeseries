@@ -5,7 +5,6 @@ import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 /**

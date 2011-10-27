@@ -8,7 +8,6 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
  * Created by IntelliJ IDEA.

@@ -12,7 +12,9 @@ import org.jfree.data.xy.AbstractXYDataset;
 
 import javax.swing.*;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

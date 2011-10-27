@@ -19,10 +19,10 @@
 package com.od.jtimeseries.ui.selector.action;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.util.Disposable;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.action.ModelDrivenAction;
 
 import java.awt.event.ActionEvent;

@@ -18,12 +18,12 @@
  */
 package com.od.jtimeseries.server.servermetrics;
 
+import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.source.ValueSupplier;
-import com.od.jtimeseries.util.time.TimePeriod;
-import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
-import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
+import com.od.jtimeseries.util.numeric.Numeric;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.

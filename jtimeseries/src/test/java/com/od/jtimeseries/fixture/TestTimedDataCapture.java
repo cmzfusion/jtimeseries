@@ -1,21 +1,19 @@
 package com.od.jtimeseries.fixture;
 
-import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import org.junit.Test;
-import com.od.jtimeseries.util.numeric.DoubleNumeric;
-import com.od.jtimeseries.util.numeric.LongNumeric;
+import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.AbstractSimpleCaptureFixture;
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.capture.function.CaptureFunctions;
+import org.junit.Test;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MIN;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
 
 /**
  * Created by IntelliJ IDEA.

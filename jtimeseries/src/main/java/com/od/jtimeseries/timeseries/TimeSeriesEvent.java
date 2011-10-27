@@ -19,7 +19,6 @@
 package com.od.jtimeseries.timeseries;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

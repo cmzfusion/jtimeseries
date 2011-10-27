@@ -18,7 +18,10 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.FixedTimeSource;

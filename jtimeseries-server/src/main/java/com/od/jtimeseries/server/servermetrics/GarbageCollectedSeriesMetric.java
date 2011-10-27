@@ -18,12 +18,11 @@
  */
 package com.od.jtimeseries.server.servermetrics;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
-import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
-import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.util.time.TimePeriod;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
 

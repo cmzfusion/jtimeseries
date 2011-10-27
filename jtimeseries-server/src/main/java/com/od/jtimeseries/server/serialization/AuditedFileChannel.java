@@ -1,7 +1,6 @@
 package com.od.jtimeseries.server.serialization;
 
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.source.ValueRecorder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

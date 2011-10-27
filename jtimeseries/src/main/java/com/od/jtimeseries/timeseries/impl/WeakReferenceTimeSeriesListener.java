@@ -19,8 +19,8 @@
 package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesListener;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesListener;
 
 import java.lang.ref.WeakReference;
 

@@ -18,10 +18,8 @@
  */
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.config.ConfigAwareTreeManager;
 import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.ExportableConfig;
-import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 
 import javax.swing.*;

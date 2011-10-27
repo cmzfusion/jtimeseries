@@ -18,13 +18,12 @@
  */
 package com.od.jtimeseries.timeseries.function.aggregate;
 
-import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.Numeric;
 
-import java.util.TreeSet;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

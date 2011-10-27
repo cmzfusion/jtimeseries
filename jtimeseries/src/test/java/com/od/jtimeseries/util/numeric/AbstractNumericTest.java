@@ -1,8 +1,6 @@
 package com.od.jtimeseries.util.numeric;
 
 import junit.framework.Assert;
-import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
 
 /**

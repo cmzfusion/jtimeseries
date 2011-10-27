@@ -18,8 +18,8 @@
  */
 package com.od.jtimeseries.ui.uicontext;
 
-import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 
 /**
  * All the information necessary to import an identifiable into this context

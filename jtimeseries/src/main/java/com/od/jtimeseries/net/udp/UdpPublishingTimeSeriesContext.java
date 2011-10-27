@@ -18,17 +18,17 @@
  */
 package com.od.jtimeseries.net.udp;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultContextFactory;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
+import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
 
-import java.util.Map;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

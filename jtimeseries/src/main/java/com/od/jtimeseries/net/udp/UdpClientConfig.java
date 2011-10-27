@@ -19,7 +19,6 @@
 package com.od.jtimeseries.net.udp;
 
 import java.net.InetAddress;
-import java.net.DatagramSocket;
 import java.net.UnknownHostException;
 
 /**

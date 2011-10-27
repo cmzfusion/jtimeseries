@@ -5,7 +5,6 @@ import com.od.jtimeseries.ui.config.DomainTimeSelection;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
 
 public class ChartCreatorParameters {

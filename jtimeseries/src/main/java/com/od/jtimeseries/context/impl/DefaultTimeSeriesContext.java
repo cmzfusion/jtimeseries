@@ -22,7 +22,13 @@ import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.function.CaptureFunction;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
-import com.od.jtimeseries.context.*;
+import com.od.jtimeseries.context.ContextFactory;
+import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.context.ContextQueries;
+import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
+import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.scheduling.DefaultScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.scheduling.Triggerable;
@@ -32,11 +38,9 @@ import com.od.jtimeseries.source.impl.DefaultValueSourceFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
-import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
-import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.identifiable.QueryResult;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

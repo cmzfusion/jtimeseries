@@ -1,11 +1,9 @@
 package com.od.jtimeseries.server.timeseries;
 
-import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 /**
  * Created by IntelliJ IDEA.

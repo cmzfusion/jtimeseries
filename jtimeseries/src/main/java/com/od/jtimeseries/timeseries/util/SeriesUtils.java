@@ -1,6 +1,9 @@
 package com.od.jtimeseries.timeseries.util;
 
-import com.od.jtimeseries.timeseries.*;
+import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 import java.util.*;

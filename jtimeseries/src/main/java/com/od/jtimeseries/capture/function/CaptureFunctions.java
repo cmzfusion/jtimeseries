@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.capture.function;
 
+import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
-import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;

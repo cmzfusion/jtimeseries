@@ -19,13 +19,13 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

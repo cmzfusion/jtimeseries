@@ -18,10 +18,10 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesFactory;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
-import com.od.jtimeseries.util.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.

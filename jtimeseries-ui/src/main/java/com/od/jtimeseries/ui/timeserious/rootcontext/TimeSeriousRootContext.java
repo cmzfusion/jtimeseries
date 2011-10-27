@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.rootcontext;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.*;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -28,7 +29,6 @@ import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
 import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.ContextUpdatingBusListener;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

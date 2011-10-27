@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.mainselector;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
@@ -25,7 +26,6 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import javax.swing.*;
 

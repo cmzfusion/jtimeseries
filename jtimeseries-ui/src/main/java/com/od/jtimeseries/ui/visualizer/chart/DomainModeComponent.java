@@ -22,7 +22,6 @@ import com.od.jtimeseries.ui.config.ChartDomainMode;
 import com.od.jtimeseries.ui.config.DomainTimeSelection;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;

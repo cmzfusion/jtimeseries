@@ -18,9 +18,9 @@
  */
 package com.od.jtimeseries.ui.uicontext;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.util.IdentifiableSource;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

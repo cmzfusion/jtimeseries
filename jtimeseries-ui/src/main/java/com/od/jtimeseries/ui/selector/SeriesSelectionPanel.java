@@ -18,18 +18,18 @@
  */
 package com.od.jtimeseries.ui.selector;
 
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.ui.config.ColumnSettings;
-import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
-import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.swing.action.ActionModelListener;
 import com.od.swing.util.AwtSafeListener;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;

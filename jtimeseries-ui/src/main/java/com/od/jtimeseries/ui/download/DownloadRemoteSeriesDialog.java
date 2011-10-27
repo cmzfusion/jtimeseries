@@ -19,18 +19,18 @@
 package com.od.jtimeseries.ui.download;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
 import com.od.jtimeseries.ui.download.panel.SelectServerPanel;
-import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
-import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
+import com.od.jtimeseries.ui.timeseries.ServerTimeSeries;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.*;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.progress.ProgressLayeredPane;
 
 import javax.swing.*;

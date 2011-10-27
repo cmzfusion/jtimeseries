@@ -1,14 +1,11 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.timeserious.frame.AbstractDesktopFrame;
-import com.od.jtimeseries.ui.timeserious.frame.DefaultDesktopFrame;
 import com.od.jtimeseries.ui.timeserious.frame.TimeSeriousDesktopPane;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
 
 /**
  * Created by IntelliJ IDEA.

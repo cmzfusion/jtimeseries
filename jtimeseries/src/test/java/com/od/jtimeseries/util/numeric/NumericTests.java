@@ -3,8 +3,6 @@ package com.od.jtimeseries.util.numeric;
 import junit.framework.Assert;
 import org.junit.Test;
 
-import java.util.*;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt

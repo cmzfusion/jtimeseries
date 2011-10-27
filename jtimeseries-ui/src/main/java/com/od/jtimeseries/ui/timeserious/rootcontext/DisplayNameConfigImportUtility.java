@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.rootcontext;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.DisplayNamePattern;
 import com.od.jtimeseries.ui.config.DisplayNamePatternConfig;
 import com.od.jtimeseries.ui.config.ExportableConfig;
@@ -25,7 +26,6 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.util.UIUtilities;
 
 import javax.swing.*;

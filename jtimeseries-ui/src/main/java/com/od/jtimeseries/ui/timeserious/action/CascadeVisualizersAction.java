@@ -7,9 +7,7 @@ import com.od.jtimeseries.ui.util.ImageUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyVetoException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 
 /**

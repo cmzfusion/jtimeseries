@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.mainselector;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.ColumnSettings;
 import com.od.jtimeseries.ui.config.ConfigAware;
@@ -32,7 +33,6 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.uicontext.ImportExportTransferHandler;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.swing.util.ProxyingPropertyChangeListener;
 
 import javax.swing.*;

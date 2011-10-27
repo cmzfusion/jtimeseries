@@ -1,7 +1,5 @@
 package com.od.jtimeseries.util.numeric;
 
-import org.junit.Test;
-
 /**
  * Created by IntelliJ IDEA.
  * User: nick

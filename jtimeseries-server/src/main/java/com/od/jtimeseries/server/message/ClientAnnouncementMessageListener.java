@@ -19,8 +19,8 @@
 package com.od.jtimeseries.server.message;
 
 import com.od.jtimeseries.net.udp.*;
-import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

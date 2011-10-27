@@ -18,16 +18,16 @@
  */
 package com.od.jtimeseries.ui.visualizer;
 
+import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
+import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
+import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
 import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.ContextUpdatingBusListener;
-import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
-import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
-import com.od.jtimeseries.identifiable.PathParser;
 
 import java.util.List;
 

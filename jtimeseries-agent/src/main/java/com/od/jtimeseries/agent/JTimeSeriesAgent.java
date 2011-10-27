@@ -18,17 +18,17 @@
  */
 package com.od.jtimeseries.agent;
 
+import com.od.jtimeseries.agent.input.InputHandlerSource;
+import com.od.jtimeseries.agent.input.InputProcessor;
+import com.od.jtimeseries.agent.jmx.AgentConfigJmx;
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
-import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
-import com.od.jtimeseries.agent.jmx.AgentConfigJmx;
-import com.od.jtimeseries.agent.input.InputHandlerSource;
-import com.od.jtimeseries.agent.input.InputProcessor;
+import com.od.jtimeseries.net.udp.UdpClient;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;

@@ -2,9 +2,9 @@ package com.od.jtimeseries.timeseries.impl;
 
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.util.numeric.LongNumeric;
 import junit.framework.Assert;
 import org.junit.Test;
-import com.od.jtimeseries.util.numeric.LongNumeric;
 
 /**
  * Created by IntelliJ IDEA.

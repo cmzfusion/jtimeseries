@@ -18,11 +18,11 @@
  */
 package com.od.jtimeseries.agent;
 
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 /**
  * Created by IntelliJ IDEA.

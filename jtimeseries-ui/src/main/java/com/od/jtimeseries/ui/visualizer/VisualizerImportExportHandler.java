@@ -19,9 +19,11 @@
 package com.od.jtimeseries.ui.visualizer;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.selector.shared.*;
+import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
+import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeries;
 import com.od.jtimeseries.ui.timeseries.RemoteHttpTimeSeriesCollection;
@@ -29,7 +31,6 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.ContextImportExportHandler;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.ImportItem;
-import com.od.jtimeseries.identifiable.Identifiable;
 
 import java.awt.*;
 import java.awt.dnd.DnDConstants;

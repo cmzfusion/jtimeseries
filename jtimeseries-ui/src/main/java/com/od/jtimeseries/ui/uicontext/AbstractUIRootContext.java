@@ -19,11 +19,11 @@
 package com.od.jtimeseries.ui.uicontext;
 
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.util.Disposable;
-import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.swing.eventbus.UIEventBus;

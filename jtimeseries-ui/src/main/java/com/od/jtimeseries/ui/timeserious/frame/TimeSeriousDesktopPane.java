@@ -18,6 +18,10 @@
  */
 package com.od.jtimeseries.ui.timeserious.frame;
 
+import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
+import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -30,10 +34,6 @@ import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerPopupMenuPo
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
-import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
-import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
-import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
 import com.od.swing.util.AwtSafeListener;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 

@@ -18,11 +18,11 @@
  */
 package com.od.jtimeseries.timeseries.impl;
 
+import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
-import com.od.jtimeseries.util.identifiable.IdentifiableBase;
 
 import java.util.Iterator;
 import java.util.List;

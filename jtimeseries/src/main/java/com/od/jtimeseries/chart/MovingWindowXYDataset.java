@@ -240,7 +240,7 @@ public class MovingWindowXYDataset<E extends TimeSeries> extends AbstractXYDatas
             boolean modified = false;
             try {
                 snapshotData.writeLock().lock();
-                Iterator<TimeSeriesItem> i = snapshotData.unsafeIterator();
+                Iterator<TimeSeriesItem> i = snapshotData.unsafeIterable().iterator();
                 while (i.hasNext()) {
                     if (i.next().getTimestamp() < currentStartTime) {
                         i.remove();

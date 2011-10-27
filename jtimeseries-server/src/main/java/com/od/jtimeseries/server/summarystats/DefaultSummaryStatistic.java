@@ -23,6 +23,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 
+import java.util.Iterator;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -44,14 +46,18 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
         AggregateFunction f = function.newInstance();  //not supporting chaining functions
         long startTime = getStartTime();
         long endTime = getEndTime();
-        synchronized (timeSeries) {
-            for (TimeSeriesItem i : timeSeries) {
+        try {
+            timeSeries.readLock().lock();
+            for ( TimeSeriesItem i : timeSeries.unsafeIterable()) {
                 long timestamp = i.getTimestamp();
-                if ( timestamp >= startTime && timestamp <= endTime) {
+                if (timestamp >= startTime && timestamp <= endTime) {
                     f.addValue(i.getValue());
                 }
             }
+        } finally {
+            timeSeries.readLock().unlock();
         }
+
         return f.calculateAggregateValue();
     }
 

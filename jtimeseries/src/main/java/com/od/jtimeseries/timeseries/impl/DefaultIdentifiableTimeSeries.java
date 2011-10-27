@@ -131,8 +131,8 @@ public class DefaultIdentifiableTimeSeries extends IdentifiableBase implements I
         return wrappedSeries.iterator();
     }
 
-    public Iterator<TimeSeriesItem> unsafeIterator() {
-        return wrappedSeries.unsafeIterator();
+    public Iterable<TimeSeriesItem> unsafeIterable() {
+        return wrappedSeries.unsafeIterable();
     }
 
     public void addItem(TimeSeriesItem i) {

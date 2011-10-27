@@ -165,8 +165,8 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         return new NoRemovalSnapshotIterator<TimeSeriesItem>(locked_getSnapshot().iterator());
     }
 
-    protected Iterator<TimeSeriesItem> locked_unsafeIterator() {
-        return series.iterator();
+    protected Iterable<TimeSeriesItem> locked_unsafeIterator() {
+        return new UnsafeIterable(series.iterator());
     }
 
     protected List<TimeSeriesItem> locked_getSnapshot() {
@@ -298,7 +298,7 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
 
         public void remove() {
             throw new UnsupportedOperationException("This iterator is backed by a snapshot and does not support removal, " +
-                    "instead consider using timeseries.unsafeIterator() and using writeLock().lock()/writeLock.unlock()");
+                    "instead consider using timeseries.unsafeIterable() and using writeLock().lock()/writeLock.unlock()");
         }
 
         public boolean hasNext() {
@@ -306,4 +306,19 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         }
     }
 
+    /**
+     * Wrapper around an Iterator which is backed by the internal array, and so not threadsafe
+     * unless externally synchronized by holding read/write lock
+     */
+    private class UnsafeIterable implements Iterable<TimeSeriesItem> {
+        private Iterator<TimeSeriesItem> iterator;
+
+        public UnsafeIterable(Iterator<TimeSeriesItem> iterator) {
+            this.iterator = iterator;
+        }
+
+        public Iterator<TimeSeriesItem> iterator() {
+            return iterator;
+        }
+    }
 }

@@ -8,8 +8,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -326,7 +324,7 @@ public abstract class AbstractLockedTimeSeries implements TimeSeries {
      * @return an Iterator which is backed by the series internal array and does not provide thread safe iteration,
      * you must hold the readLock on the series while iterating
      */
-    public Iterator<TimeSeriesItem> unsafeIterator() {
+    public Iterable<TimeSeriesItem> unsafeIterable() {
         try {
             readLock().lock();
             return locked_unsafeIterator();
@@ -336,5 +334,5 @@ public abstract class AbstractLockedTimeSeries implements TimeSeries {
 
     }
 
-    protected abstract Iterator<TimeSeriesItem> locked_unsafeIterator();
+    protected abstract Iterable<TimeSeriesItem> locked_unsafeIterator();
 }

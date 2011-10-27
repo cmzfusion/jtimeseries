@@ -50,7 +50,7 @@ import java.util.concurrent.locks.Lock;
  * TimeSeries implementations should be be thread safe, and the methods readLock() and writeLock() return
  * reentrant lock instances which can be used to guarantee atomicity for operations which span multiple method calls
  * Iteration of TimeSeries is thread safe because iteration is performed on a snapshot of series data. To avoid the
- * performance penalty inherent in this, use unsafeIterator(), but hold the readLock while iterating.
+ * performance penalty inherent in this, use unsafeIterable(), but hold the readLock while iterating.
  *
  * TimeSeries are observable, and TimeSeriesEvent are fired to TimeSeriesListener on a separate event thread.
  * Events from a time series instance should have thread affinity (events from a timeseries instance should always be
@@ -173,10 +173,10 @@ public interface TimeSeries extends Iterable<TimeSeriesItem> {
     Iterator<TimeSeriesItem> iterator();
 
     /**
-     * @return an Iterator which is backed by the series internal state, providing more efficient iteration and supporting
+     * @return an Iterable which is backed by the series internal state, providing more efficient iteration and supporting
      * removes, but is not thread safe unless you hold the readLock while iterating (and writeLock if removing items)
      */
-    Iterator<TimeSeriesItem> unsafeIterator();
+    Iterable<TimeSeriesItem> unsafeIterable();
 
 
     Lock readLock();

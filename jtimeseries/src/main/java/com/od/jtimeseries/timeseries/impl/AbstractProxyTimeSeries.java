@@ -22,7 +22,6 @@ import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesListener;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -106,8 +105,8 @@ public abstract class AbstractProxyTimeSeries implements TimeSeries {
         return wrappedTimeSeries.iterator();
     }
 
-    public Iterator<TimeSeriesItem> unsafeIterator() {
-        return wrappedTimeSeries.unsafeIterator();
+    public Iterable<TimeSeriesItem> unsafeIterable() {
+        return wrappedTimeSeries.unsafeIterable();
     }
 
     public synchronized long getModCount() {

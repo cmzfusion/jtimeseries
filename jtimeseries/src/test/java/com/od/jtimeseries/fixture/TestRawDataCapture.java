@@ -23,7 +23,6 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description");
         valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder");
         eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer");
-        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer");
     }
 
     @Test
@@ -31,7 +30,6 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         assertNotNull(counter);
         assertNotNull(valueRecorder);
         assertNotNull(eventTimer);
-        assertNotNull(queueTimer);
 
         rootContext.startDataCapture();
         counter.incrementCount();
@@ -49,15 +47,6 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         sleep(sleepPeriod);
         eventTimer.stopEventTimer();
 
-        Object o = new Object();
-        queueTimer.objectAddedToQueue(o);
-        sleep(sleepPeriod);
-        queueTimer.objectRemovedFromQueue(o);
-
-        queueTimer.objectAddedToQueue(o);
-        sleep(sleepPeriod);
-        queueTimer.objectRemovedFromQueue(o);
-
         TimeSeries timeSeries = rootContext.findTimeSeries(counter).getFirstMatch();
         DefaultTimeSeries d = new DefaultTimeSeries(timeSeries.getSnapshot()); //create a ListTimeSeries for random access to indexes
         assertEquals(2, d.size());
@@ -73,9 +62,6 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(100l, d.getItem(3).longValue());
 
         timeSeries = rootContext.findTimeSeries(eventTimer).getFirstMatch();
-        checkRecordedSleepPeriods(timeSeries);
-
-        timeSeries = rootContext.findTimeSeries(queueTimer).getFirstMatch();
         checkRecordedSleepPeriods(timeSeries);
     }
 

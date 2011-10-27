@@ -34,10 +34,6 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
         return new DefaultValueRecorder(id, description);
     }
 
-    protected QueueTimer createQueueTimer(Identifiable parent, String path, String id, String description, Object... parameters) {
-        return new DefaultQueueTimer(id, description);
-    }
-
     protected Counter createCounter(Identifiable parent, String path, String id, String description, Object... parameters) {
         return new DefaultCounter(id, description);
     }
@@ -53,8 +49,6 @@ public class DefaultValueSourceFactory extends IdentifiableBase implements Value
     public ValueSource createValueSource(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
         if ( classType.isAssignableFrom(ValueRecorder.class)) {
             return createValueRecorder(parent, path, id, description, parameters);
-        } else if ( classType.isAssignableFrom(QueueTimer.class)) {
-            return createQueueTimer(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(Counter.class)) {
             return createCounter(parent, path, id, description, parameters);
         } else if ( classType.isAssignableFrom(EventTimer.class)) {

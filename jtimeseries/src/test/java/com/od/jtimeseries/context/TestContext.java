@@ -33,8 +33,6 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description");
         valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder");
         eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer");
-        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer");
-
         childContext = rootContext.createContext("Child");
     }
 
@@ -48,11 +46,10 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     public void testGetSources() {
         assertSame(counter, rootContext.getSource(counter.getId()));
 
-        assertEquals(4, rootContext.getSources().size());
+        assertEquals(3, rootContext.getSources().size());
         assertTrue(rootContext.getSources().contains(counter));
         assertTrue(rootContext.getSources().contains(valueRecorder));
         assertTrue(rootContext.getSources().contains(eventTimer));
-        assertTrue(rootContext.getSources().contains(queueTimer));
     }
 
     @Test
@@ -60,11 +57,10 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         Capture counterCapture = rootContext.findCaptures(counter).getFirstMatch();
         assertSame(counterCapture, rootContext.getCapture(counterCapture.getId()));
 
-        assertEquals(4, rootContext.getCaptures().size());
+        assertEquals(3, rootContext.getCaptures().size());
         assertTrue(rootContext.getCaptures().contains(rootContext.findCaptures(counter).getFirstMatch()));
         assertTrue(rootContext.getCaptures().contains(rootContext.findCaptures(valueRecorder).getFirstMatch()));
         assertTrue(rootContext.getCaptures().contains(rootContext.findCaptures(eventTimer).getFirstMatch()));
-        assertTrue(rootContext.getCaptures().contains(rootContext.findCaptures(queueTimer).getFirstMatch()));
     }
 
     @Test
@@ -72,11 +68,10 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         IdentifiableTimeSeries timeSeries = rootContext.findTimeSeries(counter).getFirstMatch();
         assertSame(timeSeries, rootContext.getTimeSeries(timeSeries.getId()));
 
-        assertEquals(4, rootContext.getTimeSeries().size());
+        assertEquals(3, rootContext.getTimeSeries().size());
         assertTrue(rootContext.getTimeSeries().contains(rootContext.findTimeSeries(counter).getFirstMatch()));
         assertTrue(rootContext.getTimeSeries().contains(rootContext.findTimeSeries(valueRecorder).getFirstMatch()));
         assertTrue(rootContext.getTimeSeries().contains(rootContext.findTimeSeries(eventTimer).getFirstMatch()));
-        assertTrue(rootContext.getTimeSeries().contains(rootContext.findTimeSeries(queueTimer).getFirstMatch()));
     }
 
     @Test

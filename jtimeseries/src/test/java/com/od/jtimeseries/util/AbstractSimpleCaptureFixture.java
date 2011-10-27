@@ -35,7 +35,6 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
     protected volatile Counter counter;
     protected volatile ValueRecorder valueRecorder;
     protected volatile EventTimer eventTimer;
-    protected volatile QueueTimer queueTimer;
 
 
     @Before
@@ -55,7 +54,6 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         counter = null;
         valueRecorder = null;
         eventTimer = null;
-        queueTimer = null;
     }
 
     protected WaitForEndOfCapturePeriodListener createCapturePeriodListener() {
@@ -72,7 +70,6 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         addIfNotNull(l, counter);
         addIfNotNull(l, valueRecorder);
         addIfNotNull(l, eventTimer);
-        addIfNotNull(l, queueTimer);
         return l;
     }
 

@@ -177,8 +177,8 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private void fireAddEvent(final TimeSeriesItem i) {
-        final TimeSeriesEvent e = TimeSeriesEvent.createItemsAddedOrInsertedEvent(
-                FilesystemTimeSeries.this, Collections.singletonList(i), ++modCount
+        final TimeSeriesEvent e = TimeSeriesEvent.createItemsAppendedOrInsertedEvent(
+            FilesystemTimeSeries.this, Collections.singletonList(i), ++modCount, true
         );
 
         eventExecutor.execute(new Runnable() {

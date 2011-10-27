@@ -53,7 +53,7 @@ import java.util.List;
  * TimeSeriesContext has several convenience methods in the form createXXSeries, such as createValueRecorderSeries()
  * which allow the user to create in one method call:
  * - a value source (to submit values),
- * - a capture (to record the raw values into a series or apply a function to record a value periodically) and
+ * - one or more capture (to record the raw values into a series or apply a function to record a value periodically) and
  * - a time series within the context in one method call.
  *
  * An example is the easiest way to illustrate this
@@ -136,10 +136,6 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
     ValueRecorder createValueRecorder(String path, String description);
 
     ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions);
-
-    QueueTimer createQueueTimer(String path, String description);
-
-    QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions);
 
     Counter createCounter(String path, String description);
 

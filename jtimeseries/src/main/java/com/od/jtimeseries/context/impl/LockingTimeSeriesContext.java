@@ -216,10 +216,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return create(path, description, ValueRecorder.class);
     }
 
-    public final QueueTimer createQueueTimer(String id, String description) {
-        return create(id, description, QueueTimer.class);
-    }
-
     public final Counter createCounter(String path, String description) {
         return create(path, description, Counter.class);
     }
@@ -234,10 +230,6 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
 
     public final ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions) {
         return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, (Object[])getFunctions(captureFunctions));
-    }
-
-    public final QueueTimer createQueueTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, QueueTimer.class, (Object[])getFunctions(captureFunctions));
     }
 
     public final Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions) {

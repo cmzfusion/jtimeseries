@@ -35,7 +35,6 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
         valueRecorder = rootContext.createValueRecorderSeries("TestValueRecorder", "Test Value Recorder", MEAN(capturePeriod));
         eventTimer = rootContext.createEventTimerSeries("TestEventTimer", "Test Event Timer", MAX(capturePeriod));
-        queueTimer = rootContext.createQueueTimerSeries("TestQueueTimer", "Test Queue Timer", MIN(capturePeriod));
     }
 
     @Test
@@ -43,7 +42,6 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertNotNull(counter);
         assertNotNull(valueRecorder);
         assertNotNull(eventTimer);
-        assertNotNull(queueTimer);
 
         WaitForEndOfCapturePeriodListener countDownListener = createCapturePeriodListener();
         rootContext.startDataCapture().startScheduling();
@@ -63,7 +61,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(4, rawValueSeries.getLatestItem().longValue());
 
         List<IdentifiableTimeSeries> allSeries = rootContext.findAllTimeSeries().getAllMatches();
-        assertEquals(8, allSeries.size());
+        assertEquals(7, allSeries.size());
         for (IdentifiableTimeSeries s : allSeries) {
             if ( s != rawValueSeries) {
                 assertEquals(2, s.size());
@@ -111,9 +109,6 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
         s = rootContext.findTimeSeries(eventTimer).getFirstMatch();
         checkRecordedSleepPeriods(s);
-
-        s = rootContext.findTimeSeries(queueTimer).getFirstMatch();
-        checkRecordedSleepPeriods(s);
     }
 
     private void generateSourceValuesForPeriod() {
@@ -133,15 +128,6 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         eventTimer.startEventTimer();
         sleep(sleepPeriod);
         eventTimer.stopEventTimer();
-
-        Object o = new Object();
-        queueTimer.objectAddedToQueue(o);
-        sleep(sleepPeriod);
-        queueTimer.objectRemovedFromQueue(o);
-
-        queueTimer.objectAddedToQueue(o);
-        sleep(sleepPeriod);
-        queueTimer.objectRemovedFromQueue(o);
     }
 
 

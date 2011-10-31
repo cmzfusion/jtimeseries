@@ -20,6 +20,7 @@ package com.od.jtimeseries.util;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +46,14 @@ public class TimeSeriesExecutorFactory {
         return executorSource.getExecutorForIdentifiableTreeEvents(identifiable);
     }
 
+    public static ExecutorService getCaptureProcessingExecutor(Object capture) {
+        return executorSource.getCaptureProcessingExecutor(capture);
+    }
+
+    public static ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler) {
+        return executorSource.getCaptureSchedulingExecutor(scheduler);
+    }
+
     public static ExecutorSource getExecutorSource() {
         return executorSource;
     }
@@ -57,21 +66,37 @@ public class TimeSeriesExecutorFactory {
 
         /**
          * Should return a single threaded executor if the guaranteed ordering of events
-         * is to be preserved (the same executor to be used for all events fired by a single timeseries)
+         * is to be preserved (the same thread must be used for all events fired by a single timeseries, thread
+         * affinity by timeseries instance)
          */
-        Executor getExecutorForTimeSeriesEvents(Object timeSeries);
+        ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries);
 
         /**
          * Should return a single threaded executor if the guaranteed ordering of events
-         * is to be preserved
+         * is to be preserved (the same thread must be used for all events fired by a single capture, thread
+         * affinity by capture instance)
          */
-        Executor getExecutorForCaptureEvents(Object capture);
+        ExecutorService getExecutorForCaptureEvents(Object capture);
 
         /**
          * Should return a single threaded executor if the guaranteed ordering of events
-         * is to be preserved (the same executor instance should be used for each identifiable tree hierarchy)
+         * is to be preserved (the same thread must be used for all events fired within a single identifiable tree,
+         * / identifiable root, thread affinity by identifiable tree structure)
          */
-        Executor getExecutorForIdentifiableTreeEvents(Object identifiable);
+        ExecutorService getExecutorForIdentifiableTreeEvents(Object identifiable);
+
+        /**
+         * Should return a single threaded executor if the guaranteed ordering for capturing to timeseries
+         * is to be observed (the same thread must be used for all events fired by a single capture, thread
+         * affinity by capture instance)
+         */
+        ExecutorService getCaptureProcessingExecutor(Object capture);
+
+        /**
+         * @return the ScheduledExecutorService to be used by the schedulers which trigger timed capture, and other
+         * triggerable events
+         */
+        ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler);
     }
 
     private static class DefaultExecutorSource implements ExecutorSource {
@@ -79,17 +104,28 @@ public class TimeSeriesExecutorFactory {
         private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
         private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
         private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");
+        private ScheduledExecutorService captureSchedulingExecutor = NamedExecutors.newScheduledThreadPool("CaptureScheduling", 2);
+        private ExecutorService captureProcessingExecutor = NamedExecutors.newSingleThreadExecutor("CaptureProcessing");
 
-        public Executor getExecutorForTimeSeriesEvents(Object timeSeries) {
+        public ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries) {
             return timeSeriesEventExecutor;
         }
 
-        public Executor getExecutorForCaptureEvents(Object capture) {
+        public ExecutorService getExecutorForCaptureEvents(Object capture) {
             return captureEventExecutor;
         }
 
-        public Executor getExecutorForIdentifiableTreeEvents(Object identifiable) {
+        public ExecutorService getExecutorForIdentifiableTreeEvents(Object identifiable) {
             return identifiableEventExecutor;
         }
+
+        public ExecutorService getCaptureProcessingExecutor(Object capture) {
+            return captureProcessingExecutor;
+        }
+
+        public ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler) {
+            return captureSchedulingExecutor;
+        }
+
     }
 }

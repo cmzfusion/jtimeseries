@@ -62,6 +62,11 @@ import com.od.jtimeseries.util.time.TimePeriod;
  *   when the first timer triggered function switch takes place.
  *   This solves the problem where we are 'started' half way through a scheduler time period, for schedulers
  *   which are already running and which group and execute together all captures with the same period
+ *
+ * - Scheduling and calculation take place on separate threads. A thread from sheduling thread pool switches the
+ *   initiates the capture and switches the function instance. The actual work of calculating a value and adding to the
+ *   series takes place on a thread from capture calculation pool, so long calculations don't affect the timeliness
+ *   of scheduling for other captures
  */
 public class DefaultTimedCapture extends AbstractCapture implements TimedCapture, ValueSourceCapture {
 

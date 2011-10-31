@@ -37,14 +37,6 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
 
     private Map<Long, TriggerableGroupTimerTask> tasksByPeriod = Collections.synchronizedMap(new HashMap<Long, TriggerableGroupTimerTask>());
 
-    public GroupByPeriodScheduler() {
-        this(3);
-    }
-
-    public GroupByPeriodScheduler(int threadCount) {
-        super(threadCount);
-    }
-
     public synchronized boolean addTriggerable(Triggerable t) {
         boolean added = super.addTriggerable(t);
         if ( added) {

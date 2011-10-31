@@ -38,14 +38,6 @@ public class NonGroupingScheduler extends AbstractScheduler {
 
     private Map<Triggerable, TriggerableTimerTask> tasks = Collections.synchronizedMap(new HashMap<Triggerable, TriggerableTimerTask>());
 
-    public NonGroupingScheduler() {
-        this(3);
-    }
-
-    public NonGroupingScheduler(int threadCount) {
-        super(threadCount);
-    }
-
     public synchronized boolean addTriggerable(Triggerable t) {
         boolean added = super.addTriggerable(t);
         if ( added ) {

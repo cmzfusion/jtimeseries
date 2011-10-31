@@ -20,6 +20,7 @@ package com.od.jtimeseries.scheduling;
 
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,12 +37,10 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     private Set<Triggerable> captures = Collections.synchronizedSet(new HashSet<Triggerable>());
     private boolean isStarted;
     private ScheduledExecutorService captureTimer;
-    private int threadCount;
 
-    public AbstractScheduler(int threadCount) {
+    public AbstractScheduler() {
         super(ID, ID);
         setDescription(getClass().getName());
-        this.threadCount = threadCount;
     }
 
     public synchronized boolean addTriggerable(Triggerable c) {
@@ -77,7 +76,7 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     }
 
     protected ScheduledExecutorService createExecutor() {
-        return NamedExecutors.newScheduledThreadPool("AbstractScheduler", threadCount);
+        return TimeSeriesExecutorFactory.getCaptureSchedulingExecutor(this);
     }
 
     protected abstract void doStart();

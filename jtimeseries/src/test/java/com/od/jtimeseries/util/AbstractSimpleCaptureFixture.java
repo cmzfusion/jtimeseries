@@ -1,12 +1,13 @@
 package com.od.jtimeseries.util;
 
 import com.od.jtimeseries.capture.Capture;
-import com.od.jtimeseries.capture.CaptureListenerAdapter;
+import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 import junit.framework.Assert;
@@ -16,7 +17,6 @@ import org.junit.Before;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,9 +56,18 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
         eventTimer = null;
     }
 
-    protected WaitForEndOfCapturePeriodListener createCapturePeriodListener() {
+    protected CaptureCompleteCountdown createCapturePeriodListener() {
         List<ValueSource> l = getListOfSources();
-        WaitForEndOfCapturePeriodListener w = new WaitForEndOfCapturePeriodListener(l.size());
+        CaptureCompleteCountdown w = new CaptureCompleteCountdown(l.size());
+        for ( ValueSource v : l) {
+            rootContext.findCaptures(v).getFirstMatch().addCaptureListener(w);
+        }
+        return w;
+    }
+
+    protected CaptureStartedCountdown createCaptureStartedListener() {
+        List<ValueSource> l = getListOfSources();
+        CaptureStartedCountdown w = new CaptureStartedCountdown(l.size());
         for ( ValueSource v : l) {
             rootContext.findCaptures(v).getFirstMatch().addCaptureListener(w);
         }
@@ -120,30 +129,36 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
     }
 
      /**
-     * A mechanism which allows us to wait until the scheduler has triggered all of the
+     * A mechanism which allows us to wait until values have been captured for all of the
      * timed captures for the sources we are interested in
      */
-    protected static class WaitForEndOfCapturePeriodListener extends CaptureListenerAdapter {
+    protected static class CaptureCompleteCountdown extends AbstractCaptureCountdown {
 
-        private volatile CountDownLatch countDownLatch;
-        private final int captureCount;
+         public CaptureCompleteCountdown(int captureCount) {
+             super(captureCount);
+         }
 
-        public WaitForEndOfCapturePeriodListener(int captureCount) {
-            this.captureCount = captureCount;
-            this.countDownLatch = new CountDownLatch(captureCount);
-        }
-
-         public void captureTriggered(Capture source) {
+        public void captureComplete(Capture source, Numeric value, TimeSeries series) {
             countDownLatch.countDown();
         }
 
-        public void waitForAll() {
-            try {
-                countDownLatch.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            countDownLatch = new CountDownLatch(captureCount);
+     }
+
+    /**
+     * A mechanism which allows us to wait until values have been captured for all of the
+     * timed captures for the sources we are interested in
+     */
+    protected static class CaptureStartedCountdown extends AbstractCaptureCountdown {
+
+        public CaptureStartedCountdown(int captureCount) {
+            super(captureCount);
         }
-    }
+
+        public void captureStateChanged(Capture source, CaptureState oldState, CaptureState newState) {
+            if ( newState == CaptureState.STARTED) {
+                countDownLatch.countDown();
+            }
+        }
+
+     }
 }

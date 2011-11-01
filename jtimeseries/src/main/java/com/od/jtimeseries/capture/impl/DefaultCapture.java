@@ -24,6 +24,10 @@ import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
@@ -38,6 +42,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public class DefaultCapture extends AbstractCapture implements ValueSourceCapture {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultCapture.class);
     private ValueSourceListener valueSourceListener;
     private static final Object startStopLock = new Object();
 
@@ -50,21 +55,36 @@ public class DefaultCapture extends AbstractCapture implements ValueSourceCaptur
             if ( getState() == CaptureState.STOPPED) {
                 valueSourceListener = new ValueSourceListener() {
                     public void newValue(long value) {
-                        getTimeSeries().addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), LongNumeric.valueOf(value)));
+                        addValueToSeries(LongNumeric.valueOf(value));
                     }
 
                     public void newValue(double value) {
-                        getTimeSeries().addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(value)));
+                        addValueToSeries(DoubleNumeric.valueOf(value));
                     }
 
                     public void newValue(Numeric sourceValue) {
-                        getTimeSeries().addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), sourceValue));
+                        addValueToSeries(sourceValue);
                     }
                 };
                 getValueSource().addValueListener(valueSourceListener);
                 changeStateAndFireEvent(CaptureState.STARTED);
             }
         }
+    }
+
+    private void addValueToSeries(final Numeric v) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+                TimeSeries timeSeries = getTimeSeries();
+                try {
+                    timeSeries.addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), v));
+                    fireCaptureCompleteEvent(v, timeSeries);
+                } catch (Throwable t) {
+                    logMethods.logError("Failed to capture value " + v + " to series " + timeSeries, t);
+                }
+            }
+        };
+        TimeSeriesExecutorFactory.getCaptureProcessingExecutor(DefaultCapture.this).execute(runnable);
     }
 
     public void stop() {

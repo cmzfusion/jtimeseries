@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.capture;
 
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.util.numeric.Numeric;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -34,4 +37,8 @@ public class CaptureListenerAdapter implements CaptureListener {
 
     public void captureTriggered(Capture source) {
     }
+
+    public void captureComplete(Capture source, Numeric value, TimeSeries timeseries) {
+    }
+
 }

@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.capture;
 
+import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.util.numeric.Numeric;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -31,8 +34,13 @@ public interface CaptureListener {
     void captureStateChanged(Capture source, CaptureState oldState, CaptureState newState);
 
     /**
-     * Called when a capture has been triggered by a scheduler for
+     * Called when a capture has been triggered by a scheduler (for timed captures only)
      */
     void captureTriggered(Capture source);
+
+    /**
+     * Called each time a value has been committed to a TimeSeries
+     */
+    void captureComplete(Capture source, Numeric value, TimeSeries timeseries);
 
 }

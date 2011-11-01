@@ -24,7 +24,9 @@ import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
+import com.od.jtimeseries.util.numeric.Numeric;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,9 +77,6 @@ public abstract class AbstractCapture extends IdentifiableBase implements Captur
         });
     }
 
-    //Calling this will change the state and place a state change event on the event processing queue
-    //Calling this while holding a state change lock is expected - this will guarantee the order of events
-    //and doing the actual event processing on a subthread should gurantee we don't hold the lock for long
     protected void fireTriggerEvent() {
         Executor e = TimeSeriesExecutorFactory.getExecutorForCaptureEvents(this);
         e.execute(new Runnable() {
@@ -85,6 +84,18 @@ public abstract class AbstractCapture extends IdentifiableBase implements Captur
                 CaptureListener[] snapshot = getListenerSnapshot();
                 for ( CaptureListener l : snapshot) {
                     l.captureTriggered(AbstractCapture.this);
+                }
+            }
+        });
+    }
+
+    protected void fireCaptureCompleteEvent(final Numeric value, final TimeSeries timeseries) {
+        Executor e = TimeSeriesExecutorFactory.getExecutorForCaptureEvents(this);
+        e.execute(new Runnable() {
+            public void run() {
+                CaptureListener[] snapshot = getListenerSnapshot();
+                for ( CaptureListener l : snapshot) {
+                    l.captureComplete(AbstractCapture.this, value, timeseries);
                 }
             }
         });

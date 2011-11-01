@@ -26,7 +26,11 @@ import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
 
@@ -70,11 +74,14 @@ import com.od.jtimeseries.util.time.TimePeriod;
  */
 public class DefaultTimedCapture extends AbstractCapture implements TimedCapture, ValueSourceCapture {
 
+    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultTimedCapture.class);
+
     private static AggregateFunction DUMMY_FUNCTION = new DummyFunction();
     private CaptureFunction captureFunction;
     private AggregateFunction function = DUMMY_FUNCTION;
     private final Object functionLock = new Object();
-    public ValueSourceListener valueListener;
+    private ValueSourceListener valueListener;
+
 
     public DefaultTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         super(id, "Capture " + captureFunction.getDescription() + " to timeSeries " + timeSeries.getId() + " from " + source.getId() + " every " + captureFunction.getCapturePeriod(), timeSeries, source);
@@ -104,16 +111,33 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             //do the aggregate calculation on the old function instance, while we are not holding the functionlock
             //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
             //this would be very bad, since that thread may be very performance sensitive
-            //this way the source is free to update the new function instance while the calculation takes place on the timer thread
-            if ( oldFunctionInstance != DUMMY_FUNCTION ) {
-                Numeric value = oldFunctionInstance.calculateAggregateValue();
-                getTimeSeries().addItem(
-                   new DefaultTimeSeriesItem(timestamp, value)
-                );
-            }
+            //this way the source is free to update the new function instance while the calculation takes place on a calculation
+            //subthread / the old function instance
+            queueCaptureCalculation(timestamp, oldFunctionInstance);
 
             //fire an event to tell observers this timed capture has been triggered by the scheduler
             fireTriggerEvent();
+        }
+    }
+
+    private void queueCaptureCalculation(final long timestamp, final AggregateFunction oldFunctionInstance) {
+        if ( oldFunctionInstance != DUMMY_FUNCTION ) {
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    TimeSeries timeSeries = getTimeSeries();
+                    Numeric value = null;
+                    try {
+                        value = oldFunctionInstance.calculateAggregateValue();
+                        timeSeries.addItem(
+                            new DefaultTimeSeriesItem(timestamp, value)
+                        );
+                        fireCaptureCompleteEvent(value, timeSeries);
+                    } catch (Exception e) {
+                        logMethods.logDebug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, e);
+                    }
+                }
+            };
+            TimeSeriesExecutorFactory.getCaptureProcessingExecutor(this).execute(runnable);
         }
     }
 

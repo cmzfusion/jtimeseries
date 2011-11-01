@@ -2,6 +2,7 @@ package com.od.jtimeseries.capture.impl;
 
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
+import com.od.jtimeseries.scheduling.GroupByPeriodScheduler;
 import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.source.ValueSource;
@@ -21,14 +22,14 @@ import java.util.concurrent.TimeUnit;
  * Time: 22:44:44
  * To change this template use File | Settings | File Templates.
  */
-public class TestTimedCapture extends TestCase {
+public abstract class AbstractTestTimedCaptureScheduling extends TestCase {
 
-    private Scheduler s = new NonGroupingScheduler();
+    private Scheduler s;
     public TimedCapture timedCapture;
     public CountDownLatch latch;
 
     public void setUp() {
-        s = new NonGroupingScheduler();
+        s = createScheduler();
         latch = new CountDownLatch(1);
         ValueSource valueRecorder = new DefaultValueRecorder("test recorder", "test recorder");
         DefaultIdentifiableTimeSeries timeSeries = new DefaultIdentifiableTimeSeries("timeseries", "timeseries") {
@@ -38,6 +39,8 @@ public class TestTimedCapture extends TestCase {
         };
         timedCapture = new DefaultTimedCapture("test timed capture", valueRecorder, timeSeries, CaptureFunctions.MAX(Time.milliseconds(10)));
     }
+
+    protected abstract Scheduler createScheduler();
 
     public void tearDown() {
         s.stop();

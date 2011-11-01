@@ -19,6 +19,7 @@
 package com.od.jtimeseries.scheduling;
 
 import java.util.*;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,42 +60,56 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
         }
     }
 
+    protected void doStop() {
+        for ( TriggerableGroupTimerTask t : tasksByPeriod.values()) {
+            t.cancel();
+        }
+    }
+
     private void addToCaptureTimerTask(Triggerable t) {
         TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTimePeriod().getLengthInMillis());
         if ( task == null ) {
             task = new TriggerableGroupTimerTask(t.getTimePeriod().getLengthInMillis());
             tasksByPeriod.put(t.getTimePeriod().getLengthInMillis(), task);
+            task.addTriggerable(t);
             if ( isStarted() ) {
                 scheduleCaptureTask(task);
             }
+        } else {
+            task.addTriggerable(t);
         }
-        task.addTimedCapture(t);
     }
 
     private void removeFromCaptureTimerTask(Triggerable t) {
         TriggerableGroupTimerTask task = tasksByPeriod.get(t.getTimePeriod().getLengthInMillis());
-        task.removeTimedCapture(t);
+        task.removeTriggerable(t);
+        if ( task.getTriggerableCount() == 0) {
+            task.cancel();
+            tasksByPeriod.remove(t.getTimePeriod());
+        }
     }
 
     private void scheduleCaptureTask(TriggerableGroupTimerTask t) {
-        getScheduledExecutorService().scheduleAtFixedRate(t, 0, t.getPeriod(), TimeUnit.MILLISECONDS);
+        Future f = getScheduledExecutorService().scheduleAtFixedRate(t, 0, t.getPeriod(), TimeUnit.MILLISECONDS);
+        t.setFuture(f);
     }
 
     private class TriggerableGroupTimerTask implements Runnable  {
 
-        private List<Triggerable> captures = Collections.synchronizedList(new ArrayList<Triggerable>());
+        private List<Triggerable> triggerables = Collections.synchronizedList(new ArrayList<Triggerable>());
         private Long period;
+        private volatile Future future;
 
         public TriggerableGroupTimerTask(Long period) {
             this.period = period;
         }
 
-        public void addTimedCapture(Triggerable t) {
-            captures.add(t);
+        public void addTriggerable(Triggerable t) {
+            triggerables.add(t);
         }
 
-        public void removeTimedCapture(Triggerable t) {
-            captures.remove(t);
+        public void removeTriggerable(Triggerable t) {
+            triggerables.remove(t);
         }
 
         public Long getPeriod() {
@@ -103,13 +118,23 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
 
         public void run() {
             long timestamp = System.currentTimeMillis();
-            for (Triggerable t: captures) {
+            for (Triggerable t: triggerables) {
                 t.trigger(timestamp);
             }
         }
 
-        public int getCaptureCount() {
-            return captures.size();
+        public void setFuture(Future future) {
+            this.future = future;
+        }
+
+        public void cancel() {
+            if ( future != null && ! future.isCancelled()) {
+                future.cancel(false);
+            }
+        }
+
+        public int getTriggerableCount() {
+            return triggerables.size();
         }
     }
 

@@ -24,7 +24,6 @@ import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,9 +33,9 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractScheduler extends IdentifiableBase implements Scheduler {
 
-    private Set<Triggerable> captures = Collections.synchronizedSet(new HashSet<Triggerable>());
+    private Set<Triggerable> triggerables = Collections.synchronizedSet(new HashSet<Triggerable>());
     private boolean isStarted;
-    private ScheduledExecutorService captureTimer;
+    private ScheduledExecutorService captureExecutor;
 
     public AbstractScheduler() {
         super(ID, ID);
@@ -44,19 +43,19 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     }
 
     public synchronized boolean addTriggerable(Triggerable c) {
-        return captures.add(c);
+        return triggerables.add(c);
     }
 
     public synchronized boolean removeTriggerable(Triggerable c) {
-        return captures.remove(c);
+        return triggerables.remove(c);
     }
 
     public boolean containsTriggerable(Object c) {
-        return c instanceof Triggerable && captures.contains((Triggerable)c);
+        return c instanceof Triggerable && triggerables.contains((Triggerable)c);
     }
 
     public synchronized List<Triggerable> getTriggerables() {
-        return new ArrayList<Triggerable>(captures);
+        return new ArrayList<Triggerable>(triggerables);
     }
 
     public synchronized boolean isStarted() {
@@ -70,12 +69,12 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     public synchronized void start() {
         if ( ! isStarted() ) {
             setStarted(true);
-            captureTimer = createExecutor();
+            captureExecutor = getExecutor();
             doStart();
         }
     }
 
-    protected ScheduledExecutorService createExecutor() {
+    protected ScheduledExecutorService getExecutor() {
         return TimeSeriesExecutorFactory.getCaptureSchedulingExecutor(this);
     }
 
@@ -88,22 +87,9 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
         }
     }
 
-    protected void doStop() {
-        //Doing the cancel this way, the cancel task is guaranteed to be the last one to run
-        //otherwise we may be mid way through a capture task when the cancel takes place
-        getScheduledExecutorService().schedule(new CancelTimerTask(), 0, TimeUnit.SECONDS);
-    }
+    protected abstract void doStop();
 
     protected ScheduledExecutorService getScheduledExecutorService() {
-        return captureTimer;
-    }
-
-    private class CancelTimerTask implements Runnable {
-        public void run() {
-            synchronized ( AbstractScheduler.this ) {
-                setStarted(false);
-                getScheduledExecutorService().shutdownNow();
-            }
-        }
+        return captureExecutor;
     }
 }

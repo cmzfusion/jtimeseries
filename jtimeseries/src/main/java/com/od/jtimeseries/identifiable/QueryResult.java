@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.identifiable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,6 +28,24 @@ import java.util.List;
 * Time: 22:54
 */
 public interface QueryResult<E extends Identifiable> {
+
+    public static final QueryResult EMPTY_RESULT = new QueryResult() {
+        public Identifiable getFirstMatch() {
+            return null;
+        }
+
+        public List getAllMatches() {
+            return Collections.emptyList();
+        }
+
+        public int getNumberOfMatches() {
+            return 0;
+        }
+
+        public boolean removeFromResults(Identifiable item) {
+            return false;
+        }
+    };
 
     /**
      * @return the first item matching the query, or null if there are no matches

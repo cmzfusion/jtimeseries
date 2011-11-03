@@ -18,9 +18,7 @@
  */
 package com.od.jtimeseries.identifiable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * An event generated when the tree of identifiable nodes changes
@@ -29,21 +27,25 @@ public class IdentifiableTreeEvent {
 
     private final Identifiable rootNode;
     private final String path;
-    private final List<Identifiable> nodes;
+    private final Map<Identifiable, Collection<Identifiable>> nodes;
 
     public IdentifiableTreeEvent(Identifiable rootNode, String path, Identifiable node) {
-       this(rootNode, path, Collections.singletonList(node));
+       this(rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()));
     }
-    
+
+    public IdentifiableTreeEvent(Identifiable rootNode, String path, Identifiable node, Collection<Identifiable> children) {
+       this(rootNode, path, createSingletonMap(node, children));
+    }
+
     /**
      * @param rootNode, the root node of the tree which is changing
      * @param path, path to parent node of nodes which have changed
      * @param nodes, nodes which were modified
      */
-    public IdentifiableTreeEvent(Identifiable rootNode, String path, List<Identifiable> nodes) {
+    public IdentifiableTreeEvent(Identifiable rootNode, String path, Map<Identifiable, Collection<Identifiable>> nodes) {
         this.rootNode = rootNode;
         this.path = path;
-        this.nodes = new ArrayList<Identifiable>(nodes);
+        this.nodes = nodes;
     }
 
     /**
@@ -56,7 +58,14 @@ public class IdentifiableTreeEvent {
     /**
      * @return a list of the nodes affected by the event, you should not modify this list
      */
-    public List<Identifiable> getNodes() {
+    public Collection<Identifiable> getNodes() {
+        return nodes.keySet();
+    }
+
+     /**
+     * @return a list of the nodes affected by the event, you should not modify this list
+     */
+    public Map<Identifiable, Collection<Identifiable>> getNodesWithChildren() {
         return nodes;
     }
 
@@ -65,5 +74,11 @@ public class IdentifiableTreeEvent {
      */
     public Identifiable getRootNode() {
         return rootNode;
+    }
+
+    private static Map<Identifiable, Collection<Identifiable>> createSingletonMap(Identifiable node, Collection<Identifiable> c) {
+        Map m = new HashMap<Identifiable, Collection<Identifiable>>();
+        m.put(node, c);
+        return m;
     }
 }

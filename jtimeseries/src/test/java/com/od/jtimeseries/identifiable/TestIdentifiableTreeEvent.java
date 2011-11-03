@@ -155,7 +155,7 @@ public class TestIdentifiableTreeEvent extends TestCase {
             String[] event = expectedEvents.removeFirst();
             assertEquals(name, event[0], type);
             assertEquals(name, event[1], contextTreeEvent.getPath());
-            assertEquals(name, event[2], contextTreeEvent.getNodes().get(0).getId());
+            assertEquals(name, event[2], contextTreeEvent.getNodes().iterator().next().getId());
             countDown();
         }
 

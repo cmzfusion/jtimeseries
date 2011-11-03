@@ -106,15 +106,6 @@ public class FrameManager implements ConfigAware {
         addToFrameMap(c, mainFrame);
     }
 
-    private void showFrames() {
-        List<DesktopContext> contexts = rootContext.findAll(DesktopContext.class).getAllMatches();
-        for ( DesktopContext context : contexts) {
-            if ( context.isShown()) {
-                showFrame(context);
-            }
-        }
-    }
-
     private void addShowFrameTreeListener() {
         rootContext.addTreeListener(AwtSafeListener.getAwtSafeListener(new ShowFrameTreeListener(), IdentifiableTreeListener.class));
     }

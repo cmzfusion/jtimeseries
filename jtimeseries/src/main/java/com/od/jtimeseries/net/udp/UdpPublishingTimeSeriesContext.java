@@ -24,8 +24,6 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiablePathUtils;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
-import com.od.jtimeseries.timeseries.TimeSeriesEvent;
-import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -42,8 +40,7 @@ import java.util.Map;
 */
 public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
 
-    private static int DEFAULT_MIN_SEND_INTERVAL_MILLIS = 500;
-    private Map<Identifiable, PublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, PublishingTimeSeriesListener>();
+    private Map<Identifiable, UdpPublishingListener.UdpPublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, UdpPublishingListener.UdpPublishingTimeSeriesListener>();
     private UdpClient udpClient;
     private int minSendIntervalMillis;
 
@@ -51,11 +48,11 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
      * Create a UdpPublishingTimeSeriesContext as a root context 
      */
     public UdpPublishingTimeSeriesContext(UdpClient udpClient) {
-        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, true);
+        this(udpClient, UdpPublishingListener.DEFAULT_MIN_SEND_INTERVAL_MILLIS, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, IdentifiablePathUtils.DEFAULT_ROOT_CONTEXT_ID, true);
     }
 
     public UdpPublishingTimeSeriesContext(UdpClient udpClient, String id, String description) {
-        this(udpClient, DEFAULT_MIN_SEND_INTERVAL_MILLIS, id, description, false);
+        this(udpClient, UdpPublishingListener.DEFAULT_MIN_SEND_INTERVAL_MILLIS, id, description, false);
     }
 
     public UdpPublishingTimeSeriesContext(UdpClient udpClient, int minSendIntervalMillis, String id, String description, boolean rootContext) {
@@ -69,7 +66,7 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
         TimeSeriesContext t = super.addChild_Locked(identifiables);
         for ( Identifiable i : identifiables) {
             if ( i instanceof IdentifiableTimeSeries) {
-                PublishingTimeSeriesListener listener = new PublishingTimeSeriesListener(udpClient, (IdentifiableTimeSeries) i, minSendIntervalMillis);
+                UdpPublishingListener.UdpPublishingTimeSeriesListener listener = new UdpPublishingListener.UdpPublishingTimeSeriesListener(udpClient, (IdentifiableTimeSeries) i, minSendIntervalMillis);
                 listenersByIdentifiable.put(i, listener);
                 ((IdentifiableTimeSeries)i).addTimeSeriesListener(listener);
             }
@@ -80,42 +77,12 @@ public class UdpPublishingTimeSeriesContext extends DefaultTimeSeriesContext {
     public boolean removeChild_Locked(Identifiable identifiable) {
         boolean result = super.removeChild_Locked(identifiable);
         if (result) {
-            PublishingTimeSeriesListener l = listenersByIdentifiable.get(identifiable);
+            UdpPublishingListener.UdpPublishingTimeSeriesListener l = listenersByIdentifiable.get(identifiable);
             if ( l != null) {
                 ((IdentifiableTimeSeries)identifiable).removeTimeSeriesListener(l);
             }
         }
         return result;
-    }
-
-    /**
-     * Listen for insert events which insert one item and send these as a datagram
-     * Only send a datagram if it is at least MIN_DATAGRAM_SEND_INTERVAL millis since the last one
-     */
-    private static class PublishingTimeSeriesListener extends TimeSeriesListenerAdapter {
-
-        private UdpClient udpClient;
-        private IdentifiableTimeSeries i;
-        private volatile long lastSentTime;
-        private final int minSendIntervalMillis;
-
-        public PublishingTimeSeriesListener(UdpClient udpClient, IdentifiableTimeSeries i, int minSendIntervalMillis) {
-            this.udpClient = udpClient;
-            this.i = i;
-            this.minSendIntervalMillis = minSendIntervalMillis;
-        }
-
-        public void itemsAddedOrInserted(TimeSeriesEvent e) {
-            long time = System.currentTimeMillis();
-            if ( e.getItems().size() == 1 && (time - lastSentTime) > minSendIntervalMillis) {
-                udpClient.sendMessage(new TimeSeriesValueMessage(
-                        i.getPath(),
-                        i.getDescription(),
-                        e.getItems().get(0)
-                ));
-                lastSentTime = time;
-            }
-        }
     }
 
     public class UdpPublishingContextFactory extends DefaultContextFactory {

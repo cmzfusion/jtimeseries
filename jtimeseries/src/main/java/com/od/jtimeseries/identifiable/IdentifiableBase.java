@@ -83,7 +83,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         //set this node as new parent and fire event
         identifiable.setParent(this);
         identifiable.addTreeListener(childEventPropagator);
-        fireDescendantsAdded(new IdentifiableTreeEvent(getRoot(), getPath(), identifiable));
+        fireDescendantsAdded(new IdentifiableTreeEvent(getRoot(), getPath(), identifiable, identifiable.findAll(Identifiable.class).getAllMatches()));
     }
 
     protected String getParentPath_Locked() {
@@ -127,7 +127,7 @@ public class IdentifiableBase extends LockingIdentifiable {
             i.setParent(null);
             i.removeTreeListener(childEventPropagator);
             removed = true;
-            fireDescendantsRemoved(new IdentifiableTreeEvent(getRoot(), getPath(), i));
+            fireDescendantsRemoved(new IdentifiableTreeEvent(getRoot(), getPath(), i, i.findAll(Identifiable.class).getAllMatches()));
         }
         return removed;
     }

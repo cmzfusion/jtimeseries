@@ -19,6 +19,7 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
@@ -72,7 +73,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class NanoHTTPD {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(NanoHTTPD.class);
-    private static Executor httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 5, NamedExecutors.DAEMON_THREAD_CONFIGURER);
     private static AtomicLong lastRequestId = new AtomicLong();
     private volatile HttpRequestMonitor requestMonitor = HttpRequestMonitor.DUMMY_REQUEST_MONITOR;
 
@@ -322,7 +322,8 @@ public class NanoHTTPD {
 
         public HTTPSession(Socket s) {
             mySocket = s;
-            httpExecutor.execute(this);
+            Executor e = TimeSeriesExecutorFactory.getHttpdQueryExecutor(NanoHTTPD.this);
+            e.execute(this);
         }
 
         public void run() {

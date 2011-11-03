@@ -62,7 +62,13 @@ public interface Identifiable {
      */
     Identifiable setParent(Identifiable parent);
 
+    Identifiable addChild(Identifiable... identifiables);
+
+    boolean removeChild(Identifiable c);
+
     List<Identifiable> getChildren();
+
+    int getChildCount();
 
     <E extends Identifiable> List<E> getChildren(Class<E> classType);
 
@@ -77,8 +83,6 @@ public interface Identifiable {
     Identifiable remove(String path);
 
     <E extends Identifiable> E remove(String path, Class<E> classType); 
-
-    boolean removeChild(Identifiable c);
 
     /**
      * Structural changes made to the context tree structure should be made
@@ -129,8 +133,6 @@ public interface Identifiable {
      * @return the previous value for propertyName, or null if property was not set
      */
     String removeProperty(String propertyName);
-
-    Identifiable addChild(Identifiable... identifiables);
 
     <E extends Identifiable> E getFromAncestors(String id, Class<E> clazz);
 

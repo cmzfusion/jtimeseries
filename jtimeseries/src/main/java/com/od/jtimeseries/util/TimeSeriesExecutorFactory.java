@@ -62,6 +62,10 @@ public class TimeSeriesExecutorFactory {
         TimeSeriesExecutorFactory.executorSource = executorSource;
     }
 
+    public static Executor getHttpdQueryExecutor(Object httpdInstance) {
+        return executorSource.getHttpdQueryExcecutor(httpdInstance);
+    }
+
     public static interface ExecutorSource {
 
         /**
@@ -97,15 +101,21 @@ public class TimeSeriesExecutorFactory {
          * triggerable events
          */
         ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler);
+
+        /**
+         * @return the ExecutoService which should be used for httpd queries
+         */
+        ExecutorService getHttpdQueryExcecutor(Object httpdInstance);
     }
 
-    private static class DefaultExecutorSource implements ExecutorSource {
+    public static class DefaultExecutorSource implements ExecutorSource {
 
         private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
         private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
         private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");
         private ScheduledExecutorService captureSchedulingExecutor = NamedExecutors.newScheduledThreadPool("CaptureScheduling", 2);
         private ExecutorService captureProcessingExecutor = NamedExecutors.newSingleThreadExecutor("CaptureProcessing");
+        private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 3, NamedExecutors.DAEMON_THREAD_CONFIGURER);
 
         public ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries) {
             return timeSeriesEventExecutor;
@@ -125,6 +135,10 @@ public class TimeSeriesExecutorFactory {
 
         public ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler) {
             return captureSchedulingExecutor;
+        }
+
+        public ExecutorService getHttpdQueryExcecutor(Object httpdInstance) {
+            return httpExecutor;
         }
 
     }

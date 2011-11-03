@@ -3,7 +3,6 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
-import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
@@ -25,7 +24,7 @@ public class UdpPublishingListener extends IdentifiableTreeListenerAdapter {
     private Map<Identifiable, UdpPublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, UdpPublishingTimeSeriesListener>();
 
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithChildren().entrySet()) {
+        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithDescendants().entrySet()) {
             //first add top level node
             if ( e.getKey() instanceof IdentifiableTimeSeries) {
                 addListener((IdentifiableTimeSeries)e.getKey());
@@ -45,7 +44,7 @@ public class UdpPublishingListener extends IdentifiableTreeListenerAdapter {
     }
 
     public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithChildren().entrySet()) {
+        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithDescendants().entrySet()) {
             //first add top level node
             if ( e.getKey() instanceof IdentifiableTimeSeries) {
                 removeListener((IdentifiableTimeSeries) e.getKey());

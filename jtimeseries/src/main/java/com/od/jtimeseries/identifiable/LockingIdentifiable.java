@@ -84,6 +84,18 @@ public abstract class LockingIdentifiable implements Identifiable {
 
     protected abstract List<Identifiable> getChildren_Locked();
 
+    public final int getChildCount() {
+        try {
+            getTreeLock().readLock().lock();
+            return getChildCount_Locked();
+        } finally {
+            getTreeLock().readLock().unlock();
+        }
+
+    }
+
+    protected abstract int getChildCount_Locked();
+
     public final <E extends Identifiable> List<E> getChildren(Class<E> classType) {
         try {
             getTreeLock().readLock().lock();

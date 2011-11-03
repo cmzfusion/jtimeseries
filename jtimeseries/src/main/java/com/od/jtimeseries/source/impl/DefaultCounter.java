@@ -106,6 +106,10 @@ public class DefaultCounter implements Counter {
         return simpleSource.getChildren();
     }
 
+    public int getChildCount() {
+        return simpleSource.getChildCount();
+    }
+
     public <E extends Identifiable> List<E> getChildren(Class<E> classType) {
         return simpleSource.getChildren(classType);
     }

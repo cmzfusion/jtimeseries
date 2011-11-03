@@ -28,13 +28,17 @@ public class IdentifiableTreeEvent {
     private final Identifiable rootNode;
     private final String path;
     private final Map<Identifiable, Collection<Identifiable>> nodes;
+    private final TreeEventType type;
 
-    public IdentifiableTreeEvent(Identifiable rootNode, String path, Identifiable node) {
-       this(rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()));
+    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Identifiable node) {
+       this(type, rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()));
     }
 
-    public IdentifiableTreeEvent(Identifiable rootNode, String path, Identifiable node, Collection<Identifiable> children) {
-       this(rootNode, path, createSingletonMap(node, children));
+    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Identifiable node, Collection<Identifiable> children) {
+       this(type, rootNode, path, createSingletonMap(node, children));
+       //       if ( children.size() > 0 ) {
+       //           System.out.println("Created TreeEvent " + this + " with child count " + children.size() + " on node " + node);
+       //       }
     }
 
     /**
@@ -42,7 +46,8 @@ public class IdentifiableTreeEvent {
      * @param path, path to parent node of nodes which have changed
      * @param nodes, nodes which were modified
      */
-    public IdentifiableTreeEvent(Identifiable rootNode, String path, Map<Identifiable, Collection<Identifiable>> nodes) {
+    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Map<Identifiable, Collection<Identifiable>> nodes) {
+        this.type = type;
         this.rootNode = rootNode;
         this.path = path;
         this.nodes = nodes;
@@ -63,9 +68,9 @@ public class IdentifiableTreeEvent {
     }
 
      /**
-     * @return a list of the nodes affected by the event, you should not modify this list
+     * @return a list of the nodes affected by the event and their descendants at the time the event was fired, you should not modify this list
      */
-    public Map<Identifiable, Collection<Identifiable>> getNodesWithChildren() {
+    public Map<Identifiable, Collection<Identifiable>> getNodesWithDescendants() {
         return nodes;
     }
 
@@ -76,9 +81,27 @@ public class IdentifiableTreeEvent {
         return rootNode;
     }
 
+    public TreeEventType getType() {
+        return type;
+    }
+
+    public String toString() {
+        return "IdentifiableTreeEvent{" +
+            "type=" + type +
+            ", path='" + path + '\'' +
+            ", rootNode=" + rootNode +
+            '}';
+    }
+
     private static Map<Identifiable, Collection<Identifiable>> createSingletonMap(Identifiable node, Collection<Identifiable> c) {
         Map m = new HashMap<Identifiable, Collection<Identifiable>>();
         m.put(node, c);
         return m;
+    }
+
+    public static enum TreeEventType {
+        CHANGE,
+        ADD,
+        REMOVE
     }
 }

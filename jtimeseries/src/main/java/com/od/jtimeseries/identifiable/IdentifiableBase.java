@@ -83,7 +83,13 @@ public class IdentifiableBase extends LockingIdentifiable {
         //set this node as new parent and fire event
         identifiable.setParent(this);
         identifiable.addTreeListener(childEventPropagator);
-        fireDescendantsAdded(new IdentifiableTreeEvent(getRoot(), getPath(), identifiable, identifiable.findAll(Identifiable.class).getAllMatches()));
+        fireDescendantsAdded(new IdentifiableTreeEvent(
+            IdentifiableTreeEvent.TreeEventType.ADD,
+            getRoot(),
+            getPath(),
+            identifiable,
+            identifiable.findAll(Identifiable.class).getAllMatches()
+        ));
     }
 
     protected String getParentPath_Locked() {
@@ -127,7 +133,13 @@ public class IdentifiableBase extends LockingIdentifiable {
             i.setParent(null);
             i.removeTreeListener(childEventPropagator);
             removed = true;
-            fireDescendantsRemoved(new IdentifiableTreeEvent(getRoot(), getPath(), i, i.findAll(Identifiable.class).getAllMatches()));
+            fireDescendantsRemoved(new IdentifiableTreeEvent(
+                IdentifiableTreeEvent.TreeEventType.REMOVE,
+                getRoot(),
+                getPath(),
+                i,
+                i.findAll(Identifiable.class).getAllMatches())
+            );
         }
         return removed;
     }
@@ -178,6 +190,10 @@ public class IdentifiableBase extends LockingIdentifiable {
         List<Identifiable> children = new ArrayList<Identifiable>();
         children.addAll(this. childrenById.values());
         return children;
+    }
+
+    protected int getChildCount_Locked() {
+        return childrenById.size();
     }
 
     protected <E extends Identifiable> List<E> getChildren_Locked(Class<E> classType) {
@@ -368,7 +384,13 @@ public class IdentifiableBase extends LockingIdentifiable {
     private class ChildTreeEventPropagator implements IdentifiableTreeListener {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            IdentifiableTreeEvent e = new IdentifiableTreeEvent(getRoot(), getPath(), node);
+            IdentifiableTreeEvent e = new IdentifiableTreeEvent(
+                IdentifiableTreeEvent.TreeEventType.CHANGE,
+                getRoot(),
+                getPath(),
+                node
+            );
+
             for ( IdentifiableTreeListener l : treeListeners) {
                 l.descendantChanged(e);
             }

@@ -27,17 +27,19 @@ package com.od.jtimeseries.identifiable;
  * This listener will receive events when an identifiable/context tree changes
  *
  * Since event firing is performed asynchronously, the context tree may have undergone subsequent changes by the time
- * tree events are received. When you receive events, the affected nodes or their parents may have changed (had more
- * descendants added, for example) since the event was fired.
+ * tree events are received. This means that by the time you receive events, the affected nodes, their descendants or
+ * their parents may have undergone further changes since the event was fired (had descendant nodes added or removed,
+ * for example).
  *
  * When you examine the nodes referenced in the event you are looking at the current state of those nodes, rather
- * than their state at the point the event was fired. (An alternative design would involve cloning the affected nodes
- * at the time an event is fired and passing the cloned instances - but that would impose severe performance penalties)
- * It is better to make listeners responsible for syncing with the current state of the source nodes where required.)
+ * than their state at the point the event was fired. However, for add and remove events, the descendants of the nodes
+ * removed or added are captured into snapshot collections at the point the event was fired, and these are accessible
+ * via event.getNodesWithDescendants - this makes the implementation for certain IdentifiableTreeListener classes much
+ * simpler
  *
- * In general, any traversal of the context tree, or subtrees within it, including the nodes which form part of a
- * IdentifiableTreeEvent, should be done while holding the tree lock of the nodes in question, to ensure that
- * the structure does not change while traversal is taking place (Identifiable.getTreeLock())
+ * n.b in general, any traversal of the identifiable tree, or subtrees within it, including the added and removed nodes
+ * which form part of a IdentifiableTreeEvent, should be done while holding the tree lock of the nodes in question,
+ * to ensure that the structure does not change while traversal is taking place (Identifiable.getTreeLock())
  */
 public interface IdentifiableTreeListener {
 

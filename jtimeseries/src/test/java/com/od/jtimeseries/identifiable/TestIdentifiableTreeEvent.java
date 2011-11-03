@@ -132,7 +132,13 @@ public class TestIdentifiableTreeEvent extends TestCase {
         }
 
         public void nodeChanged(Identifiable node, Object changeDescription) {
-            checkExpectedEvent(name, "change", expectedRootContext, new IdentifiableTreeEvent(expectedRootContext, "LOCAL", node), expectedEvents);
+            checkExpectedEvent(name, "change", expectedRootContext, new IdentifiableTreeEvent(
+                IdentifiableTreeEvent.TreeEventType.CHANGE,
+                expectedRootContext,
+                "LOCAL",
+                node),
+                expectedEvents
+            );
         }
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {

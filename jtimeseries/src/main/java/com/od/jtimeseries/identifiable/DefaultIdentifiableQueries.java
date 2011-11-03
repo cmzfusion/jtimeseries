@@ -38,7 +38,7 @@ public class DefaultIdentifiableQueries implements IdentifiableQueries {
 
     public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
         QueryResult<E> result = QueryResult.EMPTY_RESULT;
-        if ( identifiable.getChildren().size() > 0) {
+        if ( identifiable.getChildCount() > 0) {
              List<E> children = new ArrayList<E>();
              addAllIdentifiableMatchingClassRecursive(children, identifiable, assignableToClass);
              result = new DefaultQueryResult<E>(children);
@@ -48,7 +48,7 @@ public class DefaultIdentifiableQueries implements IdentifiableQueries {
 
     public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         QueryResult<E> result = QueryResult.EMPTY_RESULT;
-        if ( identifiable.getChildren().size() > 0) {
+        if ( identifiable.getChildCount() > 0) {
             result = new DefaultQueryResult<E>(
                 findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
             );

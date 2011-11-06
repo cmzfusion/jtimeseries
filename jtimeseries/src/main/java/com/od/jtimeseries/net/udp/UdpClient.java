@@ -158,8 +158,8 @@ public class UdpClient {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
         propertiesForDatagram.storeToXML(bos, null);
         byte[] data = bos.toByteArray();
-        if ( data.length > UdpServer.MAX_PACKET_SIZE ) {
-            throw new IOException("Cannot send UdpClient with properties consuming more than " + UdpServer.MAX_PACKET_SIZE + " bytes of data");
+        if ( data.length > UdpServer.MAX_PACKET_SIZE_BYTES) {
+            throw new IOException("Cannot send UdpClient with properties consuming more than " + UdpServer.MAX_PACKET_SIZE_BYTES + " bytes of data");
         }
         return data;
     }

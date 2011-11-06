@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.identifiable;
 
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+
 import java.util.*;
 
 /**
@@ -83,6 +85,26 @@ public class IdentifiableTreeEvent {
 
     public TreeEventType getType() {
         return type;
+    }
+
+    public <E extends Identifiable> void processNodesAndDescendants(IdentifiableProcessor<E> i, Class<E> clazz) {
+        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  getNodesWithDescendants().entrySet()) {
+            //first process top level node
+            if ( clazz.isAssignableFrom(e.getKey().getClass())) {
+                i.process((E)e.getKey());
+            }
+
+            //now its descendants
+            for ( Identifiable s : e.getValue()) {
+                if ( clazz.isAssignableFrom(s.getClass())) {
+                    i.process((E)s);
+                }
+            }
+        }
+    }
+
+    public static interface IdentifiableProcessor<E> {
+        void process(E identifiable);
     }
 
     public String toString() {

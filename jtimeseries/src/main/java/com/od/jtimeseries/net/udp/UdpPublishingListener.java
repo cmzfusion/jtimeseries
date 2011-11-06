@@ -24,39 +24,23 @@ public class UdpPublishingListener extends IdentifiableTreeListenerAdapter {
     private Map<Identifiable, UdpPublishingTimeSeriesListener> listenersByIdentifiable = new IdentityHashMap<Identifiable, UdpPublishingTimeSeriesListener>();
 
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithDescendants().entrySet()) {
-            //first add top level node
-            if ( e.getKey() instanceof IdentifiableTimeSeries) {
-                addListener((IdentifiableTimeSeries)e.getKey());
+        contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<IdentifiableTimeSeries>() {
+            public void process(IdentifiableTimeSeries identifiable) {
+                addListener(identifiable);
             }
-
-            //now any children
-            for ( Identifiable s : e.getValue()) {
-                if ( s instanceof IdentifiableTimeSeries) {
-                    addListener((IdentifiableTimeSeries)s);
-                }
-            }
-        }
+        }, IdentifiableTimeSeries.class);
     }
 
     private void addListener(IdentifiableTimeSeries s) {
-        //To change body of created methods use File | Settings | File Templates.
+
     }
 
     public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-        for ( Map.Entry<Identifiable,Collection<Identifiable>> e :  contextTreeEvent.getNodesWithDescendants().entrySet()) {
-            //first add top level node
-            if ( e.getKey() instanceof IdentifiableTimeSeries) {
-                removeListener((IdentifiableTimeSeries) e.getKey());
+        contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<IdentifiableTimeSeries>() {
+            public void process(IdentifiableTimeSeries identifiable) {
+                removeListener(identifiable);
             }
-
-            //now any children
-            for ( Identifiable s : e.getValue()) {
-                if ( s instanceof IdentifiableTimeSeries) {
-                    removeListener((IdentifiableTimeSeries) s);
-                }
-            }
-        }
+        }, IdentifiableTimeSeries.class);
     }
 
     private void removeListener(IdentifiableTimeSeries key) {

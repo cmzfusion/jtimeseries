@@ -22,12 +22,9 @@
         <constructor-arg value="${maxRoundRobinSeriesSize}"/>
     </bean>
 
-    <bean id="rootContext" class="com.od.jtimeseries.net.udp.UdpPublishingTimeSeriesContext">
-        <constructor-arg ref="udpClient"/>
-        <constructor-arg value="5000"/>
+    <bean id="rootContext" class="com.od.jtimeseries.context.impl.DefaultTimeSeriesContext">
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
-        <constructor-arg value="true"/>
         <property name="timeSeriesFactory" ref="timeSeriesFactory"/>
     </bean>
 

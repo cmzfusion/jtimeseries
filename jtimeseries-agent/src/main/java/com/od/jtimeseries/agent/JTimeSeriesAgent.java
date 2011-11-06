@@ -29,6 +29,7 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
 import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpClient;
+import com.od.jtimeseries.net.udp.UdpPublishingTreeListener;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -75,6 +76,7 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     private void doStartup() throws IOException {
         new JmxManagementService().startJmxManagementService(jmxManagementPort);
+        setupUdpPublishing();
         setupManagedMetrics();
         startJmx();
         startTimeSeriesHttpServer();
@@ -82,6 +84,11 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
         //start scheduling for any series (e.g server metrics) which require it
         rootContext.startScheduling().startDataCapture();
+    }
+
+    private void setupUdpPublishing() {
+        UdpPublishingTreeListener l = new UdpPublishingTreeListener(udpClient);
+        rootContext.addTreeListener(l);
     }
 
     private void startInputHandler() {

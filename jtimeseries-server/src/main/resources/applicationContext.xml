@@ -98,6 +98,13 @@
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="com.od.jtimeseries.server.serialization.FileHeader.setMaxPropertyLength"/>
         <property name="arguments" value="${maxPropertyLength}"/>
-     </bean>
+    </bean>
+
+    <bean id="executorSource" class="com.od.jtimeseries.server.util.ServerExecutorSource"/>
+    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="staticMethod" value="com.od.jtimeseries.util.TimeSeriesExecutorFactory.setExecutorSource"/>
+        <property name="arguments" ref="executorSource"/>
+    </bean>
+
 
 </beans>

@@ -3,7 +3,6 @@ package com.od.jtimeseries.server.util.path;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,6 +22,8 @@ public class PathRestriction extends AbstractPathProcessingRule {
     private volatile List<String> permittedPaths = new LinkedList<String>();
     private List<Pattern> patterns = new LinkedList<Pattern>();
 
+    public PathRestriction() {}
+
     public PathRestriction(PathProcessingRule decoratedRule) {
         super(decoratedRule);
     }
@@ -38,15 +39,19 @@ public class PathRestriction extends AbstractPathProcessingRule {
         }
     }
 
-    protected StringBuilder doGetPath(StringBuilder s) {
-        boolean result = false;
+    protected PathMappingResult doGetPath(PathMappingResult s) {
+        boolean matched = false;
         for (Pattern p : patterns) {
-            if ( p.matcher(s).matches()) {
-                result = true;
+            if ( p.matcher(s.getNewPath()).find()) {
+                matched = true;
                 break;
             }
         }
-        return result ? s : null;
+
+        if ( ! matched) {
+            s.setType(PathMappingResult.ResultType.DENY);
+        }
+        return s;
     }
 
     /**

@@ -63,7 +63,7 @@ public class TimeSeriesExecutorFactory {
     }
 
     public static Executor getHttpdQueryExecutor(Object httpdInstance) {
-        return executorSource.getHttpdQueryExcecutor(httpdInstance);
+        return executorSource.getHttpdQueryExecutor(httpdInstance);
     }
 
     public static interface ExecutorSource {
@@ -105,17 +105,18 @@ public class TimeSeriesExecutorFactory {
         /**
          * @return the ExecutoService which should be used for httpd queries
          */
-        ExecutorService getHttpdQueryExcecutor(Object httpdInstance);
+        ExecutorService getHttpdQueryExecutor(Object httpdInstance);
     }
 
     public static class DefaultExecutorSource implements ExecutorSource {
 
         private ExecutorService timeSeriesEventExecutor = NamedExecutors.newSingleThreadExecutor("TimeSeriesEvent");
         private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
-        private ExecutorService identifiableEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableEvent");
+        private ExecutorService identifiableTreeEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableTreeEvent");
         private ScheduledExecutorService captureSchedulingExecutor = NamedExecutors.newScheduledThreadPool("CaptureScheduling", 2);
         private ExecutorService captureProcessingExecutor = NamedExecutors.newSingleThreadExecutor("CaptureProcessing");
         private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 3, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+
 
         public ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries) {
             return timeSeriesEventExecutor;
@@ -126,7 +127,7 @@ public class TimeSeriesExecutorFactory {
         }
 
         public ExecutorService getExecutorForIdentifiableTreeEvents(Object identifiable) {
-            return identifiableEventExecutor;
+            return identifiableTreeEventExecutor;
         }
 
         public ExecutorService getCaptureProcessingExecutor(Object capture) {
@@ -137,7 +138,7 @@ public class TimeSeriesExecutorFactory {
             return captureSchedulingExecutor;
         }
 
-        public ExecutorService getHttpdQueryExcecutor(Object httpdInstance) {
+        public ExecutorService getHttpdQueryExecutor(Object httpdInstance) {
             return httpExecutor;
         }
 

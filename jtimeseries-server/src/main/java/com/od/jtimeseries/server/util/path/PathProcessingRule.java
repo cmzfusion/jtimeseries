@@ -20,8 +20,7 @@ public interface PathProcessingRule {
      * Get a processed path (may modify the supplied path, and return the modified instance)
      *
      * @param path, the path to process
-     * @return the processed path, or null if the processed path is invalid
      */
-    StringBuilder getPath(StringBuilder path);
+    PathMappingResult getPath(PathMappingResult path);
 
 }

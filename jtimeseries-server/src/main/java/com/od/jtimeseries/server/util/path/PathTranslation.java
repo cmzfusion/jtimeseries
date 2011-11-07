@@ -24,6 +24,8 @@ public class PathTranslation extends AbstractPathProcessingRule {
     private volatile Map<String, String> patternMap = new HashMap<String, String>();
     private Map<Pattern, String> compiledPatternToReplacement = new HashMap<Pattern, String>();
 
+    public PathTranslation() {}
+
     public PathTranslation(PathProcessingRule decoratedRule) {
         super(decoratedRule);
     }
@@ -39,16 +41,15 @@ public class PathTranslation extends AbstractPathProcessingRule {
         }
     }
 
-    protected StringBuilder doGetPath(StringBuilder s) {
-        StringBuilder result = s;
+    protected PathMappingResult doGetPath(PathMappingResult s) {
         for (Map.Entry<Pattern, String> e : compiledPatternToReplacement.entrySet()) {
-            Matcher matcher = e.getKey().matcher(s);
-            if ( matcher.matches()) {
-                result = new StringBuilder(matcher.replaceAll(e.getValue()));
+            Matcher matcher = e.getKey().matcher(s.getNewPath());
+            if ( matcher.find()) {
+                s.setNewPath(matcher.replaceAll(e.getValue()));
                 break;
             }
         }
-        return result;
+        return s;
     }
 
     /**

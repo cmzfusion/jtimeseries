@@ -100,7 +100,9 @@
         <property name="arguments" value="${maxPropertyLength}"/>
     </bean>
 
-    <bean id="executorSource" class="com.od.jtimeseries.server.util.ServerExecutorSource"/>
+    <bean id="executorSource" class="com.od.jtimeseries.server.util.ServerExecutorSource">
+        <constructor-arg value="${maxHttpdThreads}"/>
+    </bean>
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="com.od.jtimeseries.util.TimeSeriesExecutorFactory.setExecutorSource"/>
         <property name="arguments" ref="executorSource"/>

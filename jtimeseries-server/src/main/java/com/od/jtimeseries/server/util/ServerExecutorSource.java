@@ -14,7 +14,11 @@ import java.util.concurrent.ExecutorService;
 public class ServerExecutorSource extends TimeSeriesExecutorFactory.DefaultExecutorSource {
 
     //a httpd daemon with more threads
-    private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 10, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+    private ExecutorService httpExecutor;
+
+    public ServerExecutorSource(int maxThreads) {
+        httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", maxThreads, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+    }
 
     public ExecutorService getHttpdQueryExecutor(Object httpdInstance) {
         return httpExecutor;

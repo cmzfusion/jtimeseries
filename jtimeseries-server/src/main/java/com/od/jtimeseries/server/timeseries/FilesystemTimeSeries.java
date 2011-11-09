@@ -21,8 +21,8 @@ package com.od.jtimeseries.server.timeseries;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.server.serialization.FileHeader;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
+import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.timeseries.*;
 import com.od.jtimeseries.timeseries.impl.ProxyTimeSeriesEventHandler;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
@@ -70,7 +70,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     private Executor eventExecutor = TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
     private SoftReference<RoundRobinTimeSeries> softSeriesReference = new SoftReference<RoundRobinTimeSeries>(null);
-    private RoundRobinSerializer roundRobinSerializer;
+    private TimeSeriesSerializer timeseriesSerializer;
     private TimePeriod appendPeriod;
     private TimePeriod rewritePeriod;
     private FileHeader fileHeader;
@@ -84,10 +84,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     /**
      *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader, which must have been updated to match the latest state of the file
      */
-    public FilesystemTimeSeries(FileHeader fileHeader, RoundRobinSerializer roundRobinSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+    public FilesystemTimeSeries(FileHeader fileHeader, TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(fileHeader.getId(), fileHeader.getDescription());
         this.fileHeader = fileHeader;
-        setFields(roundRobinSerializer, appendPeriod, rewritePeriod);
+        setFields(timeseriesSerializer, appendPeriod, rewritePeriod);
     }
 
     /**
@@ -95,26 +95,26 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      *  The series may more may not already exist on disk, if it does exist a FileHeader will be created and synced with existing series, of not a new series file will be
      *  created
      */
-    public FilesystemTimeSeries(String parentPath, String id, String description, RoundRobinSerializer roundRobinSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+    public FilesystemTimeSeries(String parentPath, String id, String description, TimeSeriesSerializer timeseriesSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(id, description);
-        createFileHeader(roundRobinSerializer, parentPath, seriesLength);
-        setFields(roundRobinSerializer, appendPeriod, rewritePeriod);
+        createFileHeader(timeseriesSerializer, parentPath, seriesLength);
+        setFields(timeseriesSerializer, appendPeriod, rewritePeriod);
     }
 
-    private void setFields(RoundRobinSerializer roundRobinSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) {
-        this.roundRobinSerializer = roundRobinSerializer;
+    private void setFields(TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) {
+        this.timeseriesSerializer = timeseriesSerializer;
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
         this.lastTimestamp = fileHeader.getMostRecentItemTimestamp();
         this.writeBehindCache = new WriteBehindCache();
     }
 
-    private void createFileHeader(RoundRobinSerializer roundRobinSerializer, String parentPath, int seriesLength) throws SerializationException {
+    private void createFileHeader(TimeSeriesSerializer timeseriesSerializer, String parentPath, int seriesLength) throws SerializationException {
         this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + getId(), getDescription(), seriesLength);
-        if ( roundRobinSerializer.fileExists(fileHeader) ) {
-            roundRobinSerializer.updateHeader(fileHeader);
+        if ( timeseriesSerializer.fileExists(fileHeader) ) {
+            timeseriesSerializer.readHeader(fileHeader);
         } else {
-            roundRobinSerializer.createFile(fileHeader);
+            timeseriesSerializer.createFile(fileHeader);
         }
     }
 
@@ -178,7 +178,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
 
     private void fireAddEvent(final TimeSeriesItem i) {
         final TimeSeriesEvent e = TimeSeriesEvent.createItemsAppendedOrInsertedEvent(
-            FilesystemTimeSeries.this, Collections.singletonList(i), ++modCount, true
+                FilesystemTimeSeries.this, Collections.singletonList(i), ++modCount, true
         );
 
         eventExecutor.execute(new Runnable() {
@@ -397,7 +397,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         RoundRobinTimeSeries s = isSeriesInWriteCache() ? writeBehindCache.getSeries() : softSeriesReference.get();
         if ( s == null && deserializeIfRequired ) {
             try {
-                s = roundRobinSerializer.deserialize(fileHeader);
+                s = timeseriesSerializer.readSeries(fileHeader);
 
                 //there may be items in our cache we need to add to
                 //bring the filesystem series into sync. We will have to call a special
@@ -477,11 +477,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
             try {
                 if (roundRobinSeries != null) {
                     //we have a local series which contains other changes, as well as possibly some appends
-                    roundRobinSerializer.serialize(fileHeader, roundRobinSeries);
+                    timeseriesSerializer.writeSeries(fileHeader, roundRobinSeries);
                 } else {
                     //only changes are appends, or if the append series is empty there may be
                     //other changes which require a header rewrite (e.g. properties)
-                    roundRobinSerializer.append(fileHeader, itemsToAppend);
+                    timeseriesSerializer.appendToSeries(fileHeader, itemsToAppend);
                 }
 
                 //clear cache if no exception / write succeeded

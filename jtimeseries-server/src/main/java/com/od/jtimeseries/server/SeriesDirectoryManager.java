@@ -20,9 +20,11 @@ package com.od.jtimeseries.server;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.server.serialization.FileHeader;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.server.serialization.SerializationException;
+import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.server.util.FileReaper;
+import com.od.jtimeseries.server.util.path.PathMapper;
+import com.od.jtimeseries.server.util.path.PathMappingResult;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -43,8 +45,9 @@ public class SeriesDirectoryManager {
     private static LogMethods logMethods = LogUtils.getLogMethods(SeriesDirectoryManager.class);
 
     private File seriesDirectory;
-    private RoundRobinSerializer roundRobinSerializer;
+    private TimeSeriesSerializer timeseriesSerializer;
     private TimeSeriesContext rootContext;
+    private PathMapper pathMapper;
     private String seriesFileSuffix;
     private int maxFileCount;
     private int maxDiskSpaceForSeriesMb;
@@ -52,10 +55,11 @@ public class SeriesDirectoryManager {
     private int loadCount;
     private FileReaper reaper;
 
-    public SeriesDirectoryManager(File seriesDirectory, RoundRobinSerializer roundRobinSerializer, TimeSeriesContext rootContext, String seriesFileSuffix, int maxFileCount, int maxDiskSpaceForSeriesMb, int maxSeriesFileAgeDays) {
+    public SeriesDirectoryManager(File seriesDirectory, TimeSeriesSerializer timeseriesSerializer, TimeSeriesContext rootContext, PathMapper pathMapper, String seriesFileSuffix, int maxFileCount, int maxDiskSpaceForSeriesMb, int maxSeriesFileAgeDays) {
         this.seriesDirectory = seriesDirectory;
-        this.roundRobinSerializer = roundRobinSerializer;
+        this.timeseriesSerializer = timeseriesSerializer;
         this.rootContext = rootContext;
+        this.pathMapper = pathMapper;
         this.seriesFileSuffix = seriesFileSuffix;
         this.maxFileCount = maxFileCount;
         this.maxDiskSpaceForSeriesMb = maxDiskSpaceForSeriesMb;
@@ -97,16 +101,30 @@ public class SeriesDirectoryManager {
 
     private void loadTimeSeries(File f) {
         try {
-            FileHeader header = roundRobinSerializer.readHeader(f);
-            logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
+            FileHeader header = timeseriesSerializer.readHeader(f);
+            String path = header.getPath();
+            PathMappingResult r = pathMapper.getPathMapping(path);
+            if (r.getType() == PathMappingResult.ResultType.DENY) {
+                logMethods.logInfo("Not loading series at path " + path + " since this path is denied by path mapping rules");
+            } else if ( ! r.getNewPath().equals(path)) {
+                logMethods.logInfo("Migrating series at path " + path + " to " + r.getNewPath() + " since this path is migrated by path mapping rules");
+                timeseriesSerializer.migratePath(header, r.getNewPath());
+                loadSeriesFile(header);
+            } else {
+                logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
+                loadSeriesFile(header);
+            }
 
-            //the type of time series which will be created depends on the TimeSeriesFactory set on the context
-            //we are expecting FilesystemTimeSeries
-            rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
-            loadCount++;
         } catch (SerializationException e) {
             logMethods.logError("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);
         }
+    }
+
+    private void loadSeriesFile(FileHeader header) {
+        //the type of time series which will be created depends on the TimeSeriesFactory set on the context
+        //we are expecting FilesystemTimeSeries
+        rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
+        loadCount++;
     }
 
     private File[] getCandidateSeriesFiles() {

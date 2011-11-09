@@ -17,16 +17,16 @@ import java.util.regex.Pattern;
  * Translate paths using patterns and replacements
  * Paths which do not match a pattern are passed through unchanged
  */
-public class PathTranslation extends AbstractPathProcessingRule {
+public class PathMigration extends AbstractPathProcessingRule {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(PathTranslation.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(PathMigration.class);
 
     private volatile Map<String, String> patternMap = new HashMap<String, String>();
     private Map<Pattern, String> compiledPatternToReplacement = new HashMap<Pattern, String>();
 
-    public PathTranslation() {}
+    public PathMigration() {}
 
-    public PathTranslation(PathProcessingRule decoratedRule) {
+    public PathMigration(PathProcessingRule decoratedRule) {
         super(decoratedRule);
     }
 
@@ -46,6 +46,7 @@ public class PathTranslation extends AbstractPathProcessingRule {
             Matcher matcher = e.getKey().matcher(s.getNewPath());
             if ( matcher.find()) {
                 s.setNewPath(matcher.replaceAll(e.getValue()));
+                s.setType(PathMappingResult.ResultType.MIGRATE);
                 break;
             }
         }

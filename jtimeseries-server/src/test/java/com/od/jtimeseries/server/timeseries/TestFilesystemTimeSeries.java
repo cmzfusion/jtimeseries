@@ -2,10 +2,7 @@ package com.od.jtimeseries.server.timeseries;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.server.serialization.FileHeader;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
-import com.od.jtimeseries.server.serialization.SerializationException;
-import com.od.jtimeseries.server.serialization.TestRoundRobinSerializer;
+import com.od.jtimeseries.server.serialization.*;
 import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
 import com.od.jtimeseries.util.time.Time;
 import junit.framework.TestCase;
@@ -22,17 +19,17 @@ import java.io.File;
  */
 public class TestFilesystemTimeSeries extends TestCase {
 
-    private RoundRobinSerializer roundRobinSerializer;
+    private TimeSeriesSerializer timeseriesSerializer;
     private final String TEST_CONTEXT = "test";
 
     public void setUp() throws Exception {
         RoundRobinSerializer.setShutdownHandlingDisabled(true);
-        roundRobinSerializer = TestRoundRobinSerializer.createTestSerializer();
+        timeseriesSerializer = TestRoundRobinSerializer.createTestSerializer();
         super.setUp();
     }
 
     public void tearDown() {
-        roundRobinSerializer = null;
+        timeseriesSerializer = null;
     }
 
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
@@ -40,13 +37,13 @@ public class TestFilesystemTimeSeries extends TestCase {
         FilesystemTimeSeries s = new FilesystemTimeSeries(
                 context.getPath(),
                 "id" + (int)(Math.random() * 100000000),
-                "description", roundRobinSerializer,
+                "description", timeseriesSerializer,
                 10000,
                 Time.seconds(10),
                 Time.seconds(10));
 
         context.addChild(s);
-        File file = roundRobinSerializer.getFile(s.getFileHeader());
+        File file = timeseriesSerializer.getFile(s.getFileHeader());
         file.deleteOnExit();
         return s;
     }
@@ -132,7 +129,7 @@ public class TestFilesystemTimeSeries extends TestCase {
     public void testMaximumSize() throws SerializationException {
         TimeSeriesContext c = new DefaultTimeSeriesContext().createContext("test");
         int maxSize = 3;
-        FilesystemTimeSeries series = new FilesystemTimeSeries(c.getPath(), "id" + (int)(Math.random() * 100000000), "description", roundRobinSerializer, maxSize, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries series = new FilesystemTimeSeries(c.getPath(), "id" + (int)(Math.random() * 100000000), "description", timeseriesSerializer, maxSize, Time.seconds(10), Time.seconds(10));
         c.addChild(series);
 
         //after creation, we have just read the header, not deserialized the series yet
@@ -199,7 +196,7 @@ public class TestFilesystemTimeSeries extends TestCase {
         assertEquals(3, series.getFileHeader().getMostRecentItemTimestamp());
 
         TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
-        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), series.getId(), "description", roundRobinSerializer, 10000, Time.seconds(10), Time.seconds(10));
+        FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), series.getId(), "description", timeseriesSerializer, 10000, Time.seconds(10), Time.seconds(10));
         context.addChild(s);
         assertEquals(3, s.getLatestTimestamp());
     }
@@ -213,7 +210,7 @@ public class TestFilesystemTimeSeries extends TestCase {
         }
         series.flush();
         FileHeader h = new FileHeader(series.getFileHeader().getPath(), series.getFileHeader().getDescription(), 10000);
-        roundRobinSerializer.deserialize(h);
+        timeseriesSerializer.readSeries(h);
         assertTrue(h.getSeriesProperty("Property500") != null);
     }
 

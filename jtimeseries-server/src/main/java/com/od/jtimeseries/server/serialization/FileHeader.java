@@ -67,13 +67,18 @@ public class FileHeader extends LockingFileHeader {
      * @param seriesMaxLength, maximum size for this series
      */
     public FileHeader(String path, String description, int seriesMaxLength) {
-        seriesProperties.setProperty(PATH_KEY, path);
+        setPath(path);
         seriesProperties.setProperty(DESCRIPTION_KEY, description);
         this.seriesMaxLength = seriesMaxLength;
     }
 
     protected String doGetPath() {
         return seriesProperties.getProperty(PATH_KEY);
+    }
+
+    //use with care, this effectively changes the series path/id, only for path migrations before series is created
+    protected void doSetPath(String path) {
+        seriesProperties.setProperty(PATH_KEY, path);
     }
 
     protected Properties doGetSnapshot() {

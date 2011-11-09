@@ -18,7 +18,7 @@ public class TestPathMapper extends TestCase{
 
     public void setUp() throws Exception {
 
-        PathTranslation pathTranslation = new PathTranslation();
+        PathMigration pathTranslation = new PathMigration();
         HashMap<String,String> patternMap = new HashMap<String,String>();
         patternMap.put("root\\.child1", "root\\.child2");
         pathTranslation.setPatternMap(patternMap);
@@ -32,9 +32,15 @@ public class TestPathMapper extends TestCase{
         mapper.initialize();
     }
 
-    public void testMapperForTranslatedPath() {
+     public void testMapperForPermittedPath() {
+        PathMappingResult result = mapper.getPathMapping("root.child2.grandchild1");
+        PathMappingResult expected = getExpectedResult("root.child2.grandchild1", PathMappingResult.ResultType.PERMIT);
+        assertEquals(expected, result);
+    }
+
+    public void testMapperForMigratedPath() {
         PathMappingResult result = mapper.getPathMapping("root.child1.grandchild2");
-        PathMappingResult expected = getExpectedResult("root.child2.grandchild2", PathMappingResult.ResultType.PERMIT);
+        PathMappingResult expected = getExpectedResult("root.child2.grandchild2", PathMappingResult.ResultType.MIGRATE);
         assertEquals(expected, result);
     }
 

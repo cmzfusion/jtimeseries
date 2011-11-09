@@ -37,8 +37,9 @@ public class PathMappingResult {
     }
 
     public static enum ResultType {
-        PERMIT,
-        DENY
+        MIGRATE,
+        DENY,
+        PERMIT
     }
 
     @Override

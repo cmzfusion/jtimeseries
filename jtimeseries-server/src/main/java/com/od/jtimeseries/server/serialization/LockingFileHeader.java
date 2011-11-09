@@ -29,6 +29,19 @@ public abstract class LockingFileHeader {
 
     protected abstract String doGetPath();
 
+    //use with care, this effectively changes the series path/id, only for path migrations before series is created
+    public void setPath(String path) {
+        try {
+            writeLock().lock();
+            doSetPath(path);
+        } finally {
+            writeLock().unlock();
+        }
+
+    }
+
+    protected abstract void doSetPath(String path);
+
     public Properties getSeriesProperties() {
         try {
            headerLock.readLock().lock();
@@ -229,5 +242,5 @@ public abstract class LockingFileHeader {
     public Lock writeLock() {
         return headerLock.writeLock();
     }
-    
+
 }

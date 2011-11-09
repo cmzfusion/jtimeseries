@@ -29,7 +29,7 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.server.jmx.ServerConfigJmx;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
-import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
+import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
 import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
@@ -54,7 +54,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     private int jmxManagementPort;
     private TimeSeriesContext rootContext;
     private UdpClient udpClient;
-    private RoundRobinSerializer fileSerializer;
+    private TimeSeriesSerializer fileSerializer;
     private HttpServerAnnouncementMessage serverAnnouncementMessage;
     private ServerConfigJmx serverConfigJmx;
     private UdpServer udpServer;
@@ -158,8 +158,8 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         this.udpClient = udpClient;
     }
 
-    public void setFileSerializer(RoundRobinSerializer roundRobinSerializer) {
-        this.fileSerializer = roundRobinSerializer;
+    public void setFileSerializer(TimeSeriesSerializer timeseriesSerializer) {
+        this.fileSerializer = timeseriesSerializer;
     }
 
     public void setServerAnnouncementMessage(HttpServerAnnouncementMessage announceMessage) {

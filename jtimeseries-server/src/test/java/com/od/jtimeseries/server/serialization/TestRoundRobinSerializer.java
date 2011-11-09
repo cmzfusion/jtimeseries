@@ -25,7 +25,7 @@ import java.io.File;
  */
 public class TestRoundRobinSerializer extends TestCase {
 
-    private RoundRobinSerializer serializer;
+    private TimeSeriesSerializer serializer;
     private int SERIES_LENGTH = 10000;
     private FileHeader fileHeader = new FileHeader("test.id", "test series", SERIES_LENGTH);
 
@@ -33,37 +33,37 @@ public class TestRoundRobinSerializer extends TestCase {
         RoundRobinSerializer.setShutdownHandlingDisabled(true);        
         serializer = createTestSerializer();
         RoundRobinTimeSeries r = createTestSeries();
-        serializer.serialize(fileHeader, r);
+        serializer.writeSeries(fileHeader, r);
 
         serializer.getFile(fileHeader).deleteOnExit();
         serializer.getRootDirectory().deleteOnExit();        
     }
 
     public void testDeserialization() throws SerializationException {
-        RoundRobinTimeSeries d = serializer.deserialize(fileHeader);
+        RoundRobinTimeSeries d = serializer.readSeries(fileHeader);
         RoundRobinTimeSeries r = createTestSeries();
         assertEquals(r, d);
     }
 
     public void testReadHeader() throws SerializationException {
-        serializer.updateHeader(fileHeader);
+        serializer.readHeader(fileHeader);
         assertEquals(FileHeader.DEFAULT_HEADER_START_LENGTH, fileHeader.getHeaderLength());
     }
 
     public void testWriteEmptyFile() throws SerializationException {
         RoundRobinTimeSeries s = new RoundRobinTimeSeries(5);
-        serializer.serialize(fileHeader, s);
+        serializer.writeSeries(fileHeader, s);
         assertEquals(-1, fileHeader.getCurrentHead());
 
-        serializer.updateHeader(fileHeader);
+        serializer.readHeader(fileHeader);
         assertEquals(-1, fileHeader.getCurrentHead());
 
         RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l,1,2,3);
-        serializer.append(fileHeader, l);
+        serializer.appendToSeries(fileHeader, l);
         assertEquals(0, fileHeader.getCurrentHead());
 
-        RoundRobinTimeSeries d = serializer.deserialize(fileHeader);
+        RoundRobinTimeSeries d = serializer.readSeries(fileHeader);
         assertEquals(l, d);
     }
 
@@ -71,15 +71,15 @@ public class TestRoundRobinSerializer extends TestCase {
         RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l, 5, 6);
 
-        serializer.append(fileHeader, l);
+        serializer.appendToSeries(fileHeader, l);
         assertEquals(0, fileHeader.getCurrentHead());
         assertEquals(6, fileHeader.getCurrentTail());
 
-        serializer.updateHeader(fileHeader);
+        serializer.readHeader(fileHeader);
         assertEquals(0, fileHeader.getCurrentHead());
         assertEquals(6, fileHeader.getCurrentTail());
 
-        RoundRobinTimeSeries d = serializer.deserialize(fileHeader);
+        RoundRobinTimeSeries d = serializer.readSeries(fileHeader);
         RoundRobinTimeSeries c = createTestSeries();
         addNewItemsForTimestamps(c, 5, 6);
         assertEquals(c, d);
@@ -90,15 +90,15 @@ public class TestRoundRobinSerializer extends TestCase {
         RoundRobinTimeSeries l = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(l,5,6,7,8);
 
-        serializer.append(fileHeader, l);
+        serializer.appendToSeries(fileHeader, l);
         assertEquals(1, fileHeader.getCurrentHead());
         assertEquals(1, fileHeader.getCurrentTail());
 
-        serializer.updateHeader(fileHeader);
+        serializer.readHeader(fileHeader);
         assertEquals(1, fileHeader.getCurrentHead());
         assertEquals(1, fileHeader.getCurrentTail());
 
-        RoundRobinTimeSeries d = serializer.deserialize(fileHeader);
+        RoundRobinTimeSeries d = serializer.readSeries(fileHeader);
         RoundRobinTimeSeries c = createTestSeries();
         addNewItemsForTimestamps(c,5,6,7,8);
         assertEquals(c, d);
@@ -106,12 +106,12 @@ public class TestRoundRobinSerializer extends TestCase {
         //rr strucure is now full, both head and tail advance when we add
         l.clear();
         l.addItem(createItemForTimestamp(9));
-        serializer.append(fileHeader, l);
+        serializer.appendToSeries(fileHeader, l);
 
         assertEquals(2, fileHeader.getCurrentHead());
         assertEquals(2, fileHeader.getCurrentTail());
 
-        d = serializer.deserialize(fileHeader);
+        d = serializer.readSeries(fileHeader);
         c.addItem(createItemForTimestamp(9));
         assertEquals(c, d);
 
@@ -125,8 +125,8 @@ public class TestRoundRobinSerializer extends TestCase {
 
         l.clear();
         addNewItemsForTimestamps(l, itemsForTimestamps);
-        serializer.append(fileHeader, l);
-        d = serializer.deserialize(fileHeader);
+        serializer.appendToSeries(fileHeader, l);
+        d = serializer.readSeries(fileHeader);
         addNewItemsForTimestamps(c, itemsForTimestamps);
         assertEquals(c, d);
     }
@@ -144,7 +144,7 @@ public class TestRoundRobinSerializer extends TestCase {
         series.flush();
         assertEquals(6, series.getItem(5).longValue());
 
-        IndexedTimeSeries s = serializer.deserialize(fileHeader);
+        IndexedTimeSeries s = serializer.readSeries(fileHeader);
         assertEquals(6, s.getItem(5).longValue());
 
         series.removeItem(createItemForTimestamp(3));
@@ -152,7 +152,7 @@ public class TestRoundRobinSerializer extends TestCase {
         assertEquals(4, series.size());
         series.flush();
 
-        s = serializer.deserialize(fileHeader);
+        s = serializer.readSeries(fileHeader);
         assertEquals(4, s.size());
         DefaultTimeSeries l = new DefaultTimeSeries();
         addNewItemsForTimestamps(l, 1,2,5,6);
@@ -165,7 +165,7 @@ public class TestRoundRobinSerializer extends TestCase {
         for ( int loop=0; loop < 1000; loop++) {
             RoundRobinTimeSeries s = new RoundRobinTimeSeries(7);
             s.addItem(new DefaultTimeSeriesItem(loop, DoubleNumeric.valueOf(loop)));
-            serializer.append(fileHeader, s);
+            serializer.appendToSeries(fileHeader, s);
         }
         long endTime = System.currentTimeMillis();
         assertEquals(7, fileHeader.getCurrentSeriesSize());
@@ -174,13 +174,31 @@ public class TestRoundRobinSerializer extends TestCase {
         assertTrue("Test append speed", (endTime - startTime) < 5000);
     }
 
+    public void testPathMigration() throws SerializationException {
+        assertEquals("test.id", fileHeader.getPath());
+
+        serializer.migratePath(fileHeader, "new.path");
+        assertTrue(serializer.fileExists(fileHeader));
+        serializer.getFile(fileHeader).deleteOnExit();
+        assertTrue(fileHeader.getPath().equals("new.path"));
+
+        FileHeader header2 = new FileHeader("test.id", "test", 100);
+        assertFalse(serializer.fileExists(header2));
+
+        try {
+            serializer.migratePath(header2, "new.path");
+            fail("Should fail to migrate to a path for which a file exists already");
+        } catch (SerializationException s) {
+        }
+    }
+
     private RoundRobinTimeSeries createTestSeries() {
         RoundRobinTimeSeries r = new RoundRobinTimeSeries(7);
         addNewItemsForTimestamps(r,1,2,3,4);
         return r;
     }
 
-    public static RoundRobinSerializer createTestSerializer() throws SerializationException {
+    public static TimeSeriesSerializer createTestSerializer() throws SerializationException {
         File tmpDir = new File(System.getProperty("java.io.tmpdir"), "testtimeseries");
         if ( ! tmpDir.isDirectory()) {
             if ( ! tmpDir.mkdir() ) {

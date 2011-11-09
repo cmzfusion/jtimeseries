@@ -214,6 +214,7 @@ class SerializerOperations {
             header.updateHeaderFields(header.getHeaderLength(), newHead, newTail, header.getSeriesMaxLength(), newLastTimestamp);
         }
 
+        //if the header is updated in memory, we need to write it to disk
         if ( toAppend.size() > 0 || writeProperties ) {
             c.position(HEADER_SECTION_2_OFFSET);
             writeHeaderSectionTwo(header, writeProperties, properties, c);

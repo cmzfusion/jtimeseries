@@ -34,7 +34,7 @@ public abstract class AbstractManagedMetric implements ManagedMetric {
     protected static final TimePeriod DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS = Time.minutes(5);
 
     public final void initializeMetrics(TimeSeriesContext rootContext)  {
-        TimeSeriesContext c = rootContext.createContext(getParentContextPath());
+        TimeSeriesContext c = rootContext.getOrCreateContext(getParentContextPath());
         doInitializeMetric(c);
     }
 

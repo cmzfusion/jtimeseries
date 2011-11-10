@@ -337,14 +337,27 @@ public class IdentifiableBase extends LockingIdentifiable {
                 if ( s != null) {
                     addChild(s);
                 }
+            } else {
+                throw new DuplicateIdException("Identifiable with path " + path + " already exists");
             }
             return s;
         } else {
-            //create the next context in the path, and recusively call create
+            //get or create the next context in the path, and recursively call create
             String nextNode = p.removeFirstNode();
-            Identifiable c = create(nextNode, nextNode, Identifiable.class, parameters);
+            Identifiable c = get(nextNode, Identifiable.class);
+            if ( c == null ) {
+                c = create(nextNode, nextNode, Identifiable.class, parameters);
+            }
             return c.create(p.getRemainingPath(), description, clazz, parameters);
         }
+    }
+
+    protected <E extends Identifiable> E getOrCreate_Locked(String path, String description, Class<E> clazz, Object[] parameters) {
+        E result = get(path, clazz);
+        if ( result == null) {
+            result = create(path, description, clazz, parameters);
+        }
+        return result;
     }
 
     protected <E extends Identifiable> E remove_Locked(String path, Class<E> classType) {

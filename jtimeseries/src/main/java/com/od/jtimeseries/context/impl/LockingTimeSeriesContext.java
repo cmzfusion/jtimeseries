@@ -196,12 +196,24 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
         return createContext(path, "TimeSeriesContext at " + path);
     }
 
+    public final TimeSeriesContext getOrCreateContext(String path) {
+        return getOrCreateContext(path, "TimeSeriesContext at " + path);
+    }
+
     public final TimeSeriesContext createContext(String path, String description) {
         return create(path, description, TimeSeriesContext.class);
     }
 
+    public final TimeSeriesContext getOrCreateContext(String path, String description) {
+        return getOrCreate(path, description, TimeSeriesContext.class);
+    }
+
     public final IdentifiableTimeSeries createTimeSeries(String path, String description) {
         return create(path, description, IdentifiableTimeSeries.class);
+    }
+
+    public final IdentifiableTimeSeries getOrCreateTimeSeries(String path, String description) {
+        return getOrCreate(path, description, IdentifiableTimeSeries.class);
     }
 
     public final Capture createCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series) {
@@ -229,15 +241,15 @@ public abstract class LockingTimeSeriesContext extends IdentifiableBase implemen
     }
 
     public final ValueRecorder createValueRecorderSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, (Object[])getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, ValueRecorder.class, (Object[]) getFunctions(captureFunctions));
     }
 
     public final Counter createCounterSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, Counter.class, (Object[])getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, Counter.class, (Object[]) getFunctions(captureFunctions));
     }
 
     public final EventTimer createEventTimerSeries(String path, String description, CaptureFunction... captureFunctions) {
-        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, EventTimer.class, (Object[])getFunctions(captureFunctions));
+        return create(path + ContextMetricCreator.SOURCE_SUFFIX, description, EventTimer.class, (Object[]) getFunctions(captureFunctions));
     }
 
     public final TimedValueSupplier createTimedValueSupplierSeries(String path, String description, ValueSupplier valueSupplier, TimePeriod timePeriod) {

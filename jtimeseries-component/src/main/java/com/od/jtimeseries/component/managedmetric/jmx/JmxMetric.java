@@ -22,6 +22,7 @@ import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
 import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueRecorder;
@@ -130,8 +131,7 @@ public class JmxMetric implements ManagedMetric {
 
     private void createJmxTasks(TimeSeriesContext rootContext) {
         for (JmxMeasurement m : jmxMeasurements) {
-            TimeSeriesContext c = rootContext.createContext(m.getParentContextPath());
-            ValueRecorder r = c.createValueRecorderSeries(m.getId(), m.getDescription());
+            ValueRecorder r = rootContext.createValueRecorderSeries(m.getParentContextPath() + Identifiable.NAMESPACE_SEPARATOR + m.getId(), m.getDescription());
             measurementTasks.add(new JmxMeasurementTask(r, m));
         }
     }

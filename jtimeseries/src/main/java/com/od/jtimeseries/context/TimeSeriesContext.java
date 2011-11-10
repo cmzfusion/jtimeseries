@@ -125,9 +125,15 @@ public interface TimeSeriesContext extends Identifiable, ContextQueries {
 
     TimeSeriesContext createContext(String path);
 
+    TimeSeriesContext getOrCreateContext(String path);
+
     TimeSeriesContext createContext(String path, String description);
 
+    TimeSeriesContext getOrCreateContext(String path, String description);
+
     IdentifiableTimeSeries createTimeSeries(String path, String description);
+
+    IdentifiableTimeSeries getOrCreateTimeSeries(String path, String description);
 
     Capture createCapture(String path, String description, ValueSource source, IdentifiableTimeSeries series);
 

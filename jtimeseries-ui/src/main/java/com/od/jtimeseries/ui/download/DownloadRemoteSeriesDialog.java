@@ -22,7 +22,6 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
 import com.od.jtimeseries.ui.download.panel.AbstractDownloadWizardPanel;
 import com.od.jtimeseries.ui.download.panel.ChooseSeriesPanel;
@@ -111,10 +110,10 @@ public class DownloadRemoteSeriesDialog extends JFrame {
                 //we don't know what type of UIPropertiesTimeSeries the destination context should contain
                 //defer construction to the context's factories by using the generic create method on context
                 destinationRootContext.create(
-                    path,
-                    p.getDescription(),
-                    UIPropertiesTimeSeries.class,
-                    config
+                        path,
+                        p.getDescription(),
+                        UIPropertiesTimeSeries.class,
+                        config
                 );
             }
         }

@@ -142,6 +142,10 @@ public class DefaultCounter implements Counter {
         return simpleSource.create(id, description, clazz, parameters);
     }
 
+    public <E extends Identifiable> E getOrCreate(String path, String description, Class<E> clazz, Object... parameters) {
+        return simpleSource.getOrCreate(path, description, clazz, parameters);
+    }
+
     public boolean containsChildWithId(String id) {
         return simpleSource.containsChildWithId(id);
     }

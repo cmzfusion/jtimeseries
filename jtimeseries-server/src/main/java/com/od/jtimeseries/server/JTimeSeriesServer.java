@@ -31,6 +31,7 @@ import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
+import com.od.jtimeseries.server.util.path.PathMapper;
 import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
@@ -62,6 +63,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     private SummaryStatisticsCalculator summaryStatisticsCalculator;
     private HtmlAdaptorServer htmlAdaptorServer;
     private JTimeSeriesHttpd httpdServer;
+    private PathMapper pathMapper;
 
     static {
         initialize(JTimeSeriesServer.class);
@@ -99,7 +101,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     private void startUdpServer() {
         logMethods.logInfo("Adding UDP message listeners");
-        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext));
+        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext, pathMapper));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
         logMethods.logInfo("Starting UDP server on port " + udpServer.getPort());
         udpServer.startReceive();
@@ -192,6 +194,10 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     public void setJmxManagementPort(int jmxManagementPort) {
         this.jmxManagementPort = jmxManagementPort;
+    }
+
+    public void setPathMapper(PathMapper pathMapper) {
+        this.pathMapper = pathMapper;
     }
 
     public static void main(String[] args) throws IOException {

@@ -111,7 +111,6 @@ public class SeriesDirectoryManager {
                 timeseriesSerializer.migratePath(header, r.getNewPath());
                 loadSeriesFile(header);
             } else {
-                logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
                 loadSeriesFile(header);
             }
 
@@ -123,6 +122,7 @@ public class SeriesDirectoryManager {
     private void loadSeriesFile(FileHeader header) {
         //the type of time series which will be created depends on the TimeSeriesFactory set on the context
         //we are expecting FilesystemTimeSeries
+        logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
         rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
         loadCount++;
     }

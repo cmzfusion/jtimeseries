@@ -2,8 +2,6 @@ package com.od.jtimeseries.capture.impl;
 
 import com.od.jtimeseries.capture.TimedCapture;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
-import com.od.jtimeseries.scheduling.GroupByPeriodScheduler;
-import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.scheduling.Scheduler;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.impl.DefaultValueRecorder;

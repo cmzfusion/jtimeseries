@@ -22,8 +22,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpMessage;
 import com.od.jtimeseries.net.udp.UdpServer;
+import com.od.jtimeseries.server.util.path.PathMapper;
+import com.od.jtimeseries.server.util.path.PathMappingResult;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -31,9 +34,7 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -62,8 +63,14 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
 
     private TimeSeriesContext rootContext;
 
-    public AppendToSeriesMessageListener(TimeSeriesContext rootContext) {
+    private PathMapper pathMapper;
+    private Set<String> loggedDeniedPaths = Collections.synchronizedSet(new HashSet<String>());
+    private Set<String> loggedMigratedPaths = Collections.synchronizedSet(new HashSet<String>());
+
+
+    public AppendToSeriesMessageListener(TimeSeriesContext rootContext, PathMapper pathMapper) {
         this.rootContext = rootContext;
+        this.pathMapper = pathMapper;
 
         scheduleReportingAndCleanup(NamedExecutors.newSingleThreadScheduledExecutor("AppendToSeriesMessageListener"));
     }
@@ -98,8 +105,26 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
     }
 
     private void processNewTimeSeriesValue(TimeSeriesValueMessage v) {
+        String path = v.getSeriesPath();
+        PathMappingResult result = pathMapper.getPathMapping(path);
+        if ( result.getType() == PathMappingResult.ResultType.DENY) {
+            if ( loggedDeniedPaths.add(path)) {
+                logMethod.logInfo("Not creating a series for path " + path + ", this is an invalid series path which is denied by path mapping rules configuration");
+            }
+        } else if ( result.getType() == PathMappingResult.ResultType.MIGRATE) {
+            if ( loggedMigratedPaths.add(path)) {
+                logMethod.logInfo("Series with path " + path + " will be migrated to path " + result.getNewPath() + " due to path mapping rules configuration");
+            }
+            path = result.getNewPath();
+            findOrCreateSeriesAndAddTimepoint(v, path);
+        } else if ( result.getType() == PathMappingResult.ResultType.PERMIT) {
+            findOrCreateSeriesAndAddTimepoint(v, path);
+        }
+    }
+
+    private void findOrCreateSeriesAndAddTimepoint(TimeSeriesValueMessage v, String path) {
         try {
-            TimeSeries s = rootContext.createTimeSeries(v.getContextPath(), v.getDescription());
+            TimeSeries s = rootContext.getOrCreateTimeSeries(path, v.getDescription());
             s.addItem(v.getTimeSeriesItem());
 
             if ( updateMessagesReceivedCounter != null) {
@@ -107,14 +132,14 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
             }
 
             synchronized (liveSeriesLastUpdateMap) {
-                Long lastTimestamp = liveSeriesLastUpdateMap.get(v.getContextPath());
+                Long lastTimestamp = liveSeriesLastUpdateMap.get(path);
                 if ( lastTimestamp == null) {
-                    liveSeriesLastUpdateMap.put(v.getContextPath(), System.currentTimeMillis());
-                    logMethod.logInfo("Started to receive UDP updates for series " + v.getContextPath() + " from host " + v.getHostname() + " with address " + v.getInetAddress());
+                    liveSeriesLastUpdateMap.put(path, System.currentTimeMillis());
+                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getHostname() + " with address " + v.getInetAddress());
                 }
             }
         } catch ( Exception e) {
-            logMethod.logError("Error when trying to create timeseries for UDP series "  + v.getContextPath() + " from host " + v.getInetAddress() + " with address " + v.getInetAddress());
+            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getInetAddress() + " with address " + v.getInetAddress());
             logMethod.logDebug("Error when trying to create timeseries", e);
         }
     }

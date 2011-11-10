@@ -117,6 +117,17 @@ public abstract class LockingIdentifiable implements Identifiable {
     }
     protected abstract <E extends Identifiable> E create_Locked(String path, String description, Class<E> clazz, Object... parameters);
 
+    public <E extends Identifiable> E getOrCreate(String path, String description, Class<E> clazz, Object... parameters) {
+         try {
+            getTreeLock().writeLock().lock();
+            return getOrCreate_Locked(path, description, clazz, parameters);
+        } finally {
+            getTreeLock().writeLock().unlock();
+        }
+    }
+
+    protected abstract <E extends Identifiable> E getOrCreate_Locked(String path, String description, Class<E> clazz, Object[] parameters);
+
     public final boolean removeChild(Identifiable c) {
         try {
             getTreeLock().writeLock().lock();

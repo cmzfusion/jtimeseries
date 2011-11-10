@@ -124,10 +124,10 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
         //we don't know what type of UIPropertiesTimeSeries the destination context should contain
         //defer construction to the context's factories by using the generic create method on context
         destinationRootContext.create(
-            path,
-            series.getDescription(),
-            UIPropertiesTimeSeries.class,
-            config
+                path,
+                series.getDescription(),
+                UIPropertiesTimeSeries.class,
+                config
         );
     }
 

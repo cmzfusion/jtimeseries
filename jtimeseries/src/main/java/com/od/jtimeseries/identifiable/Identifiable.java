@@ -78,7 +78,9 @@ public interface Identifiable {
 
     <E extends Identifiable> E get(String path, Class<E> classType);
 
-    <E extends Identifiable> E create(String id, String description, Class<E> clazz, Object... parameters);
+    <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters);
+
+    <E extends Identifiable> E getOrCreate(String path, String description, Class<E> clazz, Object... parameters);
 
     Identifiable remove(String path);
 

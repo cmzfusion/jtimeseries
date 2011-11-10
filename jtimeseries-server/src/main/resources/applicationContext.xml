@@ -10,7 +10,8 @@
     </bean>
 
     <import resource="managedMetrics.xml"/>
-    <import resource="summaryStats.xml"/>    
+    <import resource="summaryStats.xml"/>
+    <import resource="pathMappings.xml"/>
 
     <bean id="seriesDirectory" class="java.io.File">
         <constructor-arg value="${seriesDirectory}"/>
@@ -46,6 +47,7 @@
         <constructor-arg ref="seriesDirectory"/>
         <constructor-arg ref="fileSerializer"/>
         <constructor-arg ref="rootContext"/>
+        <constructor-arg ref="pathMapper"/>
         <constructor-arg value="${seriesFileSuffix}"/>
         <constructor-arg value="${maxSeriesCount}"/>
         <constructor-arg value="${maxDiskSpaceForSeriesInMB}"/>
@@ -93,6 +95,7 @@
         <property name="summaryStatisticsCalculator" ref="summaryStatsCalculator"/>
         <property name="htmlAdaptorServer" ref="htmlAdaptorServer"/>
         <property name="jmxManagementPort" value="${jmxManagementPort}"/>
+        <property name="pathMapper" ref="pathMapper"/>
     </bean>
 
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">

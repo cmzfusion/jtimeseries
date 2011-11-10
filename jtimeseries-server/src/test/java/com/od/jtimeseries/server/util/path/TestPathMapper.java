@@ -17,7 +17,6 @@ public class TestPathMapper extends TestCase{
     private PathMapper mapper;
 
     public void setUp() throws Exception {
-
         PathMigration pathTranslation = new PathMigration();
         HashMap<String,String> patternMap = new HashMap<String,String>();
         patternMap.put("root\\.child1", "root\\.child2");
@@ -51,9 +50,6 @@ public class TestPathMapper extends TestCase{
     }
 
     private PathMappingResult getExpectedResult(String p, PathMappingResult.ResultType t) {
-        return new PathMappingResult(
-                    t,
-                    p
-            );
+        return new PathMappingResult(t, p);
     }
 }

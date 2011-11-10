@@ -34,7 +34,7 @@ import java.util.Properties;
 public class TimeSeriesValueMessage extends UdpMessage {
 
     public static final String MESSAGE_TYPE = "TimeSeriesValueMessage";
-    public static final String CONTEXT_PATH_KEY = "CONTEXT_PATH";
+    public static final String SERIES_PATH_KEY = "CONTEXT_PATH"; //keep CONTEXT_PATH to support legacy clients although this is series path
     public static final String TIMESTAMP_KEY = "TIMESTAMP";
     public static final String NUMERIC_VALUE_KEY = "VALUE";
     public static final String DESCRIPTION_KEY = "DESCRIPTION";
@@ -45,13 +45,13 @@ public class TimeSeriesValueMessage extends UdpMessage {
      * The seriesDescription will be truncated if it might be too large to fit into one datagram packet
      * but for most practical purposes it can be long enough.
      */
-    public TimeSeriesValueMessage(String contextPath, String seriesDescription, TimeSeriesItem timeSeriesItem) {
+    public TimeSeriesValueMessage(String seriesPath, String seriesDescription, TimeSeriesItem timeSeriesItem) {
         super(MESSAGE_TYPE);
 
         //truncate the description if likely to cause a 'too large' datagram packet
         seriesDescription = seriesDescription.length() > 3000 ? seriesDescription.substring(0, 3000) : seriesDescription;
 
-        setProperty(CONTEXT_PATH_KEY, contextPath);
+        setProperty(SERIES_PATH_KEY, seriesPath);
         setProperty(TIMESTAMP_KEY, String.valueOf(timeSeriesItem.getTimestamp()));
         setProperty(NUMERIC_VALUE_KEY, timeSeriesItem.getValue().toString());
         setProperty(DESCRIPTION_KEY, seriesDescription);
@@ -61,8 +61,8 @@ public class TimeSeriesValueMessage extends UdpMessage {
         super(p);
     }
 
-    public String getContextPath() {
-        return getProperty(CONTEXT_PATH_KEY);
+    public String getSeriesPath() {
+        return getProperty(SERIES_PATH_KEY);
     }
 
     public String getDescription() {

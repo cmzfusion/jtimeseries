@@ -76,11 +76,23 @@ public interface Identifiable {
 
     boolean contains(String path);
 
+    /**
+     * @return the Identifiable at path which is assignable to classType, or null if no identifiable exists at this path
+     * @throws WrongClassTypeException if there is an identifiable at path which is not assignable to classType
+     */
     <E extends Identifiable> E get(String path, Class<E> classType);
 
-    <E extends Identifiable> E create(String path, String description, Class<E> clazz, Object... parameters);
+    /**
+     * @return a newly created Identifiable at path which is assignable to classType
+     * @throws DuplicateIdException if there is already an identifiable at path
+     */
+    <E extends Identifiable> E create(String path, String description, Class<E> classType, Object... parameters);
 
-    <E extends Identifiable> E getOrCreate(String path, String description, Class<E> clazz, Object... parameters);
+    /**
+     * @return Identifiable at path which is assignable to classType - the existing instance if an Identifiable already exists, if not a newly created instance
+     * @throws WrongClassTypeException if there is already an identifiable at path which is not assignable to classType
+     */
+    <E extends Identifiable> E getOrCreate(String path, String description, Class<E> classType, Object... parameters);
 
     Identifiable remove(String path);
 

@@ -5,6 +5,7 @@ import com.od.jtimeseries.capture.CaptureFactory;
 import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.capture.impl.DefaultCaptureFactory;
 import com.od.jtimeseries.context.impl.DefaultContextFactory;
+import com.od.jtimeseries.identifiable.DuplicateIdException;
 import com.od.jtimeseries.identifiable.WrongClassTypeException;
 import com.od.jtimeseries.scheduling.NonGroupingScheduler;
 import com.od.jtimeseries.source.Counter;
@@ -98,6 +99,25 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         } catch ( Throwable t) {
             fail("Expected WrongClassTypeException");
         }
+    }
+
+    @Test
+    public void testGetOrCreateById() {
+        assertSame(childContext, rootContext.getOrCreate(childContext.getId(), childContext.getId(), TimeSeriesContext.class));
+        assertSame(counter, rootContext.getOrCreate(counter.getId(), counter.getId(), ValueSource.class));
+
+        //the identifiable with counter id is not a time series, so this should throw an exception
+        try {
+            rootContext.getOrCreate(counter.getId(), counter.getId(), IdentifiableTimeSeries.class);
+            fail("Should throw a WrongClassTypeException");
+        } catch ( WrongClassTypeException w ) {
+        } catch ( Throwable t) {
+            fail("Expected WrongClassTypeException");
+        }
+
+        //this should create a new series, since id 'newSeries' does not yet exist
+        IdentifiableTimeSeries s = rootContext.getOrCreate("newSeries", "newSeries", IdentifiableTimeSeries.class);
+        assertNotNull(s);
     }
 
     @Test
@@ -228,8 +248,36 @@ public class TestContext extends AbstractSimpleCaptureFixture {
         assertEquals("grandchild2", rootContext.getContext("child2").getContext("grandchild2").getDescription());
         assertEquals("wibble", rootContext.getContext("child2").getContext("grandchild2").getContext("greatgrandchild1").getDescription());
 
-        //creating a context with a "" path just returns the current context
-        assertEquals(rootContext, rootContext.createContext("", ""));
+        //getOrCreate a context with a "" path just returns the current context
+        assertEquals(rootContext, rootContext.getOrCreateContext("", ""));
+    }
+
+    @Test
+    public void createDuplicateFails() {
+        rootContext.createContext("child2.grandchild1");
+        try {
+            rootContext.createContext("child2.grandchild1");
+            fail("Should not be able to create duplicate context");
+        } catch ( DuplicateIdException e) {
+        }
+
+        rootContext.createTimeSeries("testChildContext.testSeriesId", "TestDescription");
+        try {
+            rootContext.createTimeSeries("testChildContext.testSeriesId", "TestDescription");
+            fail("Should not be able to create duplicate series");
+        } catch ( DuplicateIdException e) {
+        }
+    }
+
+     @Test
+    public void getOrCreateDuplicateReturnsSameInstanceForDuplicatePath() {
+        TimeSeriesContext c = rootContext.getOrCreateContext("child2.grandchild1");
+        TimeSeriesContext c2 = rootContext.getOrCreateContext("child2.grandchild1");
+        assertTrue( c == c2);
+
+        IdentifiableTimeSeries i = rootContext.getOrCreateTimeSeries("testChildContext.testSeriesId", "TestDescription");
+        IdentifiableTimeSeries i2 = rootContext.getOrCreateTimeSeries("testChildContext.testSeriesId", "TestDescription");
+        assertTrue( i == i2 );
     }
 
     @Test

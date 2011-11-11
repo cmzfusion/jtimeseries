@@ -20,6 +20,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.source.ValueSupplier;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
@@ -49,18 +50,13 @@ public class TotalSeriesMetric extends AbstractManagedMetric {
         this.countPeriod = countPeriod;
     }
 
-
-    public String getSeriesId() {
-        return id;
+    protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        metricContext.createTimedValueSupplierSeries(
-            id,
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        rootContext.createTimedValueSupplierSeries(
+            path,
             "Total number of series managed by the server",
             new TotalSeriesCountValueSupplier(),
             countPeriod

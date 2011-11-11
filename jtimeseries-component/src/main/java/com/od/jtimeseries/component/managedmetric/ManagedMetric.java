@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.component.managedmetric;
 
+import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.context.TimeSeriesContext;
 
 /**
@@ -33,6 +34,6 @@ public interface ManagedMetric {
      * Called by the server to ask the metric to initialize itself
      * Typically this will involve creating one or more new timeseries
      */
-    public void initializeMetrics(TimeSeriesContext rootContext) ;
+    public void initializeMetrics(TimeSeriesContext rootContext, PathMapper pathMapper) ;
 
 }

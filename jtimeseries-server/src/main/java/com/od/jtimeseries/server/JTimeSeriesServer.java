@@ -31,7 +31,7 @@ import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
-import com.od.jtimeseries.server.util.path.PathMapper;
+import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.util.time.Time;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 

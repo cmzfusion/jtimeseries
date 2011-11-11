@@ -3,6 +3,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -30,16 +31,12 @@ public class HttpRequestTimeMetric extends AbstractManagedMetric {
         this.captureTime = captureTime;
     }
 
-    public String getSeriesId() {
-        return id;
+    protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        ValueRecorder v = metricContext.createValueRecorderSeries(id, "Length of time taken to process HTTP requests in milliseconds", MEDIAN(captureTime), CaptureFunctions.MAX(captureTime));
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        ValueRecorder v = rootContext.createValueRecorderSeries(path, "Length of time taken to process HTTP requests in milliseconds", MEDIAN(captureTime), CaptureFunctions.MAX(captureTime));
         ServerHttpRequestMonitor.setHttpRequestTimeValueRecorder(v);
     }
 }

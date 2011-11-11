@@ -21,6 +21,8 @@ package com.od.jtimeseries.component.managedmetric.jmx;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
 import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
+import com.od.jtimeseries.component.util.path.PathMapper;
+import com.od.jtimeseries.component.util.path.PathMappingResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
@@ -116,24 +118,40 @@ public class JmxMetric implements ManagedMetric {
         JmxMetric.jmxExecutorService = jmxExecutorService;
     }
 
-    public void initializeMetrics(TimeSeriesContext rootContext) {
+    public void initializeMetrics(TimeSeriesContext rootContext, PathMapper pathMapper) {
         try {
             url = new JMXServiceURL(serviceUrl);
         } catch (MalformedURLException e) {
             logMethods.logError("Failed to set up JMX Metric - bad URL " + serviceUrl, e);
         }
 
-        createJmxTasks(rootContext);
+        createJmxTasks(rootContext, pathMapper);
 
         //adding the triggerable to root context should cause it to start getting triggered
         rootContext.addChild(new TriggerableJmxConnectTask());
     }
 
-    private void createJmxTasks(TimeSeriesContext rootContext) {
+    private void createJmxTasks(TimeSeriesContext rootContext, PathMapper pathMapper) {
         for (JmxMeasurement m : jmxMeasurements) {
-            ValueRecorder r = rootContext.createValueRecorderSeries(m.getParentContextPath() + Identifiable.NAMESPACE_SEPARATOR + m.getId(), m.getDescription());
-            measurementTasks.add(new JmxMeasurementTask(r, m));
+            String path = m.getParentContextPath() + Identifiable.NAMESPACE_SEPARATOR + m.getId();
+            PathMappingResult r = pathMapper.getPathMapping(path);
+            switch ( r.getType()) {
+                case PERMIT:
+                    doCreateMetric(rootContext, path, m);
+                    break;
+                case MIGRATE:
+                    doCreateMetric(rootContext, r.getNewPath(), m);
+                    break;
+                case DENY:
+                default:
+                    logMethods.logError("Cannot create JMX metric at path " + path + " this path is denied by PathMapper rules");
+            }
         }
+    }
+
+    private void doCreateMetric(TimeSeriesContext rootContext, String newPath, JmxMeasurement m) {
+        ValueRecorder r = rootContext.createValueRecorderSeries(newPath, m.getDescription());
+        measurementTasks.add(new JmxMeasurementTask(r, m));
     }
 
     private class TriggerableJmxConnectTask extends IdentifiableBase implements Triggerable {

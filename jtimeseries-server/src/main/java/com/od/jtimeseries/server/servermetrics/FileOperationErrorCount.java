@@ -2,6 +2,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -28,16 +29,12 @@ public class FileOperationErrorCount extends AbstractManagedMetric {
         this.captureTime = captureTime;
     }
 
-    public String getSeriesId() {
-        return id;
+    protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Count of errors encountered during series file reads or writes", COUNT_OVER(captureTime));
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        Counter c = rootContext.createCounterSeries(path, "Count of errors encountered during series file reads or writes", COUNT_OVER(captureTime));
         RoundRobinSerializer.setFileErrorCounter(c);
     }
 }

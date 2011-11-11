@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.util.path;
+package com.od.jtimeseries.component.util.path;
 
 /**
  * Created by IntelliJ IDEA.
@@ -8,7 +8,7 @@ package com.od.jtimeseries.server.util.path;
  */
 public abstract class AbstractPathProcessingRule implements PathProcessingRule {
 
-    private PathProcessingRule decoratedRule = new NullProcessingRule();
+    private PathProcessingRule decoratedRule = PathProcessingRule.NULL_PROCESSING_RULE;
 
     public AbstractPathProcessingRule(PathProcessingRule decoratedRule) {
         this.decoratedRule = decoratedRule;
@@ -34,17 +34,4 @@ public abstract class AbstractPathProcessingRule implements PathProcessingRule {
 
     protected abstract PathMappingResult doGetPath(PathMappingResult s);
 
-    /**
-     * A rule which simply returns the path unchanged, used to terminate a chain of decorated
-     * processing rules
-     */
-    private static class NullProcessingRule implements PathProcessingRule {
-
-        public void initialize() {
-        }
-
-        public PathMappingResult getPath(PathMappingResult path) {
-            return path;
-        }
-    }
 }

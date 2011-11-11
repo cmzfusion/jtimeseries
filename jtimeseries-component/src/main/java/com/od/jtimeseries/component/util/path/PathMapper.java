@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.util.path;
+package com.od.jtimeseries.component.util.path;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,6 +12,10 @@ public class PathMapper {
 
     private ConcurrentHashMap<String,PathMappingResult> pathMappings = new ConcurrentHashMap<String, PathMappingResult>();
     private PathProcessingRule rule;
+
+    public PathMapper() {
+        this(PathProcessingRule.NULL_PROCESSING_RULE);
+    }
 
     /**
      * Create a PathMapper with a rule (which may be last rule in a chain of decorated rules)

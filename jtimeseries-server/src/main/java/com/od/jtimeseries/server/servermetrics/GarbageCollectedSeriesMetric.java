@@ -20,6 +20,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -48,17 +49,13 @@ public class GarbageCollectedSeriesMetric extends AbstractManagedMetric {
         this.countPeriod = countPeriod;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
+   protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getSeriesId() {
-        return id;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter counter = metricContext.createCounterSeries(
-                id,
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        Counter counter = rootContext.createCounterSeries(
+                path,
                 "A count of the series deallocated for memory efficiency, we would expect a heavily loaded server to " +
                 "regularly deallocate series data once it is no longer possible to maintain all series data in RAM",
                 COUNT_OVER(countPeriod));

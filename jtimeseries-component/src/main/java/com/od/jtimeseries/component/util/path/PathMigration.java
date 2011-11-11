@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.util.path;
+package com.od.jtimeseries.component.util.path;
 
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;

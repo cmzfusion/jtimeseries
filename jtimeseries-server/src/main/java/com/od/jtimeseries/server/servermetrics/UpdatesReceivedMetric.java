@@ -20,6 +20,7 @@ package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -35,7 +36,7 @@ import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
  */
 public class UpdatesReceivedMetric extends AbstractManagedMetric {
 
-    private static final String SERIES_ID = "UdpSeriesUpdates";
+    private static final String id = "UdpSeriesUpdates";
     private TimePeriod countPeriod;
     private String parentContextPath;
 
@@ -48,17 +49,13 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
         this.countPeriod = countPeriod;
     }
 
-    public String getSeriesId() {
-        return SERIES_ID;
+    protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter counter = metricContext.createCounterSeries(
-            SERIES_ID,
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        Counter counter = rootContext.createCounterSeries(
+            path,
             "A count of series data update UDP datagram messages received",
             COUNT_OVER(countPeriod)
         );

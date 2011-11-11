@@ -20,6 +20,7 @@ package com.od.jtimeseries.component.managedmetric;
 
 import com.od.jtimeseries.component.managedmetric.jmx.JmxExecutorService;
 import com.od.jtimeseries.component.managedmetric.jmx.JmxMetric;
+import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -40,11 +41,17 @@ public class ManagedMetricInitializer {
     private TimeSeriesContext rootContext;
     private List<ManagedMetricSource> managedMetricSourceList;
     private JmxExecutorService jmxExecutorService;
+    private PathMapper pathMapper;
 
     public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxExecutorService jmxExecutorService) {
+        this(rootContext, managedMetricSourceList, jmxExecutorService, new PathMapper());
+    }
+
+    public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxExecutorService jmxExecutorService, PathMapper pathMapper) {
         this.rootContext = rootContext;
         this.managedMetricSourceList = managedMetricSourceList;
         this.jmxExecutorService = jmxExecutorService;
+        this.pathMapper = pathMapper;
     }
 
     public void initializeServerMetrics() {
@@ -64,7 +71,7 @@ public class ManagedMetricInitializer {
 
     private void setupMetric(ManagedMetric m) {
         try {
-            m.initializeMetrics(rootContext);
+            m.initializeMetrics(rootContext, pathMapper);
         } catch (Throwable t) {
             logMethods.logError("Failed to set up managed metric " + m.getClass() + " " + m, t);
         }

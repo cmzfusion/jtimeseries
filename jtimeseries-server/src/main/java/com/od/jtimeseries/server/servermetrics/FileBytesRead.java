@@ -3,6 +3,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -30,16 +31,12 @@ public class FileBytesRead extends AbstractManagedMetric {
         this.captureTime = captureTime;
     }
 
-    public String getSeriesId() {
-        return id;
+    protected String getSeriesPath() {
+        return parentContextPath + Identifiable.NAMESPACE_SEPARATOR + id;
     }
 
-    public String getParentContextPath() {
-        return parentContextPath;
-    }
-
-    public void doInitializeMetric(TimeSeriesContext metricContext) {
-        Counter c = metricContext.createCounterSeries(id, "Bytes read from timeseries files", COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
+    public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
+        Counter c = rootContext.createCounterSeries(path, "Bytes read from timeseries files", COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
         RoundRobinSerializer.setFileBytesRead(c);
     }
 }

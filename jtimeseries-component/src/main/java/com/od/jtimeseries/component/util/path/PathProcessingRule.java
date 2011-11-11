@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.util.path;
+package com.od.jtimeseries.component.util.path;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,6 +9,8 @@ package com.od.jtimeseries.server.util.path;
  * Rule to process a path in PathMapper
  */
 public interface PathProcessingRule {
+
+    public static final PathProcessingRule NULL_PROCESSING_RULE = new NullProcessingRule();
 
     /**
      * Initialize the rule, called once before the rule is first used
@@ -23,4 +25,19 @@ public interface PathProcessingRule {
      */
     PathMappingResult getPath(PathMappingResult path);
 
+
+
+    /**
+     * A rule which simply returns the path unchanged, used to terminate a chain of decorated
+     * processing rules
+     */
+    class NullProcessingRule implements PathProcessingRule {
+
+        public void initialize() {
+        }
+
+        public PathMappingResult getPath(PathMappingResult path) {
+            return path;
+        }
+    }
 }

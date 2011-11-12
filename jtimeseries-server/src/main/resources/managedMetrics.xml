@@ -136,6 +136,7 @@
                 <constructor-arg value="${jmxConnectionMaxAgeMillis}"/>
             </bean>
         </constructor-arg>
+        <constructor-arg ref="pathMapper"/>
     </bean>
 	
 </beans>

@@ -13,7 +13,7 @@
         </property>
     </bean>
 
-    <bean id="pathMapper" class="com.od.jtimeseries.component.util.path.PathMapper">
+    <bean id="pathMapper" class="com.od.jtimeseries.component.util.path.PathMapper" init-method="initialize">
         <constructor-arg ref="pathRestriction"/>
     </bean>
 

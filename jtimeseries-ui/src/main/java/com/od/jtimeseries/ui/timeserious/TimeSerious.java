@@ -33,7 +33,7 @@ import com.od.jtimeseries.ui.util.JideInitialization;
 import com.od.jtimeseries.ui.util.LocalJmxMetrics;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import od.configutil.ConfigManagerException;
+import od.configutil.util.ConfigManagerException;
 
 import javax.swing.*;
 import java.io.IOException;

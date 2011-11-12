@@ -23,7 +23,7 @@ import com.od.jtimeseries.ui.config.ConfigInitializer;
 import com.od.jtimeseries.ui.config.TimeSeriousConfig;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import od.configutil.ConfigManagerException;
+import od.configutil.util.ConfigManagerException;
 
 import javax.swing.*;
 

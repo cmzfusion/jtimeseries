@@ -20,9 +20,9 @@ package com.od.jtimeseries.ui.config;
 
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import od.configutil.ConfigLogImplementation;
+import od.configutil.util.ConfigLogImplementation;
 import od.configutil.ConfigManager;
-import od.configutil.XStreamSeralizer;
+import od.configutil.serializer.XStreamSeralizer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,7 +43,7 @@ public class ConfigManagerForTimeSerious extends ConfigManager {
     }
 
     private void setupLogging() {
-        ConfigLogImplementation.setLogMethods(new od.configutil.LogMethods() {
+        ConfigLogImplementation.setLogMethods(new od.configutil.util.LogMethods() {
 
             public void info(String s) {
                 logMethods.logInfo(s);

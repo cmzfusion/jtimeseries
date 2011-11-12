@@ -21,8 +21,8 @@ package com.od.jtimeseries.ui.uicontext;
 import com.od.jtimeseries.ui.config.ConfigManagerForTimeSerious;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import od.configutil.ConfigManager;
-import od.configutil.ConfigManagerException;
-import od.configutil.FileSource;
+import od.configutil.util.ConfigManagerException;
+import od.configutil.sinkandsource.FileSource;
 
 import java.io.File;
 import java.util.ArrayList;

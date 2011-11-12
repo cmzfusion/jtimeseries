@@ -122,9 +122,11 @@ public class SeriesDirectoryManager {
     private void loadSeriesFile(FileHeader header) {
         //the type of time series which will be created depends on the TimeSeriesFactory set on the context
         //we are expecting FilesystemTimeSeries
-        logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
-        rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
-        loadCount++;
+        if ( ! rootContext.contains(header.getPath())) { //this may be a server metrics series which has already been created
+            logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
+            rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
+            loadCount++;
+        }
     }
 
     private File[] getCandidateSeriesFiles() {

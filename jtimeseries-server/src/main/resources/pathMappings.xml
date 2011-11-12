@@ -8,6 +8,9 @@
 
     <bean id="pathRestriction" class="com.od.jtimeseries.component.util.path.PathRestriction">
         <constructor-arg ref="pathMigration"/>
+        <property name="permittedPaths">
+            <list><value>.*</value></list>
+        </property>
     </bean>
 
     <bean id="pathMapper" class="com.od.jtimeseries.component.util.path.PathMapper">

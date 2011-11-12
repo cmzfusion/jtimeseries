@@ -40,8 +40,8 @@ public class DisplayNamePatternConfig implements ExportableConfig {
         this.displayNamePatterns = displayNamePatterns;
     }
 
-    public DisplayNamePatternConfig() {
-    }
+    //no params constructor required for bean xml persistence
+    public DisplayNamePatternConfig() {}
 
     public void setDisplayNamePatterns(List<DisplayNamePattern> displayNamePatterns) {
         this.displayNamePatterns = displayNamePatterns;

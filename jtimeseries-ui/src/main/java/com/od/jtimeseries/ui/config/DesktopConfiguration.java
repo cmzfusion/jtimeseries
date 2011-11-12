@@ -38,6 +38,9 @@ public class DesktopConfiguration implements ExportableConfig {
     private java.util.List<VisualizerConfiguration> visualizerConfigurations = new LinkedList<VisualizerConfiguration>();
     private boolean isShown = true;
 
+    //no params constructor required for bean xml persistence
+    public DesktopConfiguration() {}
+
     public DesktopConfiguration(String desktopTitle) {
         this.title = desktopTitle;
     }

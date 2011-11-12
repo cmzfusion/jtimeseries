@@ -25,8 +25,8 @@ import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import od.configutil.ConfigManager;
-import od.configutil.ConfigManagerException;
-import od.configutil.FileSink;
+import od.configutil.util.ConfigManagerException;
+import od.configutil.sinkandsource.FileSink;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

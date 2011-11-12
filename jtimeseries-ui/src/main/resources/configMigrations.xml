@@ -3,12 +3,12 @@
   <migrationList>
     <migration>
       <targetVersion>201011181800</targetVersion>
-      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
     <migration>
       <targetVersion>201102281100</targetVersion>
-      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.RegexMigrationStrategy</migrationClass>
       <arguments>
         <string>Last Refresh\w</string>
         <string>Last Refresh Time</string>
@@ -16,7 +16,7 @@
     </migration>
     <migration>
       <targetVersion>201102281110</targetVersion>
-      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.RegexMigrationStrategy</migrationClass>
       <arguments>
         <string>Refresh\(s\)</string>
         <string>Refresh Frequency\(s\)</string>
@@ -24,7 +24,7 @@
     </migration>
      <migration> <!-- remove old display name patterns -->
       <targetVersion>201104041710</targetVersion>
-      <migrationClass>od.configutil.XPathMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.XPathMigrationStrategy</migrationClass>
       <arguments>
         <string>descendant-or-self::displayNamePatterns</string>
         <string>REMOVE NODE</string>
@@ -32,7 +32,7 @@
     </migration>
      <migration>
       <targetVersion>201104291000</targetVersion>
-      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.RegexMigrationStrategy</migrationClass>
       <arguments>
         <string>chartsTitle</string>
         <string>title</string>
@@ -40,7 +40,7 @@
     </migration>
     <migration>
       <targetVersion>201104291100</targetVersion>
-      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.RegexMigrationStrategy</migrationClass>
       <arguments>
         <string>desktopName</string>
         <string>title</string>
@@ -48,7 +48,7 @@
     </migration>
     <migration>
       <targetVersion>201104291700</targetVersion>
-      <migrationClass>od.configutil.RegexMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.RegexMigrationStrategy</migrationClass>
       <arguments>
         <string>frameBounds</string>
         <string>frameLocation</string>
@@ -56,22 +56,22 @@
     </migration>
     <migration>
       <targetVersion>201108151900</targetVersion>
-      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
     <migration>
       <targetVersion>201109151335</targetVersion>
-      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
     <migration>
       <targetVersion>201109261700</targetVersion>
-      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
     <migration>
       <targetVersion>201110011500</targetVersion>
-      <migrationClass>od.configutil.NullMigrationStrategy</migrationClass>
+      <migrationClass>od.configutil.migration.NullMigrationStrategy</migrationClass>
       <arguments/>
     </migration>
   </migrationList>

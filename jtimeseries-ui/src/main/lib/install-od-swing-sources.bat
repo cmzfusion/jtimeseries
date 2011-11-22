@@ -1,1 +1,1 @@
-mvn install:install-file -Dfile=od-swing-1.0.9-sources.jar -DgroupId=od -DartifactId=od-swing -Dversion=1.0.9 -Dpackaging=jar -Dclassifier=sources
+mvn install:install-file -Dfile=od-swing-1.0.11-sources.jar -DgroupId=od -DartifactId=od-swing -Dversion=1.0.11 -Dpackaging=jar -Dclassifier=sources

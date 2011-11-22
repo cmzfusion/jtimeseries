@@ -1,0 +1,1 @@
+mvn install:install-file -Dfile=od-configutil-1.1.jar -DgroupId=od -DartifactId=od-configutil -Dversion=1.1 -Dpackaging=jar

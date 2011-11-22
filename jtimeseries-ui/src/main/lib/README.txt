@@ -13,6 +13,9 @@ SWINGCOMMAND:
 This is a Object Definitions Ltd. framework for asynchronous swing commands, similar in purpose to 
 swingworker, available under the apache 2.0 open source license.
 
+OD-CONFIGUTIL
+This is a utility package to manage configuration files, and migrations between versions
+
 JIDE JARS:
 The jtimeseries project has an open source license, granted by jidesoft, to use the jide components and
 jide jars which are included in this directory, although in fact only jide-grids and jide-common are 

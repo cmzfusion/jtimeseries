@@ -22,9 +22,9 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(ServerHttpRequestMonitor.class);
     private static volatile ValueRecorder htpRequestTimeValueRecorder = DefaultValueRecorder.NULL_VALUE_RECORDER;
-    private static Counter requestCounter = DefaultCounter.NULL_COUNTER;
-    private static Counter requestErrorCounter = DefaultCounter.NULL_COUNTER;
-    private static Counter requestInvalidCounter;
+    private static volatile Counter requestCounter = DefaultCounter.NULL_COUNTER;
+    private static volatile Counter requestErrorCounter = DefaultCounter.NULL_COUNTER;
+    private static volatile Counter requestInvalidCounter = DefaultCounter.NULL_COUNTER;
 
     private ThreadLocal<Long> requestStartTimes = new ThreadLocal<Long>();
 

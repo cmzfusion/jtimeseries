@@ -54,9 +54,24 @@ public class FileHeader extends LockingFileHeader {
     private static int MAX_PROPERTY_LENGTH = 1024;
 
     private volatile int headerLength = DEFAULT_HEADER_START_LENGTH;  //default start length for header
+
+    /**
+     * Max size of series
+     */
     private volatile int seriesMaxLength;
+
+    /**
+     * round robin position of item with the earliest timestamp
+     */
     private volatile int currentHead;
+
+    /**
+     * position at which to next series item (position after item with the latest timestamp)
+     * will equal currentHead if we already have max number of items in series
+     */
     private volatile int currentTail;
+
+
     private volatile long mostRecentItemTimestamp = -1;
 
     private SeriesProperties seriesProperties = new SeriesProperties();
@@ -164,6 +179,9 @@ public class FileHeader extends LockingFileHeader {
     }
 
     void doUpdateHeaderFields(int newHeaderLength, int head, int tail, int seriesMaxLength, long latestTimestamp) {
+        assert(tail >= 0 && tail <= seriesMaxLength);
+        assert(head >= -1 && head <= seriesMaxLength);
+        //logMethods.logInfo(head + ", " + tail + ", " + seriesMaxLength);
         this.headerLength = newHeaderLength;
         this.currentHead = head;
         this.currentTail = tail;

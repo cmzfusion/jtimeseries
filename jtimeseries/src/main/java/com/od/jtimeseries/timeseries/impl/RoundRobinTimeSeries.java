@@ -62,6 +62,11 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
         checkSize();
     }
 
+    protected void locked_addAll(Iterable<TimeSeriesItem> items) {
+        super.locked_addAll(items);
+        checkSize();
+    }
+
     private void checkSize() {
         while (size() > maxSize) {
             removeItem(getEarliestItem());

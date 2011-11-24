@@ -204,7 +204,7 @@ public class JmxMetric implements ManagedMetric {
             try {
                 w = getJmxConnectionPool().getConnection(url);
             } catch (Throwable t) {
-                if ( t.getCause() instanceof IOException || t.getCause() instanceof ServiceUnavailableException) {
+                if ( t instanceof IOException || t instanceof ServiceUnavailableException) {
                     //stop stack traces for connect exceptions filling the logs
                     logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
                 } else {

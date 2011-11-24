@@ -6,7 +6,7 @@ package com.od.jtimeseries.component.managedmetric.jmx;
  * Date: 24/11/11
  * Time: 21:43
  */
-public interface Acquirable {
+interface Acquirable {
 
      void acquire();
 

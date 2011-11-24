@@ -35,7 +35,7 @@ import java.util.*;
  * Once the pool is full, an attempt to create an acquirable with a key which is not currently known will cause the oldest
  * acquirable in the pool to be removed
  */
-public abstract class AbstractKeyedAcquirablePool<K, E extends Acquirable> {
+abstract class AbstractKeyedAcquirablePool<K, E extends Acquirable> {
 
     private LinkedHashMap<K, E> activeAcquirables = new LinkedHashMap<K, E>();
     private int maxPoolSize = 10;

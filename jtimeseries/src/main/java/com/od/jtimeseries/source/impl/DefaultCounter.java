@@ -74,6 +74,10 @@ public class DefaultCounter implements Counter {
         currentValue.set(0);
     }
 
+    public long getCount() {
+        return currentValue.get();
+    }
+
     public String getId() {
         return simpleSource.getId();
     }

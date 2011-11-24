@@ -14,43 +14,50 @@ import java.io.File;
  */
 public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
-    protected static Counter fileAppendCounter = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileRewriteCounter = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileReadCounter = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileHeaderReadCounter = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileErrorCounter = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileBytesWritten = DefaultCounter.NULL_COUNTER;
-    protected static Counter fileBytesRead = DefaultCounter.NULL_COUNTER;
+    protected static Counter fileAppendCounter = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileRewriteCounter = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileReadCounter = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileHeaderReadCounter = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileErrorCounter = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileBytesWritten = new DefaultCounter("dummyCounter", "");
+    protected static Counter fileBytesRead = new DefaultCounter("dummyCounter", "");
 
     protected final Object readWriteLock = new Object();
     protected volatile boolean shutdown;
 
     public static void setFileAppendCounter(Counter fileAppendCounter) {
+        fileAppendCounter.incrementCount(AbstractLockedSerializer.fileAppendCounter.getCount());  //add startup count
         AbstractLockedSerializer.fileAppendCounter = fileAppendCounter;
     }
 
     public static void setFileRewriteCounter(Counter fileRewriteCounter) {
+        fileRewriteCounter.incrementCount(AbstractLockedSerializer.fileRewriteCounter.getCount()); //add startup count
         AbstractLockedSerializer.fileRewriteCounter = fileRewriteCounter;
     }
 
     public static void setFileReadCounter(Counter fileReaderCounter) {
+        fileReaderCounter.incrementCount(AbstractLockedSerializer.fileReadCounter.getCount()); //add startup count
         AbstractLockedSerializer.fileReadCounter = fileReaderCounter;
     }
 
     public static void setFileHeaderReadCounter(Counter fileHeaderReadCounter) {
+        fileHeaderReadCounter.incrementCount(AbstractLockedSerializer.fileHeaderReadCounter.getCount()); //add startup count
         AbstractLockedSerializer.fileHeaderReadCounter = fileHeaderReadCounter;
     }
 
     public static void setFileErrorCounter(Counter fileErrorCounter) {
+        fileErrorCounter.incrementCount(AbstractLockedSerializer.fileErrorCounter.getCount()); //add startup count
         AbstractLockedSerializer.fileErrorCounter = fileErrorCounter;
     }
 
-    public static void setFileBytesWritten(Counter v) {
-        AbstractLockedSerializer.fileBytesWritten = v;
+    public static void setFileBytesWritten(Counter fileBytesWrittenCounter) {
+        fileBytesWrittenCounter.incrementCount(AbstractLockedSerializer.fileBytesWritten.getCount()); //add startup count
+        AbstractLockedSerializer.fileBytesWritten = fileBytesWrittenCounter;
     }
 
-    public static void setFileBytesRead(Counter v) {
-        AbstractLockedSerializer.fileBytesRead = v;
+    public static void setFileBytesRead(Counter fileBytesReadCounter) {
+        fileBytesReadCounter.incrementCount(AbstractLockedSerializer.fileBytesRead.getCount());  //add startup count
+        AbstractLockedSerializer.fileBytesRead = fileBytesReadCounter;
     }
 
     /**

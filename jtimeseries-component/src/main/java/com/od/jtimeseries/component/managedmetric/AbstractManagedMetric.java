@@ -37,7 +37,7 @@ public abstract class AbstractManagedMetric implements ManagedMetric {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(AbstractManagedMetric.class);
 
-    protected static final TimePeriod DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS = Time.minutes(5);
+    protected static final TimePeriod DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS = Time.minutes(1);
 
     /**
      * @return the id of the metric which will be created

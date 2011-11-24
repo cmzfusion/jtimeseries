@@ -24,7 +24,6 @@ import com.od.jtimeseries.component.managedmetric.DefaultMetricSource;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricSource;
-import com.od.jtimeseries.component.managedmetric.jmx.AbstractKeyedAcquirablePool;
 import com.od.jtimeseries.component.managedmetric.jmx.DefaultJmxConnectionPool;
 import com.od.jtimeseries.component.managedmetric.jmx.JmxConnectionPool;
 import com.od.jtimeseries.component.managedmetric.jmx.JmxMetric;

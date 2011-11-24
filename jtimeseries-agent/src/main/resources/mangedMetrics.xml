@@ -53,7 +53,7 @@
             </list>
         </constructor-arg>
         <constructor-arg>
-            <bean class="com.od.jtimeseries.component.managedmetric.jmx.DefaultJmxExecutorService">
+            <bean class="com.od.jtimeseries.component.managedmetric.jmx.AbstractKeyedAcquirablePool">
                 <constructor-arg value="${jmxConnectionCountLimit}"/>
                 <constructor-arg value="${jmxConnectionMaxAgeMillis}"/>
             </bean>

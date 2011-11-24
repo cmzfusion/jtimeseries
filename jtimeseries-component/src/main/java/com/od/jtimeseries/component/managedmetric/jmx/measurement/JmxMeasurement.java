@@ -39,6 +39,7 @@ public class JmxMeasurement {
     private List<JmxValue> listOfJmxValue;
     private AggregateFunction aggregateFunction;
     private double divisor = 1;
+    private boolean recordNanIfFailed = true;
 
     /**
      * JMX Measurement which reads a single value from a jmx bean
@@ -84,6 +85,18 @@ public class JmxMeasurement {
 
     public void setDivisor(double divisor) {
         this.divisor = divisor;
+    }
+
+    public boolean isRecordNanIfFailed() {
+        return recordNanIfFailed;
+    }
+
+    public void setRecordNanIfFailed(boolean recordNanIfFailed) {
+        this.recordNanIfFailed = recordNanIfFailed;
+    }
+
+    public String toString() {
+        return "JmxMeasurement{" + parentContextPath + "."  + id + "}";
     }
 }
 

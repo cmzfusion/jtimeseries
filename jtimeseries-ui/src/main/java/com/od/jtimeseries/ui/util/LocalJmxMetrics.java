@@ -24,7 +24,9 @@ import com.od.jtimeseries.component.managedmetric.DefaultMetricSource;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricSource;
-import com.od.jtimeseries.component.managedmetric.jmx.DefaultJmxExecutorService;
+import com.od.jtimeseries.component.managedmetric.jmx.AbstractKeyedAcquirablePool;
+import com.od.jtimeseries.component.managedmetric.jmx.DefaultJmxConnectionPool;
+import com.od.jtimeseries.component.managedmetric.jmx.JmxConnectionPool;
 import com.od.jtimeseries.component.managedmetric.jmx.JmxMetric;
 import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
 import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements;
@@ -121,7 +123,7 @@ public class LocalJmxMetrics {
 
         DefaultMetricSource metricSource = new DefaultMetricSource(Collections.singletonList(m));
 
-        DefaultJmxExecutorService executorService = new DefaultJmxExecutorService(1, 1000 * 60 * 60 * 24); //when this number is exceeded, service should reconnect in any case
+        JmxConnectionPool executorService = new DefaultJmxConnectionPool(1, 1000 * 60 * 60 * 24); //when this number is exceeded, service should reconnect in any case
 
         ManagedMetricInitializer managedMetricInitializer = new ManagedMetricInitializer(
             rootContext,

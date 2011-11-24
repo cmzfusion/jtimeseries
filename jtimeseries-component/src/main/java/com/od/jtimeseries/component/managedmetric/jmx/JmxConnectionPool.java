@@ -18,29 +18,32 @@
  */
 package com.od.jtimeseries.component.managedmetric.jmx;
 
-import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 06-Feb-2010
- * Time: 13:20:26
- * To change this template use File | Settings | File Templates.
+ * Time: 11:39:08
+ *
+ * A service for pooling jmx connections
  */
-public interface JmxExecutorTask {
+public interface JmxConnectionPool {
 
     /**
-     * @return the JMXServiceURL used to create the connection required by this task
-     */
-    JMXServiceURL getServiceURL();
-
-    /**
-     * Carry out a task using a jmxConnection
+     * get a JmxConnectionWrapper for this serviceURL, aquiring exclusive access while this connection is held
+     * The connection will not be closed, or made available to another thread, until returned to the pool
      *
-     * The jmxConnection instance supplied should not be reused outside the context of the task execution
-     * (do not keep a reference to it)
+     * Calling classes should always call returnConnection in a finally{} block to ensure this connection is returned,
+     * or a resource leak or liveliness issue may occur.
+     *
+     * This method may block, if another thread has already acquired the connection, until the connection is returned
      */
-    void executeTask(MBeanServerConnection jmxConnection) throws Exception;
+    JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception;
+
+    /**
+     * Return a connection to the pool
+     */
+    void returnConnection(JmxConnectionWrapper connection);
 
 }

@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.component.managedmetric;
 
-import com.od.jtimeseries.component.managedmetric.jmx.JmxExecutorService;
+import com.od.jtimeseries.component.managedmetric.jmx.JmxConnectionPool;
 import com.od.jtimeseries.component.managedmetric.jmx.JmxMetric;
 import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -40,14 +40,14 @@ public class ManagedMetricInitializer {
 
     private TimeSeriesContext rootContext;
     private List<ManagedMetricSource> managedMetricSourceList;
-    private JmxExecutorService jmxExecutorService;
+    private JmxConnectionPool jmxExecutorService;
     private PathMapper pathMapper;
 
-    public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxExecutorService jmxExecutorService) {
+    public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxConnectionPool jmxExecutorService) {
         this(rootContext, managedMetricSourceList, jmxExecutorService, new PathMapper());
     }
 
-    public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxExecutorService jmxExecutorService, PathMapper pathMapper) {
+    public ManagedMetricInitializer(TimeSeriesContext rootContext, List<ManagedMetricSource> managedMetricSourceList, JmxConnectionPool jmxExecutorService, PathMapper pathMapper) {
         this.rootContext = rootContext;
         this.managedMetricSourceList = managedMetricSourceList;
         this.jmxExecutorService = jmxExecutorService;
@@ -58,7 +58,7 @@ public class ManagedMetricInitializer {
         logMethods.logInfo("Initializing Managed Metrics");
 
         logMethods.logInfo("Creating JMX Executor Service " + jmxExecutorService);
-        JmxMetric.setJmxExecutorService(jmxExecutorService);
+        JmxMetric.setJmxConnectionPool(jmxExecutorService);
 
         for ( ManagedMetricSource s : managedMetricSourceList) {
             for ( ManagedMetric m : s.getManagedMetrics()) {

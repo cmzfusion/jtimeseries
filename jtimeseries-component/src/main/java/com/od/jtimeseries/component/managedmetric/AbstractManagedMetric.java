@@ -64,6 +64,6 @@ public abstract class AbstractManagedMetric implements ManagedMetric {
     public abstract void doInitializeMetric(TimeSeriesContext rootContext, String path);
 
     public String toString() {
-        return "ManagedMetfic: " + getSeriesPath();
+        return "ManagedMetric: " + getSeriesPath();
     }
 }

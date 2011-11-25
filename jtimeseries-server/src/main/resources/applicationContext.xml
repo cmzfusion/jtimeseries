@@ -105,6 +105,7 @@
 
     <bean id="executorSource" class="com.od.jtimeseries.server.util.ServerExecutorSource">
         <constructor-arg value="${maxHttpdThreads}"/>
+        <constructor-arg value="${maxJmxMetricThreads}"/>
     </bean>
     <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
         <property name="staticMethod" value="com.od.jtimeseries.util.TimeSeriesExecutorFactory.setExecutorSource"/>

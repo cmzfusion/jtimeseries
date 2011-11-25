@@ -15,9 +15,11 @@ public class ServerExecutorSource extends TimeSeriesExecutorFactory.DefaultExecu
 
     //a httpd daemon with more threads
     private ExecutorService httpExecutor;
+    private ExecutorService jmxExecutor;
 
-    public ServerExecutorSource(int maxThreads) {
+    public ServerExecutorSource(int maxThreads, int maxJmxThreads) {
         httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", maxThreads, NamedExecutors.DAEMON_THREAD_CONFIGURER);
+        jmxExecutor = NamedExecutors.newFixedThreadPool("JmxMetricProcessor", maxJmxThreads, NamedExecutors.DAEMON_THREAD_CONFIGURER);
     }
 
     public ExecutorService getHttpdQueryExecutor(Object httpdInstance) {

@@ -25,4 +25,8 @@ public class ServerExecutorSource extends TimeSeriesExecutorFactory.DefaultExecu
     public ExecutorService getHttpdQueryExecutor(Object httpdInstance) {
         return httpExecutor;
     }
+
+    public ExecutorService getJmxMetricExecutor(Object metric) {
+        return httpExecutor;
+    }
 }

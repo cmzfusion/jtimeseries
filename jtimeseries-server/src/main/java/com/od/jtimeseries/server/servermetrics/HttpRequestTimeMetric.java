@@ -8,7 +8,9 @@ import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.MEDIAN;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.TOTAL_COUNT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +38,7 @@ public class HttpRequestTimeMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        ValueRecorder v = rootContext.createValueRecorderSeries(path, "Length of time taken to process HTTP requests in milliseconds", MEDIAN(captureTime), CaptureFunctions.MAX(captureTime));
+        ValueRecorder v = rootContext.createValueRecorderSeries(path, "Length of time taken to process HTTP requests in milliseconds", MEDIAN(captureTime), MAX(captureTime));
         ServerHttpRequestMonitor.setHttpRequestTimeValueRecorder(v);
     }
 }

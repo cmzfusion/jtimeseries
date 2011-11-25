@@ -126,7 +126,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
 
     protected FileHeader doReadHeader(File f) throws SerializationException {
         FileHeader h = new FileHeader();
-        updateHeaderImpl(h, f);
+        readHeaderImpl(h, f);
         return h;
     }
 
@@ -149,7 +149,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
         } else if (!f.canRead()) {
             throw new SerializationException("File for header " + fileHeader + " is not readable");
         }
-        updateHeaderImpl(fileHeader, f);
+        readHeaderImpl(fileHeader, f);
     }
 
     protected void doMigratePath(FileHeader header, String newPath) throws SerializationException {
@@ -241,7 +241,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
         return fileHeader.calculateNewHeaderLength(headerBytesToWrite);
     }
 
-    private void updateHeaderImpl(FileHeader fileHeader, File f) throws SerializationException {
+    private void readHeaderImpl(FileHeader fileHeader, File f) throws SerializationException {
         fileHeaderReadCounter.incrementCount();
 
         RandomAccessFile r = null;

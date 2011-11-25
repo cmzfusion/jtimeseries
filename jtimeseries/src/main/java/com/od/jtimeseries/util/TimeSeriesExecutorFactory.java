@@ -66,6 +66,10 @@ public class TimeSeriesExecutorFactory {
         return executorSource.getHttpdQueryExecutor(httpdInstance);
     }
 
+    public static Executor getJmxMetricExecutor(Object jmxMetric) {
+        return executorSource.getJmxMetricExecutor(jmxMetric);
+    }
+
     public static interface ExecutorSource {
 
         /**
@@ -106,6 +110,9 @@ public class TimeSeriesExecutorFactory {
          * @return the ExecutoService which should be used for httpd queries
          */
         ExecutorService getHttpdQueryExecutor(Object httpdInstance);
+
+
+        Executor getJmxMetricExecutor(Object jmxMetric);
     }
 
     public static class DefaultExecutorSource implements ExecutorSource {
@@ -116,7 +123,7 @@ public class TimeSeriesExecutorFactory {
         private ScheduledExecutorService captureSchedulingExecutor = NamedExecutors.newScheduledThreadPool("CaptureScheduling", 2);
         private ExecutorService captureProcessingExecutor = NamedExecutors.newSingleThreadExecutor("CaptureProcessing");
         private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 3, NamedExecutors.DAEMON_THREAD_CONFIGURER);
-
+        private ExecutorService jmxMetricExecutor = NamedExecutors.newFixedThreadPool("JmxMetricProcessor", 3);
 
         public ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries) {
             return timeSeriesEventExecutor;
@@ -140,6 +147,10 @@ public class TimeSeriesExecutorFactory {
 
         public ExecutorService getHttpdQueryExecutor(Object httpdInstance) {
             return httpExecutor;
+        }
+
+        public ExecutorService getJmxMetricExecutor(Object jmxMetric) {
+            return jmxMetricExecutor;
         }
 
     }

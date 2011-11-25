@@ -34,6 +34,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -63,7 +65,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
  *
  * - Initially when started we record values into a dummy function instance
  *   We never capture any values for this dummy instance into the time series - the real capture starts
- *   when the first timer triggered function switch takes place.
+ *   when the first timer initialTriggerReceived function switch takes place.
  *   This solves the problem where we are 'started' half way through a scheduler time period, for schedulers
  *   which are already running and which group and execute together all captures with the same period
  *
@@ -76,9 +78,9 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultTimedCapture.class);
 
-    private static AggregateFunction DUMMY_FUNCTION = new DummyFunction();
+    private AtomicBoolean initialTriggerReceived = new AtomicBoolean();
     private CaptureFunction captureFunction;
-    private AggregateFunction function = DUMMY_FUNCTION;
+    private AggregateFunction function;
     private final Object functionLock = new Object();
     private ValueSourceListener valueListener;
 
@@ -86,6 +88,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
     public DefaultTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         super(id, "Capture " + captureFunction.getDescription() + " to timeSeries " + timeSeries.getId() + " from " + source.getId() + " every " + captureFunction.getCapturePeriod(), timeSeries, source);
         this.captureFunction = captureFunction;
+        this.function = captureFunction.nextFunctionInstance();
     }
 
     public TimePeriod getTimePeriod() {
@@ -96,55 +99,61 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
         if ( getState() == CaptureState.STARTED || getState() == CaptureState.STARTING) {
             AggregateFunction oldFunctionInstance;
 
+            boolean isFirstTrigger;
+
             //hold the lock while we switch functions, so that the current function becomes a new instance but we
             //keep a reference to the old, which contains any values collected during the last period
             synchronized (functionLock) {
+                isFirstTrigger = ! initialTriggerReceived.getAndSet(true);
                 oldFunctionInstance = this.function;
                 function = getCaptureFunction().nextFunctionInstance();
-                if ( oldFunctionInstance == DUMMY_FUNCTION) {
+                if ( isFirstTrigger ) {
                     //this was the first trigger, we are now writing into a real function instance
                     //which means we can transition from STARTING to STARTED
                     changeStateAndFireEvent(CaptureState.STARTED);
                 }
             }
 
-            //do the aggregate calculation on the old function instance, while we are not holding the functionlock
-            //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
-            //this would be very bad, since that thread may be very performance sensitive
-            //this way the source is free to update the new function instance while the calculation takes place on a calculation
-            //subthread / the old function instance
-            queueCaptureCalculation(timestamp, oldFunctionInstance);
+            //the first trigger starts the capture period, before then we may have values added
+            //to function but may get triggered at any time, so we don't capture anything until the
+            //second trigger, the end of the first complete period
+            if ( ! isFirstTrigger ) {
+                //do the aggregate calculation on the old function instance, while we are not holding the functionlock
+                //otherwise, the new values thread from the data source will be blocked waiting for the aggregate calculation to be performed
+                //this would be very bad, since that thread may be very performance sensitive
+                //this way the source is free to update the new function instance while the calculation takes place on a calculation
+                //subthread / the old function instance
+                queueCaptureCalculation(timestamp, oldFunctionInstance);
+            }
 
-            //fire an event to tell observers this timed capture has been triggered by the scheduler
+            //fire an event to tell observers this timed capture has been initialTriggerReceived by the scheduler
             fireTriggerEvent();
         }
     }
 
     private void queueCaptureCalculation(final long timestamp, final AggregateFunction oldFunctionInstance) {
-        if ( oldFunctionInstance != DUMMY_FUNCTION ) {
-            Runnable runnable = new Runnable() {
-                public void run() {
-                    TimeSeries timeSeries = getTimeSeries();
-                    Numeric value = null;
-                    try {
-                        value = oldFunctionInstance.calculateAggregateValue();
-                        timeSeries.addItem(
-                            new DefaultTimeSeriesItem(timestamp, value)
-                        );
-                        fireCaptureCompleteEvent(value, timeSeries);
-                    } catch (Exception e) {
-                        logMethods.logDebug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, e);
-                    }
+        Runnable runnable = new Runnable() {
+            public void run() {
+                TimeSeries timeSeries = getTimeSeries();
+                Numeric value = null;
+                try {
+                    value = oldFunctionInstance.calculateAggregateValue();
+                    timeSeries.addItem(
+                        new DefaultTimeSeriesItem(timestamp, value)
+                    );
+                    fireCaptureCompleteEvent(value, timeSeries);
+                } catch (Exception e) {
+                    logMethods.logDebug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, e);
                 }
-            };
-            TimeSeriesExecutorFactory.getCaptureProcessingExecutor(this).execute(runnable);
-        }
+            }
+        };
+        TimeSeriesExecutorFactory.getCaptureProcessingExecutor(this).execute(runnable);
     }
 
     public void start() {
         synchronized (functionLock) {
             if ( getState() == CaptureState.STOPPED) {
-                //although we set the listener here the function we are writing to should be DUMMY_FUNCTION
+                //although we set the listener here the function we are writing to should be dummyFunction
                 //until the first timerTrigger takes place, and we move from STARTING to STARTED
                 valueListener = new FunctionCallingSourceListener();
                 getValueSource().addValueListener(valueListener);
@@ -158,7 +167,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             if ( getState() == CaptureState.STARTED ) {
                 getValueSource().removeValueListener(valueListener);
                 valueListener = null;
-                function = DUMMY_FUNCTION;
+                initialTriggerReceived.getAndSet(false);
                 changeStateAndFireEvent(CaptureState.STOPPED);
             }
         }
@@ -167,37 +176,6 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
 
     public CaptureFunction getCaptureFunction() {
         return captureFunction;
-    }
-
-    private static class DummyFunction implements AggregateFunction {
-
-        public void addValue(Numeric value) {}
-
-        public void addValue(double value) {}
-
-        public void addValue(long value) {}
-
-        public Numeric getLastAddedValue() {
-            return null;
-        }
-
-        public Numeric calculateAggregateValue() {
-            return null;
-        }
-
-        public String getDescription() {
-            return "DummyFunction";
-        }
-
-        public void clear() {}
-
-        public AggregateFunction newInstance() {
-            return new DummyFunction();
-        }
-
-        public AggregateFunction next() {
-            return new DummyFunction();
-        }
     }
 
     //call the function when the value source produces a new value

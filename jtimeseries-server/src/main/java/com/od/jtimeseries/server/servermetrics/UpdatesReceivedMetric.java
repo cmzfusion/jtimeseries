@@ -24,7 +24,7 @@ import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
-
+import static com.od.jtimeseries.capture.function.CaptureFunctions.TOTAL_COUNT;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
 
 /**
@@ -57,7 +57,8 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
         Counter counter = rootContext.createCounterSeries(
             path,
             "A count of series data update UDP datagram messages received",
-            COUNT_OVER(countPeriod)
+            COUNT_OVER(countPeriod),
+            TOTAL_COUNT(countPeriod)
         );
         AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
     }

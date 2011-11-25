@@ -14,13 +14,13 @@ import java.io.File;
  */
 public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
-    protected static Counter fileAppendCounter = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileRewriteCounter = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileReadCounter = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileHeaderReadCounter = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileErrorCounter = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileBytesWritten = new DefaultCounter("dummyCounter", "");
-    protected static Counter fileBytesRead = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileAppendCounter = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileRewriteCounter = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileReadCounter = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileHeaderReadCounter = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileErrorCounter = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileBytesWritten = new DefaultCounter("dummyCounter", "");
+    protected static volatile Counter fileBytesRead = new DefaultCounter("dummyCounter", "");
 
     protected final Object readWriteLock = new Object();
     protected volatile boolean shutdown;

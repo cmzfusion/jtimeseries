@@ -26,6 +26,7 @@ import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.TOTAL_COUNT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,7 +59,7 @@ public class GarbageCollectedSeriesMetric extends AbstractManagedMetric {
                 path,
                 "A count of the series deallocated for memory efficiency, we would expect a heavily loaded server to " +
                 "regularly deallocate series data once it is no longer possible to maintain all series data in RAM",
-                COUNT_OVER(countPeriod));
+                COUNT_OVER(countPeriod), TOTAL_COUNT(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
 

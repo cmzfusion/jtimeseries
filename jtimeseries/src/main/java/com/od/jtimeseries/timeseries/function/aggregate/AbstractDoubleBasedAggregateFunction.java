@@ -30,7 +30,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Superclass for default aggregate function implementations which return a DoubleNumeric as the result,
  * and generally use a double as the internal representation.
  *
- * Functions derived from AbstractDoubleBasedAggregateFunction ignore any NaN values which are added
+ * Functions derived from AbstractDoubleBasedAggregateFunction ignore any NaN values
+ * which are added
  */
 public abstract class AbstractDoubleBasedAggregateFunction implements AggregateFunction {
 

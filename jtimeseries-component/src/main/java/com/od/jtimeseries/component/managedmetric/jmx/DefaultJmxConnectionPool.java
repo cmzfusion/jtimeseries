@@ -24,9 +24,11 @@ import java.util.concurrent.TimeUnit;
  * A default service to pool JMX connections
  *
  * This service maintains a map of connections by JmxServiceURL
- * There is an upper limit on the number of permitted connections, and a maximum connection age after which pooled connections will be closed
+ * There is an upper limit on the number of permitted connections, and a maximum connection idle period
+ * after which a pooled connection will be closed
  *
- * If the permitted connection count is reached, subsequent requests for connections will cause the oldest established connection to be closed
+ * If the permitted connection count is reached, subsequent requests for connections will cause the
+ * oldest established connection to be closed
  */
 public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXServiceURL, DefaultJmxConnectionPool.JmxConnectionWrapperImpl> implements JmxConnectionPool {
 

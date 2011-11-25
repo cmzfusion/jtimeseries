@@ -53,9 +53,9 @@
             </list>
         </constructor-arg>
         <constructor-arg>
-            <bean class="com.od.jtimeseries.component.managedmetric.jmx.AbstractKeyedAcquirablePool">
+            <bean class="com.od.jtimeseries.component.managedmetric.jmx.DefaultJmxConnectionPool">
                 <constructor-arg value="${jmxConnectionCountLimit}"/>
-                <constructor-arg value="${jmxConnectionMaxAgeMillis}"/>
+                <constructor-arg value="${jmxIdleConnectionCloseTime}"/>
             </bean>
         </constructor-arg>
     </bean>

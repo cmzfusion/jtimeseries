@@ -19,6 +19,7 @@
 package com.od.jtimeseries.component.managedmetric.jmx;
 
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
+import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
 import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
 import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.component.util.path.PathMappingResult;
@@ -29,6 +30,7 @@ import com.od.jtimeseries.scheduling.Triggerable;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -39,6 +41,7 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.naming.ServiceUnavailableException;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,14 +67,14 @@ public class JmxMetric implements ManagedMetric {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
 
-    private static JmxConnectionPool jmxExecutorService = new DefaultJmxConnectionPool(10, 60000);
+    private static JmxConnectionPool jmxConnectionPool = new DefaultJmxConnectionPool(10, 60000);
     private static final AtomicInteger triggerableId = new AtomicInteger();
 
     private final TimePeriod timePeriod;
     private final String serviceUrl;
     private JMXServiceURL url;
     private List<com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement> jmxMeasurements;
-    private List<JmxReading> measurementTasks = new ArrayList<JmxReading>();
+    private List<JmxMeasurementTask> measurementTaskTasks = new ArrayList<JmxMeasurementTask>();
     private String description = "";
 
     /**
@@ -85,14 +88,14 @@ public class JmxMetric implements ManagedMetric {
      * A JmxMetric with a single series, which reads several jmx values and aggregates them using a defined function (e.g. Sum)
      */
     public JmxMetric(TimePeriod timePeriod, String serviceUrl, String metricParentContextPath, String metricId, String metricDescription, List<JmxValue> listOfJmxValue, AggregateFunction aggregateFunction) {
-        this(timePeriod, serviceUrl, Arrays.asList(new com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement(metricParentContextPath, metricId, metricDescription, listOfJmxValue, aggregateFunction)));
+        this(timePeriod, serviceUrl, Arrays.asList(new JmxMeasurement(metricParentContextPath, metricId, metricDescription, listOfJmxValue, aggregateFunction)));
     }
 
-    public JmxMetric(TimePeriod timePeriod, String serviceUrl, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement jmxMeasurement) {
+    public JmxMetric(TimePeriod timePeriod, String serviceUrl, JmxMeasurement jmxMeasurement) {
         this(timePeriod, serviceUrl, Arrays.asList(jmxMeasurement));
     }
 
-    public JmxMetric(TimePeriod timePeriod, String serviceUrl, List<com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement> jmxMeasurements) {
+    public JmxMetric(TimePeriod timePeriod, String serviceUrl, List<JmxMeasurement> jmxMeasurements) {
         this.timePeriod = timePeriod;
         this.serviceUrl = serviceUrl;
         this.jmxMeasurements = jmxMeasurements;
@@ -110,11 +113,11 @@ public class JmxMetric implements ManagedMetric {
     }
 
     protected static JmxConnectionPool getJmxConnectionPool() {
-        return jmxExecutorService;
+        return jmxConnectionPool;
     }
 
     public static void setJmxConnectionPool(JmxConnectionPool jmxExecutorService) {
-        JmxMetric.jmxExecutorService = jmxExecutorService;
+        JmxMetric.jmxConnectionPool = jmxExecutorService;
     }
 
     public void initializeMetrics(TimeSeriesContext rootContext, PathMapper pathMapper) {
@@ -124,22 +127,22 @@ public class JmxMetric implements ManagedMetric {
             logMethods.logError("Failed to set up JMX Metric - bad URL " + serviceUrl, e);
         }
 
-        createJmxTasks(rootContext, pathMapper);
+        createJmxMeasurementTasks(rootContext, pathMapper);
 
         //adding the triggerable to root context should cause it to start getting triggered
         rootContext.addChild(new TriggerableJmxConnectTask());
     }
 
-    private void createJmxTasks(TimeSeriesContext rootContext, PathMapper pathMapper) {
-        for (com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement m : jmxMeasurements) {
+    private void createJmxMeasurementTasks(TimeSeriesContext rootContext, PathMapper pathMapper) {
+        for (JmxMeasurement m : jmxMeasurements) {
             String path = m.getParentContextPath() + Identifiable.NAMESPACE_SEPARATOR + m.getId();
             PathMappingResult r = pathMapper.getPathMapping(path);
             switch ( r.getType()) {
                 case PERMIT:
-                    doCreateMetric(rootContext, path, m);
+                    doCreateMeasurementTask(rootContext, path, m);
                     break;
                 case MIGRATE:
-                    doCreateMetric(rootContext, r.getNewPath(), m);
+                    doCreateMeasurementTask(rootContext, r.getNewPath(), m);
                     break;
                 case DENY:
                 default:
@@ -148,9 +151,9 @@ public class JmxMetric implements ManagedMetric {
         }
     }
 
-    private void doCreateMetric(TimeSeriesContext rootContext, String newPath, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement m) {
+    private void doCreateMeasurementTask(TimeSeriesContext rootContext, String newPath, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement m) {
         ValueRecorder r = rootContext.createValueRecorderSeries(newPath, m.getDescription());
-        measurementTasks.add(new JmxReading(r, m));
+        measurementTaskTasks.add(new JmxMeasurementTask(r, m));
     }
 
     private class TriggerableJmxConnectTask extends IdentifiableBase implements Triggerable {
@@ -164,34 +167,39 @@ public class JmxMetric implements ManagedMetric {
         }
 
         public void trigger(long timestamp) {
-            JmxConnectionWrapper w = null;
-            try {
-                w = getConnection();
-                if ( w != null) {
-                    readMeasurements(w);
-                }  else {
-                    recordNaN();
-                }
+            Runnable jmxMetricTask = new Runnable() {
+                public void run() {
+                    JmxConnectionWrapper w = null;
+                    try {
+                        w = getConnection();
+                        if ( w != null) {
+                            runMeasurementTasks(w);
+                        }  else {
+                            recordNaN();
+                        }
 
-            } finally {
-                getJmxConnectionPool().returnConnection(w);
-            }
+                    } finally {
+                        getJmxConnectionPool().returnConnection(w);
+                    }
+                }
+            };
+            TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
         }
 
         private void recordNaN() {
-            for (JmxReading m : measurementTasks) {
+            for (JmxMeasurementTask m : measurementTaskTasks) {
                 if ( m.recordNanIfFailed()) {
                     m.recordNaN();
                 }
             }
         }
 
-        private void readMeasurements(JmxConnectionWrapper w) {
-            for (JmxReading m : measurementTasks) {
+        private void runMeasurementTasks(JmxConnectionWrapper w) {
+            for (JmxMeasurementTask m : measurementTaskTasks) {
                 try {
                      m.processMeasurement(w.getConnection());
                 } catch ( Throwable t) {
-                    logMethods.logError("Could not read JmxMeasurement " + m + " from connection " + w, t);
+                    logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName());
                     if ( m.recordNanIfFailed()) {
                         m.recordNaN();
                     }
@@ -215,14 +223,14 @@ public class JmxMetric implements ManagedMetric {
         }
     }
 
-    private class JmxReading {
+    private class JmxMeasurementTask {
 
         private Numeric result = DoubleNumeric.NaN;
         private ValueRecorder valueRecorder;
         private AggregateFunction aggregateFunction;
-        private com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement measurement;
+        private JmxMeasurement measurement;
 
-        private JmxReading(ValueRecorder valueRecorder, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement measurement) {
+        private JmxMeasurementTask(ValueRecorder valueRecorder, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement measurement) {
             this.valueRecorder = valueRecorder;
             this.aggregateFunction = measurement.getAggregateFunction();
             this.measurement = measurement;
@@ -230,24 +238,16 @@ public class JmxMetric implements ManagedMetric {
 
         private void processMeasurement(MBeanServerConnection jmxConnection) throws Exception {
             result = DoubleNumeric.NaN;
-            executeTask(jmxConnection);
+            retreiveAndAddValues(jmxConnection, aggregateFunction);
+            result = aggregateFunction.calculateAggregateValue();
+            aggregateFunction = aggregateFunction.next(); //allow chaining
             if ( measurement.getDivisor() != 1) {
                 result = DoubleNumeric.valueOf(result.doubleValue() / measurement.getDivisor());
             }
             valueRecorder.newValue(result);
         }
 
-        public JMXServiceURL getServiceURL() {
-            return url;
-        }
-
-        public void executeTask(MBeanServerConnection jmxConnection) throws Exception {
-            retreiveAndAddValues(jmxConnection, aggregateFunction);
-            result = aggregateFunction.calculateAggregateValue();
-            aggregateFunction = aggregateFunction.next(); //allow chaining
-        }
-
-         private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
+        private void retreiveAndAddValues(MBeanServerConnection jmxConnection, AggregateFunction aggregateFunction) throws Exception {
             for ( JmxValue n : measurement.getListOfJmxValue()) {
                 n.readValues(jmxConnection, aggregateFunction);
             }
@@ -259,6 +259,10 @@ public class JmxMetric implements ManagedMetric {
 
         public void recordNaN() {
             valueRecorder.newValue(DoubleNumeric.NaN);
+        }
+
+        public String toString() {
+            return measurement.toString();
         }
     }
 

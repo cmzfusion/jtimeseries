@@ -197,7 +197,8 @@ public class JmxMetric implements ManagedMetric {
         private void runMeasurementTasks(JmxConnectionWrapper w) {
             for (JmxMeasurementTask m : measurementTaskTasks) {
                 try {
-                     m.processMeasurement(w.getConnection());
+                    MBeanServerConnection connection = w.getConnection();
+                    m.processMeasurement(connection);
                 } catch ( Throwable t) {
                     logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName());
                     if ( m.recordNanIfFailed()) {

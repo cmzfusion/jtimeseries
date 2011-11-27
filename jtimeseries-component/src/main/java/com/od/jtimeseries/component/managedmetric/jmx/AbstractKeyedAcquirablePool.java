@@ -18,7 +18,6 @@
  */
 package com.od.jtimeseries.component.managedmetric.jmx;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -84,17 +83,22 @@ abstract class AbstractKeyedAcquirablePool<K, E extends Acquirable> {
         Iterator<Map.Entry<K,E>> i = activeAcquirables.entrySet().iterator();
         if ( i.hasNext() ) {
             Map.Entry<K, E> next = i.next();
-            removeAcquirable(next.getKey(), next.getValue());
+            acquireAndRemoveFromPool(next.getKey(), next.getValue());
         } else {
             throw new RuntimeException("Could not close acquirable from pool, none to close");
         }
     }
 
-    protected void removeAcquirable(K key, E acquirable) {
+    protected void acquireAndRemoveFromPool(K key, E acquirable) {
         acquirable.acquire();
+        removeFromPool(key, acquirable);
+        acquirable.release();
+    }
+
+    //always acquire the acquirable first
+    protected synchronized void removeFromPool(K key, E acquirable) {
         activeAcquirables.remove(key);
         doRemoveAcquirable(key, acquirable);
-        acquirable.release();
     }
 
     protected abstract void doRemoveAcquirable(K key, E acquirable);

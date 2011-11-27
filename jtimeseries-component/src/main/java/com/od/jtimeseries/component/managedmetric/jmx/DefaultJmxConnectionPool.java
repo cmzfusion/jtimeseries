@@ -1,5 +1,7 @@
 package com.od.jtimeseries.component.managedmetric.jmx;
 
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXServiceURL, DefaultJmxConnectionPool.JmxConnectionWrapperImpl> implements JmxConnectionPool {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultJmxConnectionPool.class);
+    private static Counter jmxConnectionCounter = new DefaultCounter("dummy counter", "");
 
     private int maxConnectionIdlePeriod = 1800000;  //0.5 hours
     private Map<String, ?> connectorEnvironment;
@@ -45,9 +48,24 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
 
     public JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception {
         logMethods.logDebug("Getting JMX connection to service " + serviceUrl);
+
         JmxConnectionWrapperImpl connection = getAcquirable(serviceUrl);
+
+        //acquired connection may already have been closed if another waiting thread acquired it first
+        //and closed it for any reason, if this has happened, try again until we acquire a good connection
         while ( connection.isClosed()) {
             connection = getAcquirable(serviceUrl);
+        }
+
+        //now we have acquired a connection, but it may not yet have been opened
+        //ensure connection is opened, if failed to open, mark closed, remove from pool and throw exception
+        //we cannot do this when holding the lock to add connection to pool, since the long timeout
+        //establishing the connection may cause all threads to be blocked
+        try {
+            connection.checkConnectionOpen();
+        } catch (JmxConnectionWrapperImpl.JmxConnectionPoolException e) {
+            removeFromPool(connection.getServiceURL(), connection);
+            throw e;
         }
         return connection;
     }
@@ -58,6 +76,7 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
 
 
     protected JmxConnectionWrapperImpl createAcquirable(JMXServiceURL key) throws IOException {
+        jmxConnectionCounter.incrementCount();
         logMethods.logDebug("Creating JMX connection to service " + key);
         return new JmxConnectionWrapperImpl(key, connectorEnvironment);
     }
@@ -69,18 +88,19 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
     private synchronized void pruneByAge() {
 
         Map<JMXServiceURL,JmxConnectionWrapperImpl> snapshotAcquirables = new LinkedHashMap<JMXServiceURL, JmxConnectionWrapperImpl>(getAcquirables());
-        JmxConnectionWrapperImpl currentConnection;
+        JmxConnectionWrapperImpl c;
 
         for (Map.Entry<JMXServiceURL, JmxConnectionWrapperImpl> e : snapshotAcquirables.entrySet()) {
-            currentConnection = e.getValue();
-            if (currentConnection.getAge() > maxConnectionIdlePeriod) {
-                removeAcquirable(currentConnection.getServiceURL(), currentConnection);
+            c = e.getValue();
+            if (c.getAge() > maxConnectionIdlePeriod) {
+                logMethods.logDebug("Closing JMX connection " + c + " which is " + c.getAge() + " millis old");
+                acquireAndRemoveFromPool(c.getServiceURL(), c);
             }
         }
     }
 
     protected void doRemoveAcquirable(JMXServiceURL k, JmxConnectionWrapperImpl connection) {
-        logMethods.logDebug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
+        jmxConnectionCounter.decrementCount();
         connection.close();
     }
 
@@ -118,14 +138,30 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
         private long lastUsageTime;
         private Semaphore semaphore = new Semaphore(1, true);
         private volatile boolean closed;
+        private volatile boolean opened;
 
         JmxConnectionWrapperImpl(JMXServiceURL serviceURL,  Map<String, ?> connectorEnvironment) throws IOException {
             this.serviceURL = serviceURL;
             this.connectorEnvironment = connectorEnvironment;
-            openConnection(serviceURL);
         }
 
-        private void openConnection(JMXServiceURL serviceURL) throws IOException {
+        /**
+         * If this connection has not been opened, open it
+         */
+        public void checkConnectionOpen() throws IOException {
+            if ( ! opened) {
+                opened = true;
+                try {
+                    logMethods.logDebug("Opening JMX connection to service " + serviceURL);
+                    openConnection();
+                } catch (Throwable t) {
+                    closed = true;  //otherwise next acquirer may try to use it
+                    throw new JmxConnectionPoolException(t);
+                }
+            }
+        }
+
+        private void openConnection() throws IOException {
             this.connector = JMXConnectorFactory.connect(serviceURL, connectorEnvironment);
             this.connection = connector.getMBeanServerConnection();
         }
@@ -148,11 +184,13 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
         }
 
         public void close() {
-            closed = true;
-            try {
-                connector.close();
-            } catch (IOException e) {
-                logMethods.logError("Failed to close JMX connection to " + serviceURL, e);
+            if ( ! closed ) {
+                closed = true;
+                try {
+                    connector.close();
+                } catch (IOException e) {
+                    logMethods.logError("Failed to close JMX connection to " + serviceURL, e);
+                }
             }
         }
 
@@ -167,7 +205,18 @@ public class DefaultJmxConnectionPool extends AbstractKeyedAcquirablePool<JMXSer
         public boolean isClosed() {
             return closed;
         }
+
+        private class JmxConnectionPoolException extends IOException {
+
+            public JmxConnectionPoolException(Throwable t) {
+                super(t);
+            }
+        }
     }
 
+    public static void setJmxConnectionCounter(Counter jmxConnectionCounter) {
+        jmxConnectionCounter.incrementCount(DefaultJmxConnectionPool.jmxConnectionCounter.getCount()); //add any initial value
 
+        DefaultJmxConnectionPool.jmxConnectionCounter = jmxConnectionCounter;
+    }
 }

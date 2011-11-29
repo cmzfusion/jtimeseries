@@ -95,8 +95,13 @@
                                 <constructor-arg value="${serverMetricsContextPath}.file"/>
                             </bean>
 
-                            <!-- Count of series file data reads whole file -->
+                            <!-- Count of connections in jmx connection pool -->
                             <bean class="com.od.jtimeseries.server.servermetrics.JmxConnectionCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.jmx"/>
+                            </bean>
+
+                            <!-- Count of queries made using jmx connections -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.JmxQueryCountMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.jmx"/>
                             </bean>
 

@@ -27,7 +27,9 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.scheduling.Triggerable;
+import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.source.impl.DefaultCounter;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
@@ -67,13 +69,14 @@ public class JmxMetric implements ManagedMetric {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(JmxMetric.class);
 
+    private static volatile Counter jmxQueryCounter = new DefaultCounter("jmxQueryCount", "dummyCounter");
     private static JmxConnectionPool jmxConnectionPool = new DefaultJmxConnectionPool(10, 60000);
     private static final AtomicInteger triggerableId = new AtomicInteger();
 
     private final TimePeriod timePeriod;
     private final String serviceUrl;
     private JMXServiceURL url;
-    private List<com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement> jmxMeasurements;
+    private List<JmxMeasurement> jmxMeasurements;
     private List<JmxMeasurementTask> measurementTaskTasks = new ArrayList<JmxMeasurementTask>();
     private String description = "";
 
@@ -118,6 +121,11 @@ public class JmxMetric implements ManagedMetric {
 
     public static void setJmxConnectionPool(JmxConnectionPool jmxExecutorService) {
         JmxMetric.jmxConnectionPool = jmxExecutorService;
+    }
+
+    public static void setJmxQueryCounter(Counter jmxQueryCounter) {
+        jmxQueryCounter.incrementCount(JmxMetric.jmxQueryCounter.getCount()); //capture any initial count
+        JmxMetric.jmxQueryCounter = jmxQueryCounter;
     }
 
     public void initializeMetrics(TimeSeriesContext rootContext, PathMapper pathMapper) {
@@ -173,6 +181,7 @@ public class JmxMetric implements ManagedMetric {
                     try {
                         w = getConnection();
                         if ( w != null) {
+                            jmxQueryCounter.incrementCount();
                             runMeasurementTasks(w);
                         }  else {
                             recordNaN();
@@ -231,7 +240,7 @@ public class JmxMetric implements ManagedMetric {
         private AggregateFunction aggregateFunction;
         private JmxMeasurement measurement;
 
-        private JmxMeasurementTask(ValueRecorder valueRecorder, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement measurement) {
+        private JmxMeasurementTask(ValueRecorder valueRecorder, JmxMeasurement measurement) {
             this.valueRecorder = valueRecorder;
             this.aggregateFunction = measurement.getAggregateFunction();
             this.measurement = measurement;

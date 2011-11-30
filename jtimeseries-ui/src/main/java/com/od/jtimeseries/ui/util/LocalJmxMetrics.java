@@ -122,7 +122,7 @@ public class LocalJmxMetrics {
 
         DefaultMetricSource metricSource = new DefaultMetricSource(Collections.singletonList(m));
 
-        JmxConnectionPool executorService = new DefaultJmxConnectionPool(1, 1000 * 60 * 60 * 24); //when this number is exceeded, service should reconnect in any case
+        JmxConnectionPool executorService = new DefaultJmxConnectionPool(1000 * 60 * 60 * 24); //when this number is exceeded, service should reconnect in any case
 
         ManagedMetricInitializer managedMetricInitializer = new ManagedMetricInitializer(
             rootContext,

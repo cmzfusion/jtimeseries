@@ -19,6 +19,7 @@
 package com.od.jtimeseries.component.managedmetric.jmx;
 
 import javax.management.remote.JMXServiceURL;
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,9 +42,7 @@ public interface JmxConnectionPool {
      */
     JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception;
 
-    /**
-     * Return a connection to the pool
-     */
-    void returnConnection(JmxConnectionWrapper connection);
+    void removeConnection(JmxConnectionWrapper connection);
 
+    JmxConnectionWrapper createAndAddConnection(JMXServiceURL key) throws IOException;
 }

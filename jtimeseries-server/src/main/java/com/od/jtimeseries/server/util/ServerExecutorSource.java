@@ -27,6 +27,6 @@ public class ServerExecutorSource extends TimeSeriesExecutorFactory.DefaultExecu
     }
 
     public ExecutorService getJmxMetricExecutor(Object metric) {
-        return httpExecutor;
+        return jmxExecutor;
     }
 }

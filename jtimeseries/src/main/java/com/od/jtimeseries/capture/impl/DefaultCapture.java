@@ -73,18 +73,13 @@ public class DefaultCapture extends AbstractCapture implements ValueSourceCaptur
     }
 
     private void addValueToSeries(final Numeric v) {
-        Runnable runnable = new Runnable() {
-            public void run() {
-                TimeSeries timeSeries = getTimeSeries();
-                try {
-                    timeSeries.addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), v));
-                    fireCaptureCompleteEvent(v, timeSeries);
-                } catch (Throwable t) {
-                    logMethods.logError("Failed to capture value " + v + " to series " + timeSeries, t);
-                }
-            }
-        };
-        TimeSeriesExecutorFactory.getCaptureProcessingExecutor(DefaultCapture.this).execute(runnable);
+        TimeSeries timeSeries = getTimeSeries();
+        try {
+            timeSeries.addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), v));
+            fireCaptureCompleteEvent(v, timeSeries);
+        } catch (Throwable t) {
+            logMethods.logError("Failed to capture value " + v + " to series " + timeSeries, t);
+        }
     }
 
     public void stop() {

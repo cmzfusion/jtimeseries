@@ -30,6 +30,7 @@ import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpPublishingTreeListener;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 
 import javax.management.MBeanServer;
@@ -87,7 +88,15 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     }
 
     private void setupUdpPublishing() {
-        UdpPublishingTreeListener l = new UdpPublishingTreeListener(udpClient);
+        //add listener to publish UDP timeseries messages
+        //only publish messages for self monitoring if sendAgentMetricsToServer is 'true'
+        UdpPublishingTreeListener l = new UdpPublishingTreeListener(udpClient) {
+            protected void addListener(IdentifiableTimeSeries s) {
+                if ( sendAgentMetricsToServer || ! s.getPath().contains(agentMetricsContextPath)) {
+                    super.addListener(s);
+                }
+            }
+        };
         rootContext.addTreeListener(l);
     }
 
@@ -98,24 +107,12 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
 
     private void setupManagedMetrics() {
-        logMethods.logInfo("Setting up server metrics series");
-        if ( !sendAgentMetricsToServer) {
+        if ( ! sendAgentMetricsToServer ) {
             logMethods.logInfo("Not sending agent self-monitoring stats to timeseries-server");
-            createStandardContextForMetrics();
         }
-        managedMetricInitializer.initializeServerMetrics();
-    }
 
-    //the metrics context must not be a UdpPublishing context, which would be the case by default
-    //since the root context is a UdpPublishing context.
-    //We don't want to send the agent's own stats to the timeseries-server.
-    private void createStandardContextForMetrics() {
-        PathParser p = new PathParser(agentMetricsContextPath);
-        String contextName = p.removeLastNode();
-        String parentPath = p.getRemainingPath();
-        TimeSeriesContext parentContext = rootContext.createContext(parentPath);
-        DefaultTimeSeriesContext metricsContext = new DefaultTimeSeriesContext(contextName, "Context for agent self-monitoring statistics");
-        parentContext.addChild(metricsContext);
+        logMethods.logInfo("Setting up server metrics series");
+        managedMetricInitializer.initializeServerMetrics();
     }
 
     private void startJmx() {

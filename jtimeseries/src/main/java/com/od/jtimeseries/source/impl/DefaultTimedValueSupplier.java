@@ -21,6 +21,9 @@ package com.od.jtimeseries.source.impl;
 import com.od.jtimeseries.source.TimedValueSupplier;
 import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.source.ValueSupplier;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
 
@@ -32,6 +35,8 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * To change this template use File | Settings | File Templates.
  */
 public class DefaultTimedValueSupplier extends AbstractValueSource implements TimedValueSupplier {
+
+    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultTimedValueSupplier.class);
 
     private TimePeriod timePeriod;
     private ValueSupplier valueSupplier;
@@ -47,9 +52,18 @@ public class DefaultTimedValueSupplier extends AbstractValueSource implements Ti
     }
 
     public void trigger(long timestamp) {
-        Numeric value = valueSupplier.getValue();
-        if ( value != null) {
-            newSourceValue(value);
-        }
+        Runnable runnable = new Runnable() {
+            public void run() {
+                try {
+                    Numeric value = valueSupplier.getValue();
+                    if ( value != null) {
+                        newSourceValue(value);
+                    }
+                } catch (Throwable t) {
+                    logMethods.logError("Failed to get new value from ValueSupplier", t);
+                }
+            }
+        };
+        TimeSeriesExecutorFactory.getTimedValueSupplierExecutor(this).execute(runnable);
     }
 }

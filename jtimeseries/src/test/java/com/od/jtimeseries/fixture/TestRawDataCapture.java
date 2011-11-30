@@ -54,6 +54,7 @@ public class TestRawDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(0, d.getItem(1).longValue());
 
         timeSeries = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
+        assertFalse(timeSeries.getItem(1).getValue().longValue() == 1);
         d = new DefaultTimeSeries(timeSeries);
         assertEquals(4, d.size());
         assertEquals(1.5d, d.getItem(0).doubleValue());

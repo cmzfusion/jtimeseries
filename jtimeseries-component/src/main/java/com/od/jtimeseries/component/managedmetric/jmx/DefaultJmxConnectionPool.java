@@ -122,7 +122,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         private JMXServiceURL serviceURL;
         private Map<String, ?> connectorEnvironment;
         private MBeanServerConnection connection;
-        private long lastUsageTime;
+        private long lastUsageTime = System.currentTimeMillis();
         private volatile boolean closed;
 
         JmxConnectionWrapperImpl(JMXServiceURL serviceURL,  Map<String, ?> connectorEnvironment) throws IOException {

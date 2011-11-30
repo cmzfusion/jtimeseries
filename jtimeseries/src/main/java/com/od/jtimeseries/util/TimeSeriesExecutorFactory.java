@@ -50,6 +50,10 @@ public class TimeSeriesExecutorFactory {
         return executorSource.getCaptureProcessingExecutor(capture);
     }
 
+    public static ExecutorService getTimedValueSupplierExecutor(Object valueSupplier) {
+        return executorSource.getTimedValueSupplierExecutor(valueSupplier);
+    }
+
     public static ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler) {
         return executorSource.getCaptureSchedulingExecutor(scheduler);
     }
@@ -107,12 +111,20 @@ public class TimeSeriesExecutorFactory {
         ScheduledExecutorService getCaptureSchedulingExecutor(Object scheduler);
 
         /**
-         * @return the ExecutoService which should be used for httpd queries
+         * @return the ExecutorService which should be used for httpd queries
          */
         ExecutorService getHttpdQueryExecutor(Object httpdInstance);
 
 
-        Executor getJmxMetricExecutor(Object jmxMetric);
+        /**
+         * @return the ExecutorService which should be used for jmx queries
+         */
+        ExecutorService getJmxMetricExecutor(Object jmxMetric);
+
+        /**
+         * @return the ExecutorService which should be used to read values from valueSuppliers
+         */
+        ExecutorService getTimedValueSupplierExecutor(Object valueSupplier);
     }
 
     public static class DefaultExecutorSource implements ExecutorSource {
@@ -121,7 +133,8 @@ public class TimeSeriesExecutorFactory {
         private ExecutorService captureEventExecutor = NamedExecutors.newSingleThreadExecutor("CaptureEvent");
         private ExecutorService identifiableTreeEventExecutor = NamedExecutors.newSingleThreadExecutor("IdentifiableTreeEvent");
         private ScheduledExecutorService captureSchedulingExecutor = NamedExecutors.newScheduledThreadPool("CaptureScheduling", 2);
-        private ExecutorService captureProcessingExecutor = NamedExecutors.newSingleThreadExecutor("CaptureProcessing");
+        private ExecutorService captureProcessingExecutor = NamedExecutors.newFixedThreadPool("CaptureProcessing", 2);
+        private ExecutorService valueSupplierExecutor = NamedExecutors.newFixedThreadPool("ValueSupplierProcessing", 2);
         private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("HttpRequestProcessor", 3, NamedExecutors.DAEMON_THREAD_CONFIGURER);
         private ExecutorService jmxMetricExecutor = NamedExecutors.newFixedThreadPool("JmxMetricProcessor", 3);
 
@@ -153,5 +166,8 @@ public class TimeSeriesExecutorFactory {
             return jmxMetricExecutor;
         }
 
+        public ExecutorService getTimedValueSupplierExecutor(Object valueSupplier) {
+            return valueSupplierExecutor;
+        }
     }
 }

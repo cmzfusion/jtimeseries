@@ -142,8 +142,8 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                         new DefaultTimeSeriesItem(timestamp, value)
                     );
                     fireCaptureCompleteEvent(value, timeSeries);
-                } catch (Exception e) {
-                    logMethods.logDebug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, e);
+                } catch (Throwable t) {
+                    logMethods.logDebug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, t);
                 }
             }
         };

@@ -35,7 +35,7 @@ public class UdpPublishingTreeListener extends IdentifiableTreeListenerAdapter {
         }, IdentifiableTimeSeries.class);
     }
 
-    private void addListener(IdentifiableTimeSeries s) {
+    protected void addListener(IdentifiableTimeSeries s) {
         udpPublisher.publishAppends(s);
     }
 
@@ -47,7 +47,7 @@ public class UdpPublishingTreeListener extends IdentifiableTreeListenerAdapter {
         }, IdentifiableTimeSeries.class);
     }
 
-    private void removeListener(IdentifiableTimeSeries s) {
+    protected void removeListener(IdentifiableTimeSeries s) {
         udpPublisher.stopPublishing(s);
     }
 

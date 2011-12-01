@@ -117,10 +117,11 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private void setTickingFlag() {
         long timeSinceUpdate = System.currentTimeMillis() - getLatestTimestamp();
 
-         //enough time for local timeserious generated metrics to start to get datapoints
-        boolean justStarted = System.currentTimeMillis() - STARTUP_TIME < 60000;
+        //always treat no values as ticking - this might be a new series, waiting for the first value
+        boolean seriesHasNoValues = size() == 0;
 
-        boolean ticking = timeSinceUpdate < Time.hours(TICKING_FLAG_HOURS_SINCE_LAST_UPDATE).getLengthInMillis() || justStarted;
+        //TODO - a better algorithm to determine 'ticking' state, taking into account frequency of updates
+        boolean ticking = timeSinceUpdate < Time.hours(TICKING_FLAG_HOURS_SINCE_LAST_UPDATE).getLengthInMillis() || seriesHasNoValues;
         setTicking(ticking);
     }
 

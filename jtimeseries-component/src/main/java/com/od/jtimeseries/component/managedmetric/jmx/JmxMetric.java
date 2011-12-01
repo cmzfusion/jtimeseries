@@ -43,14 +43,10 @@ import javax.management.MBeanServerConnection;
 import javax.management.remote.JMXServiceURL;
 import javax.naming.ServiceUnavailableException;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -74,7 +70,6 @@ public class JmxMetric implements ManagedMetric {
 
     private static volatile Counter jmxQueryCounter = new DefaultCounter("jmxQueryCount", "dummyCounter");
     private static JmxConnectionPool jmxConnectionPool = new DefaultJmxConnectionPool(60000);
-    private static Map<JMXServiceURL, Semaphore> connectionLockMap = new ConcurrentHashMap<JMXServiceURL, Semaphore>();
     private static final AtomicInteger triggerableId = new AtomicInteger();
 
     private final TimePeriod timePeriod;
@@ -182,32 +177,17 @@ public class JmxMetric implements ManagedMetric {
             Runnable jmxMetricTask = new Runnable() {
                 public void run() {
                     JmxConnectionWrapper w = null;
-                    Semaphore s = null;
                     try {
-                        s = getConnectionLock();
-                        s.acquireUninterruptibly();
-
-                        w = jmxConnectionPool.getConnection(url);
-                        if ( w == null) {
-                            w = jmxConnectionPool.createAndAddConnection(url);
-                        }
-
-                        jmxQueryCounter.incrementCount();
-                        runMeasurementTasks(w);
-
-                    } catch ( Throwable t ) {
-                        if ( t instanceof IOException || t instanceof ServiceUnavailableException) {
-                            //stop stack traces for connect exceptions filling the logs
-                            logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
+                        w = obtainConnection();
+                        if ( w != null ) {
+                            jmxQueryCounter.incrementCount();
+                            runMeasurementTasks(w);
                         } else {
-                            logMethods.logError("Error running jmx query for " + JmxMetric.this, t);
-                            if ( w != null) {
-                                jmxConnectionPool.removeConnection(w);
-                            }
+                            recordNaN();
                         }
                     } finally {
-                        if ( s != null) {
-                            s.release();
+                        if ( w != null) {
+                            jmxConnectionPool.returnConnection(w);
                         }
                     }
                 }
@@ -215,13 +195,22 @@ public class JmxMetric implements ManagedMetric {
             TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
         }
 
-        private Semaphore getConnectionLock() {
-            Semaphore s = connectionLockMap.get(url);
-            if ( s == null) {
-                s = new Semaphore(1);
-                connectionLockMap.put(url, s);
+        private JmxConnectionWrapper obtainConnection() {
+            JmxConnectionWrapper w = null;
+            try {
+                w = jmxConnectionPool.getConnection(url);
+            } catch (Throwable t) {
+                if (t instanceof IOException || t instanceof ServiceUnavailableException) {
+                    //stop stack traces for connect exceptions filling the logs
+                    logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
+                } else {
+                    logMethods.logError("Error running jmx query for " + JmxMetric.this + " will close the current jmx connection", t);
+                    if (w != null) {
+                        jmxConnectionPool.closeAndRemove(w);
+                    }
+                }
             }
-            return s;
+            return w;
         }
 
         private void recordNaN() {
@@ -244,21 +233,6 @@ public class JmxMetric implements ManagedMetric {
                     }
                 }
             }
-        }
-
-        private JmxConnectionWrapper getConnection() {
-            JmxConnectionWrapper w = null;
-            try {
-                w = getJmxConnectionPool().getConnection(url);
-            } catch (Throwable t) {
-                if ( t instanceof IOException || t instanceof ServiceUnavailableException) {
-                    //stop stack traces for connect exceptions filling the logs
-                    logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
-                } else {
-                    logMethods.logError("Error getting JMX connection for " + JmxMetric.this, t);
-                }
-            }
-            return w;
         }
     }
 

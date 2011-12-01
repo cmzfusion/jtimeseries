@@ -19,7 +19,6 @@
 package com.od.jtimeseries.component.managedmetric.jmx;
 
 import javax.management.remote.JMXServiceURL;
-import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,11 +37,20 @@ public interface JmxConnectionPool {
      * Calling classes should always call returnConnection in a finally{} block to ensure this connection is returned,
      * or a resource leak or liveliness issue may occur.
      *
-     * This method may block, if another thread has already acquired the connection, until the connection is returned
+     * This method may block, if another thread has already acquired the connection for this serviceURL, until the
+     * connection is returned
      */
     JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception;
 
-    void removeConnection(JmxConnectionWrapper connection);
+    /**
+     * Return a connection to the pool, this method should always be called for a retrieved connection, even if
+     * the connection has been closed with 'closeAndRemove' while held
+     * @param connection
+     */
+    void returnConnection(JmxConnectionWrapper connection);
 
-    JmxConnectionWrapper createAndAddConnection(JMXServiceURL key) throws IOException;
+    /**
+     * Return a connection to the pool
+     */
+    void closeAndRemove(JmxConnectionWrapper connection);
 }

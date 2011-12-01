@@ -29,10 +29,6 @@ import java.util.concurrent.TimeUnit;
  *
  * It will periodically close any connections which have not been accessed
  * for a configurable time period
- *
- * Unlike a traditional pool, synchronization/ownership of the connection
- * for each serviceURL must be handled by client classes, the pool
- * acts as a mechanism for storing created connections only
  */
 public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
@@ -42,6 +38,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
     private int maxConnectionIdlePeriod = 1800000;  //0.5 hours
     private Map<String, ?> connectorEnvironment;
 
+    private Map<JMXServiceURL, Semaphore> connectionLockMap = new ConcurrentHashMap<JMXServiceURL, Semaphore>();
     private Map<JMXServiceURL, JmxConnectionWrapperImpl> connectionMap = new ConcurrentHashMap<JMXServiceURL, JmxConnectionWrapperImpl>();
 
     public DefaultJmxConnectionPool(int maxConnectionIdlePeriodMillis) {
@@ -51,16 +48,23 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
     public JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception {
         logMethods.logDebug("Getting JMX connection to service " + serviceUrl);
-        return connectionMap.get(serviceUrl);
-    }
-
-    public void removeConnection(JmxConnectionWrapper connection) {
-        if ( connectionMap.remove(connection.getServiceURL()) != null ) {
-            jmxConnectionCounter.decrementCount();
+        getConnectionLock(serviceUrl).acquireUninterruptibly();
+        JmxConnectionWrapper w = connectionMap.get(serviceUrl);
+        if ( w == null) {
+            w = createAndAddConnection(serviceUrl);
         }
+        return w;
     }
 
-    public JmxConnectionWrapper createAndAddConnection(JMXServiceURL key) throws IOException {
+     public void returnConnection(JmxConnectionWrapper connection) {
+         getConnectionLock(connection.getServiceURL()).release();
+     }
+
+    public void closeAndRemove(JmxConnectionWrapper connection) {
+       closeAndRemove((JmxConnectionWrapperImpl)connection);
+    }
+
+    private JmxConnectionWrapper createAndAddConnection(JMXServiceURL key) throws IOException {
         if ( connectionMap.containsKey(key)) {
             throw new UnsupportedOperationException("Connection pool already contains a connection for " + key);
         } else {
@@ -83,11 +87,30 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
         for (Map.Entry<JMXServiceURL, JmxConnectionWrapperImpl> e : snapshotAcquirables.entrySet()) {
             c = e.getValue();
-            if (c.getAge() > maxConnectionIdlePeriod) {
-                logMethods.logDebug("Closing JMX connection " + c + " which is " + c.getAge() + " millis old");
-                c.close();
-                connectionMap.remove(c.getServiceURL());
+            Semaphore s = getConnectionLock(e.getKey());
+            if ( s.tryAcquire()) {
+                try {
+                    if (c.getAge() > maxConnectionIdlePeriod) {
+                        closeAndRemove(c);
+                    }
+                } finally {
+                    s.release();
+                }
             }
+        }
+    }
+
+    private void closeAndRemove(JmxConnectionWrapperImpl connection) {
+        logMethods.logDebug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
+        if ( ! connection.closed) {
+            try {
+                connection.close();
+            } catch (Throwable t) {
+                logMethods.logWarning("Failed to close connection " + connection + " this connection may have been disconnected already");
+            }
+        }
+        if ( connectionMap.remove(connection.getServiceURL()) != null ) {
+            jmxConnectionCounter.decrementCount();
         }
     }
 
@@ -106,6 +129,16 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
             TimeUnit.SECONDS
         );
     }
+
+    private Semaphore getConnectionLock(JMXServiceURL url) {
+        Semaphore s = connectionLockMap.get(url);
+        if ( s == null) {
+            s = new Semaphore(1);
+            connectionLockMap.put(url, s);
+        }
+        return s;
+    }
+
 
     public String toString() {
         return "DefaultJmxExecutorService, max connection idle period ms:" + maxConnectionIdlePeriod;

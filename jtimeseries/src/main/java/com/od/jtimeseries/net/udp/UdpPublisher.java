@@ -17,12 +17,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * UDP publication may be revised/improved in a future release
  *
  * The maximum publish rate can be set, to limit the possible network overhead
- * Default max is 100 datagrams / second
- * = 100 * 8192 bytes (assuming max datagram size is 8192 bytes)  == 819200 bytes, so a bit less than 1MB/s worst case
+ * Default max is 25 datagrams / second
+ * = 25 * 8192 bytes (assuming max datagram size is 8192 bytes)  == 204800 bytes, so a bit less than 256KB/s worst case
  */
 public class UdpPublisher extends TimeSeriesListenerAdapter {
 
-    private static final int DEFAULT_MAX_MESSAGES = 100;
+    private static final int DEFAULT_MAX_MESSAGES = 25;
     private ScheduledExecutorService rateControllingExecutor = NamedExecutors.newSingleThreadScheduledExecutor("UdpPublisherQueue" + this);
     private UdpClient udpClient;
     private AppendPublishingListener p = new AppendPublishingListener();

@@ -306,17 +306,20 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         }
 
         public void descendantChanged(IdentifiableTreeEvent contextTreeEvent) {
-            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, false);
-            modifySelectedForCharting(seriesAffected);
+            contextTreeEvent.processNodesAndDescendants(new UpdateSelectionsProcessor(), seriesClass);
         }
 
         public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-            modifySelectedForCharting(seriesAffected);
+            contextTreeEvent.processNodesAndDescendants(new UpdateSelectionsProcessor(), seriesClass);
         }
 
-        private void modifySelectedForCharting(List<E> seriesAffected) {
-            for (E series : seriesAffected) {
+        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
+            contextTreeEvent.processNodesAndDescendants(new RemoveSelectionsProcessor(), seriesClass);
+        }
+
+        private class UpdateSelectionsProcessor implements IdentifiableTreeEvent.IdentifiableProcessor<E> {
+
+            public void process(E series) {
                 if (series.isSelected()) {
                     selectionListForCharting.addSelection(series);
                 } else {
@@ -325,18 +328,19 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
             }
         }
 
-        public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-            //remove those series selected for charting
-            List<E> seriesAffected = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-            for (E series : seriesAffected) {
-                selectionListForCharting.removeSelection(series);
-            }
+        private class RemoveSelectionsProcessor implements IdentifiableTreeEvent.IdentifiableProcessor<E> {
+            public void process(E series) {
 
-            //remove those identifiable selected/highlighted in tree/table
+
+                //remove those series selected for charting
+                selectionListForCharting.removeSelection(series);
+
+                //remove those identifiable selected/highlighted in tree/table
 //                                List<Identifiable> allIdentifiable = SelectorComponent.getAffectedSeries(Identifiable.class, contextTreeEvent, true);
 //                                for ( Identifiable i : allIdentifiable) {
 //                                    selectionActionModel.removeSelected(i);
-//                                }
+//
+            }
         }
     }
 }

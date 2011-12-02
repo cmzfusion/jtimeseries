@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 * It also ensures we don't insert duplicates into the table, since jide bean table model allows the same bean to appear twice at different rows
 *
 */
-class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
+class CoalescingTableUpdater<E extends Identifiable> implements IdentifiableTreeListener {
 
     private static ScheduledExecutorService coalescingEventExceutor = NamedExecutors.newSingleThreadScheduledExecutor("Selector-CoalescingEventExecutor");
 
@@ -70,30 +70,37 @@ class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
     }
 
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
-        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-        if ( timeSeries.size() > 0 ) {
-            synchronized (changeList) {
-                if ( changeList.size() > 0 && changeList.getLast().isAdd()) {
-                    changeList.getLast().addBeans(timeSeries);
-                } else {
-                    changeList.add(new TableChange(true, new LinkedHashSet(timeSeries)));
+        synchronized (changeList) {
+
+            contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<E>() {
+                public void process(E timeSeries) {
+                    if (changeList.size() > 0 && changeList.getLast().isAdd()) {
+                        changeList.getLast().addBean(timeSeries);
+                    } else {
+                        LinkedHashSet beans = new LinkedHashSet();
+                        beans.add(timeSeries);
+                        changeList.add(new TableChange(true, beans));
+                    }
+                    scheduleUpdate();
                 }
-                scheduleUpdate();
-            }
+            }, seriesClass);
         }
     }
 
     public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-        java.util.List<E> timeSeries = SelectorComponent.getAffectedSeries(seriesClass, contextTreeEvent, true);
-        if ( timeSeries.size() > 0 ) {
-            synchronized (changeList) {
-                if ( changeList.size() > 0 && ! changeList.getLast().isAdd()) {
-                    changeList.getLast().addBeans(timeSeries);
-                } else {
-                    changeList.add(new TableChange(false, new LinkedHashSet(timeSeries)));
+        synchronized (changeList) {
+            contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<E>() {
+                public void process(E timeSeries) {
+                    if (changeList.size() > 0 && !changeList.getLast().isAdd()) {
+                        changeList.getLast().addBean(timeSeries);
+                    } else {
+                        LinkedHashSet beans = new LinkedHashSet();
+                        beans.add(timeSeries);
+                        changeList.add(new TableChange(false, beans));
+                    }
+                    scheduleUpdate();
                 }
-                scheduleUpdate();
-            }
+            }, seriesClass);
         }
     }
 
@@ -112,8 +119,8 @@ class CoalescingTableUpdater<E> implements IdentifiableTreeListener {
             this.beans = beans;
         }
 
-        public void addBeans(java.util.List beans) {
-            this.beans.addAll(beans);
+        public void addBean(Object bean) {
+            this.beans.add(bean);
         }
 
         public boolean isAdd() {

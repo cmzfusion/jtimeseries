@@ -147,8 +147,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
 
         public void descendantRemoved(IdentifiableTreeEvent contextTreeEvent) {
-            for ( Identifiable i : contextTreeEvent.getNodes()) {
-                removeNodeAndAllDescendants(i);
+            Map<Identifiable, Collection<Identifiable>> n = contextTreeEvent.getNodesWithDescendants();
+            Iterator<Map.Entry<Identifiable, Collection<Identifiable>>> i = n.entrySet().iterator();
+            while(i.hasNext()) {
+                Map.Entry<Identifiable, Collection<Identifiable>> nodeWithDescendants = i.next();
+                removeNodeAndAllDescendants(nodeWithDescendants);
             }
         }
 
@@ -182,13 +185,11 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     }
 
-    private void removeNodeAndAllDescendants(Identifiable node) {
-        AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(node);
+    private void removeNodeAndAllDescendants(Map.Entry<Identifiable, Collection<Identifiable>> entry) {
+        AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(entry.getKey());
         treeModel.removeNodeFromParent(n);
 
-        List<Identifiable> allDescendants = new LinkedList<Identifiable>();
-        addAllDescendants(allDescendants, node);
-        for ( Identifiable i : allDescendants) {
+        for ( Identifiable i : entry.getValue()) {
             identifiableToNodeMap.remove(i);
         }
     }
@@ -211,7 +212,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
                 TreePath p = tree.getPathForLocation(e.getX(), e.getY());
                 //if node under right click not already a selection,
                 //clear selections and set as selected item
-                if ( ! tree.getSelectionModel().isPathSelected(p)) {
+                if (!tree.getSelectionModel().isPathSelected(p)) {
                     tree.getSelectionModel().setSelectionPath(p);
                 }
             }

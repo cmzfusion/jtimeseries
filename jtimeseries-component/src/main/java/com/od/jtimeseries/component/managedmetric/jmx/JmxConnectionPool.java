@@ -31,7 +31,7 @@ import javax.management.remote.JMXServiceURL;
 public interface JmxConnectionPool {
 
     /**
-     * get a JmxConnectionWrapper for this serviceURL, aquiring exclusive access while this connection is held
+     * get a JmxConnectionWrapper for this serviceURL, acquiring lock on serviceURL while this connection is held
      * The connection will not be closed, or made available to another thread, until returned to the pool
      *
      * Calling classes should always call returnConnection in a finally{} block to ensure this connection is returned,
@@ -43,11 +43,10 @@ public interface JmxConnectionPool {
     JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception;
 
     /**
-     * Return a connection to the pool, this method should always be called for a retrieved connection, even if
+     * Release the lock on the serviceURL, this method should always be called for a retrieved connection, even if
      * the connection has been closed with 'closeAndRemove' while held
-     * @param connection
      */
-    void returnConnection(JmxConnectionWrapper connection);
+    void returnConnection(JMXServiceURL url);
 
     /**
      * Return a connection to the pool

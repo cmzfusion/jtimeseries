@@ -178,7 +178,7 @@ public class JmxMetric implements ManagedMetric {
                 public void run() {
                     JmxConnectionWrapper w = null;
                     try {
-                        w = obtainConnection();
+                        w = obtainConnection(url);
                         if ( w != null ) {
                             jmxQueryCounter.incrementCount();
                             runMeasurementTasks(w);
@@ -186,16 +186,14 @@ public class JmxMetric implements ManagedMetric {
                             recordNaN();
                         }
                     } finally {
-                        if ( w != null) {
-                            jmxConnectionPool.returnConnection(w);
-                        }
+                        jmxConnectionPool.returnConnection(url);
                     }
                 }
             };
             TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
         }
 
-        private JmxConnectionWrapper obtainConnection() {
+        private JmxConnectionWrapper obtainConnection(JMXServiceURL url) {
             JmxConnectionWrapper w = null;
             try {
                 w = jmxConnectionPool.getConnection(url);

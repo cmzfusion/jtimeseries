@@ -56,8 +56,8 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         return w;
     }
 
-     public void returnConnection(JmxConnectionWrapper connection) {
-         getConnectionLock(connection.getServiceURL()).release();
+     public void returnConnection(JMXServiceURL url) {
+         getConnectionLock(url).release();
      }
 
     public void closeAndRemove(JmxConnectionWrapper connection) {

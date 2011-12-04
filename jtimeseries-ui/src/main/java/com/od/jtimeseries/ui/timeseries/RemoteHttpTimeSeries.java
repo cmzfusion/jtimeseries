@@ -52,8 +52,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSeriesListener {
 
-    private static final long STARTUP_TIME = System.currentTimeMillis();
-
     private static final LogMethods logMethods = LogUtils.getLogMethods(RemoteHttpTimeSeries.class);
 
     private final Map<UIPropertiesTimeSeries, String> weakClientSeries = new WeakHashMap<UIPropertiesTimeSeries, String>();
@@ -71,7 +69,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private static final int MAX_FAILURES_BEFORE_STALE = 2;
 
-    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 60; //15 mins
+    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 90; //reduce query frequency for series with no recent updates
     private static final int TICKING_FLAG_HOURS_SINCE_LAST_UPDATE = 4; //if no new data for this time a series is considered 'not ticking'
 
 

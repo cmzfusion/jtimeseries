@@ -61,8 +61,6 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     private static ScheduledExecutorService scheduleExecutor = NamedExecutors.newSingleThreadScheduledExecutor("RemoteHttpTimeSeries-Schedule");
     private static Executor seriesLoadExecutor = NamedExecutors.newFixedThreadPool("RemoteHttpTimeSeries-Query", 3);
 
-    private static final int MIN_REFRESH_TIME_SECONDS = 10;
-
     private RefreshDataCommand refreshDataCommand = new RefreshDataCommand();
     private volatile ScheduledFuture refreshTask;
     private volatile int displayedChartCount;
@@ -73,7 +71,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
     //a series starts not 'stale' and remains not stale until a set number of consecutive download failures have occurred
     private static final int MAX_FAILURES_BEFORE_STALE = 2;
 
-    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 900; //15 mins
+    private static final int NOT_TICKING_REFRESH_TIME_SECONDS = 60; //15 mins
     private static final int TICKING_FLAG_HOURS_SINCE_LAST_UPDATE = 4; //if no new data for this time a series is considered 'not ticking'
 
 

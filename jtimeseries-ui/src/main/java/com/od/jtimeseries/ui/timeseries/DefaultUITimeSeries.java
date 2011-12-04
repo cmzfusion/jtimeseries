@@ -36,8 +36,8 @@ public class DefaultUITimeSeries extends PropertyChangeTimeSeries implements UIP
 
     private static InternStringFieldOptimiser<URL> urlOptimiser = new InternStringFieldOptimiser<URL>(URL.class, "host", "protocol", "authority");
     private static final ColorRotator colorRotator = new ColorRotator();
-    private static final int MIN_REFRESH_TIME_SECONDS = 10;
-    private static final int DEFAULT_REFRESH_FREQUENCY_SECONDS = 300;
+    public static final int MIN_REFRESH_TIME_SECONDS = 5;
+    public static final int DEFAULT_REFRESH_FREQUENCY_SECONDS = 30;
 
     private volatile int refreshFrequencySeconds = DEFAULT_REFRESH_FREQUENCY_SECONDS;
     private volatile boolean selected;

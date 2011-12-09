@@ -34,18 +34,11 @@ public class LatestFunction extends AbstractDoubleBasedAggregateFunction {
     private static final String DESCRIPTION = "Latest";
     private double latest = Double.NaN;
 
-    public LatestFunction() {
-    }
-
-    public LatestFunction(double latest) {
-        this.latest = latest;
-    }
-
     protected void doAddValue(double d) {
         latest = d;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         return DoubleNumeric.valueOf(latest);
     }
 
@@ -57,7 +50,7 @@ public class LatestFunction extends AbstractDoubleBasedAggregateFunction {
         latest = Double.NaN;
     }
 
-    public AggregateFunction next() {
-        return new LatestFunction(latest);
+    public AggregateFunction newInstance() {
+        return new LatestFunction();
     }
 }

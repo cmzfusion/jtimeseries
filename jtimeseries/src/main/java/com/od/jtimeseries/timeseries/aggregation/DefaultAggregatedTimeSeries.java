@@ -27,7 +27,6 @@ import com.od.jtimeseries.timeseries.impl.WeakReferenceTimeSeriesListener;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
 import com.od.jtimeseries.timeseries.interpolation.DefaultInterpolatedTimeSeries;
 import com.od.jtimeseries.timeseries.interpolation.InterpolatedTimeSeries;
-import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +120,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         aggregateFunction.clear();
         boolean success = addValuesFromChildSeries(nextTimepoint, aggregateFunction);
         if (success) {
-            addItem(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateAggregateValue()));
+            addItem(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateResult()));
             lastTimepoint = nextTimepoint;
         }
         return success;

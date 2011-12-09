@@ -36,7 +36,7 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
         min = Double.isNaN(min) ? value : Math.min(min, value);
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         return DoubleNumeric.valueOf(min);
     }
 
@@ -48,7 +48,7 @@ class MinFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new MinFunction();
     }
 }

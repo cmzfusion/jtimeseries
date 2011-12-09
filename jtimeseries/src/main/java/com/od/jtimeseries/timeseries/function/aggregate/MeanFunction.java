@@ -38,7 +38,7 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
         count++;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         double result = Double.NaN;
         if ( count > 0 ) {
             result = sum / count;
@@ -55,7 +55,7 @@ class MeanFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new MeanFunction();
     }
 

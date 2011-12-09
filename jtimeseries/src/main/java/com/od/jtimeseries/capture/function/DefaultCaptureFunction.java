@@ -32,8 +32,8 @@ public class DefaultCaptureFunction extends AbstractCaptureFunction {
 
     private AggregateFunction prototype;
 
-    public DefaultCaptureFunction(TimePeriod timePeriod, AggregateFunction prototype) {
-        super(timePeriod);
+    public DefaultCaptureFunction(TimePeriod timePeriod, AggregateFunction prototype, ChainingMode chainingMode) {
+        super(timePeriod, chainingMode);
         this.prototype = prototype;
     }
 
@@ -41,8 +41,16 @@ public class DefaultCaptureFunction extends AbstractCaptureFunction {
         return prototype.getDescription() + " " + getCapturePeriod();
     }
 
-    public AggregateFunction nextFunctionInstance() {
-        prototype = prototype.next();
+    public AggregateFunction getPrototypeFunction() {
         return prototype;
+    }
+
+    public AggregateFunction nextFunctionInstance(AggregateFunction oldFunctionInstance) {
+        AggregateFunction next = oldFunctionInstance.newInstance();
+        switch(getChainingMode()) {
+            case LAST_VALUE_CHAINING:
+                next.addValue(oldFunctionInstance.getLastAddedValue());
+        }
+        return next;
     }
 }

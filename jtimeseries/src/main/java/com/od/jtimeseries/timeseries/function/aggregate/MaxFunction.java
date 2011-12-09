@@ -36,7 +36,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
         max = Double.isNaN(max) ? value : Math.max(max, value);
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         return DoubleNumeric.valueOf(max);
     }
 
@@ -48,7 +48,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
         return DESCRIPTION;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new MaxFunction();
     }
 }

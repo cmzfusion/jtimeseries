@@ -34,7 +34,7 @@ public interface AggregateFunction {
      * @return a Numeric value which is the result of the aggregation.
      * If it is not possible to calculate a value, the Numeric returned should have numeric.isNaN() == true, or use Numeric.NaN
      */
-    Numeric calculateAggregateValue();
+    Numeric calculateResult();
 
     String getDescription();
 
@@ -42,17 +42,13 @@ public interface AggregateFunction {
 
     /**
      * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance can be used
-     * as a prototype. The function returned should be in its default initial state (equivalent to calling clear())
+     * as a prototype.
      */
     AggregateFunction newInstance();
 
     /**
-     * This is similar to newInstance() in that a new function is created, but in this case the new instance may be initialized
-     * with values from the current function. Functions are sometimes used in sequence with the previous function providing an initial
-     * value to the next (in the case of Delta function, for example, where we need to keep track of the current value).
-     *
-     * @return a new instance of the AggregateFunction
+     * Create a new instance of the AggregateFunction, passing in an initial value
      */
-    AggregateFunction next();
+    AggregateFunction newInstance(Numeric initialValue);
 
 }

@@ -28,9 +28,15 @@ import com.od.jtimeseries.util.time.TimePeriod;
 public interface CaptureFunction {
 
     /**
-     * @return a new function instance to process values from a source
+     * @return the AggregateFunction instance used as the prototype for creating subsequent function instances
      */
-    AggregateFunction nextFunctionInstance();
+    AggregateFunction getPrototypeFunction();
+
+    /**
+     * @return a new function instance to process values from a source
+     * @param oldFunctionInstance
+     */
+    AggregateFunction nextFunctionInstance(AggregateFunction oldFunctionInstance);
 
 
     String getDescription();

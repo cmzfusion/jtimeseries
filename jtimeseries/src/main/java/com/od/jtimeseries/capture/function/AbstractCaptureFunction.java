@@ -20,25 +20,26 @@ package com.od.jtimeseries.capture.function;
 
 import com.od.jtimeseries.util.time.TimePeriod;
 
-//TODO - must implement equals
 public abstract class AbstractCaptureFunction implements CaptureFunction {
 
     private TimePeriod timePeriod;
+    private ChainingMode chainingMode;
 
-    public AbstractCaptureFunction(TimePeriod timePeriod) {
+    public AbstractCaptureFunction(TimePeriod timePeriod, ChainingMode chainingMode) {
         this.timePeriod = timePeriod;
+        this.chainingMode = chainingMode;
     }
 
     public TimePeriod getCapturePeriod() {
         return timePeriod;
     }
 
-    public long getCapturePeriodInMillis() {
-        return timePeriod.getLengthInMillis();
-    }
-
     public final String getDescription() {
         return "(" + doGetDescription() + ")";
+    }
+
+    public ChainingMode getChainingMode() {
+        return chainingMode;
     }
 
     protected abstract String doGetDescription();

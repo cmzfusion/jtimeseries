@@ -56,7 +56,7 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
             timeSeries.readLock().unlock();
         }
 
-        return f.calculateAggregateValue();
+        return f.calculateResult();
     }
 
     protected long getStartTime() {

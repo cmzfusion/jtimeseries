@@ -39,7 +39,7 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
         count++;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         return DoubleNumeric.valueOf(count);
     }
 
@@ -51,7 +51,7 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
         count = 0;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new CountFunction();
     }
 }

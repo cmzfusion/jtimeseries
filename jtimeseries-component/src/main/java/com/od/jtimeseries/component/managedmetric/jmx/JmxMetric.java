@@ -250,8 +250,8 @@ public class JmxMetric implements ManagedMetric {
         private void processMeasurement(MBeanServerConnection jmxConnection) throws Exception {
             result = DoubleNumeric.NaN;
             retreiveAndAddValues(jmxConnection, aggregateFunction);
-            result = aggregateFunction.calculateAggregateValue();
-            aggregateFunction = aggregateFunction.next(); //allow chaining
+            result = aggregateFunction.calculateResult();
+            aggregateFunction = aggregateFunction.newInstance(); //allow chaining
             if ( measurement.getDivisor() != 1) {
                 result = DoubleNumeric.valueOf(result.doubleValue() / measurement.getDivisor());
             }

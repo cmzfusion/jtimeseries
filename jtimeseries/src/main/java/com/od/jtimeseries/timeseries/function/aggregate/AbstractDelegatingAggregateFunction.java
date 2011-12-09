@@ -53,8 +53,8 @@ public abstract class AbstractDelegatingAggregateFunction implements AggregateFu
         return wrappedFunction.getLastAddedValue();
     }
 
-    public Numeric calculateAggregateValue() {
-        return wrappedFunction.calculateAggregateValue();
+    public Numeric calculateResult() {
+        return wrappedFunction.calculateResult();
     }
 
     public String getDescription() {
@@ -70,10 +70,10 @@ public abstract class AbstractDelegatingAggregateFunction implements AggregateFu
     }
 
     public AggregateFunction newInstance() {
-        AggregateFunction a = next();
-        a.clear();
-        return a;
+        return wrappedFunction.newInstance();
     }
 
-    public abstract AggregateFunction next();
+    public final AggregateFunction newInstance(Numeric initialValue) {
+        return wrappedFunction.newInstance(initialValue);
+    }
 }

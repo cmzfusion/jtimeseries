@@ -17,11 +17,11 @@ public class TestAggregateFunctions extends TestCase {
         assertEquals("Median", f.getDescription());
 
         addValues(f, 1, 5, 2, 8, 7);
-        assertEquals(5d, f.calculateAggregateValue().doubleValue());
+        assertEquals(5d, f.calculateResult().doubleValue());
 
         f.clear();
         addValues(f, 1, 5, 2, 8, 7, 2);
-        assertEquals(3.5d, f.calculateAggregateValue().doubleValue());
+        assertEquals(3.5d, f.calculateResult().doubleValue());
     }
 
     public void testPercentile() {
@@ -32,25 +32,25 @@ public class TestAggregateFunctions extends TestCase {
         assertEquals("90 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
-        assertEquals(47d, f.calculateAggregateValue().doubleValue());
+        assertEquals(47d, f.calculateResult().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(95);
         assertEquals("95 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
-        assertEquals(48d, f.calculateAggregateValue().doubleValue());
+        assertEquals(48d, f.calculateResult().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(75);
         assertEquals("75 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
-        assertEquals(42.5d, f.calculateAggregateValue().doubleValue());
+        assertEquals(42.5d, f.calculateResult().doubleValue());
 
         f = AggregateFunctions.PERCENTILE(15);
         assertEquals("15 Percentile", f.getDescription());
 
         addValues(f, 6, 47, 49, 15, 42, 41, 7, 39, 43, 40, 36);
-        assertEquals(11d, f.calculateAggregateValue().doubleValue());
+        assertEquals(11d, f.calculateResult().doubleValue());
     }
 
     private void addValues(AggregateFunction f, int... value) {

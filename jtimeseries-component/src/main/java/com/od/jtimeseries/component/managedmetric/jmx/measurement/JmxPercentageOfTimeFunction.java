@@ -53,9 +53,9 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
         this.lastTriggerTime = lastTriggerTime;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         double result = Double.NaN;
-        Numeric totalTime = super.calculateAggregateValue();
+        Numeric totalTime = super.calculateResult();
         if ( ! totalTime.isNaN() ) {
             long newTotalTime = totalTime.longValue();
             if ( oldTotalTime > 0 && componentNotRestarted(newTotalTime)) {
@@ -76,7 +76,7 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
         return oldTotalTime < newTotalTime;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new JmxPercentageOfTimeFunction(oldTotalTime, lastTriggerTime);
     }
 }

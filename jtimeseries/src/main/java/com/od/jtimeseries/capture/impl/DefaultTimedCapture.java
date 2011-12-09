@@ -88,7 +88,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
     public DefaultTimedCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries, CaptureFunction captureFunction) {
         super(id, "Capture " + captureFunction.getDescription() + " to timeSeries " + timeSeries.getId() + " from " + source.getId() + " every " + captureFunction.getCapturePeriod(), timeSeries, source);
         this.captureFunction = captureFunction;
-        this.function = captureFunction.nextFunctionInstance();
+        this.function = captureFunction.nextFunctionInstance(captureFunction.getPrototypeFunction());
     }
 
     public TimePeriod getTimePeriod() {
@@ -106,7 +106,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
             synchronized (functionLock) {
                 isFirstTrigger = ! initialTriggerReceived.getAndSet(true);
                 oldFunctionInstance = this.function;
-                function = getCaptureFunction().nextFunctionInstance();
+                function = getCaptureFunction().nextFunctionInstance(oldFunctionInstance);
                 if ( isFirstTrigger ) {
                     //this was the first trigger, we are now writing into a real function instance
                     //which means we can transition from STARTING to STARTED
@@ -137,7 +137,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                 TimeSeries timeSeries = getTimeSeries();
                 Numeric value = null;
                 try {
-                    value = oldFunctionInstance.calculateAggregateValue();
+                    value = oldFunctionInstance.calculateResult();
                     timeSeries.addItem(
                         new DefaultTimeSeriesItem(timestamp, value)
                     );

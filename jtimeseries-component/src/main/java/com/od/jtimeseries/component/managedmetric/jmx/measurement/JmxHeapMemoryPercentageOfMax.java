@@ -57,7 +57,7 @@ class JmxHeapMemoryPercentageOfMax extends JmxMeasurement {
             values.add(d);
         }
 
-        public Numeric calculateAggregateValue() {
+        public Numeric calculateResult() {
             Numeric result = DoubleNumeric.NaN;
             if ( values.size() == 2) {
                 double sumOfUsed = values.get(0);
@@ -76,7 +76,7 @@ class JmxHeapMemoryPercentageOfMax extends JmxMeasurement {
             values.clear();
         }
 
-        public AggregateFunction next() {
+        public AggregateFunction newInstance() {
             return new PercentageOfMaxMemoryFunction();
         }
     }

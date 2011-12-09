@@ -50,7 +50,7 @@ public class PercentileFunction extends AbstractDoubleBasedAggregateFunction {
         values.add(d);
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         double result = Double.NaN;
         int N = values.size();
         if ( N > 0) {
@@ -82,7 +82,7 @@ public class PercentileFunction extends AbstractDoubleBasedAggregateFunction {
         values.clear();
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new PercentileFunction(description, percentile);
     }
 }

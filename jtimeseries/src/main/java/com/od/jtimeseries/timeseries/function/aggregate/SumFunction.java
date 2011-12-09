@@ -36,7 +36,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
         total = Double.isNaN(total) ? value : total + value;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         return DoubleNumeric.valueOf(total);
     }
 
@@ -48,7 +48,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction next() {
+    public AggregateFunction newInstance() {
         return new SumFunction();
     }
 }

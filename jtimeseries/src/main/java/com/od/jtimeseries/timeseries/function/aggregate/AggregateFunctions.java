@@ -62,7 +62,9 @@ public class AggregateFunctions {
     }
 
     public static AggregateFunction CHANGE(Numeric initialValue) {
-        return new ChangeFunction(initialValue);
+        ChangeFunction f = new ChangeFunction();
+        f.addValue(initialValue);
+        return f;
     }
 
     public static AggregateFunction LATEST() {

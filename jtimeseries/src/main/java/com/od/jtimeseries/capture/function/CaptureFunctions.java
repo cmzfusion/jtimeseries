@@ -26,6 +26,9 @@ import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import static com.od.jtimeseries.capture.function.ChainingMode.LAST_VALUE_CHAINING;
+import static com.od.jtimeseries.capture.function.ChainingMode.NO_CHAINING;
+
 public class CaptureFunctions {
 
     /**
@@ -41,30 +44,30 @@ public class CaptureFunctions {
      *  CaptureFunctions.RAW_VALUES
      * )
      */
-    public static final CaptureFunction RAW_VALUES = new DefaultCaptureFunction(null, null);
+    public static final CaptureFunction RAW_VALUES = new DefaultCaptureFunction(null, null, null);
 
     public static CaptureFunction MAX(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MAX());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MAX(), NO_CHAINING);
     }
 
     public static CaptureFunction MIN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MIN());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MIN(), NO_CHAINING);
     }
 
     public static CaptureFunction MEAN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN(), NO_CHAINING);
     }
 
     public static CaptureFunction MEDIAN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEDIAN());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEDIAN(), NO_CHAINING);
     }
 
     public static CaptureFunction PERCENTILE(TimePeriod timePeriod, int percentile) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.PERCENTILE(percentile));
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.PERCENTILE(percentile), NO_CHAINING);
     }
 
     public static CaptureFunction SUM(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM());
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM(), NO_CHAINING);
     }
 
     /**
@@ -78,7 +81,9 @@ public class CaptureFunctions {
      * @return a function which measures net change over a time period, starting from the initialValue
      */
     public static CaptureFunction CHANGE(TimePeriod timePeriod, Numeric initialValue) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.CHANGE(initialValue));
+        AggregateFunction change = AggregateFunctions.CHANGE();
+        change.addValue(initialValue);
+        return new DefaultCaptureFunction(timePeriod, change, ChainingMode.LAST_VALUE_CHAINING);
     }
 
     /**
@@ -94,14 +99,16 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
-        return new DefaultCaptureFunction(timePeriod, new MeanChangeFunction(initialValue, timeIntervalToExpressCount, timePeriod));
+        MeanChangeFunction f = new MeanChangeFunction(timeIntervalToExpressCount, timePeriod);
+        f.addValue(initialValue);
+        return new DefaultCaptureFunction(timePeriod, f, LAST_VALUE_CHAINING);
     }
 
     /**
      * @return a function which measures the number of values received from ValueSource over the period, a true count rather than the sum of the values received
      */
     public static CaptureFunction VALUE_COUNT(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT()) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT(), NO_CHAINING) {
             protected String doGetDescription() {
                 return "ValueCount" + " " + getCapturePeriod();
             }
@@ -113,7 +120,7 @@ public class CaptureFunctions {
      * last minute was 50. This function is intended for use with Counter value source.
      */
     public static CaptureFunction COUNT_OVER(TimePeriod timePeriod) {
-        return new CountOverFunction(timePeriod);
+        return new CountOverFunction(timePeriod, LongNumeric.ZERO);
     }
 
     /**
@@ -121,14 +128,15 @@ public class CaptureFunctions {
      * eg my overall count to date is 1000, the mean count per second over the last minute was 5. This function is intended for use with Counter value source
      */
     public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, new MeanCountOverFunction(LongNumeric.ZERO, timeIntervalToExpressCount, timePeriod));
+        MeanCountOverFunction f = new MeanCountOverFunction(LongNumeric.ZERO, timeIntervalToExpressCount, timePeriod);
+        return new DefaultCaptureFunction(timePeriod, f, LAST_VALUE_CHAINING);
     }
 
     /**
-     * @return a function which records the latest (most recent value) at the end of each time period, eg the latest value of a Counter
+     * @return a function which records the latest (most recent value) at the end of each time period
      */
     public static CaptureFunction LATEST(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST()){
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST(), LAST_VALUE_CHAINING){
             protected String doGetDescription() {
                 return "Latest";
             }
@@ -140,7 +148,7 @@ public class CaptureFunctions {
      * (this is the same as the latest value of the counter at the end of each time period, but 'total' count is more intuitive)
      */
     public static CaptureFunction TOTAL_COUNT(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST()){
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST(), LAST_VALUE_CHAINING){
             protected String doGetDescription() {
                 return "Total";
             }
@@ -156,12 +164,12 @@ public class CaptureFunctions {
 
     private static class MeanChangeFunction extends MeanPerXTimeOverYTimeFunction {
 
-        public MeanChangeFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
+        public MeanChangeFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+            super(AggregateFunctions.CHANGE(), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
         }
 
-        public AggregateFunction next() {
-            return new MeanChangeFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
+        public AggregateFunction newInstance() {
+            return new MeanChangeFunction(getTimeIntervalToExpressCount(), getTimePeriod());
         }
     }
 
@@ -171,8 +179,8 @@ public class CaptureFunctions {
      */
     private static class CountOverFunction extends DefaultCaptureFunction {
 
-        public CountOverFunction(TimePeriod timePeriod) {
-            super(timePeriod, AggregateFunctions.CHANGE(LongNumeric.ZERO));
+        public CountOverFunction(TimePeriod timePeriod, Numeric initialValue) {
+            super(timePeriod, AggregateFunctions.CHANGE(initialValue), LAST_VALUE_CHAINING);
         }
 
         protected String doGetDescription() {
@@ -186,7 +194,7 @@ public class CaptureFunctions {
             super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
         }
 
-        public AggregateFunction next() {
+        public AggregateFunction newInstance() {
             return new MeanCountOverFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
         }
     }
@@ -206,8 +214,8 @@ public class CaptureFunctions {
             this.description = description;
         }
 
-        public Numeric calculateAggregateValue() {
-            return DoubleNumeric.valueOf(getWrappedFunction().calculateAggregateValue().doubleValue() / divisor);
+        public Numeric calculateResult() {
+            return DoubleNumeric.valueOf(getWrappedFunction().calculateResult().doubleValue() / divisor);
         }
 
         public String getDescription() {

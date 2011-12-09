@@ -41,22 +41,16 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
     private double currentValue = Double.NaN;
 
 
-    ChangeFunction(Numeric initialValue) {
-        this("Change", initialValue);
+    ChangeFunction() {
+        this("Change");
     }
 
     /**
      * Change function where initial value is specified up front
      */
-    ChangeFunction(String description, Numeric initialValue) {
+    ChangeFunction(String description) {
         this.description = description;
         addValue(initialValue);
-    }
-
-    /**
-     * Change function where initial value is defined by the first value received from the value source
-     */
-    ChangeFunction() {
     }
 
     public void doAddValue(double value) {
@@ -66,7 +60,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
         currentValue = value;
     }
 
-    public Numeric calculateAggregateValue() {
+    public Numeric calculateResult() {
         Numeric result = DoubleNumeric.NaN;
         if (! Double.isNaN(currentValue) && ! Double.isNaN(initialValue)) {
             result = DoubleNumeric.valueOf(currentValue - initialValue);
@@ -79,19 +73,11 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
         currentValue = Double.NaN;
     }
 
-    public double getInitialValue() {
-        return initialValue;
-    }
-
-    public void setInitialValue(double initialValue) {
-        this.initialValue = initialValue;
-    }
-
     public String getDescription() {
         return description;
     }
 
-    public AggregateFunction next() {
-        return new ChangeFunction(DoubleNumeric.valueOf(currentValue));
+    public AggregateFunction newInstance() {
+        return new ChangeFunction();
     }
 }

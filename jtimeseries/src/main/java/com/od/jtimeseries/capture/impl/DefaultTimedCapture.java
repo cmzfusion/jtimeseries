@@ -108,8 +108,8 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                 oldFunctionInstance = this.function;
                 function = getCaptureFunction().nextFunctionInstance(oldFunctionInstance);
                 if ( isFirstTrigger ) {
-                    //this was the first trigger, we are now writing into a real function instance
-                    //which means we can transition from STARTING to STARTED
+                    //this was the first trigger, we won't capture a value from the initial function since the time period may not have been
+                    //complete, but can transition from STARTING to STARTED
                     changeStateAndFireEvent(CaptureState.STARTED);
                 }
             }

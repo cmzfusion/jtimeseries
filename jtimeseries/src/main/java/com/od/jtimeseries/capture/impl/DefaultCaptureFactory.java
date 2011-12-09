@@ -43,7 +43,7 @@ public class DefaultCaptureFactory extends IdentifiableBase implements CaptureFa
 
     public Capture createCapture(Identifiable parent, String path, String id, ValueSource valueSource, IdentifiableTimeSeries identifiableTimeSeries, CaptureFunction captureFunction, Class classType, Object[] parameters) {
         if ( captureFunction == CaptureFunctions.RAW_VALUES ) {
-            return new DefaultCapture(id, valueSource, identifiableTimeSeries);
+            return new RawCapture(id, valueSource, identifiableTimeSeries);
         } else {
             return new DefaultTimedCapture(id, valueSource, identifiableTimeSeries, captureFunction);
         }

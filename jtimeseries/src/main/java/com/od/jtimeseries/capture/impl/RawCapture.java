@@ -25,7 +25,6 @@ import com.od.jtimeseries.source.ValueSourceListener;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
-import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -40,13 +39,13 @@ import com.od.jtimeseries.util.numeric.Numeric;
  *
  * Capture values from a source to a timeseries, without aggregation
  */
-public class DefaultCapture extends AbstractCapture implements ValueSourceCapture {
+public class RawCapture extends AbstractCapture implements ValueSourceCapture {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultCapture.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(RawCapture.class);
     private ValueSourceListener valueSourceListener;
     private static final Object startStopLock = new Object();
 
-    public DefaultCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
+    public RawCapture(String id, ValueSource source, IdentifiableTimeSeries timeSeries) {
         super(id, "Capture to timeSeries " + timeSeries.getId() + " from " + source.getId(), timeSeries, source);
     }
 

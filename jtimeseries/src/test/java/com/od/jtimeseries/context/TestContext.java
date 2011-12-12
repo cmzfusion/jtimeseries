@@ -226,7 +226,7 @@ public class TestContext extends AbstractSimpleCaptureFixture {
     }
 
     @Test
-    public void testCannotChangesSchedulerIfSchedulerStarted() {
+    public void testCannotChangeSchedulerIfSchedulerStarted() {
         rootContext.startScheduling();
         try {
             rootContext.setScheduler(new NonGroupingScheduler());

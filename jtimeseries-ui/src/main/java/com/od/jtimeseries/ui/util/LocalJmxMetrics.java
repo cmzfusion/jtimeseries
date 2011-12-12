@@ -131,9 +131,6 @@ public class LocalJmxMetrics {
         );
 
         managedMetricInitializer.initializeServerMetrics();
-
-        rootContext.startScheduling(); 
-
     }
 
     public Counter getQueryCounter() {

@@ -26,7 +26,16 @@ import com.od.jtimeseries.util.time.TimePeriod;
  * User: nick
  * Date: 27-Nov-2009
  * Time: 21:49:25
- * To change this template use File | Settings | File Templates.
+ *
+ * Triggerable interface is used to define a task which will be periodically
+ * triggered by a jTimeSeries Scheduler
+ *
+ * Implementations of the  trigger() method must execute and return very quickly,
+ * since there are a limited number of Scheduler threads, and a delay might affect
+ * the timeliness of scheduling for subsequent tasks.
+ *
+ * For this reason, any significant work performed during the trigger() callback should
+ * be offloaded to a worker thread
  */
 public interface Triggerable extends Identifiable {
 

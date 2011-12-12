@@ -49,6 +49,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForGrandchildPicksUpTheGrandchildCaptures() {
+        rootContext.stopScheduling();
         grandchildContext.setScheduler(new NonGroupingScheduler());
         assertNotSame(rootContext.getScheduler(), grandchildContext.getScheduler());
         assertFalse(rootContext.getScheduler().containsTriggerable(rootContext.findCaptures(grandchildCounter).getFirstMatch()));
@@ -57,6 +58,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testNewSchedulerForChildPicksUpTheChildAndGrandchildCapturesIfGranchildDoesNotHaveItsOwnScheduler() {
+        rootContext.stopScheduling();
         childContext.setScheduler(new NonGroupingScheduler());
 
         assertNotSame(rootContext.getScheduler(), childContext.getScheduler());
@@ -73,6 +75,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
     @Test
     public void testSettingNewSchedulerForChildDoesNotPickUpGrandchildCapturesIfGrandchildHasItsOwnScheduler() {
+        rootContext.stopScheduling();
         grandchildContext.setScheduler(new NonGroupingScheduler());
         childContext.setScheduler(new NonGroupingScheduler());
 
@@ -91,6 +94,7 @@ public class TestContextScheduler extends AbstractSimpleCaptureFixture {
 
    @Test
     public void testStartAndStoppingSchedulingAffectsLocalSchedulerAndThoseForChildNodes() {
+        rootContext.stopScheduling();
         grandchildContext.setScheduler(new NonGroupingScheduler());
         childContext.setScheduler(new NonGroupingScheduler());
         childContext.startScheduling();

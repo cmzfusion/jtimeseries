@@ -80,10 +80,15 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
         checkId(id);
         if (createRootContextResources) {
             createRootContextResources();
+            initializeRootContext();
         }
     }
 
-    private void createRootContextResources() {
+    protected void initializeRootContext() {
+        getScheduler().start(); //should not create any threads until a Triggerable is added
+    }
+
+    protected void createRootContextResources() {
         setScheduler(new GroupByPeriodScheduler());
         setTimeSeriesFactory(new DefaultTimeSeriesFactory());
         setValueSourceFactory(new DefaultValueSourceFactory());

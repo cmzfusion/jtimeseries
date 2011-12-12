@@ -52,7 +52,6 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
     private void testCapture() {
         CaptureStartedCountdown c = createCaptureStartedListener();
-        rootContext.startScheduling().startDataCapture();
         c.waitForAll();
 
         CaptureCompleteCountdown countDownListener = createCapturePeriodListener();

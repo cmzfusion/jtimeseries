@@ -109,12 +109,6 @@ public class JTimeSeriesDemo {
         );
         rootContext.addChild(a);
 
-        //start everything up!
-        //no values will be captured until startDataCapture()
-        //for metrics where we apply a function to the values recorded over a time period (e.g. max/mean)
-        //nothing will capture until we start the scheduling
-        rootContext.startScheduling().startDataCapture();
-
         //create an http server to make our time series data available over http/in a browser
         JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(HTTPD_PORT, rootContext);
         httpd.start();

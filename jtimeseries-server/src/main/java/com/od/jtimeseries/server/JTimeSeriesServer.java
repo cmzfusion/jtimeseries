@@ -90,7 +90,6 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
-        startScheduling();
         serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
     }
 
@@ -110,11 +109,6 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     private void setupServerMetrics() {
         logMethods.logInfo("Setting up server metrics series");
         managedMetricInitializer.initializeServerMetrics();
-    }
-
-    private void startScheduling() {
-        //start scheduling for any series (e.g server metrics) which require it
-        rootContext.startScheduling();
     }
 
     private void startSummaryStats() {

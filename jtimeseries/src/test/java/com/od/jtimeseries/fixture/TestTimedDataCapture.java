@@ -31,6 +31,7 @@ import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
 public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
     protected void doExtraSetUp() {
+        rootContext.stopScheduling(); //now started by default
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description",
                 CaptureFunctions.COUNT_OVER(capturePeriod),
                 CaptureFunctions.CHANGE(capturePeriod),
@@ -141,6 +142,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
     @Test
     public void testTimedCaptureLifecycleWhenStartImmediately() {
         TimeSeriesContext c = JTimeSeries.createRootContext();
+        c.stopScheduling();//now is started by default
         Counter counter = c.createCounterSeries("test.counter", "Test Counter Description", CaptureFunctions.COUNT_OVER(Time.milliseconds(500)));
         Capture capture = c.findCaptures(counter).getFirstMatch();
         doTestFromAStartingState(c, capture);
@@ -149,6 +151,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
     @Test
     public void testTimedCaptureLifecycleWhenNotStartImmediately() {
         TimeSeriesContext c = JTimeSeries.createRootContext();
+        c.stopScheduling();//now is started by default
         c.setProperty(ContextProperties.START_CAPTURES_IMMEDIATELY_PROPERTY, "false");
         Counter counter = c.createCounterSeries("test.counter", "Test Counter Description", CaptureFunctions.COUNT_OVER(Time.milliseconds(500)));
         Capture capture = c.findCaptures(counter).getFirstMatch();

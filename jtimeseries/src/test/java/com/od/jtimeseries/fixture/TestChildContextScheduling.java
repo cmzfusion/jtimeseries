@@ -21,6 +21,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
 
     protected void doExtraSetUp() {
+        rootContext.stopScheduling();//now started by default
         childContext = rootContext.createContext("child1");
         childContext2 = childContext.createContext("child2", "child 2 description");
 
@@ -40,6 +41,7 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
         //set a new child scheduler on context2
         childContext2.setScheduler(new NonGroupingScheduler());
+        childContext2.stopScheduling();
 
         //the new scheduler should now own the eventTimer capture
         assertTrue(childContext2.getScheduler().containsTriggerable(
@@ -52,9 +54,11 @@ public class TestChildContextScheduling extends AbstractSimpleCaptureFixture {
 
     private void testCapture() {
         CaptureStartedCountdown c = createCaptureStartedListener();
+        rootContext.startScheduling();
         c.waitForAll();
 
         CaptureCompleteCountdown countDownListener = createCapturePeriodListener();
+
         counter.incrementCount();
         valueRecorder.newValue(10);
         eventTimer.startEventTimer();

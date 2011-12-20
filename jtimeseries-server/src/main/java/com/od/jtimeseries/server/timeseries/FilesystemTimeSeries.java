@@ -87,7 +87,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     public FilesystemTimeSeries(FileHeader fileHeader, TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(fileHeader.getId(), fileHeader.getDescription());
         this.fileHeader = fileHeader;
-        setFields(timeseriesSerializer, appendPeriod, rewritePeriod);
+        setFields(timeseriesSerializer, appendPeriod, rewritePeriod, fileHeader);
     }
 
     /**
@@ -97,11 +97,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      */
     public FilesystemTimeSeries(String parentPath, String id, String description, TimeSeriesSerializer timeseriesSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(id, description);
-        createFileHeader(timeseriesSerializer, parentPath, seriesLength);
-        setFields(timeseriesSerializer, appendPeriod, rewritePeriod);
+        this.fileHeader = createFileHeader(timeseriesSerializer, parentPath, seriesLength);
+        setFields(timeseriesSerializer, appendPeriod, rewritePeriod, fileHeader);
     }
 
-    private void setFields(TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) {
+    private void setFields(TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod, FileHeader fileHeader) {
         this.timeseriesSerializer = timeseriesSerializer;
         this.appendPeriod = appendPeriod;
         this.rewritePeriod = rewritePeriod;
@@ -109,13 +109,14 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
         this.writeBehindCache = new WriteBehindCache();
     }
 
-    private void createFileHeader(TimeSeriesSerializer timeseriesSerializer, String parentPath, int seriesLength) throws SerializationException {
-        this.fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + getId(), getDescription(), seriesLength);
+    private FileHeader createFileHeader(TimeSeriesSerializer timeseriesSerializer, String parentPath, int seriesLength) throws SerializationException {
+        FileHeader fileHeader = new FileHeader(parentPath + Identifiable.NAMESPACE_SEPARATOR + getId(), getDescription(), seriesLength);
         if ( timeseriesSerializer.fileExists(fileHeader) ) {
             timeseriesSerializer.readHeader(fileHeader);
         } else {
             timeseriesSerializer.createFile(fileHeader);
         }
+        return fileHeader;
     }
 
     /**

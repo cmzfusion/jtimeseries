@@ -59,4 +59,8 @@ public class JmxMeasurements {
         return JmxHeapMemoryPercentageOfMax.createMemoryUsagePercentage(parentContextPath, id, description);
     }
 
+    public static JmxMeasurement getNumericSystemProperty(String parentContextPath, String id, String description, String attributeKey) {
+        return JmxNumericProperty.createNumericSystemProperty(parentContextPath, id, description, attributeKey);
+    }
+
 }

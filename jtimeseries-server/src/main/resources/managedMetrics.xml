@@ -131,6 +131,12 @@
                                         <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="heapMemoryPercentageOfMax">
                                             <constructor-arg value="${serverMetricsContextPath}.server"/>
                                         </bean>
+                                        <bean class="com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurements" factory-method="getNumericSystemProperty">
+                                            <constructor-arg value="${serverMetricsContextPath}.server"/>
+                                            <constructor-arg value="Version number"/>
+                                            <constructor-arg value="Version number of eBond Component"/>
+                                            <constructor-arg value="build.number"/>
+                                        </bean>
                                     </list>
                                 </constructor-arg>
                             </bean>

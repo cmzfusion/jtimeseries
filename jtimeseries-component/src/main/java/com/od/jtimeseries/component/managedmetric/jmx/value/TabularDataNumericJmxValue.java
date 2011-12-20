@@ -31,7 +31,7 @@ public class TabularDataNumericJmxValue extends JmxValue {
     }
 
     /**
-     * Reads the first
+     * Reads in the numeric value of mapped to the tabularDataKey value specified when this object was created
      * @param jmxConnection
      * @param f
      * @param beanName

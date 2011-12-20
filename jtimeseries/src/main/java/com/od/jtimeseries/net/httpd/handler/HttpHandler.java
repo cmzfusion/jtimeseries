@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.httpd;
+package com.od.jtimeseries.net.httpd.handler;
+
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 
 import java.util.Properties;
 
@@ -28,5 +30,5 @@ import java.util.Properties;
  */
 public interface HttpHandler {
 
-    NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms);
+    NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms);
 }

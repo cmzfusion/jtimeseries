@@ -19,8 +19,8 @@
 package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.net.httpd.AttributeName;
-import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.net.httpd.xml.AttributeName;
+import com.od.jtimeseries.net.httpd.xml.ElementName;
 import com.od.jtimeseries.ui.util.AbstractRemoteQuery;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;

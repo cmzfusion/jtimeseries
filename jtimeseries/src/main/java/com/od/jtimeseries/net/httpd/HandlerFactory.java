@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.net.httpd;
 
+import com.od.jtimeseries.net.httpd.handler.HttpHandler;
+
 import java.util.Properties;
 
 /**

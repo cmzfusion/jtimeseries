@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.httpd;
+package com.od.jtimeseries.net.httpd.handler;
 
 import com.od.jtimeseries.chart.MovingWindowXYDataset;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.httpd.NanoHTTPD;
+import com.od.jtimeseries.net.httpd.response.InputStreamResponse;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -47,8 +50,8 @@ public class ChartPngHandler extends AbstractHandler {
         super(timeSeriesContext);
     }
 
-    public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties params) {
-        NanoHTTPD.Response result;
+    public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties params) {
+        NanoHttpResponse result;
 
         TimeSeriesContext requestContext = findContextForRequest(uri);
         if ( requestContext == null) {
@@ -59,8 +62,8 @@ public class ChartPngHandler extends AbstractHandler {
         return result;
     }
 
-    private NanoHTTPD.Response createChartResponse(String uri, Properties params, TimeSeriesContext requestContext) {
-        NanoHTTPD.Response result;
+    private NanoHttpResponse createChartResponse(String uri, Properties params, TimeSeriesContext requestContext) {
+        NanoHttpResponse result;
         String idToken = getLastUriToken(uri);
         idToken = idToken.substring(0, idToken.length() - CHART_PNG_POSTFIX.length());
 
@@ -73,8 +76,8 @@ public class ChartPngHandler extends AbstractHandler {
         return result;
     }
 
-    private NanoHTTPD.Response createImageResponse(Properties params, IdentifiableTimeSeries h) {
-        NanoHTTPD.Response result;
+    private NanoHttpResponse createImageResponse(Properties params, IdentifiableTimeSeries h) {
+        NanoHttpResponse result;
 
         MovingWindowXYDataset<IdentifiableTimeSeries> xyDataset = new MovingWindowXYDataset<IdentifiableTimeSeries>();
         xyDataset.addTimeSeries(h.getId(), h);
@@ -100,7 +103,7 @@ public class ChartPngHandler extends AbstractHandler {
             e.printStackTrace();
         }
 
-        result = new NanoHTTPD.InputStreamResponse(
+        result = new InputStreamResponse(
                 NanoHTTPD.HTTP_OK,
                 "image/png",
                 new ByteArrayInputStream(bos.toByteArray())

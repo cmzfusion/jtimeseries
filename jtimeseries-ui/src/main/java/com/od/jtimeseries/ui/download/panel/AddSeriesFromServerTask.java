@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.download.panel;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.net.httpd.TimeSeriesIndexHandler;
+import com.od.jtimeseries.net.httpd.handler.TimeSeriesIndexHandler;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;

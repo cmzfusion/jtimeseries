@@ -16,10 +16,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.httpd;
+package com.od.jtimeseries.net.httpd.handler;
 
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.httpd.NanoHTTPD;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
+import com.od.jtimeseries.net.httpd.xml.AttributeName;
+import com.od.jtimeseries.net.httpd.xml.ElementName;
+import com.od.jtimeseries.net.httpd.xml.HttpParameterName;
+import com.od.jtimeseries.net.httpd.xml.XmlValue;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
@@ -45,21 +51,12 @@ public class SeriesHandler extends AbstractHandler {
     public static final String SERIES_POSTFIX = ".series";
     public final static String SERIES_XSL_RESOURCE = System.getProperty("JTimeSeriesSeriesXslResource", "series.xsl");
 
-    private static ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
-        public SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        }
-    };
-
-    private static final DecimalFormat decimalFormat = new DecimalFormat("#.##################");
-
-
     public SeriesHandler(TimeSeriesContext rootContext) {
         super(rootContext);
     }
 
-    public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms) {
-        NanoHTTPD.Response result;
+    public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms) {
+        NanoHttpResponse result;
         TimeSeriesContext context = findContextForRequest(uri);
         if ( context == null) {
             result = createNotFoundResponse(uri);
@@ -69,8 +66,8 @@ public class SeriesHandler extends AbstractHandler {
         return result;
     }
 
-    private NanoHTTPD.Response createSeriesResponse(String uri, Properties parms, TimeSeriesContext context) {
-        NanoHTTPD.Response result;
+    private NanoHttpResponse createSeriesResponse(String uri, Properties parms, TimeSeriesContext context) {
+        NanoHttpResponse result;
         String lastToken = getLastUriToken(uri);
         String seriesId = lastToken.substring(0, lastToken.length() - SERIES_POSTFIX.length() );
         IdentifiableTimeSeries timeSeries = context.getTimeSeries(seriesId);
@@ -94,7 +91,7 @@ public class SeriesHandler extends AbstractHandler {
         return result;
     }
 
-    private class SeriesResponse extends NanoHTTPD.Response {
+    private class SeriesResponse extends NanoHttpResponse {
 
         private final TimeSeriesContext context;
         private final IdentifiableTimeSeries timeSeries;
@@ -160,11 +157,11 @@ public class SeriesHandler extends AbstractHandler {
             pw.write("\" ");
             date.setTime(h.getTimestamp());
             pw.write("datetime=\"");
-            pw.write(simpleDateFormat.get().format(date));
+            pw.write(getDateFormatter().format(date));
             pw.write("\" ");
             pw.write(AttributeName.value.toString());
             pw.write("=\"");
-            pw.write(Double.isNaN(h.doubleValue()) ? "NaN" : decimalFormat.format(h.doubleValue()));
+            writeDoubleValueOrNaN(pw, h.doubleValue());
             pw.write("\" ");
             pw.write("/>");
         }

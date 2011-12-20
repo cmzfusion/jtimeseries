@@ -19,8 +19,8 @@
 package com.od.jtimeseries.ui.timeseries;
 
 import com.od.jtimeseries.context.ContextProperties;
-import com.od.jtimeseries.net.httpd.AttributeName;
-import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.net.httpd.xml.AttributeName;
+import com.od.jtimeseries.net.httpd.xml.ElementName;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.ui.util.AbstractRemoteQuery;

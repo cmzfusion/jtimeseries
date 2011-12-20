@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.httpd;
+package com.od.jtimeseries.net.httpd.handler;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.httpd.NanoHTTPD;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 import java.io.OutputStream;
@@ -41,8 +43,8 @@ public class TimeSeriesIndexHandler extends AbstractHandler {
         super(rootContext);
     }
 
-    public NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms) {
-        NanoHTTPD.Response result;
+    public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms) {
+        NanoHttpResponse result;
         TimeSeriesContext context = findContextForRequest(uri);
         if ( context == null) {
             result = createNotFoundResponse(uri);
@@ -64,7 +66,7 @@ public class TimeSeriesIndexHandler extends AbstractHandler {
         pw.write("\n</timeSeries>");
     }
 
-    private class IndexResponse extends NanoHTTPD.Response {
+    private class IndexResponse extends NanoHttpResponse {
 
         private TimeSeriesContext context;
 

@@ -16,17 +16,25 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.httpd;
+package com.od.jtimeseries.net.httpd.handler;
 
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
+import com.od.jtimeseries.net.httpd.NanoHTTPD;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
+import com.od.jtimeseries.net.httpd.response.TextResponse;
+import com.od.jtimeseries.net.httpd.xml.AttributeName;
+import com.od.jtimeseries.net.httpd.xml.ElementName;
+import com.od.jtimeseries.net.httpd.xml.XmlValue;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 /**
@@ -36,6 +44,18 @@ import java.util.Properties;
  * Time: 11:59:04
  */
 public abstract class AbstractHandler implements HttpHandler {
+
+    private static final ThreadLocal<DecimalFormat> decimalFormat = new ThreadLocal<DecimalFormat>() {
+        protected DecimalFormat initialValue() {
+            return new DecimalFormat("#.##################");
+        }
+    };
+
+    private static ThreadLocal<SimpleDateFormat> simpleDateFormat = new ThreadLocal<SimpleDateFormat>() {
+        public SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        }
+    };
 
     private TimeSeriesContext rootContext;
 
@@ -47,7 +67,7 @@ public abstract class AbstractHandler implements HttpHandler {
         return rootContext;
     }
 
-    public abstract NanoHTTPD.Response createResponse(String uri, String method, Properties header, Properties parms);
+    public abstract NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms);
 
     protected TimeSeriesContext findContextForRequest(String uri) {
         String contextPath = getContextPathFromUri(uri);
@@ -99,9 +119,9 @@ public abstract class AbstractHandler implements HttpHandler {
         return decodeUrl(uri.substring(lastSlashIndex + 1));
     }
 
-    protected NanoHTTPD.Response createNotFoundResponse(String uri) {
-        NanoHTTPD.Response result;
-        result = new NanoHTTPD.TextResponse(NanoHTTPD.HTTP_NOTFOUND, NanoHTTPD.MIME_PLAINTEXT, "Could not find resource " + uri);
+    protected NanoHttpResponse createNotFoundResponse(String uri) {
+        NanoHttpResponse result;
+        result = new TextResponse(NanoHTTPD.HTTP_NOTFOUND, NanoHTTPD.MIME_PLAINTEXT, "Could not find resource " + uri);
         return result;
     }
 
@@ -160,4 +180,15 @@ public abstract class AbstractHandler implements HttpHandler {
         pw.write("/>");
     }
 
+    protected void writeDoubleValueOrNaN(PrintWriter pw, double value) {
+        pw.write(Double.isNaN(value) ? XmlValue.NaN.name() : decimalFormat.get().format(value));
+    }
+
+    protected SimpleDateFormat getDateFormatter() {
+        return simpleDateFormat.get();
+    }
+
+    protected DecimalFormat getDecimalFormatter() {
+        return decimalFormat.get();
+    }
 }

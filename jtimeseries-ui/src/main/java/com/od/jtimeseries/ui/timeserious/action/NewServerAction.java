@@ -24,7 +24,7 @@ import com.jidesoft.dialog.ButtonEvent;
 import com.jidesoft.dialog.ButtonNames;
 import com.jidesoft.dialog.PageList;
 import com.jidesoft.wizard.DefaultWizardPage;
-import com.od.jtimeseries.net.httpd.ElementName;
+import com.od.jtimeseries.net.httpd.xml.ElementName;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
 import com.od.jtimeseries.ui.util.AbstractRemoteQuery;
 import com.od.jtimeseries.ui.util.ImageUtils;

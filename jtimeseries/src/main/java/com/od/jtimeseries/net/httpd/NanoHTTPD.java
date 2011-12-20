@@ -18,7 +18,9 @@
  */
 package com.od.jtimeseries.net.httpd;
 
-import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.net.httpd.response.InputStreamResponse;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
+import com.od.jtimeseries.net.httpd.response.TextResponse;
 import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -91,7 +93,7 @@ public class NanoHTTPD {
      * @parm parms    Parsed, percent decoded parameters from URI and, in case of POST, data.
      * @parm header    Header entries, percent decoded
      */
-    public Response serve(String uri, String method, Properties header, Properties parms) {
+    public NanoHttpResponse serve(String uri, String method, Properties header, Properties parms) {
         System.out.println(method + " '" + uri + "' ");
 
         Enumeration e = header.propertyNames();
@@ -108,117 +110,6 @@ public class NanoHTTPD {
         }
 
         return serveFile(uri, header, new File("."), true);
-    }
-
-    /**
-     * HTTP response.
-     * Return one of these from serve().
-     */
-    public static class Response {
-
-        /**
-         * Basic constructor.
-         */
-        public Response(String status, String mimeType) {
-            this.status = status;
-            this.mimeType = mimeType;
-        }
-
-        /**
-         * Adds given line to the header.
-         */
-        public void addHeader(String name, String value) {
-            header.put(name, value);
-        }
-
-        /**
-         * HTTP status code after processing, e.g. "200 OK", HTTP_OK
-         */
-        public String status;
-
-        /**
-         * MIME type of content, e.g. "text/html"
-         */
-        public String mimeType;
-
-        /**
-         * Headers for the HTTP response. Use addHeader()
-         * to add lines.
-         */
-        public Properties header = new Properties();
-
-        /**
-         * Subclass should write the body of the response to the stream
-         */
-        public void writeResponseBody(OutputStream out, PrintWriter pw) {
-        }
-    }
-
-    public static class TextResponse extends NoCacheResponse {
-
-        private String text;
-
-        public TextResponse(String status, String mimeType, String text) {
-            super(status, mimeType);
-            this.text = text;
-        }
-
-         /**
-         * Subclass should write the body of the response to the stream
-         */
-        public void writeResponseBody(OutputStream out, PrintWriter pw) {
-            pw.write(text);
-        }
-    }
-
-    public static class InputStreamResponse extends NoCacheResponse {
-
-        private InputStream data;
-
-        public InputStreamResponse(String status, String mimeType, InputStream data) {
-            super(status, mimeType);
-            this.data = data;
-        }
-
-        public void writeResponseBody(OutputStream out, PrintWriter pw) {
-            if (data != null) {
-                try {
-                    byte[] buff = new byte[2048];
-                    while (true) {
-                        int read = data.read(buff, 0, 2048);
-                        if (read <= 0)
-                            break;
-                        out.write(buff, 0, read);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        data.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    /**
-     * This class is an ObjectDefinitions addition to prevent response caching
-     */
-    public static class NoCacheResponse extends Response {
-
-        public NoCacheResponse(String status, String mimeType) {
-            super(status, mimeType);
-            setNoCacheHeaders();
-        }
-
-        private void setNoCacheHeaders() {
-            addHeader("Cache-Control", "no-cache");
-        }
-
     }
 
     /**
@@ -318,7 +209,7 @@ public class NanoHTTPD {
     private class HTTPSession implements Runnable {
 
         private boolean responseSent = false;
-        private Response response = new Response(HTTP_INTERNALERROR, "NoResponseCreated");
+        private NanoHttpResponse response = new NanoHttpResponse(HTTP_INTERNALERROR, "NoResponseCreated");
 
         public HTTPSession(Socket s) {
             mySocket = s;
@@ -432,7 +323,7 @@ public class NanoHTTPD {
             requestMonitor.servingRequest(requestId, mySocket, uri, method,  header, params);
 
             // Ok, now do the serve()
-            Response response = serve(uri, method, header, params);
+            NanoHttpResponse response = serve(uri, method, header, params);
             if (response == null) {
                 throw new HttpProcessingException(HTTP_INTERNALERROR, "No response for HTTP request");
             } else {
@@ -499,7 +390,7 @@ public class NanoHTTPD {
         /**
          * Sends given response to the socket.
          */
-        private void sendResponse(Response response) throws IOException {
+        private void sendResponse(NanoHttpResponse response) throws IOException {
             responseSent = true; //never try to send more than one response
             this.response = response;
             if (response.status == null)
@@ -595,7 +486,7 @@ public class NanoHTTPD {
      * Serves file from homeDir and its' subdirectories (only).
      * Uses only URI, ignores all headers and HTTP parameters.
      */
-    public Response serveFile(String uri, Properties header, File homeDir,
+    public NanoHttpResponse serveFile(String uri, Properties header, File homeDir,
                               boolean allowDirectoryListing) {
         // Make sure we won't die of an exception later
         if (!homeDir.isDirectory())
@@ -623,7 +514,7 @@ public class NanoHTTPD {
             // directory, send a redirect.
             if (!uri.endsWith("/")) {
                 uri += "/";
-                Response r = new TextResponse(HTTP_REDIRECT, MIME_HTML,
+                NanoHttpResponse r = new TextResponse(HTTP_REDIRECT, MIME_HTML,
                         "<html><body>Redirected: <a href=\"" + uri + "\">" +
                                 uri + "</a></body></html>");
                 r.addHeader("Location", uri);
@@ -709,7 +600,7 @@ public class NanoHTTPD {
 
             FileInputStream fis = new FileInputStream(f);
             fis.skip(startFrom);
-            Response r = new InputStreamResponse(HTTP_OK, mime, fis);
+            NanoHttpResponse r = new InputStreamResponse(HTTP_OK, mime, fis);
             r.addHeader("Content-length", "" + (f.length() - startFrom));
             r.addHeader("Content-range", "" + startFrom + "-" +
                     (f.length() - 1) + "/" + f.length());

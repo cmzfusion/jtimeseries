@@ -19,6 +19,9 @@
 package com.od.jtimeseries.net.httpd;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.net.httpd.handler.HttpHandler;
+import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
+import com.od.jtimeseries.net.httpd.response.TextResponse;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -41,7 +44,7 @@ public class JTimeSeriesHttpd extends NanoHTTPD {
     public JTimeSeriesHttpd(int port, TimeSeriesContext timeSeriesContext) throws IOException {
         super(port);
         this.port = port;
-        this.handlerFactory = new TimeSeriesContextHandlerFactory(timeSeriesContext);
+        this.handlerFactory = new DefaultHandlerFactory(timeSeriesContext);
     }
 
     public void setHandlerFactory(HandlerFactory handlerFactory) {
@@ -52,7 +55,7 @@ public class JTimeSeriesHttpd extends NanoHTTPD {
         return port;
     }
 
-    public Response serve( String uri, String method, Properties header, Properties parms ) {
+    public NanoHttpResponse serve( String uri, String method, Properties header, Properties parms ) {
         HttpHandler handler = handlerFactory.getHandler(uri, method, header, parms );
         if ( handler != null) {
             return handler.createResponse(uri, method, header, parms);

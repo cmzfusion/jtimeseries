@@ -35,6 +35,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -184,6 +185,22 @@ public abstract class AbstractHandler implements HttpHandler {
         pw.write(Double.isNaN(value) ? XmlValue.NaN.name() : decimalFormat.get().format(value));
     }
 
+    /**
+     * Write a datetime attribute with value NaN if timestamp is -1
+     * @param d, this date instance will have its time set to timestamp,
+     * use this parameter to avoid creating 1000s of unnecessary Date
+     * instances during a large query
+     */
+    protected void writeDatetimeAttribute(PrintWriter pw, long timestamp, Date d) {
+        if ( timestamp > 0) {
+            d.setTime(timestamp);
+        }
+        pw.write(AttributeName.datetime.toString());
+        pw.write("=\"");
+        pw.write(timestamp > 0 ? getDateFormatter().format(d) : XmlValue.NaN.name());
+        pw.write("\" ");
+    }
+
     protected SimpleDateFormat getDateFormatter() {
         return simpleDateFormat.get();
     }
@@ -191,4 +208,5 @@ public abstract class AbstractHandler implements HttpHandler {
     protected DecimalFormat getDecimalFormatter() {
         return decimalFormat.get();
     }
+
 }

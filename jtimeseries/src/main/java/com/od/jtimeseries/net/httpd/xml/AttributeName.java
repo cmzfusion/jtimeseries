@@ -38,4 +38,5 @@ public enum AttributeName {
     summaryStats,
     latestItemTimestamp,
     latestItemValue,
+    datetime
 }

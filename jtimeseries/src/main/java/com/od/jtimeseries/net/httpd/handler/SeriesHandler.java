@@ -25,15 +25,12 @@ import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 import com.od.jtimeseries.net.httpd.xml.AttributeName;
 import com.od.jtimeseries.net.httpd.xml.ElementName;
 import com.od.jtimeseries.net.httpd.xml.HttpParameterName;
-import com.od.jtimeseries.net.httpd.xml.XmlValue;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.util.SeriesUtils;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -146,7 +143,7 @@ public class SeriesHandler extends AbstractHandler {
 
     private void appendTimeSeriesItems(IdentifiableTimeSeries timeSeries, PrintWriter pw, long lastTimestamp) {
         Collection<TimeSeriesItem> seriesItems = SeriesUtils.getSubSeries(lastTimestamp + 1, timeSeries);  //we require anything more recent than last timestamp
-        Date date = new Date();
+        Date d = new Date();
         for ( TimeSeriesItem h : seriesItems) {
             pw.write("\n<");
             pw.write(ElementName.seriesItem.toString());
@@ -155,10 +152,7 @@ public class SeriesHandler extends AbstractHandler {
             pw.write("=\"");
             pw.write(String.valueOf(h.getTimestamp()));
             pw.write("\" ");
-            date.setTime(h.getTimestamp());
-            pw.write("datetime=\"");
-            pw.write(getDateFormatter().format(date));
-            pw.write("\" ");
+            writeDatetimeAttribute(pw, h.getTimestamp(), d);
             pw.write(AttributeName.value.toString());
             pw.write("=\"");
             writeDoubleValueOrNaN(pw, h.doubleValue());

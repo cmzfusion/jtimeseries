@@ -11,6 +11,7 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -68,11 +69,10 @@ public class SnapshotHandler extends AbstractHandler {
        pw.write(AttributeName.latestItemTimestamp.toString());
        pw.write("=\"");
        long latestTimestamp = s.getLatestTimestamp();
-       pw.write(latestTimestamp == -1 ?
-               XmlValue.NaN.name() :
-               String.valueOf(latestTimestamp));
+       pw.write(latestTimestamp == -1 ? XmlValue.NaN.name() : String.valueOf(latestTimestamp));
        pw.write("\"");
        pw.write(" ");
+       writeDatetimeAttribute(pw, latestTimestamp, new Date());
        pw.write(AttributeName.latestItemValue.toString());
        pw.write("=\"");
        TimeSeriesItem latestItem = s.getLatestItem();

@@ -9,8 +9,9 @@
 				<style type="text/css"/>
 			</head>
 			<body>
+                <h2>Snapshot of latest Timeseries Values</h2>
                 <table>
-                <tr><th>Series Path</th><th>Timestamp</th><th>Value</th></tr>
+                <tr><th>Series Path</th><th>datetime</th><th>Value</th></tr>
 				<xsl:apply-templates select="series"/>
 			    </table>
             </body>
@@ -20,7 +21,7 @@
 	<xsl:template match="series">
         <tr>
             <td><xsl:value-of select="@parentPath"/>.<xsl:value-of select="@id"/></td>
-            <td><xsl:value-of select="@latestItemTimestamp"/></td>
+            <td><xsl:value-of select="@datetime"/></td>
             <td align='right'><xsl:value-of select="@latestItemValue"/></td>
         </tr>
 	</xsl:template>

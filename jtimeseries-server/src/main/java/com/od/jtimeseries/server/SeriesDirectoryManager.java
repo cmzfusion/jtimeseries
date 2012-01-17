@@ -105,7 +105,7 @@ public class SeriesDirectoryManager {
             String path = header.getPath();
             PathMappingResult r = pathMapper.getPathMapping(path);
             if (r.getType() == PathMappingResult.ResultType.DENY) {
-                logMethods.logInfo("Not loading series at path " + path + " since this path is denied by path mapping rules");
+                logMethods.logWarning("Not loading series at path " + path + " since this path is denied by path mapping rules");
             } else if ( ! r.getNewPath().equals(path)) {
                 logMethods.logInfo("Migrating series at path " + path + " to " + r.getNewPath() + " since this path is migrated by path mapping rules");
                 timeseriesSerializer.migratePath(header, r.getNewPath());

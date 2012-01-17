@@ -22,7 +22,7 @@ import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeData;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +33,7 @@ import javax.management.openmbean.CompositeDataSupport;
  * A value from a CompositeData typed attribute of JMX beans(s), where the
  * compositeDataKey specifies the attribute we require
  */
-public class CompositeDataJmxValue extends JmxValue {
+public class CompositeDataJmxValue extends SimpleJmxValue {
 
     private String compositeDataKey;
 
@@ -48,10 +48,25 @@ public class CompositeDataJmxValue extends JmxValue {
     }
 
     public void readValueFromBean(MBeanServerConnection jmxConnection, AggregateFunction f, ObjectName beanName) throws Exception {
-        Object value = ((CompositeDataSupport)jmxConnection.getAttribute(
-                new ObjectName(getObjectName()), getAttribute())).get(compositeDataKey);
-        f.addValue(Double.valueOf(value.toString()));
-    }
+        checkBeanExists(jmxConnection, beanName);
+        Object attribute = safelyGetAttribute(jmxConnection, beanName);
 
+        if ( ! (attribute instanceof CompositeData)) {
+            raiseValueException("The attribute was not of type CompositeData");
+        }
+
+        CompositeData compositeData = (CompositeData) attribute;
+        if ( ! compositeData.containsKey(compositeDataKey)) {
+            raiseValueException("No value is available for the key " + compositeDataKey);
+        }
+
+        Object value = getValueFromCompositeData(compositeData, compositeDataKey);
+        if ( value == null ) {
+            raiseValueException("The value supplied for the key " + compositeDataKey + "was null");
+        }
+
+        Double v = convertToDouble(value);
+        f.addValue(v);
+    }
 
 }

@@ -57,7 +57,7 @@ public abstract class AbstractManagedMetric implements ManagedMetric {
                 break;
             case DENY:
             default:
-                logMethods.logError("Cannot create managed metric at path " + path + " this path is denied by PathMapper rules");
+                logMethods.logWarning("Cannot create managed metric at path " + path + " this path is denied by PathMapper rules");
         }
     }
 

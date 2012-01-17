@@ -12,7 +12,7 @@ import com.od.jtimeseries.component.managedmetric.jmx.value.TabularDataNumericJm
  */
 public class JmxNumericProperty extends JmxMeasurement {
 
-    public JmxNumericProperty(String parentContextPath, String id, String description, JmxValue value) {
+    private JmxNumericProperty(String parentContextPath, String id, String description, JmxValue value) {
         super(parentContextPath, id, description, value);
     }
 

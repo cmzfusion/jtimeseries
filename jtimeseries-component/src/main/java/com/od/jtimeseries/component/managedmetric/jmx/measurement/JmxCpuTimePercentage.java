@@ -19,6 +19,7 @@
 package com.od.jtimeseries.component.managedmetric.jmx.measurement;
 
 import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.value.SimpleJmxValue;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 
 import java.util.LinkedList;
@@ -41,7 +42,7 @@ class JmxCpuTimePercentage extends JmxMeasurement {
         List<JmxValue> jmxValue = new LinkedList<JmxValue>();
 
         //The collection count attribute on all GarbageCollection type mbeans
-        jmxValue.add(new JmxValue("java.lang:type=OperatingSystem", "ProcessCpuTime"));
+        jmxValue.add(new SimpleJmxValue("java.lang:type=OperatingSystem", "ProcessCpuTime"));
 
         JmxCpuTimePercentage jmxCpuTimePercentage = new JmxCpuTimePercentage(parentContextPath, id, description, jmxValue, new JmxPercentageOfTimeFunction());
         jmxCpuTimePercentage.setDivisor(1000000); //cpu times appear to be nanoseconds, we need milliseconds

@@ -21,6 +21,7 @@ package com.od.jtimeseries.component.managedmetric.jmx;
 import com.od.jtimeseries.component.managedmetric.ManagedMetric;
 import com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement;
 import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValue;
+import com.od.jtimeseries.component.managedmetric.jmx.value.JmxValueException;
 import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.component.util.path.PathMappingResult;
 import com.od.jtimeseries.context.TimeSeriesContext;
@@ -153,7 +154,7 @@ public class JmxMetric implements ManagedMetric {
                     break;
                 case DENY:
                 default:
-                    logMethods.logError("Cannot create JMX metric at path " + path + " this path is denied by PathMapper rules");
+                    logMethods.logWarning("Cannot create JMX metric at path " + path + " this path is denied by PathMapper rules");
             }
         }
     }
@@ -203,20 +204,9 @@ public class JmxMetric implements ManagedMetric {
                     logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
                 } else {
                     logMethods.logError("Error running jmx query for " + JmxMetric.this + " will close the current jmx connection", t);
-                    if (w != null) {
-                        jmxConnectionPool.closeAndRemove(w);
-                    }
                 }
             }
             return w;
-        }
-
-        private void recordNaN() {
-            for (JmxMeasurementTask m : measurementTaskTasks) {
-                if ( m.recordNanIfFailed()) {
-                    m.recordNaN();
-                }
-            }
         }
 
         private void runMeasurementTasks(JmxConnectionWrapper w) {
@@ -225,10 +215,23 @@ public class JmxMetric implements ManagedMetric {
                     MBeanServerConnection connection = w.getConnection();
                     m.processMeasurement(connection);
                 } catch ( Throwable t) {
-                    logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName());
+                    if ( t instanceof JmxValueException) {
+                        logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
+                    } else {
+                        logMethods.logWarning("Could not read JmxMeasurement", t);
+                    }
+
                     if ( m.recordNanIfFailed()) {
                         m.recordNaN();
                     }
+                }
+            }
+        }
+
+        private void recordNaN() {
+            for (JmxMeasurementTask m : measurementTaskTasks) {
+                if ( m.recordNanIfFailed()) {
+                    m.recordNaN();
                 }
             }
         }

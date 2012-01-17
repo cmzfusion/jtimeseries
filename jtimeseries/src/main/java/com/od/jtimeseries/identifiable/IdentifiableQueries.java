@@ -29,4 +29,6 @@ public interface IdentifiableQueries {
     <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass);
 
     <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass);
+
+    <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass, FindCriteria<E> findCriteria);
 }

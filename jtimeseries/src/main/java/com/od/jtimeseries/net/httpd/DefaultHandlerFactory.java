@@ -58,4 +58,8 @@ public class DefaultHandlerFactory implements HandlerFactory {
     private boolean isValidXslUri(String uri) {
         return uri.endsWith("xsl");
     }
+
+    protected TimeSeriesContext getRootContext() {
+        return rootContext;
+    }
 }

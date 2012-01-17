@@ -19,6 +19,8 @@
 package com.od.jtimeseries.identifiable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -38,29 +40,49 @@ public class DefaultIdentifiableQueries implements IdentifiableQueries {
 
     public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass) {
         QueryResult<E> result = QueryResult.EMPTY_RESULT;
-        if ( identifiable.getChildCount() > 0) {
-             List<E> children = new ArrayList<E>();
-             addAllIdentifiableMatchingClassRecursive(children, identifiable, assignableToClass);
-             result = new DefaultQueryResult<E>(children);
+        if (identifiable.getChildCount() > 0) {
+            List<E> children = new ArrayList<E>();
+            addAllIdentifiableMatchingClassRecursive(children, identifiable, assignableToClass);
+            result = new DefaultQueryResult<E>(children);
         }
         return result;
     }
 
     public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         QueryResult<E> result = QueryResult.EMPTY_RESULT;
-        if ( identifiable.getChildCount() > 0) {
+        if (identifiable.getChildCount() > 0) {
             result = new DefaultQueryResult<E>(
-                findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
+                    findAllMatchingSearchPattern(searchPattern, findAll(assignableToClass).getAllMatches())
             );
         }
         return result;
     }
 
+    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass, FindCriteria<E> findCriteria) {
+        QueryResult<E> result = QueryResult.EMPTY_RESULT;
+        if (identifiable.getChildCount() > 0) {
+            LinkedList<E> children = new LinkedList<E>();
+            addAllIdentifiableMatchingClassRecursive(children, identifiable, assignableToClass);
+            filterByCriteria(findCriteria, children);
+            result = new DefaultQueryResult<E>(children);
+        }
+        return result;
+    }
+
+    private <E extends Identifiable> void filterByCriteria(FindCriteria<E> findCriteria, LinkedList<E> children) {
+        Iterator<E> childIterator = children.iterator();
+        while (childIterator.hasNext()) {
+            if (!findCriteria.matchesCriteria(childIterator.next())) {
+                childIterator.remove();
+            }
+        }
+    }
+
     protected <E extends Identifiable> List<E> findAllMatchingSearchPattern(String searchPattern, List<E> identifiables) {
         Pattern p = Pattern.compile(searchPattern);
         List<E> result = new ArrayList<E>();
-        for ( E i : identifiables) {
-            if ( p.matcher((i).getPath()).find() ) {
+        for (E i : identifiables) {
+            if (p.matcher((i).getPath()).find()) {
                 result.add(i);
             }
         }
@@ -68,9 +90,9 @@ public class DefaultIdentifiableQueries implements IdentifiableQueries {
     }
 
     protected <E extends Identifiable> void addAllIdentifiableMatchingClassRecursive(List<E> l, Identifiable identifiable, Class<E> clazz) {
-        for ( Identifiable i : identifiable.getChildren()) {
-            if ( clazz.isAssignableFrom(i.getClass())) {
-                l.add((E)i);
+        for (Identifiable i : identifiable.getChildren()) {
+            if (clazz.isAssignableFrom(i.getClass())) {
+                l.add((E) i);
             }
             addAllIdentifiableMatchingClassRecursive(l, i, clazz);
         }

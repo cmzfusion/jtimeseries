@@ -1,6 +1,8 @@
 package com.od.jtimeseries.net.httpd.handler;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.FindCriteria;
+import com.od.jtimeseries.identifiable.QueryResult;
 import com.od.jtimeseries.net.httpd.NanoHTTPD;
 import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 import com.od.jtimeseries.net.httpd.xml.AttributeName;
@@ -25,8 +27,15 @@ public class SnapshotHandler extends AbstractHandler {
    public static final String SNAPSHOT_POSTFIX = "seriessnapshot";
    public final static String SNAPSHOT_XSL_RESOURCE = System.getProperty("JTimeSeriesTimeseriesSnapshotXslResource", "seriessnapshot.xsl");
 
+   private FindCriteria<IdentifiableTimeSeries> findCriteria;
+
    public SnapshotHandler(TimeSeriesContext rootContext) {
+       this(rootContext, FindCriteria.FIND_ALL);
+   }
+
+   public SnapshotHandler(TimeSeriesContext rootContext, FindCriteria<IdentifiableTimeSeries> findCriteria) {
        super(rootContext);
+       this.findCriteria = findCriteria;
    }
 
    public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms) {
@@ -46,7 +55,12 @@ public class SnapshotHandler extends AbstractHandler {
        pw.write(SNAPSHOT_XSL_RESOURCE);
        pw.write("\"?>");
        pw.write("\n<timeSeries>");
-       for (IdentifiableTimeSeries t : context.findAllTimeSeries().getAllMatches()) {
+
+       //find all timerseries whcih we want to include in the index
+       QueryResult<IdentifiableTimeSeries> series = context.findAll(
+           IdentifiableTimeSeries.class, findCriteria
+       );
+       for (IdentifiableTimeSeries t : series.getAllMatches()) {
            appendSeriesSnapshot(pw, t);
        }
        pw.write("\n</timeSeries>");

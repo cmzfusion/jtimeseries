@@ -48,7 +48,7 @@ public class IdentifiableBase extends LockingIdentifiable {
         this(id, description);
         this.parent = parent;
     }
-    
+
     public IdentifiableBase(String id, String description) {
         this.id = id;
         this.description = description;
@@ -259,7 +259,7 @@ public class IdentifiableBase extends LockingIdentifiable {
             }
         });
     }
-    
+
     protected void fireDescendantsChanged(final IdentifiableTreeEvent e) {
         fireEvent(new Runnable() {
             public void run() {
@@ -269,7 +269,7 @@ public class IdentifiableBase extends LockingIdentifiable {
             }
         });
     }
-    
+
     protected void fireDescendantsAdded(final IdentifiableTreeEvent e) {
         fireEvent(new Runnable() {
             public void run() {
@@ -392,7 +392,11 @@ public class IdentifiableBase extends LockingIdentifiable {
     protected <E extends Identifiable> QueryResult<E> findAll_Locked(String searchPattern, Class<E> assignableToClass) {
         return queries.findAll(searchPattern, assignableToClass);
     }
-    
+
+    protected <E extends Identifiable> QueryResult<E> findAll_Locked(Class<E> assignableToClass, FindCriteria<E> findCriteria) {
+        return queries.findAll(assignableToClass, findCriteria);
+    }
+
     //receive events from children, propagate them with updated path
     private class ChildTreeEventPropagator implements IdentifiableTreeListener {
 

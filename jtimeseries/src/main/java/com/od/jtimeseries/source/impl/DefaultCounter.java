@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.source.impl;
 
+import com.od.jtimeseries.identifiable.FindCriteria;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.identifiable.QueryResult;
@@ -220,6 +221,10 @@ public class DefaultCounter implements Counter {
 
     public <E extends Identifiable> QueryResult<E> findAll(String searchPattern, Class<E> assignableToClass) {
         return simpleSource.findAll(searchPattern, assignableToClass);
+    }
+
+    public <E extends Identifiable> QueryResult<E> findAll(Class<E> assignableToClass, FindCriteria<E> findCriteria) {
+        return simpleSource.findAll(assignableToClass, findCriteria);
     }
 
     public boolean contains(String path) {

@@ -77,6 +77,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new LocalModCountProxyTimeSeriesEventHandler(this);
     private WriteBehindCache writeBehindCache;
     private volatile long lastTimestamp = -1;
+    private volatile TimeSeriesItem lastItem;
     private ScheduledFuture nextFlushTask;
     private volatile long modCount;
     private ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -173,6 +174,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 fireAddEvent(i);
             }
             lastTimestamp = i.getTimestamp();
+            lastItem = i;
         }
         return result;
     }
@@ -204,11 +206,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     public TimeSeriesItem getLatestItem() {
-        //make use of the local write behind cache to do this if possible
+        //make use of the cached last item if already present
         try {
             this.readLock().lock();
-            return writeBehindCache.getAppendListSize() > 0 ?
-                    writeBehindCache.getAppendItems().getLatestItem() :
+            return lastItem != null ? lastItem :
                     getRoundRobinSeries().getLatestItem();
         } finally {
             this.readLock().unlock();
@@ -572,6 +573,13 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     boolean isSeriesInWriteCache() {
         return writeBehindCache.isSeriesInCache();
     }
+
+    //*******
+    //TODO - store the last item value in file header and always load it along with last timestamp
+    public boolean isLastItemInMemory() {
+        return lastItem != null;
+    }
+    //*******
 
     int getCacheAppendListSize() {
         try {

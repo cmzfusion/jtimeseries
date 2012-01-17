@@ -30,6 +30,11 @@ import java.util.List;
  * User: Nick Ebbutt
  * Date: 16-Feb-2010
  * Time: 17:05:38
+ *
+ * A value captured from JMX beans(s)
+ *
+ * One or more JmxValue may be read, and an AggregateFunction then applied to derive
+ * a value to capture to the series at parentContextPath.id
  */
 public class JmxMeasurement {
 

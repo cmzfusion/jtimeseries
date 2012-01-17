@@ -45,9 +45,7 @@ import javax.management.remote.JMXServiceURL;
 import javax.naming.ServiceUnavailableException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -57,13 +55,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Time: 22:14:47
  * To change this template use File | Settings | File Templates.
  *
- * Connect to a JMX management service to capture values to a timeseries (e.g. heap memory)
- * This is used by the server itself to capture its own memory usage.
- * It may also be configured to capture performance stats from third party processes.
+ * Connect to a JMX server to capture values to timeseries
+ *
+ * This is used by the jtimeseries server itself to capture its own memory usage / self monitor.
+ *
+ * It may also be configured to capture stats from JMX beans in third party processes/JMX servers.
  * See the serverMetricsContext.xml where the jmx metrics are defined.
  *
- * One JmxMetric may collect a number of jmx values - this enables us to make the most efficient use of 
- * the connection
+ * One JmxMetric may collect a number of jmx values from the same serviceURL/JmxConnection
+ * (each JmxMetric may have multiple JmxMeasurements, each of which update a different series)
+ *
+ * this enables us to make the most efficient use of the connection and avoids
+ * attempting to create a connection multiple times to read different values
  */
 public class JmxMetric implements ManagedMetric {
 
@@ -77,8 +80,10 @@ public class JmxMetric implements ManagedMetric {
     private final String serviceUrl;
     private JMXServiceURL url;
     private List<JmxMeasurement> jmxMeasurements;
-    private List<JmxMeasurementTask> measurementTaskTasks = new ArrayList<JmxMeasurementTask>();
     private String description = "";
+    private List<JmxMeasurementTask> measurementTasks = new ArrayList<JmxMeasurementTask>();
+    private Set<JmxMeasurementTask> measurementTasksWithErrors = new HashSet<JmxMeasurementTask>();
+
 
     /**
      * A JmxMetric with a single series / measurement
@@ -161,7 +166,7 @@ public class JmxMetric implements ManagedMetric {
 
     private void doCreateMeasurementTask(TimeSeriesContext rootContext, String newPath, com.od.jtimeseries.component.managedmetric.jmx.measurement.JmxMeasurement m) {
         ValueRecorder r = rootContext.createValueRecorderSeries(newPath, m.getDescription());
-        measurementTaskTasks.add(new JmxMeasurementTask(r, m));
+        measurementTasks.add(new JmxMeasurementTask(r, m));
     }
 
     private class TriggerableJmxConnectTask extends IdentifiableBase implements Triggerable {
@@ -210,31 +215,50 @@ public class JmxMetric implements ManagedMetric {
         }
 
         private void runMeasurementTasks(JmxConnectionWrapper w) {
-            for (JmxMeasurementTask m : measurementTaskTasks) {
-                try {
-                    MBeanServerConnection connection = w.getConnection();
-                    m.processMeasurement(connection);
-                } catch ( Throwable t) {
-                    if ( t instanceof JmxValueException) {
-                        logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
-                    } else {
-                        logMethods.logWarning("Could not read JmxMeasurement", t);
-                    }
+            boolean criticalFailure = false;
 
-                    if ( m.recordNanIfFailed()) {
-                        m.recordNaN();
+            //if a critical failure occurs, abort all further measurements
+            //this is becuase the connection may have died, further readings
+            //may each cause an attempt to read further / reconnect
+            for (JmxMeasurementTask m : measurementTasks) {
+                boolean failed = criticalFailure;
+                if ( ! criticalFailure) {
+                    try {
+                        MBeanServerConnection connection = w.getConnection();
+                        m.processMeasurement(connection);
+                    } catch ( JmxValueException t) {
+                        //a non critical failure due to reading a specific value
+                        failed = true;
+                        logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
+                    } catch ( Throwable t ) {
+                        //a critical failure, abort all the measurements for this connection
+                        failed = criticalFailure = true;
+                        if ( ! firstErrorForThisMetric(m)) {
+                            //don't log a stack every time, just the first it fails
+                            logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
+                        } else {
+                            logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w, t);
+                        }
                     }
+                }
+
+                if ( failed && m.recordNanIfFailed()) {
+                    m.recordNaN();
                 }
             }
         }
 
         private void recordNaN() {
-            for (JmxMeasurementTask m : measurementTaskTasks) {
+            for (JmxMeasurementTask m : measurementTasks) {
                 if ( m.recordNanIfFailed()) {
                     m.recordNaN();
                 }
             }
         }
+    }
+
+    private boolean firstErrorForThisMetric(JmxMeasurementTask m) {
+        return measurementTasksWithErrors.add(m);
     }
 
     private class JmxMeasurementTask {

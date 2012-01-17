@@ -23,7 +23,8 @@ package com.od.jtimeseries.component.managedmetric.jmx.measurement;
  * User: nick
  * Date: 02-Feb-2010
  * Time: 22:06:20
- * To change this template use File | Settings | File Templates.
+ *
+ * Standard JmxMesaurement, supported by Java's vanilla JMX Management Service
  */
 public class JmxMeasurements {
 

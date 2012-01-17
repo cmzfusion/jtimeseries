@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.scheduling;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class NonGroupingScheduler extends AbstractScheduler {
 
+    private static LogMethods logMethods = LogUtils.getLogMethods(NonGroupingScheduler.class);
     private Map<Triggerable, TriggerableTimerTask> tasks = Collections.synchronizedMap(new HashMap<Triggerable, TriggerableTimerTask>());
 
     public synchronized boolean addTriggerable(Triggerable t) {
@@ -101,7 +105,11 @@ public class NonGroupingScheduler extends AbstractScheduler {
         }
 
         private void triggerCapture(Triggerable t) {
-            t.trigger(System.currentTimeMillis());
+            try {
+                t.trigger(System.currentTimeMillis());
+            } catch (Throwable e) {
+                logMethods.logError("Error on trigger() for triggerable " + t, e);
+            }
         }
 
         public void cancel() {

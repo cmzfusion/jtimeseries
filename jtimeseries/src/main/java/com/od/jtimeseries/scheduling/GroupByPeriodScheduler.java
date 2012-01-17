@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.scheduling;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GroupByPeriodScheduler extends AbstractScheduler {
 
+    private static LogMethods logMethods = LogUtils.getLogMethods(GroupByPeriodScheduler.class);
     private Map<Long, TriggerableGroupTimerTask> tasksByPeriod = Collections.synchronizedMap(new HashMap<Long, TriggerableGroupTimerTask>());
 
     public synchronized boolean addTriggerable(Triggerable t) {
@@ -119,7 +123,13 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
         public void run() {
             long timestamp = System.currentTimeMillis();
             for (Triggerable t: triggerables) {
-                t.trigger(timestamp);
+                //triggerable may be provided by application classes
+                //need to handle this callback very carefully, catch all errors
+                try {
+                    t.trigger(timestamp);
+                } catch (Throwable e) {
+                    logMethods.logError("Error on trigger() for triggerable " + t, e);
+                }
             }
         }
 

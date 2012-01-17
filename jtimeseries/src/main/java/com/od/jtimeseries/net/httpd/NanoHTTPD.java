@@ -149,13 +149,16 @@ public class NanoHTTPD {
         Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
-                    while (true)
+                    while (true) {
                         new HTTPSession(ss.accept());
-                } catch (IOException ioe) {
+                    }
+                } catch (Throwable t) {
+                    logMethods.logWarning("Error in HttpdSocketAccept", t);
                 }
             }
         });
         t.setDaemon(true);
+        t.setName("JTimeSeriesHttpdSocketAccept");
         t.start();
     }
 

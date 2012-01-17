@@ -129,6 +129,8 @@ public class UdpServer {
         private PropertiesUtil propertiesUtil;
 
         public UdpReceiveThread() {
+            setName("JTimeSeriesUDPSocketReceive");
+            setDaemon(true);
             try {
                 propertiesUtil = new PropertiesUtil();
             } catch (ParserConfigurationException e) {

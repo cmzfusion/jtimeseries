@@ -25,6 +25,9 @@ package com.od.jtimeseries.util;
  * Time: 08:59
  */
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,6 +44,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * For some reason the factory methods on Executors don't give you this option
  */
 public class NamedExecutors {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(NamedExecutors.class);
+
+    private static class LogOnErrorThreadGroup extends ThreadGroup {
+        public LogOnErrorThreadGroup() {
+            super("JTimeSeriesLoggingThreadGroup");
+        }
+
+        public void uncaughtException(Thread t, Throwable e) {
+            super.uncaughtException(t, e);
+            if ( ! (e instanceof ThreadDeath)) {
+                logMethods.logError("An Uncaught Exception Shut Down Thread " + t.getName(), e);
+            }
+        }
+    }
+    private static ThreadGroup threadDeathLoggingThreadGroup = new LogOnErrorThreadGroup();
 
     public static ThreadConfigurer DAEMON_THREAD_CONFIGURER = new ThreadConfigurer() {
         public void configureNewThread(Thread t) {
@@ -104,7 +123,7 @@ public class NamedExecutors {
             this.threadConfigurer = threadConfigurer;
             threadNumber = new AtomicInteger(0);
             this.name = name;
-            threadGroup = new ThreadGroup(name);
+            threadGroup = threadDeathLoggingThreadGroup;
         }
 
         public Thread newThread(Runnable r) {

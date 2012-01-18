@@ -122,7 +122,13 @@ public class GroupByPeriodScheduler extends AbstractScheduler {
 
         public void run() {
             long timestamp = System.currentTimeMillis();
-            for (Triggerable t: triggerables) {
+
+            List<Triggerable> snapshot;
+            synchronized (triggerables) {
+                snapshot = new ArrayList<Triggerable>(triggerables);
+            }
+
+            for (Triggerable t: snapshot) {
                 //triggerable may be provided by application classes
                 //need to handle this callback very carefully, catch all errors
                 try {

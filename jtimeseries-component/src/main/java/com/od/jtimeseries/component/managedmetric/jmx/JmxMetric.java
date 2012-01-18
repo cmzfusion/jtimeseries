@@ -159,7 +159,7 @@ public class JmxMetric implements ManagedMetric {
                     break;
                 case DENY:
                 default:
-                    logMethods.logWarning("Cannot create JMX metric at path " + path + " this path is denied by PathMapper rules");
+                    logMethods.logWarning("Cannot set up JMX metric at path " + path + " this path is denied by PathMapper rules");
             }
         }
     }

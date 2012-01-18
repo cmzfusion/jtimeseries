@@ -21,6 +21,7 @@ package com.od.jtimeseries.server;
 import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
+import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage;
@@ -82,15 +83,27 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void doStartup() throws IOException {
+        //don't start collecting data until everything initialized, it should work anyway, but this is safer
+        //and makes for cleaner logs / easier debugging
+        rootContext.stopScheduling();
+        startServices();
+        serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
+        rootContext.startScheduling();
+    }
+
+    private void startServices() throws IOException {
         startSeriesDirectoryManager();
         setupServerMetrics();
-        new JmxManagementService().startJmxManagementService(jmxManagementPort);
+        startJmxManagementService();
         startSummaryStats();
         startUdpServer();
         startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
-        serverConfigJmx.setSecondsToStartServer((int)(System.currentTimeMillis() - startTime) / 1000);
+    }
+
+    private void startJmxManagementService() {
+        new JmxManagementService().startJmxManagementService(jmxManagementPort);
     }
 
     private void startServerAnnouncementPings() {

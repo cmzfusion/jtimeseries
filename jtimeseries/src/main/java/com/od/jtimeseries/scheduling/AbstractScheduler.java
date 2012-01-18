@@ -33,9 +33,9 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public abstract class AbstractScheduler extends IdentifiableBase implements Scheduler {
 
-    private Set<Triggerable> triggerables = Collections.synchronizedSet(new HashSet<Triggerable>());
+    private final Set<Triggerable> triggerables = Collections.synchronizedSet(new HashSet<Triggerable>());
+    private final ScheduledExecutorService captureExecutor = TimeSeriesExecutorFactory.getCaptureSchedulingExecutor(this);
     private boolean isStarted;
-    private ScheduledExecutorService captureExecutor;
 
     public AbstractScheduler() {
         super(ID, ID);
@@ -69,13 +69,8 @@ public abstract class AbstractScheduler extends IdentifiableBase implements Sche
     public synchronized void start() {
         if ( ! isStarted() ) {
             setStarted(true);
-            captureExecutor = getExecutor();
             doStart();
         }
-    }
-
-    protected ScheduledExecutorService getExecutor() {
-        return TimeSeriesExecutorFactory.getCaptureSchedulingExecutor(this);
     }
 
     protected abstract void doStart();

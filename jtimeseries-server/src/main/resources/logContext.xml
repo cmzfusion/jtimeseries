@@ -17,11 +17,14 @@
         <constructor-arg value="${logDirectory}${file.separator}${logFileName}"/>
     </bean>
 
+    <!--
     <bean id="logMethodsFactory" class="com.od.jtimeseries.component.logging.JavaUtilLoggingLogMethodsFactory">
         <constructor-arg ref="logFileDirectory"/>
         <constructor-arg value="${logLevel}"/>
         <constructor-arg value="${maxLogFileSizeInBytes}"/>
         <constructor-arg value="${maxLogFileCount}"/>
-    </bean>
+    </bean> -->
+
+    <bean id="logMethodsFactory" class="com.od.jtimeseries.component.logging.ApacheLog4jLogMethodsFactory"/>
 
 </beans>

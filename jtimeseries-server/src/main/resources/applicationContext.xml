@@ -32,10 +32,15 @@
         <constructor-arg value="${maxSeriesSize}"/>
     </bean>
 
-    <bean id="rootContext" class="com.od.jtimeseries.context.impl.DefaultTimeSeriesContext">
+    <bean id="scheduler" class="com.od.jtimeseries.scheduling.NonGroupingScheduler"/>
+
+    <bean id="rootContext" class="com.od.jtimeseries.context.impl.DefaultTimeSeriesContext" init-method="initializeRootContext">
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
+        <constructor-arg value="true"/>
+        <constructor-arg value="false"/>
         <property name="timeSeriesFactory" ref="timeSeriesFactory"/>
+        <property name="scheduler" ref="scheduler"/>
     </bean>
 
     <bean id="fileSerializer" class="com.od.jtimeseries.server.serialization.RoundRobinSerializer">

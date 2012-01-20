@@ -63,23 +63,31 @@ public class DefaultTimeSeriesContext extends LockingTimeSeriesContext {
     }
 
     /**
-     * Create a context without a parent (i.e. a root context), which has its own scheduler and factories for
-     * series, value sources, captures and child contexts, and sets default context properties.
-     * Child contexts generally inherit these from the root context, although any set up at a child level override the parent.
+     * Create a (root) context which has its own scheduler and factories for
+     * series, value sources, captures and child contexts, and sets default context properties, and perform initialization
+     * This is generally useful for creating a 'root' context - child contexts generally reuse factories from the root context,
+     * although any set up at a child level override the parent.
      */
     public DefaultTimeSeriesContext(String id, String description) {
         this(id, description, true);
     }
 
+    public DefaultTimeSeriesContext(String id, String description, boolean createRootContextResources) {
+        this(id, description, createRootContextResources, createRootContextResources);
+    }
+
     /**
      * Create a context, specifiying whether this is to be a root context
-     * @param createRootContextResources, whether this context is to be a root context, in which case we need to create root context resources etc.
+     * @param createRootContextResources, whether to create the factories etc. generally required by a root context
+     * @param initialize, whether to perform subsequent initialization (e.g. starting scheduler)
      */
-    public DefaultTimeSeriesContext(String id, String description, boolean createRootContextResources) {
+    public DefaultTimeSeriesContext(String id, String description, boolean createRootContextResources, boolean initialize) {
         super(id, description);
         checkId(id);
         if (createRootContextResources) {
             createRootContextResources();
+        }
+        if (initialize) {
             initializeRootContext();
         }
     }

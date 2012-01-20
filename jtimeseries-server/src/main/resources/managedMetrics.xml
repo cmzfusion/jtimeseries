@@ -100,6 +100,11 @@
                                 <constructor-arg value="${serverMetricsContextPath}.jmx"/>
                             </bean>
 
+                            <!-- Count of connections in jmx connection pool -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.JmxConnectionCreationCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.jmx"/>
+                            </bean>
+
                             <!-- Count of queries made using jmx connections -->
                             <bean class="com.od.jtimeseries.server.servermetrics.JmxQueryCountMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.jmx"/>

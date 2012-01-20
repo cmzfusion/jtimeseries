@@ -37,6 +37,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultJmxConnectionPool.class);
     private static Counter jmxConnectionCounter = new DefaultCounter("dummy counter", "");
+    private static Counter jmxConnectionCreationCounter = new DefaultCounter("dummy counter", "");
 
     private int maxConnectionIdlePeriod = 1800000;  //0.5 hours
     private Map<String, ?> connectorEnvironment;
@@ -75,6 +76,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
             JmxConnectionWrapperImpl c = new JmxConnectionWrapperImpl(key, connectorEnvironment);
             connectionMap.put(key, c);
             jmxConnectionCounter.incrementCount();
+            jmxConnectionCreationCounter.incrementCount();
             return c;
         }
     }
@@ -227,5 +229,11 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         jmxConnectionCounter.incrementCount(DefaultJmxConnectionPool.jmxConnectionCounter.getCount()); //add any initial value
 
         DefaultJmxConnectionPool.jmxConnectionCounter = jmxConnectionCounter;
+    }
+
+    public static void setJmxConnectionCreationCounter(Counter c) {
+        jmxConnectionCreationCounter.incrementCount(DefaultJmxConnectionPool.jmxConnectionCreationCounter.getCount()); //add any initial value
+
+        DefaultJmxConnectionPool.jmxConnectionCreationCounter = jmxConnectionCreationCounter;
     }
 }

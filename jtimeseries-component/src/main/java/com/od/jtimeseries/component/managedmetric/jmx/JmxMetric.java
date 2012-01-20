@@ -182,21 +182,29 @@ public class JmxMetric implements ManagedMetric {
         public void trigger(long timestamp) {
             Runnable jmxMetricTask = new Runnable() {
                 public void run() {
-                    JmxConnectionWrapper w = null;
                     try {
-                        w = obtainConnection(url);
-                        if ( w != null ) {
-                            jmxQueryCounter.incrementCount();
-                            runMeasurementTasks(w);
-                        } else {
-                            recordNaN();
-                        }
-                    } finally {
-                        jmxConnectionPool.returnConnection(url);
+                        collectMetricData();
+                    } catch ( Throwable t) {
+                        logMethods.logError("Failed to collect metric data for " + JmxMetric.this, t);
                     }
                 }
             };
             TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
+        }
+
+        private void collectMetricData() {
+            JmxConnectionWrapper w = null;
+            try {
+                w = obtainConnection(url);
+                if ( w != null ) {
+                    jmxQueryCounter.incrementCount();
+                    runMeasurementTasks(w);
+                } else {
+                    recordNaN();
+                }
+            } finally {
+                jmxConnectionPool.returnConnection(url);
+            }
         }
 
         private JmxConnectionWrapper obtainConnection(JMXServiceURL url) {

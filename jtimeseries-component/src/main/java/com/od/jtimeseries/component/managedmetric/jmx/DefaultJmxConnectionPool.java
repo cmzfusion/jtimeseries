@@ -7,6 +7,9 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.management.MBeanServerConnection;
+import javax.management.Notification;
+import javax.management.NotificationListener;
+import javax.management.remote.JMXConnectionNotification;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
@@ -61,7 +64,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
      }
 
     public void closeAndRemove(JmxConnectionWrapper connection) {
-       closeAndRemove((JmxConnectionWrapperImpl)connection);
+       doCloseAndRemove((JmxConnectionWrapperImpl) connection);
     }
 
     private JmxConnectionWrapper createAndAddConnection(JMXServiceURL key) throws IOException {
@@ -91,7 +94,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
             if ( s.tryAcquire()) {
                 try {
                     if (c.getAge() > maxConnectionIdlePeriod) {
-                        closeAndRemove(c);
+                        doCloseAndRemove(c);
                     }
                 } finally {
                     s.release();
@@ -100,7 +103,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         }
     }
 
-    private void closeAndRemove(JmxConnectionWrapperImpl connection) {
+    private void doCloseAndRemove(JmxConnectionWrapperImpl connection) {
         logMethods.logDebug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
         if ( ! connection.closed) {
             try {
@@ -149,7 +152,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
      * Pooled Acquirable JMX connection
      * Once acquired, must be released before it can be obtained for further usage
      */
-    static class JmxConnectionWrapperImpl implements JmxConnectionWrapper {
+    class JmxConnectionWrapperImpl implements JmxConnectionWrapper {
 
         private JMXConnector connector;
         private JMXServiceURL serviceURL;
@@ -166,6 +169,11 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
         private void openConnection() throws IOException {
             this.connector = JMXConnectorFactory.connect(serviceURL, connectorEnvironment);
+            connector.addConnectionNotificationListener(
+                new ConnectionRemovingNotificationListener(),
+                null,
+                this
+            );
             this.connection = connector.getMBeanServerConnection();
         }
 
@@ -195,6 +203,23 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
 
         public String toString() {
             return "JmxConnectionWrapper { " + serviceURL + " }";
+        }
+
+        private class ConnectionRemovingNotificationListener implements NotificationListener {
+
+            public void handleNotification(Notification notification, Object handback) {
+                JMXConnectionNotification n = (JMXConnectionNotification)notification;
+                if ( handback == JmxConnectionWrapperImpl.this && JMXConnectionNotification.CLOSED.equals(n.getType())) {
+                     logMethods.logWarning("JMXConnection " + JmxConnectionWrapperImpl.this +
+                             " event recieved with connection status " + n.getType() + ", will remove from pool");
+                      closed = true;
+                      closeAndRemove(JmxConnectionWrapperImpl.this);
+                } else if ( handback == JmxConnectionWrapperImpl.this && JMXConnectionNotification.NOTIFS_LOST.equals(n.getType())) {
+                    logMethods.logWarning("JMXConnection " + JmxConnectionWrapperImpl.this +
+                            " lost notifications, but I'm not taking any action");
+                    //we don't use the notification mechanism so this is probably ok
+                }
+            }
         }
     }
 

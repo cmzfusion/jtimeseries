@@ -34,7 +34,7 @@ public class FileBytesWritten extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Bytes written to timeseries files", CaptureFunctions.COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
+        Counter c = rootContext.createCounterSeries(path, "Bytes written to timeseries files", CaptureFunctions.COUNT_OVER(captureTime), CaptureFunctions.LATEST_COUNT(captureTime));
         RoundRobinSerializer.setFileBytesWritten(c);
     }
 }

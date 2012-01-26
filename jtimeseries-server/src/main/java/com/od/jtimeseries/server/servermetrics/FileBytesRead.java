@@ -36,7 +36,7 @@ public class FileBytesRead extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Bytes read from timeseries files", COUNT_OVER(captureTime), CaptureFunctions.TOTAL_COUNT(captureTime));
+        Counter c = rootContext.createCounterSeries(path, "Bytes read from timeseries files", COUNT_OVER(captureTime), CaptureFunctions.LATEST_COUNT(captureTime));
         RoundRobinSerializer.setFileBytesRead(c);
     }
 }

@@ -1,6 +1,5 @@
 package com.od.jtimeseries.server.servermetrics;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
@@ -10,7 +9,6 @@ import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.MAX;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.MEDIAN;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.TOTAL_COUNT;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,18 +1,14 @@
 package com.od.jtimeseries.demo;
 
 import com.od.jtimeseries.JTimeSeries;
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
-import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.time.Time;
-import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
 
@@ -46,7 +42,7 @@ public class ApiExamples {
         Counter counter = context.createCounterSeries(
                 "mychild.ExampleCounter",
                 "Maintaining a count in my application",
-                TOTAL_COUNT(Time.minutes(1)),  //record the latest value of the counter every 1 minute
+                LATEST_COUNT(Time.minutes(1)),  //record the latest value of the counter every 1 minute
                 RAW_VALUES  //record a value to timeseries every time the count changes
         );
 

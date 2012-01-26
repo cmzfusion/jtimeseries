@@ -133,7 +133,9 @@ public class CaptureFunctions {
     }
 
     /**
-     * @return a function which records the latest (most recent value) at the end of each time period
+     * @return a function which records the latest (most recent value overall) at the end of each time period
+     * Since this is the latest value overall (not just the latest in the period) this function doesn't include
+     * the time period the function description (e.g. will appear simply as Latest rather than Latest 30s)
      */
     public static CaptureFunction LATEST(TimePeriod timePeriod) {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST(), LAST_VALUE_CHAINING){
@@ -144,13 +146,14 @@ public class CaptureFunctions {
     }
 
     /**
-     * @return a function for use with Counter value source which records the total count to date at the end of each time period
-     * (this is the same as the latest value of the counter at the end of each time period, but 'total' count is more intuitive)
+     * @return a function for use with Counter value source which records the LatestCount at the end of each time period
+     * Since this is the latest value for the counter overall (not just the latest in the period) this function doesn't include
+     * the time period the function description (e.g. will appear simply as LatestCount rather than LatestCount 30s)
      */
-    public static CaptureFunction TOTAL_COUNT(TimePeriod timePeriod) {
+    public static CaptureFunction LATEST_COUNT(TimePeriod timePeriod) {
         return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST(), LAST_VALUE_CHAINING){
             protected String doGetDescription() {
-                return "Total";
+                return "LatestCount";
             }
         };
     }

@@ -231,7 +231,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         DefaultJmxConnectionPool.jmxConnectionCounter = jmxConnectionCounter;
     }
 
-    public static void setJmxConnectionCreationCounter(Counter c) {
+    public static void setJmxConnectionCreationCounter(Counter jmxConnectionCreationCounter) {
         jmxConnectionCreationCounter.incrementCount(DefaultJmxConnectionPool.jmxConnectionCreationCounter.getCount()); //add any initial value
 
         DefaultJmxConnectionPool.jmxConnectionCreationCounter = jmxConnectionCreationCounter;

@@ -53,10 +53,10 @@ public class SnapshotHandler extends AbstractHandler {
        return result;
    }
 
-    private void setSearchCriteria(Properties parms) {
-        if ( parms.containsKey(HttpParameterName.substringSearch)) {
+    private void setSearchCriteria(Properties params) {
+        if ( params.containsKey(HttpParameterName.substringSearch.name())) {
             //wrap the existing criteria and delegate to it, to perform and extra substring search
-            String substring = parms.get(HttpParameterName.substringSearch).toString();
+            String substring = params.get(HttpParameterName.substringSearch.name()).toString();
             findCriteria = new FindBySubstringSearchCriteria(findCriteria, substring);
         }
     }

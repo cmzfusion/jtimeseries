@@ -26,5 +26,6 @@ package com.od.jtimeseries.net.httpd.xml;
  */
 public enum HttpParameterName {
     statsOnly,
-    moreRecentThanTimestamp
+    moreRecentThanTimestamp,
+    substringSearch
 }

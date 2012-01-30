@@ -7,6 +7,7 @@ import com.od.jtimeseries.net.httpd.NanoHTTPD;
 import com.od.jtimeseries.net.httpd.response.NanoHttpResponse;
 import com.od.jtimeseries.net.httpd.xml.AttributeName;
 import com.od.jtimeseries.net.httpd.xml.ElementName;
+import com.od.jtimeseries.net.httpd.xml.HttpParameterName;
 import com.od.jtimeseries.net.httpd.xml.XmlValue;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -21,6 +22,8 @@ import java.util.Properties;
  * User: Nick Ebbutt
  * Date: 20/12/11
  * Time: 19:41
+ *
+ * A snapshot of the latest values from all timeseries under a given tree node
  */
 public class SnapshotHandler extends AbstractHandler {
 
@@ -38,25 +41,34 @@ public class SnapshotHandler extends AbstractHandler {
        this.findCriteria = findCriteria;
    }
 
-   public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties parms) {
+   public NanoHttpResponse createResponse(String uri, String method, Properties header, Properties params) {
        NanoHttpResponse result;
        TimeSeriesContext context = findContextForRequest(uri);
        if ( context == null) {
            result = createNotFoundResponse(uri);
        } else {
+           setSearchCriteria(params);
            result = new SeriesSnapshotResponse(context);
        }
        return result;
    }
 
-   private void writeIndexResponse(PrintWriter pw, TimeSeriesContext context) {
+    private void setSearchCriteria(Properties parms) {
+        if ( parms.containsKey(HttpParameterName.substringSearch)) {
+            //wrap the existing criteria and delegate to it, to perform and extra substring search
+            String substring = parms.get(HttpParameterName.substringSearch).toString();
+            findCriteria = new FindBySubstringSearchCriteria(findCriteria, substring);
+        }
+    }
+
+    private void writeSnapshotResponse(PrintWriter pw, TimeSeriesContext context) {
        pw.write("<?xml version=\"1.0\"?>");
        pw.write("\n<?xml-stylesheet type=\"text/xsl\" href=\"/");
        pw.write(SNAPSHOT_XSL_RESOURCE);
        pw.write("\"?>");
        pw.write("\n<timeSeries>");
 
-       //find all timerseries whcih we want to include in the index
+       //find all timeseries whcih we want to include in the index
        QueryResult<IdentifiableTimeSeries> series = context.findAll(
            IdentifiableTimeSeries.class, findCriteria
        );
@@ -105,7 +117,24 @@ public class SnapshotHandler extends AbstractHandler {
        }
 
        public void writeResponseBody(OutputStream out, PrintWriter pw) {
-           writeIndexResponse(pw, context);
+           writeSnapshotResponse(pw, context);
+       }
+   }
+
+   private class FindBySubstringSearchCriteria implements FindCriteria<IdentifiableTimeSeries> {
+
+       private FindCriteria<IdentifiableTimeSeries> delegateCriteria;
+       private String substring;
+
+       public FindBySubstringSearchCriteria(FindCriteria<IdentifiableTimeSeries> delegateCriteria, String substring) {
+
+           this.delegateCriteria = delegateCriteria;
+           this.substring = substring;
+       }
+
+       public boolean matchesCriteria(IdentifiableTimeSeries identifiable) {
+           return delegateCriteria.matchesCriteria(identifiable) &&
+                   identifiable.getPath().contains(substring);
        }
    }
 

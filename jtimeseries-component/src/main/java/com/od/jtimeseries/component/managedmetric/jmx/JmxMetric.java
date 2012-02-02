@@ -46,6 +46,7 @@ import javax.naming.ServiceUnavailableException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -171,6 +172,8 @@ public class JmxMetric implements ManagedMetric {
 
     private class TriggerableJmxConnectTask extends IdentifiableBase implements Triggerable {
 
+        private AtomicBoolean queuedForProcessing = new AtomicBoolean();
+
         public TriggerableJmxConnectTask() {
             super("TriggerableJmxConnectTask" + triggerableId.getAndIncrement(), "Trigger for jmx metric at serviceUrl " + serviceUrl);
         }
@@ -186,10 +189,20 @@ public class JmxMetric implements ManagedMetric {
                         collectMetricData();
                     } catch ( Throwable t) {
                         logMethods.logError("Failed to collect metric data for " + JmxMetric.this, t);
+                    } finally {
+                        queuedForProcessing.getAndSet(false);
                     }
                 }
             };
-            TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
+
+            //if already queued for processing, skip this task, to prevent a large backlog of metrics being
+            //queued (this may result in sudden cpu spike when blocking tasks are cleared)
+            if ( ! queuedForProcessing.getAndSet(true)) {
+                TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
+            } else {
+                logMethods.logWarning("Not running JMX Metric " + this + " last run did not complete, " +
+                        "there is a problem with this metric or a backlog of queued jmx tasks?");
+            }
         }
 
         private void collectMetricData() {

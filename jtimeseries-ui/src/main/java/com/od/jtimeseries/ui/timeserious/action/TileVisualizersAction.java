@@ -1,6 +1,7 @@
 package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.ui.timeserious.frame.TimeSeriousDesktopPane;
+import com.od.jtimeseries.ui.timeserious.frame.VisualizerInternalFrame;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -12,6 +13,8 @@ import java.awt.event.ActionEvent;
  * User: Nick Ebbutt
  * Date: 22/06/11
  * Time: 12:54
+ *
+ * Tile visualizers, and hide the series selector panels amd controls
  */
 public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
 
@@ -59,10 +62,24 @@ public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
                 JInternalFrame f = allframes[(i * cols) + j];
                 deiconify(f);
                 desk.getDesktopManager().resizeFrame(f, x, y, w, h);
+                hideSelector(f);
+                hideControls(f);
                 x += w;
             }
             y += h; // start the next row
             x = 0;
+        }
+    }
+
+    private void hideControls(JInternalFrame f) {
+        if ( f instanceof VisualizerInternalFrame) {
+            ((VisualizerInternalFrame)f).setChartControlsVisible(false);
+        }
+    }
+
+    private void hideSelector(JInternalFrame f) {
+        if ( f instanceof VisualizerInternalFrame) {
+            ((VisualizerInternalFrame)f).setSelectorHidden();
         }
     }
 }

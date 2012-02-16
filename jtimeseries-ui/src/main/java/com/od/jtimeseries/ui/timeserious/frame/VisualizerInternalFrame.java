@@ -126,6 +126,14 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         visualizer.addTimeSeries(selectedSeries);
     }
 
+    public void setSelectorHidden() {
+        visualizer.setSelectorHidden();
+    }
+
+    public void setChartControlsVisible(boolean visible) {
+        visualizer.setChartControlsVisible(visible);
+    }
+
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {
 
         public void nodeChanged(Identifiable node, Object changeDescription) {

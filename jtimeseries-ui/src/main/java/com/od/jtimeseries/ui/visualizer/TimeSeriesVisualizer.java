@@ -244,6 +244,18 @@ public class TimeSeriesVisualizer extends JPanel {
         splitPane.setDividerLocation(location);
     }
 
+    public void setSelectorHidden() {
+        //has the side effect of setting also the last divider location, do not change again if already zero
+        //this wipes last real location and auto expand buttons don't reset the location properly
+        if ( ! isSelectorHidden()) {
+            setDividerLocation(0);
+        }
+    }
+
+    private boolean isSelectorHidden() {
+        return splitPane.getDividerLocation() == 0;
+    }
+
     public void setChartControlsVisible(boolean visible) {
         try {
             chartControlsCollapsiblePane.setCollapsed(! visible);

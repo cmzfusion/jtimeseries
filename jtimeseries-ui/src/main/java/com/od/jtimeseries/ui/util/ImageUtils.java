@@ -66,6 +66,8 @@ public class ImageUtils {
     public static ImageIcon SPLASH_SCREEN = ImageIconCache.getImageIcon("/images/seizmograph.jpg", 450, 360);
     public static ImageIcon TILE_VISUALIZERS_ICON_16x16 = ImageIconCache.getImageIcon("/images/layout.png");
     public static ImageIcon CASCADE_VISUALIZERS_ICON_16x16 = ImageIconCache.getImageIcon("/images/windows.png");
+    public static ImageIcon TOGGLE_LEGEND_ICON_16x16 = ImageIconCache.getImageIcon("/images/document_information_16x16.png");
+    public static ImageIcon TOGGLE_CHART_TYPE_ICON_16x16 = ImageIconCache.getImageIcon("/images/chart_toggle_16x16.png");
 
 
     public static ImageIcon getImageIcon(String name) {

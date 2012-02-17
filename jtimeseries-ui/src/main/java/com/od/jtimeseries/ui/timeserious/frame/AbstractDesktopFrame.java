@@ -24,10 +24,7 @@ import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.PeerDesktop;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
-import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
-import com.od.jtimeseries.ui.timeserious.action.CascadeVisualizersAction;
-import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
-import com.od.jtimeseries.ui.timeserious.action.TileVisualizersAction;
+import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.swing.eventbus.EventSender;
@@ -54,6 +51,8 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
     protected Action newVisualizerAction;
     protected Action tileVisualizersAction;
     private Action cascadeVisualizersAction;
+    private Action toggleLegendAction;
+    private Action toggleChartTypesAction;
 
     public AbstractDesktopFrame(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel, TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
         this.desktopContext = desktopContext;
@@ -108,6 +107,14 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         return cascadeVisualizersAction;
     }
 
+    protected Action getToggleLegendAction() {
+        return toggleLegendAction;
+    }
+
+    protected Action getToggleChartTypesAction() {
+        return toggleChartTypesAction;
+    }
+
     protected void addSeparator(JToolBar toolBar) {
         toolBar.addSeparator(new Dimension(16, 16));
     }
@@ -124,6 +131,14 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         );
 
         cascadeVisualizersAction = new CascadeVisualizersAction(
+            getDesktopPane()
+        );
+
+        toggleLegendAction = new ToggleLegendAction(
+            getDesktopPane()
+        );
+
+        toggleChartTypesAction = new ToggleChartTypeAction(
             getDesktopPane()
         );
     }

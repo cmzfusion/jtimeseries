@@ -106,6 +106,8 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         addSeparator(toolBar);
         toolBar.add(getTileVisualizersAction());
         toolBar.add(getCascadeVisualizersAction());
+        toolBar.add(getToggleLegendAction());
+        toolBar.add(getToggleChartTypesAction());
     }
 
     protected Component getMainComponent() {

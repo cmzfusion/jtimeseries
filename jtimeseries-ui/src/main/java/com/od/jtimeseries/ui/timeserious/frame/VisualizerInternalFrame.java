@@ -29,6 +29,7 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.util.ImageUtils;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
+import com.od.jtimeseries.ui.visualizer.chart.creator.ChartType;
 import com.od.swing.eventbus.EventSender;
 import com.od.swing.eventbus.UIEventBus;
 import com.od.swing.util.AwtSafeListener;
@@ -132,6 +133,22 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
 
     public void setChartControlsVisible(boolean visible) {
         visualizer.setChartControlsVisible(visible);
+    }
+
+    public void setShowLegendOnChart(boolean showLegendOnChart) {
+        visualizer.setShowLegendOnChart(showLegendOnChart);
+    }
+
+    public boolean isShowLegendOnChart() {
+        return visualizer.isShowLegendOnChart();
+    }
+
+    public ChartType getChartType() {
+        return visualizer.getChartType();
+    }
+
+    public void setChartType(ChartType t) {
+        visualizer.setChartType(t);
     }
 
     private class FrameDisposingContextListener extends IdentifiableTreeListenerAdapter {

@@ -158,6 +158,8 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         addSeparator(toolBar);
         toolBar.add(getTileVisualizersAction());
         toolBar.add(getCascadeVisualizersAction());
+        toolBar.add(getToggleLegendAction());
+        toolBar.add(getToggleChartTypesAction());
     }
 
     private void initializeFrame() {

@@ -68,6 +68,7 @@ public class ImageUtils {
     public static ImageIcon CASCADE_VISUALIZERS_ICON_16x16 = ImageIconCache.getImageIcon("/images/windows.png");
     public static ImageIcon TOGGLE_LEGEND_ICON_16x16 = ImageIconCache.getImageIcon("/images/document_information_16x16.png");
     public static ImageIcon TOGGLE_CHART_TYPE_ICON_16x16 = ImageIconCache.getImageIcon("/images/chart_toggle_16x16.png");
+    public static ImageIcon TOGGLE_CHART_CONTROLS_ICON_16x16 = ImageIconCache.getImageIcon("/images/document_gearwheel_16x16.png");
 
 
     public static ImageIcon getImageIcon(String name) {

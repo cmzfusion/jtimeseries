@@ -160,6 +160,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         toolBar.add(getTileVisualizersAction());
         toolBar.add(getCascadeVisualizersAction());
         toolBar.add(getToggleLegendAction());
+        toolBar.add(getToggleChartControlsAction());
         toolBar.add(getToggleChartTypesAction());
     }
 

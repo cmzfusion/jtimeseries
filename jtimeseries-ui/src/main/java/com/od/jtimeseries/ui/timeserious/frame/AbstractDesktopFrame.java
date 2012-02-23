@@ -53,6 +53,7 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
     private Action cascadeVisualizersAction;
     private Action toggleLegendAction;
     private Action toggleChartTypesAction;
+    private Action toggleChartControlsAction;
 
     public AbstractDesktopFrame(TimeSeriesServerDictionary serverDictionary, DisplayNameCalculator displayNameCalculator, DesktopContext desktopContext, SeriesSelectionPanel selectionPanel, TimeSeriousRootContext rootContext, ApplicationActionModels actionModels) {
         this.desktopContext = desktopContext;
@@ -118,6 +119,10 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         return toggleLegendAction;
     }
 
+    protected Action getToggleChartControlsAction() {
+        return toggleChartControlsAction;
+    }
+
     protected Action getToggleChartTypesAction() {
         return toggleChartTypesAction;
     }
@@ -142,6 +147,10 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         );
 
         toggleLegendAction = new ToggleLegendAction(
+            getDesktopPane()
+        );
+
+        toggleChartControlsAction = new ToggleChartControlsAction(
             getDesktopPane()
         );
 

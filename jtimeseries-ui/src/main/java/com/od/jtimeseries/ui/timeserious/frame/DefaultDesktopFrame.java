@@ -107,6 +107,7 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         toolBar.add(getTileVisualizersAction());
         toolBar.add(getCascadeVisualizersAction());
         toolBar.add(getToggleLegendAction());
+        toolBar.add(getToggleChartControlsAction());
         toolBar.add(getToggleChartTypesAction());
     }
 

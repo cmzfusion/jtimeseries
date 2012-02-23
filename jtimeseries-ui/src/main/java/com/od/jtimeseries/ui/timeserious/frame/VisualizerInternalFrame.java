@@ -135,6 +135,10 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         visualizer.setChartControlsVisible(visible);
     }
 
+    public boolean isChartControlsVisible() {
+        return visualizer.isChartControlsVisible();
+    }
+
     public void setShowLegendOnChart(boolean showLegendOnChart) {
         visualizer.setShowLegendOnChart(showLegendOnChart);
     }

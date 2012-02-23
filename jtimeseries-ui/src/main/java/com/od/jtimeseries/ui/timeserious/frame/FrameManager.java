@@ -103,7 +103,7 @@ public class FrameManager implements ConfigAware {
     public void restoreConfig(TimeSeriousConfig config) {
         DesktopContext c = rootContext.getMainDesktopContext();
         this.mainFrame = createMainFrame(c);
-        addToFrameMap(c, mainFrame);
+        addFrame(c, mainFrame);
     }
 
     private void addShowFrameTreeListener() {
@@ -140,7 +140,7 @@ public class FrameManager implements ConfigAware {
                     DesktopContext n = (DesktopContext)c;
                     AbstractDesktopFrame f = desktopContextToFrameMap.get(n);
                     if ( f != null) { //could already be hidden
-                        f.dispose();
+                        f.dispose();  //should trigger removal via frame removing window listener
                     }
                 }
             }
@@ -162,11 +162,15 @@ public class FrameManager implements ConfigAware {
             );
         }
         frame.setVisible(true);
-        addToFrameMap(desktopContext, frame);
+        addFrame(desktopContext, frame);
     }
 
-    private void addToFrameMap(final DesktopContext desktopContext, AbstractDesktopFrame frame) {
+    private void addFrame(final DesktopContext desktopContext, AbstractDesktopFrame frame) {
         desktopContextToFrameMap.put(desktopContext, frame);
+        addFrameRemovingWindowListener(desktopContext, frame);
+    }
+
+    private void addFrameRemovingWindowListener(final DesktopContext desktopContext, AbstractDesktopFrame frame) {
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 desktopContextToFrameMap.remove(desktopContext);

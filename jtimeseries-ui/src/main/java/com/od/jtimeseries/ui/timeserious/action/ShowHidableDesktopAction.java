@@ -16,22 +16,32 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.identifiable;
+package com.od.jtimeseries.ui.timeserious.action;
 
-import java.awt.*;
+import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.util.ImageUtils;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick
  * Date: 28/04/11
- * Time: 14:06
+ * Time: 15:55
  * To change this template use File | Settings | File Templates.
  */
-public interface PeerDesktop {
+public class ShowHidableDesktopAction extends AbstractShowHidablePeerAction<DesktopContext> {
 
-    int getExtendedState();
+    public ShowHidableDesktopAction(IdentifiableListActionModel actionModel) {
+        super(actionModel, "Show Desktop", ImageUtils.DESKTOP_SHOW_16x16, DesktopContext.class);
+        setShortDescription();
+    }
 
-    Rectangle getBounds();
+    public ShowHidableDesktopAction(DesktopContext c) {
+        super(c, "Show Desktop", ImageUtils.DESKTOP_SHOW_16x16, DesktopContext.class);
+        setShortDescription();
+    }
 
-    void bringToFront();
+    private void setShortDescription() {
+        super.putValue(SHORT_DESCRIPTION, "Restore the selected desktop");
+    }
 }

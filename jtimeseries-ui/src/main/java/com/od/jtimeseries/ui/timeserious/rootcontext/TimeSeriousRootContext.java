@@ -123,10 +123,8 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
         }
     }
 
-
-    private DesktopContext createDesktopContext(DesktopConfiguration desktopConfiguration) {
-        DesktopContext context = create(desktopConfiguration.getTitle(), desktopConfiguration.getTitle(), DesktopContext.class, desktopConfiguration);
-        return context;
+    private void createDesktopContext(DesktopConfiguration desktopConfiguration) {
+        create(desktopConfiguration.getTitle(), desktopConfiguration.getTitle(), DesktopContext.class, desktopConfiguration);
     }
 
     public List<ConfigAware> getConfigAwareChildren() {

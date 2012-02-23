@@ -90,7 +90,7 @@ public class DefaultDesktopFrame extends AbstractDesktopFrame {
         private void disposeVisualizerResources() {
             for ( VisualizerContext v : getDesktopContext().findAll(VisualizerContext.class).getAllMatches() ) {
                 if ( v.isShown()) {
-                    v.disposePeerWhenParentHidden();
+                    v.disposePeer();
                 }
             }
         }

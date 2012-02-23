@@ -18,21 +18,35 @@
  */
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.identifiable.DesktopContext;
+import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
-import com.od.jtimeseries.ui.util.ImageUtils;
+
+import javax.swing.*;
+import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick
  * Date: 28/04/11
- * Time: 15:55
+ * Time: 15:57
  * To change this template use File | Settings | File Templates.
  */
-public class ShowHiddenDesktopAction extends AbstractShowHiddenPeerAction {
+public abstract class AbstractHidePeerAction<E extends HidablePeerContext> extends CheckAllSelectedActionableAction<E> {
 
-    public ShowHiddenDesktopAction(IdentifiableListActionModel actionModel) {
-        super(actionModel, "Show Desktop", ImageUtils.DESKTOP_SHOW_16x16, DesktopContext.class);
-        super.putValue(SHORT_DESCRIPTION, "Restore the selected desktop");
+    public AbstractHidePeerAction(E c, String name, ImageIcon imageIcon, Class<E> clazz) {
+        this(new IdentifiableListActionModel(Collections.singletonList(c)), name, imageIcon, clazz);
+    }
+
+    public AbstractHidePeerAction(IdentifiableListActionModel actionModel, String name, ImageIcon imageIcon, Class<E> hideableClass) {
+        super(actionModel, name, imageIcon, hideableClass);
+    }
+
+
+    protected boolean isActionable(HidablePeerContext n) {
+        return ! n.isHidden();
+    }
+
+    protected void doAction(HidablePeerContext n) {
+        n.setShown(false);
     }
 }

@@ -139,14 +139,6 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         return selectionActionModel;
     }
 
-//    public void addPropertyChangeListener(PropertyChangeListener listener) {
-//        propertyChangeSupport.addPropertyChangeListener(listener);
-//    }
-//
-//    public void removePropertyChangeListener(PropertyChangeListener listener) {
-//        propertyChangeSupport.removePropertyChangeListener(listener);
-//    }
-
     private void createTitlePanel() {
         titleBox = Box.createHorizontalBox();
         titleBox.add(new JLabel("Series Selector"));
@@ -331,15 +323,8 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         private class RemoveSelectionsProcessor implements IdentifiableTreeEvent.IdentifiableProcessor<E> {
             public void process(E series) {
 
-
                 //remove those series selected for charting
                 selectionListForCharting.removeSelection(series);
-
-                //remove those identifiable selected/highlighted in tree/table
-//                                List<Identifiable> allIdentifiable = SelectorComponent.getAffectedSeries(Identifiable.class, contextTreeEvent, true);
-//                                for ( Identifiable i : allIdentifiable) {
-//                                    selectionActionModel.removeSelected(i);
-//
             }
         }
     }

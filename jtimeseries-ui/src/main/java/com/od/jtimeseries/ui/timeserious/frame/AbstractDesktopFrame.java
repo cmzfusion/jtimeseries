@@ -67,6 +67,13 @@ public abstract class AbstractDesktopFrame extends JFrame implements PeerDesktop
         createCommonActions();
     }
 
+    public void bringToFront() {
+        if (getExtendedState() != JFrame.MAXIMIZED_BOTH) {
+            setExtendedState(JFrame.NORMAL);
+        }
+        setVisible(true);
+    }
+
     protected TimeSeriousDesktopPane getDesktopPane() {
         return desktopPane;
     }

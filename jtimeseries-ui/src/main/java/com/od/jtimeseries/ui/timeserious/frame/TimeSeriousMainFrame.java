@@ -65,6 +65,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     private ExportConfigAction exportConfigAction;
     private ImportConfigAction importConfigAction;
     private ShowAboutDialogAction showAboutDialogAction;
+    public WindowMenu windowMenu;
 
     public TimeSeriousMainFrame(TimeSeriesServerDictionary serverDictionary, ApplicationActionModels actionModels, ConfigAwareTreeManager configTreeManager, ConfigInitializer configInitializer, DisplayNameCalculator displayNameCalculator, TimeSeriousRootContext rootContext, MainSeriesSelector mainSeriesSelector, DesktopContext desktopContext) {
         super(serverDictionary, displayNameCalculator, desktopContext, mainSeriesSelector.getSelectionPanel(), rootContext, actionModels);
@@ -170,8 +171,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     private void createMenuBar() {
-        JMenu fileMenu = new JMenu("File");
-        fileMenu.setOpaque(false);
+        JMenu fileMenu = new BaseMenu("File");
         mainMenuBar.add(fileMenu);
 
         JMenuItem newServerItem = new JMenuItem(newServerAction);
@@ -193,17 +193,13 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
         JMenuItem exitItem = new JMenuItem(exitAction);
         fileMenu.add(exitItem);
 
-        JMenu windowMenu = new JMenu("Window");
-        JMenuItem newVisualizerItem = new JMenuItem(newDesktopAction);
-        windowMenu.add(newVisualizerItem);
-
-        windowMenu.setOpaque(false);
+        windowMenu = new WindowMenu(newDesktopAction, getRootContext());
+        getRootContext().addTreeListener(windowMenu); //show new desktops added
         mainMenuBar.add(windowMenu);
 
-        JMenu helpMenu = new JMenu("Help");
+        JMenu helpMenu = new BaseMenu("Help");
         JMenuItem aboutItem = new JMenuItem(showAboutDialogAction);
         helpMenu.add(aboutItem);
-        helpMenu.setOpaque(false);
         mainMenuBar.add(helpMenu);
 
         setJMenuBar(mainMenuBar);
@@ -222,6 +218,7 @@ public class TimeSeriousMainFrame extends AbstractDesktopFrame implements Config
     }
 
     public void clearConfig() {
+        getRootContext().removeTreeListener(windowMenu);
     }
 
     public void prepareConfigForSave(TimeSeriousConfig config) {

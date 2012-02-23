@@ -54,6 +54,7 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
     private Action removeVisualizerAction;
     private Action removeDesktopAction;
     private Action showHiddenDesktopAction;
+    private Action hideDesktopAction;
     private Action renameAction;
     private Action newDesktopAction;
     private Action newVisualizerAction;
@@ -70,10 +71,11 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
         refreshServerAction = new RefreshServerSeriesAction(rootContext, selectionModel);
         removeServerAction = new RemoveServerAction(parentComponent, timeSeriesServerDictionary, selectionModel);
         renameServerAction = new RenameServerAction(parentComponent, selectionModel);
-        showHiddenVisualizerAction = new ShowHiddenVisualizerAction(selectionModel);
+        showHiddenVisualizerAction = new ShowHidableVisualizerAction(selectionModel);
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel, parentComponent);
         removeDesktopAction = new RemoveDesktopAction(selectionModel, parentComponent);
-        showHiddenDesktopAction = new ShowHiddenDesktopAction(selectionModel);
+        hideDesktopAction = new HideDesktopAction(selectionModel);
+        showHiddenDesktopAction = new ShowHidableDesktopAction(selectionModel);
         renameAction = new RenameAction(parentComponent, selectionModel);
         newDesktopAction = new NewDesktopAction(parentComponent, rootContext, applicationActionModels.getDesktopSelectionActionModel());
         newVisualizerAction = new NewVisualizerAction(parentComponent, applicationActionModels.getDesktopSelectionActionModel(), applicationActionModels.getVisualizerSelectionActionModel());     editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(parentComponent, displayNameCalculator);
@@ -91,8 +93,9 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
             menu.add(removeServerAction);
             menu.add(renameServerAction);
         } else if ( selectionModel.isSelectionLimitedToTypes(DesktopContext.class)) {
-            menu.add(removeDesktopAction);
             menu.add(showHiddenDesktopAction);
+            menu.add(hideDesktopAction);
+            menu.add(removeDesktopAction);
             menu.add(renameAction);
             menu.add(new JMenuBar());
             menu.add(newVisualizerAction);

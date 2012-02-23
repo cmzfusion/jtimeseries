@@ -32,7 +32,8 @@ import com.od.jtimeseries.ui.config.ExportableConfig;
  * A context which relates to a peer ui element that can be hidden
  * e.g. a visualizer window
  *
- * When the peer component is hidden, it's config is stored so that it can be shown again
+ * When the peer component is hidden, it's config is stored so that it can be restored and
+ * shown again later
  */
 public abstract class HidablePeerContext<E extends ExportableConfig, P> extends DefaultTimeSeriesContext {
 
@@ -72,6 +73,12 @@ public abstract class HidablePeerContext<E extends ExportableConfig, P> extends 
         return ! isShown();
     }
 
+    /**
+     * Subclass may override
+     */
+    public void bringToFront() {
+    }
+
     protected boolean isPeerCreated() {
         return peerResource != null;
     }
@@ -84,13 +91,13 @@ public abstract class HidablePeerContext<E extends ExportableConfig, P> extends 
         if (this.shown != shown) {
             this.shown = shown;
             if (!shown) {
-                disposePeerWhenParentHidden();
+                disposePeer();
             }
             fireNodeChanged(SHOWN_PROPERTY);
         }
     }
 
-    public void disposePeerWhenParentHidden() {
+    public void disposePeer() {
         peerConfig = createPeerConfig(false);
         disposePeerResource();
     }

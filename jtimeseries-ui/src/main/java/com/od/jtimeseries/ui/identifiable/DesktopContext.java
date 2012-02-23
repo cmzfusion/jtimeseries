@@ -91,6 +91,10 @@ public class DesktopContext extends HidablePeerContext<DesktopConfiguration, Pee
         return getId().equals(DesktopConfiguration.MAIN_DESKTOP_NAME);
     }
 
+    public void bringToFront() {
+        getPeerResource().bringToFront();
+    }
+
     public HidablePeerContext<DesktopConfiguration, PeerDesktop> newInstance(TimeSeriesContext parent, DesktopConfiguration config) {
         return new DesktopContext(config, displayNameCalculator);
     }

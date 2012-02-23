@@ -405,7 +405,8 @@ public class IdentifiableBase extends LockingIdentifiable {
                 IdentifiableTreeEvent.TreeEventType.CHANGE,
                 getRoot(),
                 getPath(),
-                node
+                node,
+                changeDescription
             );
 
             for ( IdentifiableTreeListener l : treeListeners) {

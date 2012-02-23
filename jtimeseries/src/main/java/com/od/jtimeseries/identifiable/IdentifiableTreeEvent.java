@@ -31,13 +31,18 @@ public class IdentifiableTreeEvent {
     private final String path;
     private final Map<Identifiable, Collection<Identifiable>> nodes;
     private final TreeEventType type;
+    private final Object changeDescription;
 
     public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Identifiable node) {
-       this(type, rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()));
+       this(type, rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()), null);
+    }
+
+    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Identifiable node, Object changeDescription) {
+       this(type, rootNode, path, createSingletonMap(node, Collections.<Identifiable>emptyList()), changeDescription);
     }
 
     public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Identifiable node, Collection<Identifiable> children) {
-       this(type, rootNode, path, createSingletonMap(node, children));
+       this(type, rootNode, path, createSingletonMap(node, children), null);
        //       if ( children.size() > 0 ) {
        //           System.out.println("Created TreeEvent " + this + " with child count " + children.size() + " on node " + node);
        //       }
@@ -47,12 +52,14 @@ public class IdentifiableTreeEvent {
      * @param rootNode, the root node of the tree which is changing
      * @param path, path to parent node of nodes which have changed
      * @param nodes, nodes which were modified
+     * @param changeDescription, description of change for change events, may be null
      */
-    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Map<Identifiable, Collection<Identifiable>> nodes) {
+    public IdentifiableTreeEvent(TreeEventType type, Identifiable rootNode, String path, Map<Identifiable, Collection<Identifiable>> nodes, Object changeDescription) {
         this.type = type;
         this.rootNode = rootNode;
         this.path = path;
         this.nodes = nodes;
+        this.changeDescription = changeDescription;
     }
 
     /**
@@ -85,6 +92,10 @@ public class IdentifiableTreeEvent {
 
     public TreeEventType getType() {
         return type;
+    }
+
+    public Object getChangeDescription() {
+        return changeDescription;
     }
 
     public <E extends Identifiable> void processNodesAndDescendants(IdentifiableProcessor<E> i, Class<E> clazz) {

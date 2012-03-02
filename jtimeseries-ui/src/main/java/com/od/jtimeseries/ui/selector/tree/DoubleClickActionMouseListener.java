@@ -20,9 +20,11 @@ package com.od.jtimeseries.ui.selector.tree;
 
 import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
+import com.od.swing.util.Source;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -33,30 +35,31 @@ import java.awt.event.MouseEvent;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-class SeriesSelectionMouseListener<E extends UIPropertiesTimeSeries> extends MouseAdapter {
+class DoubleClickActionMouseListener<E extends UIPropertiesTimeSeries> extends MouseAdapter {
 
-    private  int hotspot = new JCheckBox().getPreferredSize().width;
     private JTree tree;
+    private Source<SelectorActionFactory> actionFactory;
 
-    public SeriesSelectionMouseListener(JTree tree) {
+    public DoubleClickActionMouseListener(JTree tree, Source<SelectorActionFactory> actionFactory) {
         this.tree = tree;
+        this.actionFactory = actionFactory;
     }
 
-    public void mouseClicked(MouseEvent me){
-        TreePath path = tree.getPathForLocation(me.getX(), me.getY());
-        if(path==null)
-            return;
-        if(me.getX()>tree.getPathBounds(path).x+hotspot)
-            return;
+    public void mousePressed(MouseEvent me){
+        if ( me.getClickCount() == 2) {
+            TreePath path = tree.getPathForLocation(me.getX(), me.getY());
+            if(path==null)
+                return;
 
-        Object o = path.getLastPathComponent();
-        if ( o instanceof SeriesTreeNode) {
-            E m = ((SeriesTreeNode<E>)o).getTimeSeries();
-            if ( m instanceof UIPropertiesTimeSeries) {
-                UIPropertiesTimeSeries s = (UIPropertiesTimeSeries)m;
-                s.setSelected(!s.isSelected());
+            Object o = path.getLastPathComponent();
+            if ( o instanceof AbstractIdentifiableTreeNode) {
+                Action a = actionFactory.get().getDefaultAction(((AbstractIdentifiableTreeNode)o).getIdentifiable());
+                if ( a != null ) {
+                    a.actionPerformed(
+                        new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "doubleClick")
+                    );
+                }
             }
-            tree.repaint();
         }
     }
 }

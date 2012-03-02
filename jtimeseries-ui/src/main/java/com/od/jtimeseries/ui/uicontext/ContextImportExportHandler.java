@@ -120,7 +120,7 @@ public abstract class ContextImportExportHandler {
     }
 
 
-    protected void doImport(Component component, List<ExportableConfig> configs, Identifiable target) {
+    protected void doImport(Component component, List<? extends ExportableConfig> configs, Identifiable target) {
         for ( ExportableConfig s : configs) {
             if ( shouldImport(s, target) ) {
                 ImportItem d = getImportItem(component, s, target);

@@ -71,7 +71,7 @@ public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
         importExportHandler.doImport(component, identifiables, target);
     }
 
-    public void doImport(Component component, List<ExportableConfig> configs, Identifiable target) {
+    public void doImport(Component component, List<? extends ExportableConfig> configs, Identifiable target) {
         importExportHandler.doImport(component, configs, target);
     }
 

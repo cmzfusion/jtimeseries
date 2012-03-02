@@ -20,13 +20,11 @@ package com.od.jtimeseries.ui.selector.shared;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 
 import javax.swing.*;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,8 +38,12 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
 
     private TimeSeriesContext rootContext;
     private IdentifiableListActionModel selectionsActionModel;
-    private SelectorPopupMenuPopulator popupMenuPopulator = new SelectorPopupMenuPopulator() {
+    private SelectorActionFactory actionFactory = new SelectorActionFactory() {
         public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
+        }
+
+        public Action getDefaultAction(Identifiable selectedIdentifiable) {
+            return null;
         }
     };
 
@@ -50,12 +52,12 @@ public abstract class SelectorComponent<E extends UIPropertiesTimeSeries> extend
         this.selectionsActionModel = selectionsActionModel;
     }
 
-    public SelectorPopupMenuPopulator getPopupMenuPopulator() {
-        return popupMenuPopulator;
+    public SelectorActionFactory getActionFactory() {
+        return actionFactory;
     }
 
-    public void setPopupMenuPopulator(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
-        this.popupMenuPopulator = selectorPopupMenuPopulator;
+    public void setActionFactory(SelectorActionFactory selectorActionFactory) {
+        this.actionFactory = selectorActionFactory;
     }
 
     public void showSelections(List<Identifiable> selected) {

@@ -31,7 +31,7 @@ import javax.swing.*;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractSeriesSelectionTreeNode {
+class SeriesTreeNode<E extends UIPropertiesTimeSeries> extends AbstractIdentifiableTreeNode {
 
     private E series;
 

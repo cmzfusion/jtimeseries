@@ -27,8 +27,8 @@ import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.TimeSeriesServerContext;
 import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.timeserious.action.*;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
@@ -43,17 +43,18 @@ import java.util.List;
 * Date: 16/03/11
 * Time: 07:03
 */
-public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulator {
+public class MainSelectorActionFactory implements SelectorActionFactory {
 
     private IdentifiableListActionModel selectionModel;
     private Action addSeriesAction;
+    private Action showSeriesInNewVisualizerAction;
     private Action refreshServerAction;
     private Action removeServerAction;
     private Action renameServerAction;
-    private Action showHiddenVisualizerAction;
+    private Action showVisualizerAction;
     private Action removeVisualizerAction;
     private Action removeDesktopAction;
-    private Action showHiddenDesktopAction;
+    private Action showDesktopAction;
     private Action hideDesktopAction;
     private Action renameAction;
     private Action newDesktopAction;
@@ -63,29 +64,39 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
     private TimeSeriesServerDictionary timeSeriesServerDictionary;
     private JComponent parentComponent;
 
-    public MainSelectorPopupMenuPopulator(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, JComponent parentComponent) {
+    public MainSelectorActionFactory(TimeSeriousRootContext rootContext, ApplicationActionModels applicationActionModels, SeriesSelectionPanel<UIPropertiesTimeSeries> selectionPanel, TimeSeriesServerDictionary timeSeriesServerDictionary, DisplayNameCalculator displayNameCalculator, JComponent parentComponent) {
         this.timeSeriesServerDictionary = timeSeriesServerDictionary;
         this.parentComponent = parentComponent;
         this.selectionModel = selectionPanel.getSelectionActionModel();
         addSeriesAction = new AddSeriesToActiveVisualizerAction(applicationActionModels.getVisualizerSelectionActionModel(), selectionModel);
+        showSeriesInNewVisualizerAction = new ShowSeriesInNewVisualizerAction(
+            parentComponent,
+            applicationActionModels.getDesktopSelectionActionModel(),
+            applicationActionModels.getVisualizerSelectionActionModel(),
+            selectionModel
+        );
         refreshServerAction = new RefreshServerSeriesAction(rootContext, selectionModel);
         removeServerAction = new RemoveServerAction(parentComponent, timeSeriesServerDictionary, selectionModel);
         renameServerAction = new RenameServerAction(parentComponent, selectionModel);
-        showHiddenVisualizerAction = new ShowHidableVisualizerAction(selectionModel);
+        showVisualizerAction = new ShowHidableVisualizerAction(selectionModel);
         removeVisualizerAction = new RemoveVisualizerAction(selectionModel, parentComponent);
         removeDesktopAction = new RemoveDesktopAction(selectionModel, parentComponent);
         hideDesktopAction = new HideDesktopAction(selectionModel);
-        showHiddenDesktopAction = new ShowHidableDesktopAction(selectionModel);
+        showDesktopAction = new ShowHidableDesktopAction(selectionModel);
         renameAction = new RenameAction(parentComponent, selectionModel);
         newDesktopAction = new NewDesktopAction(parentComponent, rootContext, applicationActionModels.getDesktopSelectionActionModel());
-        newVisualizerAction = new NewVisualizerAction(parentComponent, applicationActionModels.getDesktopSelectionActionModel(), applicationActionModels.getVisualizerSelectionActionModel());     editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(parentComponent, displayNameCalculator);
+        newVisualizerAction = new NewVisualizerInSelectedDesktopNode(parentComponent, selectionModel,
+            applicationActionModels.getVisualizerSelectionActionModel()
+        );
+        editDisplayNamePatternsAction = new EditDisplayNamePatternsAction(parentComponent, displayNameCalculator);
     }
 
     public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
         if (selectionModel.isSelectionLimitedToTypes(UIPropertiesTimeSeries.class)) {
-            menu.add(new JMenuItem(addSeriesAction));
+            menu.add(addSeriesAction);
+            menu.add(showSeriesInNewVisualizerAction);
         } else if ( selectionModel.isSelectionLimitedToTypes(VisualizerContext.class)) {
-            menu.add(showHiddenVisualizerAction);
+            menu.add(showVisualizerAction);
             menu.add(removeVisualizerAction);
             menu.add(renameAction);
         } else if ( selectionModel.isSelectionLimitedToTypes(TimeSeriesServerContext.class)) {
@@ -93,7 +104,7 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
             menu.add(removeServerAction);
             menu.add(renameServerAction);
         } else if ( selectionModel.isSelectionLimitedToTypes(DesktopContext.class)) {
-            menu.add(showHiddenDesktopAction);
+            menu.add(showDesktopAction);
             menu.add(hideDesktopAction);
             menu.add(removeDesktopAction);
             menu.add(renameAction);
@@ -109,6 +120,18 @@ public class MainSelectorPopupMenuPopulator implements SelectorPopupMenuPopulato
             ));
             menu.add(newDesktopAction);
         }
+    }
+
+    public Action getDefaultAction(Identifiable selectedIdentifiable) {
+        Action result = null;
+        if ( UIPropertiesTimeSeries.class.isAssignableFrom(selectedIdentifiable.getClass())) {
+            result = showSeriesInNewVisualizerAction;
+        } else if ( DesktopContext.class.isAssignableFrom(selectedIdentifiable.getClass())) {
+            result = showDesktopAction;
+        } else if ( VisualizerContext.class.isAssignableFrom(selectedIdentifiable.getClass())) {
+            result = showVisualizerAction;
+        }
+        return result;
     }
 
 }

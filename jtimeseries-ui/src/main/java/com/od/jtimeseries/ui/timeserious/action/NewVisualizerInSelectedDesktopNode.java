@@ -18,15 +18,11 @@
  */
 package com.od.jtimeseries.ui.timeserious.action;
 
-import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
-import com.od.jtimeseries.ui.identifiable.VisualizerContext;
-import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
+import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.util.ImageUtils;
-import com.od.swing.action.ModelDrivenAction;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,15 +30,20 @@ import java.awt.event.ActionEvent;
  * Date: 26-Mar-2010
  * Time: 16:32:43
  */
-public class NewVisualizerAction extends AbstractNewVisualizerAction<DesktopSelectionActionModel> {
+public class NewVisualizerInSelectedDesktopNode extends AbstractNewVisualizerAction<IdentifiableListActionModel> {
 
-    public NewVisualizerAction(Component parentComponent, DesktopSelectionActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
+    public NewVisualizerInSelectedDesktopNode(Component parentComponent, IdentifiableListActionModel m, VisualizerSelectionActionModel visualizerSelectionActionModel) {
         super(m, "New Visualizer...", ImageUtils.VISUALIZER_NEW_16x16, parentComponent, visualizerSelectionActionModel);
         super.putValue(SHORT_DESCRIPTION, "Create a new chart visualizer in current desktop");
     }
 
+    public boolean isModelStateActionable() {
+        return getActionModel().isSelectionLimitedToTypes(DesktopContext.class) &&
+               getActionModel().getSelectionCount() == 1;
+    }
+
     @Override
     protected DesktopContext getSelectedDesktop() {
-        return getActionModel().getSelectedContext();
+        return getActionModel().getSelected(DesktopContext.class).get(0);
     }
 }

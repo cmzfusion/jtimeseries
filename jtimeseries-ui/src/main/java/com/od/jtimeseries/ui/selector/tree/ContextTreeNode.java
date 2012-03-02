@@ -31,7 +31,7 @@ import javax.swing.*;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-class ContextTreeNode extends AbstractSeriesSelectionTreeNode {
+class ContextTreeNode extends AbstractIdentifiableTreeNode {
 
     private TimeSeriesContext context;
 

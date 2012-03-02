@@ -62,7 +62,7 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
 
         selectionPanel.setTreeComparator(new MainSelectorTreeComparator());
 
-        MainSelectorPopupMenuPopulator selectorActionFactory = new MainSelectorPopupMenuPopulator(
+        MainSelectorActionFactory actionFactory = new MainSelectorActionFactory(
             rootContext,
             applicationActionModels,
             selectionPanel,
@@ -71,10 +71,8 @@ public class MainSeriesSelector extends JPanel implements ConfigAware {
             this
         );
 
-        selectionPanel.setSelectorActionFactory(selectorActionFactory);
+        selectionPanel.setActionFactory(actionFactory);
         addProxyingPropertyListeners();
-
-        selectionPanel.getSelectionActionModel().addActionModelListener(new MainSelectorTreeSelectionListener(selectionPanel));
 
         selectionPanel.setTransferHandler(new ImportExportTransferHandler(rootContext,
                 selectionPanel.getSelectionActionModel()));

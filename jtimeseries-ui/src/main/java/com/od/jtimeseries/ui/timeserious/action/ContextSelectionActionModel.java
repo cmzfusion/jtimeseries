@@ -35,8 +35,11 @@ public class ContextSelectionActionModel<E> extends AbstractActionModel {
     }
 
     public void setSelectedContext(E selectedContext) {
-        this.selectedContext = selectedContext;
-        setModelValid(selectedContext != null);
+        if ( this.selectedContext != selectedContext) {
+            this.selectedContext = selectedContext;
+            setModelValid(selectedContext != null);
+            fireActionStateUpdated();
+        }
     }
 
     protected void doClearActionModelState() {

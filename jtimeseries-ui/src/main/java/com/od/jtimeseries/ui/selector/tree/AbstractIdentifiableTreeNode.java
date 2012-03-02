@@ -31,7 +31,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 * <p/>
 * To change this template use File | Settings | File Templates.
 */
-public abstract class AbstractSeriesSelectionTreeNode extends DefaultMutableTreeNode implements IdentifiableSource {
+public abstract class AbstractIdentifiableTreeNode extends DefaultMutableTreeNode implements IdentifiableSource {
 
     public abstract Identifiable getIdentifiable();
 

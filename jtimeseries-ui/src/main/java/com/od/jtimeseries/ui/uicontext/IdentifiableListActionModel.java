@@ -70,6 +70,9 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
         super.doClearActionModelState();
     }
 
+    /**
+     * @return if only identifiables of class type are selected, and there is at least one selection
+     */
     public boolean isSelectionLimitedToTypes(Class... type) {
         int total = 0;
         for ( Class c : type ) {
@@ -103,5 +106,4 @@ public class IdentifiableListActionModel extends ListSelectionActionModel<Identi
         }
         return result;
     }
-
 }

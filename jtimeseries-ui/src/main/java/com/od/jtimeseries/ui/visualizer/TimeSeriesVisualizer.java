@@ -26,7 +26,7 @@ import com.od.jtimeseries.ui.displaypattern.EditDisplayNamePatternsAction;
 import com.od.jtimeseries.ui.download.ShowDownloadSeriesDialogAction;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.TimeSeriesSelectorListener;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.timeseries.ChartingTimeSeries;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
@@ -145,8 +145,8 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createSeriesSelectionPanel() {
         seriesSelectionPanel = new SeriesSelectionPanel<ChartingTimeSeries>(rootContext, "Chart", ChartingTimeSeries.class);
 
-        SelectorPopupMenuPopulator popupMenuPopulator = new VisualizerSelectionPopupMenuPopulator(getSelectionActionModel());
-        seriesSelectionPanel.setSelectorActionFactory(popupMenuPopulator);
+        SelectorActionFactory actionFactory = new VisualizerSelectionActionFactory(getSelectionActionModel());
+        seriesSelectionPanel.setActionFactory(actionFactory);
         seriesSelectionPanel.setTransferHandler(new ImportExportTransferHandler(rootContext, getSelectionActionModel()));
     }
 
@@ -294,8 +294,8 @@ public class TimeSeriesVisualizer extends JPanel {
         seriesSelectionPanel.setColumnSettings(columnSettings);
     }
 
-    public void setSelectorActionFactory(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
-        seriesSelectionPanel.setSelectorActionFactory(selectorPopupMenuPopulator);
+    public void setSelectorActionFactory(SelectorActionFactory selectorActionFactory) {
+        seriesSelectionPanel.setActionFactory(selectorActionFactory);
     }
 
     public IdentifiableListActionModel getSelectionActionModel() {
@@ -363,6 +363,10 @@ public class TimeSeriesVisualizer extends JPanel {
     public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
         IdentifiableListActionModel identifiables = new IdentifiableListActionModel(selectedSeries);
         rootContext.doImport(this, identifiables, rootContext);
+    }
+
+    public void addTimeSeriesConfigs(List<UiTimeSeriesConfig> selectedSeries) {
+        rootContext.doImport(this, selectedSeries, rootContext);
     }
 
     //when this visualizer is garbage collected, give its series the chance to

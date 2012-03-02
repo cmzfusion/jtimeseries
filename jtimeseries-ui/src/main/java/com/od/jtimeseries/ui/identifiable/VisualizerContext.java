@@ -21,9 +21,13 @@ package com.od.jtimeseries.ui.identifiable;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -62,8 +66,19 @@ public class VisualizerContext extends HidablePeerContext<VisualizerConfiguratio
         return "timeSeriousVisualizer_" + getId();
     }
 
-    public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
-        getPeerResource().addTimeSeries(selectedSeries);
+    public void addTimeSeries(List<UiTimeSeriesConfig> selectedSeries) {
+        if ( getPeerResource() == null ) {
+            addSeriesToConfigs(selectedSeries);
+        } else {
+            getPeerResource().addTimeSeriesConfigs(selectedSeries);
+        }
+    }
+
+    //add only if series not already present in list
+    private void addSeriesToConfigs(List<UiTimeSeriesConfig> selectedSeries) {
+        LinkedHashSet<UiTimeSeriesConfig> configs = new LinkedHashSet<UiTimeSeriesConfig>(getConfiguration().getChartConfigs());
+        configs.addAll(selectedSeries);
+        getConfiguration().setChartConfigs(new LinkedList<UiTimeSeriesConfig>(configs));
     }
 
     public HidablePeerContext<VisualizerConfiguration, PeerVisualizerFrame> newInstance(TimeSeriesContext parent, VisualizerConfiguration config) {

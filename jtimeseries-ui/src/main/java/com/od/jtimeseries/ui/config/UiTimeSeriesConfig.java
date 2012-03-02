@@ -127,4 +127,22 @@ public class UiTimeSeriesConfig implements ExportableConfig {
     public void setTitle(String title) {
         setId(title);
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UiTimeSeriesConfig that = (UiTimeSeriesConfig) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (parentPath != null ? !parentPath.equals(that.parentPath) : that.parentPath != null) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result = parentPath != null ? parentPath.hashCode() : 0;
+        result = 31 * result + (id != null ? id.hashCode() : 0);
+        return result;
+    }
 }

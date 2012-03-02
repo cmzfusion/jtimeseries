@@ -37,6 +37,9 @@ public class WindowMenu extends BaseMenu implements IdentifiableTreeListener {
 
     private int firstDesktopMenuItemIndex = 2;
 
+    private Font shownFont = getFont();
+    private Font hiddenFont = shownFont.deriveFont(Font.ITALIC);
+
     public WindowMenu(NewDesktopAction newDesktopAction, TimeSeriousRootContext rootContext) {
         super("Window");
         this.newDesktopAction = newDesktopAction;
@@ -134,8 +137,10 @@ public class WindowMenu extends BaseMenu implements IdentifiableTreeListener {
             Action action;
             if ( desktopContext.isHidden()) {
                 action = new ShowHidableDesktopAction(desktopContext);
+                setFont(hiddenFont);
             } else {
                 action = new BringDesktopToFrontAction(desktopContext);
+                setFont(shownFont);
             }
             action.putValue(Action.NAME, desktopContext.getId());
             action.putValue(Action.SMALL_ICON, null);

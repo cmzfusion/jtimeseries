@@ -33,6 +33,8 @@ import java.text.NumberFormat;
  * User: Nick Ebbutt
  * Date: 28/01/11
  * Time: 06:47
+ *
+ * Select how much history to show in time series charts
  */
 public class DomainModeComponent extends JPanel {
 

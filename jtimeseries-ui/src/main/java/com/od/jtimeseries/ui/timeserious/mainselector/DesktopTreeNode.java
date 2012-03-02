@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.timeserious.mainselector;
 
 import com.od.jtimeseries.ui.identifiable.DesktopContext;
-import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
+import com.od.jtimeseries.ui.selector.tree.AbstractIdentifiableTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -30,7 +30,7 @@ import javax.swing.*;
  * Date: 11/03/11
  * Time: 12:15
  */
-public class DesktopTreeNode extends AbstractSeriesSelectionTreeNode {
+public class DesktopTreeNode extends AbstractIdentifiableTreeNode {
 
     private DesktopContext context;
 

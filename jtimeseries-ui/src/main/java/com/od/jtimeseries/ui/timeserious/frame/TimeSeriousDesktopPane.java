@@ -30,7 +30,7 @@ import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.timeserious.action.ApplicationActionModels;
 import com.od.jtimeseries.ui.timeserious.action.NewVisualizerAction;
-import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerPopupMenuPopulator;
+import com.od.jtimeseries.ui.timeserious.action.TimeSeriousVisualizerActionFactory;
 import com.od.jtimeseries.ui.timeserious.rootcontext.TimeSeriousRootContext;
 import com.od.jtimeseries.ui.util.PopupTriggerMouseAdapter;
 import com.od.jtimeseries.ui.visualizer.TimeSeriesVisualizer;
@@ -158,7 +158,7 @@ public class TimeSeriousDesktopPane extends JDesktopPane {
     }
 
     private VisualizerInternalFrame configureAndShowVisualizerFrame(VisualizerConfiguration c, TimeSeriesVisualizer visualizer, VisualizerContext visualizerNode) {
-        visualizer.setSelectorActionFactory(new TimeSeriousVisualizerPopupMenuPopulator(
+        visualizer.setSelectorActionFactory(new TimeSeriousVisualizerActionFactory(
             visualizer.getSelectionActionModel(),
             mainSelectionPanel
         ));

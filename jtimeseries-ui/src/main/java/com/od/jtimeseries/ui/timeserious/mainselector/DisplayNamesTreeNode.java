@@ -20,7 +20,7 @@ package com.od.jtimeseries.ui.timeserious.mainselector;
 
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
-import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
+import com.od.jtimeseries.ui.selector.tree.AbstractIdentifiableTreeNode;
 import com.od.jtimeseries.ui.util.ImageUtils;
 
 import javax.swing.*;
@@ -31,7 +31,7 @@ import javax.swing.*;
  * Date: 12/05/11
  * Time: 08:16
  */
-public class DisplayNamesTreeNode extends AbstractSeriesSelectionTreeNode {
+public class DisplayNamesTreeNode extends AbstractIdentifiableTreeNode {
 
     private DisplayNamesContext settingsContext;
 

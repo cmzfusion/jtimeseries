@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.identifiable;
 
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
@@ -39,5 +40,5 @@ public interface PeerVisualizerFrame {
 
     boolean isIcon();
 
-    void addTimeSeries(java.util.List<UIPropertiesTimeSeries> selectedSeries);
+    void addTimeSeriesConfigs(java.util.List<UiTimeSeriesConfig> selectedSeries);
 }

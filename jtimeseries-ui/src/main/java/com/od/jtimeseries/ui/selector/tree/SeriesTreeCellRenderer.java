@@ -49,10 +49,10 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
 
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         delegateRenderer.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        if ( value instanceof AbstractSeriesSelectionTreeNode) {
-            delegateRenderer.setIcon(((AbstractSeriesSelectionTreeNode) value).getIcon());
+        if ( value instanceof AbstractIdentifiableTreeNode) {
+            delegateRenderer.setIcon(((AbstractIdentifiableTreeNode) value).getIcon());
             removeAll();
-            delegateRenderer.setText(getDisplayName(((AbstractSeriesSelectionTreeNode) value).getIdentifiable()));
+            delegateRenderer.setText(getDisplayName(((AbstractIdentifiableTreeNode) value).getIdentifiable()));
             if ( value instanceof SeriesTreeNode ) {
                 SeriesTreeNode seriesNode = (SeriesTreeNode)value;
                 Object timeSeries = seriesNode.getTimeSeries();
@@ -64,7 +64,7 @@ public class SeriesTreeCellRenderer extends JPanel implements TreeCellRenderer {
                 }
                 add(delegateRenderer, BorderLayout.CENTER);
             } else {
-                delegateRenderer.setText(getDisplayName(((AbstractSeriesSelectionTreeNode)value).getIdentifiable()));
+                delegateRenderer.setText(getDisplayName(((AbstractIdentifiableTreeNode)value).getIdentifiable()));
                 add(delegateRenderer, BorderLayout.CENTER);
             }
             return this;

@@ -103,7 +103,7 @@ public class MainSelectorImportExportHandler extends ContextImportExportHandler 
         );
     }
 
-    protected void doImport(Component component, java.util.List<ExportableConfig> configs, Identifiable target) {
+    protected void doImport(Component component, java.util.List<? extends ExportableConfig> configs, Identifiable target) {
         //we have logic to cascade window locations on import of multiple items
         //we need to reset the start location for the cascade at the beginning of each import
         for (ExportableConfigImportUtility u : exportableConfigImportUtilities.values()) {

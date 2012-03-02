@@ -16,36 +16,34 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.ui.visualizer;
+package com.od.jtimeseries.ui.timeserious.action;
 
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.ui.selector.action.ReconnectSeriesAction;
-import com.od.jtimeseries.ui.selector.action.RemoveSeriesAction;
+import com.od.jtimeseries.ui.selector.SeriesSelectionPanel;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
+import com.od.jtimeseries.ui.visualizer.VisualizerSelectionActionFactory;
 
 import javax.swing.*;
 import java.util.List;
 
 /**
-* Created by IntelliJ IDEA.
-* User: Nick Ebbutt
-* Date: 02/03/11
-* Time: 08:23
-*/
-public class VisualizerSelectionPopupMenuPopulator implements SelectorPopupMenuPopulator {
+ * Created by IntelliJ IDEA.
+ * User: Nick Ebbutt
+ * Date: 02/03/11
+ * Time: 06:45
+ */
+public class TimeSeriousVisualizerActionFactory extends VisualizerSelectionActionFactory {
 
-    private ReconnectSeriesAction reconnectSeriesAction;
-    private RemoveSeriesAction removeSeriesAction;
+    private FindInMainSelectorAction showInMainSelectorAction;
 
-    public VisualizerSelectionPopupMenuPopulator(IdentifiableListActionModel selectionActionModel) {
-        reconnectSeriesAction = new ReconnectSeriesAction(selectionActionModel);
-        removeSeriesAction = new RemoveSeriesAction(selectionActionModel);
+    public TimeSeriousVisualizerActionFactory(IdentifiableListActionModel selectionActionModel, SeriesSelectionPanel seriesSelectionPanel) {
+        super(selectionActionModel);
+        showInMainSelectorAction = new FindInMainSelectorAction(seriesSelectionPanel, selectionActionModel);
     }
 
     public void addMenuItems(JPopupMenu menu, SelectorComponent s, List<Identifiable> selectedIdentifiable) {
-        menu.add(new JMenuItem(removeSeriesAction));
-        menu.add(new JMenuItem(reconnectSeriesAction));
+        super.addMenuItems(menu, s, selectedIdentifiable);
+        menu.add(new JMenuItem(showInMainSelectorAction));
     }
 }

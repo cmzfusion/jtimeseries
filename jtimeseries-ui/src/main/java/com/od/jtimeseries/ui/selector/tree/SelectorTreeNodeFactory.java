@@ -60,8 +60,8 @@ public class SelectorTreeNodeFactory<E extends UIPropertiesTimeSeries> {
         serverNodeAnimator.setBackgroundImage(ImageUtils.PROGRESS_SERVER_IMAGE, 1f);
     }
 
-    public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {
-        AbstractSeriesSelectionTreeNode result = null;
+    public AbstractIdentifiableTreeNode buildNode(Identifiable identifiable, JTree tree) {
+        AbstractIdentifiableTreeNode result = null;
         if ( identifiable instanceof TimeSeriesServerContext) {
             result = buildServerNode((TimeSeriesServerContext) identifiable, tree);
         } else if ( identifiable instanceof TimeSeriesContext) {

@@ -100,7 +100,7 @@ public abstract class RightClickSelectionPopupListener extends MouseAdapter {
 
     private void addMenuItems(JPopupMenu menu, MouseEvent e) {
         List<Identifiable> selectedIdentifiable = getSelectedIdentifiable(e);
-        selectorComponent.getPopupMenuPopulator().addMenuItems(
+        selectorComponent.getActionFactory().addMenuItems(
             menu,
             getSelectorComponent(),
             selectedIdentifiable

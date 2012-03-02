@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.visualizer;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.TimeSeriesServerDictionary;
+import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.selector.shared.AbstractUIContextTimeSeriesFactory;
 import com.od.jtimeseries.ui.selector.shared.ServerContextCreatingContextFactory;
@@ -66,6 +67,20 @@ public class VisualizerImportExportHandler extends ContextImportExportHandler {
             s.getDescription(),
             UIPropertiesTimeSeries.class,
             s.getConfig()
+        );
+    }
+
+    /**
+     * Subclass should override to create ImportItem if this ExportableConfig can be imported
+     * @return an ImportDetails, which contains everything necessary to import the target exportable config, or null
+     */
+    protected ImportItem getImportItem(Component component, ExportableConfig s, Identifiable target) {
+        UiTimeSeriesConfig c = (UiTimeSeriesConfig)s;
+        return new ImportItem(
+            c.getPath(),
+            c.getDescription(),
+            UIPropertiesTimeSeries.class,
+            c
         );
     }
 

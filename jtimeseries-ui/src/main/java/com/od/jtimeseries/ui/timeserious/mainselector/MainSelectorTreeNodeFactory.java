@@ -23,7 +23,7 @@ import com.od.jtimeseries.ui.identifiable.DesktopContext;
 import com.od.jtimeseries.ui.identifiable.DisplayNamesContext;
 import com.od.jtimeseries.ui.identifiable.SettingsContext;
 import com.od.jtimeseries.ui.identifiable.VisualizerContext;
-import com.od.jtimeseries.ui.selector.tree.AbstractSeriesSelectionTreeNode;
+import com.od.jtimeseries.ui.selector.tree.AbstractIdentifiableTreeNode;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 
@@ -41,8 +41,8 @@ public class MainSelectorTreeNodeFactory extends SelectorTreeNodeFactory<UIPrope
         super(seriesClass);
     }
 
-    public AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable, JTree tree) {
-        AbstractSeriesSelectionTreeNode result;
+    public AbstractIdentifiableTreeNode buildNode(Identifiable identifiable, JTree tree) {
+        AbstractIdentifiableTreeNode result;
         if ( identifiable instanceof DesktopContext) {
             result = new DesktopTreeNode((DesktopContext)identifiable);
         } else if ( identifiable instanceof VisualizerContext) {

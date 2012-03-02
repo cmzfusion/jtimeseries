@@ -21,6 +21,7 @@ package com.od.jtimeseries.ui.timeserious.frame;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListenerAdapter;
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.config.VisualizerConfiguration;
 import com.od.jtimeseries.ui.event.TimeSeriousBusListener;
 import com.od.jtimeseries.ui.identifiable.HidablePeerContext;
@@ -123,8 +124,8 @@ public class VisualizerInternalFrame extends JInternalFrame implements PeerVisua
         }
     }
 
-    public void addTimeSeries(List<UIPropertiesTimeSeries> selectedSeries) {
-        visualizer.addTimeSeries(selectedSeries);
+    public void addTimeSeriesConfigs(List<UiTimeSeriesConfig> selectedSeries) {
+        visualizer.addTimeSeriesConfigs(selectedSeries);
     }
 
     public void setSelectorHidden() {

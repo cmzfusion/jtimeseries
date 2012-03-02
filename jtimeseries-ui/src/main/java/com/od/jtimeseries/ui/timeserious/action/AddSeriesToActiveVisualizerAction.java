@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.ui.timeserious.action;
 
+import com.od.jtimeseries.ui.config.UiTimeSeriesConfig;
 import com.od.jtimeseries.ui.identifiable.VisualizerContext;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
@@ -26,6 +27,8 @@ import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.ModelDrivenAction;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
 * Created by IntelliJ IDEA.
@@ -33,7 +36,7 @@ import java.awt.event.ActionEvent;
 * Date: 16/03/11
 * Time: 06:59
 */
-public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<IdentifiableListActionModel> {
+public class AddSeriesToActiveVisualizerAction extends AbstractShowSeriesAction<IdentifiableListActionModel> {
 
     private VisualizerSelectionActionModel visualizerSelectionActionModel;
 
@@ -49,6 +52,11 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
         });
     }
 
+    public boolean isModelStateActionable() {
+        return getActionModel().isSelectionLimitedToTypes(UIPropertiesTimeSeries.class) &&
+               visualizerSelectionActionModel.isModelValid();
+    }
+
     private void setName() {
         String name = "Add to Selected Visualizer";
         if ( visualizerSelectionActionModel.isModelValid()) {
@@ -58,15 +66,13 @@ public class AddSeriesToActiveVisualizerAction extends ModelDrivenAction<Identif
     }
 
     public void actionPerformed(ActionEvent e) {
-        java.util.List<UIPropertiesTimeSeries> selectedSeries = getActionModel().getSelected(UIPropertiesTimeSeries.class);
+        List<UIPropertiesTimeSeries> selectedSeries = getActionModel().getSelected(UIPropertiesTimeSeries.class);
+        List<UiTimeSeriesConfig> series = getSeriesConfigs(selectedSeries);
 
         VisualizerContext v = visualizerSelectionActionModel.getSelectedContext();
         if ( v != null) {
-            v.addTimeSeries(selectedSeries);
+            v.addTimeSeries(series);
         }
     }
 
-    public boolean isModelStateActionable() {
-        return getActionModel().isSelectionLimitedToTypes(UIPropertiesTimeSeries.class) && visualizerSelectionActionModel.isModelValid();
-    }
 }

@@ -22,8 +22,7 @@ import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.ui.config.ColumnSettings;
-import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
-import com.od.jtimeseries.ui.selector.shared.SelectorPopupMenuPopulator;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.table.TableSelector;
 import com.od.jtimeseries.ui.selector.tree.SelectorTreeNodeFactory;
 import com.od.jtimeseries.ui.selector.tree.TreeSelector;
@@ -116,9 +115,9 @@ public class SeriesSelectionPanel<E extends UIPropertiesTimeSeries> extends JPan
         tableSelector.setSeriesSelectionEnabled(selectable);
     }
 
-    public void setSelectorActionFactory(SelectorPopupMenuPopulator selectorPopupMenuPopulator) {
-        treeSelector.setPopupMenuPopulator(selectorPopupMenuPopulator);
-        tableSelector.setPopupMenuPopulator(selectorPopupMenuPopulator);
+    public void setActionFactory(SelectorActionFactory selectorActionFactory) {
+        treeSelector.setActionFactory(selectorActionFactory);
+        tableSelector.setActionFactory(selectorActionFactory);
     }
 
     public void setTreeComparator(Comparator<Identifiable> treeComparator) {

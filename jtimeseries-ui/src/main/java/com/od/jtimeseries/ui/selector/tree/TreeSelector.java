@@ -22,6 +22,7 @@ import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableTreeEvent;
 import com.od.jtimeseries.identifiable.IdentifiableTreeListener;
 import com.od.jtimeseries.ui.selector.shared.RightClickSelectionPopupListener;
+import com.od.jtimeseries.ui.selector.shared.SelectorActionFactory;
 import com.od.jtimeseries.ui.selector.shared.SelectorComponent;
 import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.AbstractUIRootContext;
@@ -29,6 +30,7 @@ import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.uicontext.NoImportsSelectorTransferHandler;
 import com.od.swing.progress.AnimatedIconTree;
 import com.od.swing.util.AwtSafeListener;
+import com.od.swing.util.Source;
 import com.od.swing.weakreferencelistener.WeakReferenceListener;
 
 import javax.swing.*;
@@ -56,7 +58,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private static final ExpansionRule AUTO_EXPAND_RULE = new ExpansionRule() {
 
-        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n) {
+        public boolean shouldExpand(AbstractIdentifiableTreeNode n) {
             return n.getLevel() <= treeAutoExpandLevel;
         }
     };
@@ -64,7 +66,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private DefaultTreeModel treeModel;
     private AbstractUIRootContext rootContext;
     private JTree tree;
-    private Map<Identifiable, AbstractSeriesSelectionTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractSeriesSelectionTreeNode>();
+    private Map<Identifiable, AbstractIdentifiableTreeNode> identifiableToNodeMap = new HashMap<Identifiable, AbstractIdentifiableTreeNode>();
     private SelectorTreeNodeFactory<E> nodeFactory;
     private SeriesTreeCellRenderer cellRenderer;
     private Comparator<Identifiable> treeComparator = new IdentifiableTreeComparator();
@@ -120,7 +122,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
 
     private void autoExpandTree() {
         expandNodesFrom(
-            (AbstractSeriesSelectionTreeNode) treeModel.getRoot(),
+            (AbstractIdentifiableTreeNode) treeModel.getRoot(),
             AUTO_EXPAND_RULE,
             true
         );
@@ -161,7 +163,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private void fireChangeEvents(Identifiable i) {
-        AbstractSeriesSelectionTreeNode changedNode = identifiableToNodeMap.get(i);
+        AbstractIdentifiableTreeNode changedNode = identifiableToNodeMap.get(i);
         if ( i != null ) {
             treeModel.nodeChanged(changedNode);
         }
@@ -170,10 +172,10 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     private void addNodeAndAllDescendants(Identifiable i) {
         if ( ! identifiableToNodeMap.containsKey(i)) {
             Identifiable parent = i.getParent();
-            AbstractSeriesSelectionTreeNode parentNode = identifiableToNodeMap.get(parent);
+            AbstractIdentifiableTreeNode parentNode = identifiableToNodeMap.get(parent);
 
             //build and add the node tree for each added item and any descendant nodes
-            AbstractSeriesSelectionTreeNode newNode = buildTree(i);
+            AbstractIdentifiableTreeNode newNode = buildTree(i);
             if ( parentNode != null && newNode != null) {
                 int index = addChild(parentNode, newNode);
                 treeModel.nodesWereInserted(parentNode, new int[]{index});
@@ -186,7 +188,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private void removeNodeAndAllDescendants(Map.Entry<Identifiable, Collection<Identifiable>> entry) {
-        AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.remove(entry.getKey());
+        AbstractIdentifiableTreeNode n = identifiableToNodeMap.remove(entry.getKey());
         treeModel.removeNodeFromParent(n);
 
         for ( Identifiable i : entry.getValue()) {
@@ -194,16 +196,18 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     }
 
-    private void addAllDescendants(List<Identifiable> allDescendants, Identifiable node) {
-        for ( Identifiable i : node.getChildren()) {
-            addAllDescendants(allDescendants, i);
-        }
-        allDescendants.add(node);
-    }
-
     private void addMouseListeners() {
         //add a listener which lets us set the selected flag on each timeseries item
         tree.addMouseListener(new SeriesSelectionMouseListener(tree));
+
+        tree.addMouseListener(new DoubleClickActionMouseListener(
+            tree,
+            new Source<SelectorActionFactory>() {
+                public SelectorActionFactory get() {
+                    return getActionFactory();
+                }
+            })
+        );
 
         //add popup menu listener
         tree.addMouseListener(new RightClickSelectionPopupListener(this, tree) {
@@ -228,7 +232,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     protected void buildView() {
-        AbstractSeriesSelectionTreeNode rootNode = buildTree(rootContext);
+        AbstractIdentifiableTreeNode rootNode = buildTree(rootContext);
         treeModel.setRoot(rootNode);
     }
 
@@ -251,7 +255,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         Set<Identifiable> ids = convertToIdentifiableInThisContext(selected);
         List<TreePath> selectionPaths = new LinkedList<TreePath>() ;
         for ( Identifiable i : ids) {
-            AbstractSeriesSelectionTreeNode n = identifiableToNodeMap.get(i);
+            AbstractIdentifiableTreeNode n = identifiableToNodeMap.get(i);
             if ( n != null) {
                 selectionPaths.add(new TreePath(n.getPath()));
             }
@@ -260,14 +264,14 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
     }
 
     private static interface ExpansionRule {
-        public boolean shouldExpand(AbstractSeriesSelectionTreeNode n);
+        public boolean shouldExpand(AbstractIdentifiableTreeNode n);
     }
 
     /**
      * expand the tree to show any child nodes of startNode which satisfy the ExpansionRule
      */
-    private void expandNodesFrom(AbstractSeriesSelectionTreeNode node, ExpansionRule r, boolean collapse) {
-        Enumeration<AbstractSeriesSelectionTreeNode> e = node.children();
+    private void expandNodesFrom(AbstractIdentifiableTreeNode node, ExpansionRule r, boolean collapse) {
+        Enumeration<AbstractIdentifiableTreeNode> e = node.children();
         while(e.hasMoreElements()) {
             expandNodesFrom(e.nextElement(), r, collapse);
         }
@@ -282,31 +286,31 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         }
     }
 
-    private AbstractSeriesSelectionTreeNode buildTree(Identifiable identifiable) {
+    private AbstractIdentifiableTreeNode buildTree(Identifiable identifiable) {
 
-        List<AbstractSeriesSelectionTreeNode> childNodes = new LinkedList<AbstractSeriesSelectionTreeNode>();
+        List<AbstractIdentifiableTreeNode> childNodes = new LinkedList<AbstractIdentifiableTreeNode>();
         for ( Identifiable c : identifiable.getChildren()) {
-            AbstractSeriesSelectionTreeNode childNode = buildTree(c);
+            AbstractIdentifiableTreeNode childNode = buildTree(c);
             if ( childNode != null) {
                 childNodes.add(childNode);
             }
         }
 
-        AbstractSeriesSelectionTreeNode n = buildNode(identifiable);
+        AbstractIdentifiableTreeNode n = buildNode(identifiable);
         if ( n != null ) {
-            for ( AbstractSeriesSelectionTreeNode child : childNodes) {
+            for ( AbstractIdentifiableTreeNode child : childNodes) {
                 addChild(n, child);
             }
         }
         return n;
     }
 
-    private int addChild(AbstractSeriesSelectionTreeNode parent, AbstractSeriesSelectionTreeNode child) {
+    private int addChild(AbstractIdentifiableTreeNode parent, AbstractIdentifiableTreeNode child) {
         Enumeration<DefaultMutableTreeNode> e = parent.children();
         int index = 0;
         boolean inserted = false;
         while(e.hasMoreElements()) {
-            AbstractSeriesSelectionTreeNode node = (AbstractSeriesSelectionTreeNode)e.nextElement();
+            AbstractIdentifiableTreeNode node = (AbstractIdentifiableTreeNode)e.nextElement();
             int comparison = treeComparator.compare(node.getIdentifiable(), child.getIdentifiable());
             if ( comparison > 0) {
                 parent.insert(child, index);
@@ -321,8 +325,8 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
         return index;
     }
 
-    private AbstractSeriesSelectionTreeNode buildNode(Identifiable identifiable) {
-        AbstractSeriesSelectionTreeNode result = nodeFactory.buildNode(identifiable, tree);
+    private AbstractIdentifiableTreeNode buildNode(Identifiable identifiable) {
+        AbstractIdentifiableTreeNode result = nodeFactory.buildNode(identifiable, tree);
         if ( result != null ) {
             identifiableToNodeMap.put(identifiable, result);
         }
@@ -336,7 +340,7 @@ public class TreeSelector<E extends UIPropertiesTimeSeries> extends SelectorComp
             TreePath[] paths = tree.getSelectionPaths();
             if ( paths != null ) {
                 for ( TreePath p : tree.getSelectionPaths()) {
-                    AbstractSeriesSelectionTreeNode o = (AbstractSeriesSelectionTreeNode)p.getLastPathComponent();
+                    AbstractIdentifiableTreeNode o = (AbstractIdentifiableTreeNode)p.getLastPathComponent();
                     selections.add(o.getIdentifiable());
                 }
                 getSelectionsActionModel().setSelected(selections);

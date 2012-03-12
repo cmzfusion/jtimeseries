@@ -64,11 +64,12 @@ public class UdpServer {
     private LimitedErrorLogger limitedLogger;
     private int port;
     private final List<UdpMessageListener> udpMessageListeners = Collections.synchronizedList(new ArrayList<UdpMessageListener>());
-    private MessageFactory udpMessageFactory = new MessageFactory();
 
     private Executor udpMessageExecutor = NamedExecutors.newSingleThreadExecutor("UdpServer");
     private volatile boolean stopping;
     private Thread receiveThread;
+
+    private MessageFactory udpMessageFactory = new MessageFactory();
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
@@ -98,10 +99,7 @@ public class UdpServer {
         udpMessageListeners.remove(l);
     }
 
-    private void fireUdpMessageReceived(Properties p) {
-
-        UdpMessage m = udpMessageFactory.getMessage(p);
-        if ( m != null) {
+    private void fireUdpMessageReceived(UdpMessage m) {
             List<UdpMessageListener> snapshot;
             synchronized (udpMessageListeners) {
                 snapshot = new ArrayList<UdpMessageListener>(udpMessageListeners);
@@ -110,10 +108,11 @@ public class UdpServer {
             for ( UdpMessageListener l : snapshot) {
                 l.udpMessageReceived(m);
             }
-        } else {
-            String message = "Unknown UDP message received with type " + p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);
-            limitedLogger.logError(message);
-        }
+    }
+
+    private void logUnknownMessage(String messageType) {
+        String message = "Received UDP message with unknown type " + messageType;//p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);
+        limitedLogger.logError(message);
     }
 
     public int getPort() {
@@ -126,17 +125,9 @@ public class UdpServer {
 
     public class UdpReceiveThread extends Thread {
 
-        private PropertiesUtil propertiesUtil;
-
         public UdpReceiveThread() {
             setName("JTimeSeriesUDPSocketReceive");
             setDaemon(true);
-            try {
-                propertiesUtil = new PropertiesUtil();
-            } catch (ParserConfigurationException e) {
-                limitedLogger.logError("Failed to PropertiesUtil, cannot continue starting UDP server", e);
-                throw new RuntimeException("Cannot create PropertiesUtil, cannot continue starting UDP server", e);
-            }
         }
 
         public void run() {
@@ -157,9 +148,15 @@ public class UdpServer {
                     server.receive(packet);
                     byte[] receivedData = new byte[packet.getLength()];
                     System.arraycopy(buffer, 0, receivedData, 0, packet.getLength());
-                    ByteArrayInputStream bos = new ByteArrayInputStream(receivedData);
-                    Properties p = propertiesUtil.loadFromXML(bos);
-                    fireMessageToListeners(p);
+
+                    String messageXml = new String(receivedData, "UTF-8");
+                    UdpMessage m = udpMessageFactory.getMessage(messageXml);
+                    if ( m != null ) {
+                        fireMessageToListeners(m);
+                    } else {
+                        //TODO add message type to logging
+                        logUnknownMessage("");
+                    }
                 }
                 catch (Throwable t) {
                     limitedLogger.logError("Error receiving UdpClient", t);
@@ -168,11 +165,11 @@ public class UdpServer {
             stopping = false;
         }
 
-        private void fireMessageToListeners(final Properties p) {
+        private void fireMessageToListeners(final UdpMessage m) {
             udpMessageExecutor.execute(
                         new Runnable() {
                     public void run() {
-                        fireUdpMessageReceived(p);
+                        fireUdpMessageReceived(m);
                     }
                 }
             );

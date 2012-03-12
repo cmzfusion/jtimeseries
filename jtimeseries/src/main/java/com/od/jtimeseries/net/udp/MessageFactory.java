@@ -19,15 +19,42 @@
 package com.od.jtimeseries.net.udp;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
  * User: nick
  * Date: 16-May-2009
  * Time: 17:40:13
- * To change this template use File | Settings | File Templates.
+ *
+ * Message factory with support for parsing message properties xml using regular expressions
+ * which is more efficient than the built in Properties xml decoder
  */
-public class MessageFactory {
+class MessageFactory {
+
+    private Pattern pattern = Pattern.compile("key=\"(\\w*?)\">([^<]*?)</entry>");
+
+    private ThreadLocal<Properties> threadLocalProperties = new ThreadLocal<Properties>() {
+        public Properties initialValue() {
+            return new Properties();
+        }
+    };
+
+    public UdpMessage getMessage(String propertiesXml) {
+        Properties p = threadLocalProperties.get();
+        UdpMessage result = null;
+        try {
+            Matcher m = pattern.matcher(propertiesXml);
+            while ( m.find() ) {
+                p.put(m.group(1), m.group(2));
+            }
+            result = getMessage(p);
+        } finally {
+            p.clear();
+        }
+        return result;
+    }
 
     public UdpMessage getMessage(Properties p) {
         String messageType = p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);

@@ -243,7 +243,9 @@ public class FileHeader extends LockingFileHeader {
         }
 
         public Properties getSnapshot() {
-            return new Properties(wrappedProperties);
+            Properties p = new Properties();
+            p.putAll(wrappedProperties);
+            return p;
         }
 
         public byte[] getPropertiesAsByteArray() throws SerializationException {

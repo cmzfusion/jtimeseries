@@ -146,10 +146,8 @@ public class UdpServer {
                 try {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
-                    byte[] receivedData = new byte[packet.getLength()];
-                    System.arraycopy(buffer, 0, receivedData, 0, packet.getLength());
 
-                    String messageXml = new String(receivedData, "UTF-8");
+                    String messageXml = new String(buffer, 0, packet.getLength(), "UTF-8");
                     UdpMessage m = udpMessageFactory.getMessage(messageXml);
                     if ( m != null ) {
                         fireMessageToListeners(m);

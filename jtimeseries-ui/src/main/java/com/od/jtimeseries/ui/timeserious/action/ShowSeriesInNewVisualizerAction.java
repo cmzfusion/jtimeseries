@@ -8,11 +8,12 @@ import com.od.jtimeseries.ui.timeseries.UIPropertiesTimeSeries;
 import com.od.jtimeseries.ui.uicontext.IdentifiableListActionModel;
 import com.od.jtimeseries.ui.util.ContextNameCheckUtility;
 import com.od.jtimeseries.ui.util.ImageUtils;
+import com.od.swing.action.ActionModel;
+import com.od.swing.action.ActionModelListener;
 import com.od.swing.action.CompositeActionModel;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,16 +29,12 @@ public class ShowSeriesInNewVisualizerAction extends AbstractShowSeriesAction<Co
     private IdentifiableListActionModel l;
 
     public ShowSeriesInNewVisualizerAction(Component parentComponent, DesktopSelectionActionModel d, VisualizerSelectionActionModel v, IdentifiableListActionModel l) {
-        super(new CompositeActionModel(d, l), "Show in New Visualizer...", ImageUtils.VISUALIZER_NEW_16x16);
+        super(new CompositeActionModel(d, new SeriesOnlySelectionModel(l)) , "Show in New Visualizer...", ImageUtils.VISUALIZER_NEW_16x16);
         this.parentComponent = parentComponent;
         this.d = d;
         this.v = v;
         this.l = l;
         super.putValue(SHORT_DESCRIPTION, "Show the selected series in a new visualizer");
-    }
-
-    protected boolean isModelStateActionable() {
-        return l.isSelectionLimitedToTypes(UIPropertiesTimeSeries.class);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -57,4 +54,28 @@ public class ShowSeriesInNewVisualizerAction extends AbstractShowSeriesAction<Co
         }
     }
 
+    private static class SeriesOnlySelectionModel implements ActionModel {
+
+        private final IdentifiableListActionModel l;
+
+        public SeriesOnlySelectionModel(IdentifiableListActionModel l) {
+            this.l = l;
+        }
+
+        public void addActionModelListener(ActionModelListener a) {
+            l.addActionModelListener(a);
+        }
+
+        public void removeActionModelListener(ActionModelListener a) {
+            l.removeActionModelListener(a);
+        }
+
+        public boolean isModelValid() {
+            return l.isModelValid() && l.isSelectionLimitedToTypes(UIPropertiesTimeSeries.class);
+        }
+
+        public void clearActionModelState() {
+            l.clearActionModelState();
+        }
+    }
 }

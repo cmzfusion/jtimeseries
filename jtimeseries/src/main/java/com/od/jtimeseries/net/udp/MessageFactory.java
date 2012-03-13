@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 class MessageFactory {
 
     private Pattern pattern = Pattern.compile("key=\"(\\w*?)\">([^<]*?)</entry>");
+    private String lastMessageType;
 
     private ThreadLocal<Properties> threadLocalProperties = new ThreadLocal<Properties>() {
         public Properties initialValue() {
@@ -56,8 +57,13 @@ class MessageFactory {
         return result;
     }
 
+    public String getLastMessageType() {
+        return lastMessageType;
+    }
+
     public UdpMessage getMessage(Properties p) {
         String messageType = p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);
+        lastMessageType = messageType;
         UdpMessage result = null;
         if ( messageType != null) {
             if ( messageType.equals(HttpServerAnnouncementMessage.MESSAGE_TYPE)) {

@@ -154,8 +154,7 @@ public class UdpServer {
                     if ( m != null ) {
                         fireMessageToListeners(m);
                     } else {
-                        //TODO add message type to logging
-                        logUnknownMessage("");
+                        logUnknownMessage(udpMessageFactory.getLastMessageType());
                     }
                 }
                 catch (Throwable t) {

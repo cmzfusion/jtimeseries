@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.udp;
+package com.od.jtimeseries.net.udp.message.properties;
+
+import com.od.jtimeseries.net.udp.message.AnnouncementMessage;
 
 import java.util.Properties;
 
@@ -27,23 +29,25 @@ import java.util.Properties;
  * Time: 12:45:00
  * To change this template use File | Settings | File Templates.
  */
-public class AnnouncementMessage extends UdpMessage {
+class PropertiesAnnouncementMessage extends PropertiesUdpMessage implements AnnouncementMessage {
 
     public static final String PORT_KEY = "PORT";
     public static final String DESCRIPTION_KEY = "DESCRIPTION";
 
-    public AnnouncementMessage(String messageType) {
+    public PropertiesAnnouncementMessage(String messageType) {
         super(messageType);
     }
 
-    public AnnouncementMessage(Properties p) {
+    public PropertiesAnnouncementMessage(Properties p) {
         super(p);
     }
 
+    @Override
     public int getPort() {
         return Integer.parseInt(getProperty(PORT_KEY));
     }
 
+    @Override
     public String getDescription() {
         return getProperty(DESCRIPTION_KEY);
     }

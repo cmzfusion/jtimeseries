@@ -1,8 +1,9 @@
 package com.od.jtimeseries.server.message;
 
-import com.od.jtimeseries.net.udp.TimeSeriesValueMessage;
+import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpClientConfig;
+import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -44,11 +45,11 @@ public class AppendToSeriesPerformanceHarness {
         int series = (int)(Math.random() * seriesPaths.size());
         String path = seriesPaths.get(series);
 
-        TimeSeriesValueMessage timeSeriesValueMessage = new TimeSeriesValueMessage(
-            path,
-            "test description which is a good few words long in order to effectively simulate a real " +
-                    "description on a real message, after all we are testing performance aspects here.",
-            new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
+        TimeSeriesValueMessage timeSeriesValueMessage = new PropertiesMessageFactory().createTimeSeriesValueMessage(
+                path,
+                "test description which is a good few words long in order to effectively simulate a real " +
+                        "description on a real message, after all we are testing performance aspects here.",
+                new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
         );
 
         udpClient.sendMessage(timeSeriesValueMessage);

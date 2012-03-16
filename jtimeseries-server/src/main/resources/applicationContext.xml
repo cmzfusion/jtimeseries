@@ -70,7 +70,7 @@
         <constructor-arg ref="rootContext"/>
     </bean>
 
-    <bean id ="serverAnnouncementMessage" class="com.od.jtimeseries.net.udp.HttpServerAnnouncementMessage">
+    <bean id ="serverAnnouncementMessage" class="com.od.jtimeseries.net.udp.message.properties.PropertiesHttpServerAnnouncementMessage">
         <constructor-arg value="${httpdDaemonPort}"/>
         <constructor-arg value="${serverName}"/>
     </bean>

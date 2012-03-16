@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.udp;
+package com.od.jtimeseries.net.udp.message.properties;
+
+import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
 
 import java.util.Properties;
 
@@ -28,17 +30,17 @@ import java.util.Properties;
  *
  * Annouces that a Http timeseries server exists on the given host/port
  */
-public class HttpServerAnnouncementMessage extends AnnouncementMessage {
+public class PropertiesHttpServerAnnouncementMessage extends PropertiesAnnouncementMessage implements HttpServerAnnouncementMessage {
 
     public static final String MESSAGE_TYPE = "HttpServerAnnouncementMessage";
 
-    public HttpServerAnnouncementMessage(int httpPort, String serverDescription) {
+    public PropertiesHttpServerAnnouncementMessage(int httpPort, String serverDescription) {
         super(MESSAGE_TYPE);
         setProperty(PORT_KEY, String.valueOf(httpPort));
         setProperty(DESCRIPTION_KEY, serverDescription);
     }
 
-    public HttpServerAnnouncementMessage(Properties p) {
+    public PropertiesHttpServerAnnouncementMessage(Properties p) {
         super(p);
     }
 

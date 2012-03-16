@@ -1,5 +1,8 @@
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
+import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
+import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
@@ -29,6 +32,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     private LinkedBlockingQueue<TimeSeriesValueMessage> messageQueue = new LinkedBlockingQueue<TimeSeriesValueMessage>(10000);
     private AtomicBoolean started = new AtomicBoolean();
     private long delayTimeMicroseconds;
+    private UdpMessageFactory udpMessageFactory = new PropertiesMessageFactory();
 
     public UdpPublisher(UdpClient udpClient) {
         this(udpClient, DEFAULT_MAX_MESSAGES);
@@ -52,7 +56,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
             if ( e.getEventType() == TimeSeriesEvent.EventType.APPEND ) {
                 IdentifiableTimeSeries i = (IdentifiableTimeSeries)e.getSource();
                 if (e.getItems().size() == 1) {
-                    TimeSeriesValueMessage m = new TimeSeriesValueMessage(
+                    TimeSeriesValueMessage m = udpMessageFactory.createTimeSeriesValueMessage(
                         i.getPath(),
                         i.getDescription(),
                         e.getItems().get(0)

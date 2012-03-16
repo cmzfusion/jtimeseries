@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.udp;
+package com.od.jtimeseries.net.udp.message.properties;
 
+import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -31,7 +32,7 @@ import java.util.Properties;
  * Time: 23:22:45
  * To change this template use File | Settings | File Templates.
  */
-public class TimeSeriesValueMessage extends UdpMessage {
+public class PropertiesTimeSeriesValueMessage extends PropertiesUdpMessage implements TimeSeriesValueMessage {
 
     public static final String MESSAGE_TYPE = "TimeSeriesValueMessage";
     public static final String SERIES_PATH_KEY = "CONTEXT_PATH"; //keep CONTEXT_PATH to support legacy clients although this is series path
@@ -45,7 +46,7 @@ public class TimeSeriesValueMessage extends UdpMessage {
      * The seriesDescription will be truncated if it might be too large to fit into one datagram packet
      * but for most practical purposes it can be long enough.
      */
-    public TimeSeriesValueMessage(String seriesPath, String seriesDescription, TimeSeriesItem timeSeriesItem) {
+    public PropertiesTimeSeriesValueMessage(String seriesPath, String seriesDescription, TimeSeriesItem timeSeriesItem) {
         super(MESSAGE_TYPE);
 
         //truncate the description if likely to cause a 'too large' datagram packet
@@ -57,18 +58,21 @@ public class TimeSeriesValueMessage extends UdpMessage {
         setProperty(DESCRIPTION_KEY, seriesDescription);
     }
 
-    public TimeSeriesValueMessage(Properties p) {
+    public PropertiesTimeSeriesValueMessage(Properties p) {
         super(p);
     }
 
+    @Override
     public String getSeriesPath() {
         return getProperty(SERIES_PATH_KEY);
     }
 
+    @Override
     public String getDescription() {
         return getProperty(DESCRIPTION_KEY);
     }
 
+    @Override
     public TimeSeriesItem getTimeSeriesItem() {
         return new DefaultTimeSeriesItem(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),

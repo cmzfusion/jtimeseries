@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
+import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 

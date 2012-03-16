@@ -18,20 +18,19 @@
  */
 package com.od.jtimeseries.net.udp;
 
+import com.od.jtimeseries.net.udp.message.UdpMessage;
+import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.ByteArrayInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Executor;
 
 /**
@@ -40,25 +39,11 @@ import java.util.concurrent.Executor;
  * Date: 13-Jan-2009
  * Time: 11:12:18
  *
- *
- * Note on choice of MAX_PACKET_SIZE,
- * http://book.javanb.com/java-network-programming-3rd/javanp3-CHP-13-SECT-2.html
- * The theoretical limit for an IPv4 datagram is 65,507 bytes of data, and a DatagramPacket with
- * a 65,507-byte buffer can receive any possible IPv4 datagram without losing data. IPv6 datagrams
- * raise the theoretical limit to 65,536 bytes. In practice, however, many UDP-based protocols such
- * as DNS and TFTP use packets with 512 bytes of data per datagram or fewer. The largest data size
- * in common usage is 8,192 bytes for NFS. Almost all UDP datagrams you're likely to encounter will
- * have 8K of data or fewer. In fact, many operating systems don't support UDP datagrams with more
- * than 8K of data and either truncate, split, or discard larger datagrams. If a large datagram is
- * too big and as a result the network truncates or drops it, your Java program won't be notified
- * of the problem. (UDP is an unreliable protocol, after all.)
- * Consequently, you shouldn't create DatagramPacket objects with more than 8,192 bytes of data.
  */
 public class UdpServer {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(UdpServer.class);
 
-    public static final int MAX_PACKET_SIZE_BYTES = 8192;
     private static final int RESTART_WAIT = 600000; //10 mins
 
     private LimitedErrorLogger limitedLogger;
@@ -69,15 +54,15 @@ public class UdpServer {
     private volatile boolean stopping;
     private Thread receiveThread;
 
-    private MessageFactory udpMessageFactory = new MessageFactory();
+    private PropertiesMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
     }
 
-    public void setMessageFactory(MessageFactory m) {
-        this.udpMessageFactory = m;
+    public void setMessageFactory(PropertiesMessageFactory m) {
+        this.propertiesMessageFactory = m;
     }
 
     public synchronized void startReceive() {
@@ -131,7 +116,7 @@ public class UdpServer {
         }
 
         public void run() {
-            byte[] buffer = new byte[MAX_PACKET_SIZE_BYTES];
+            byte[] buffer = new byte[UdpMessage.MAX_PACKET_SIZE_BYTES];
             try {
                 DatagramSocket server = new DatagramSocket(port);
                 processMessages(buffer, server);
@@ -148,11 +133,11 @@ public class UdpServer {
                     server.receive(packet);
 
                     String messageXml = new String(buffer, 0, packet.getLength(), "UTF-8");
-                    UdpMessage m = udpMessageFactory.getMessage(messageXml);
+                    UdpMessage m = propertiesMessageFactory.getMessage(messageXml);
                     if ( m != null ) {
                         fireMessageToListeners(m);
                     } else {
-                        logUnknownMessage(udpMessageFactory.getLastMessageType());
+                        logUnknownMessage(propertiesMessageFactory.getLastMessageType());
                     }
                 }
                 catch (Throwable t) {

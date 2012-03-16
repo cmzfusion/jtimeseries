@@ -16,7 +16,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with JTimeseries.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.od.jtimeseries.net.udp;
+package com.od.jtimeseries.net.udp.message.properties;
+
+import com.od.jtimeseries.net.udp.message.ClientAnnouncementMessage;
 
 import java.util.Properties;
 
@@ -33,17 +35,17 @@ import java.util.Properties;
  * to populate a list of active servers. This mechanism makes it possible to deploy a server without
  * preconfiguring or maintaining a list of clients
  */
-public class ClientAnnouncementMessage extends AnnouncementMessage {
+public class PropertiesClientAnnouncementMessage extends PropertiesAnnouncementMessage implements ClientAnnouncementMessage {
 
     public static final String MESSAGE_TYPE = "ClientAnnouncementMessage";
 
-    public ClientAnnouncementMessage(int port, String description) {
+    public PropertiesClientAnnouncementMessage(int port, String description) {
         super(MESSAGE_TYPE);
         setProperty(PORT_KEY, String.valueOf(port));
         setProperty(DESCRIPTION_KEY, description);
     }
 
-    public ClientAnnouncementMessage(Properties p) {
+    public PropertiesClientAnnouncementMessage(Properties p) {
         super(p);
     }
 

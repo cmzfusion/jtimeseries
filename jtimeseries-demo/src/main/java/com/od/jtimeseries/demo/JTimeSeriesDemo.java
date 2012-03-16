@@ -23,6 +23,10 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.*;
+import com.od.jtimeseries.net.udp.message.AnnouncementMessage;
+import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
+import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
+import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.timeseries.aggregation.AggregatedIdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.aggregation.DefaultAggregatedIdentifiableTimeSeries;
@@ -123,7 +127,8 @@ public class JTimeSeriesDemo {
                 InetAddress.getLocalHost(),
                 UDP_SERVER_PORT
         ));
-        AnnouncementMessage h = new HttpServerAnnouncementMessage(HTTPD_PORT, "Test Server");
+        UdpMessageFactory udpMessageFactory = new PropertiesMessageFactory();
+        AnnouncementMessage h = udpMessageFactory.createHttpServerAnnouncementMessage(HTTPD_PORT, "Test Server");
         udpClient.sendRepeatedMessage(h, Time.seconds(10));
 
         //If we wanted to send a ping to a stand alone timeseries-server, to ask the server to ping us

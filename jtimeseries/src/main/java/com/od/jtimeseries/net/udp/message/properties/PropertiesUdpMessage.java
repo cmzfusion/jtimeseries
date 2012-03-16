@@ -24,6 +24,8 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -33,7 +35,8 @@ import java.util.Properties;
  * User: nick
  * Date: 16-May-2009
  * Time: 17:37:58
- * To change this template use File | Settings | File Templates.
+ *
+ * A message formatted as the XML representation of java.util.Properties
  */
 class PropertiesUdpMessage extends Properties implements UdpMessage {
 
@@ -72,13 +75,17 @@ class PropertiesUdpMessage extends Properties implements UdpMessage {
     }
 
     @Override
-    public byte[] serialize() throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(1000);
-        storeToXML(bos, null);
-        byte[] data = bos.toByteArray();
-        if ( data.length > MAX_PACKET_SIZE_BYTES) {
-            throw new IOException("Cannot send UdpClient with properties consuming more than " + MAX_PACKET_SIZE_BYTES + " bytes of data");
-        }
-        return data;
+    public void serialize(OutputStream outputStream) throws IOException {
+        storeToXML(outputStream, null);
+    }
+
+    @Override
+    public void deserialize(InputStream inputStream) throws IOException {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int getMaxExpectedSize() {
+        return 1024;
     }
 }

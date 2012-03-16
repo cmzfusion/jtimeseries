@@ -3,6 +3,9 @@ package com.od.jtimeseries.net.udp.message.properties;
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +30,7 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
         }
     };
 
-    public UdpMessage getMessage(String propertiesXml) {
+    public UdpMessage getMessage(String propertiesXml) throws IOException {
         Properties p = threadLocalProperties.get();
         UdpMessage result = null;
         try {
@@ -46,7 +49,7 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
         return lastMessageType;
     }
 
-    public UdpMessage getMessage(Properties p) {
+    public UdpMessage getMessage(Properties p) throws IOException {
         String messageType = p.getProperty(PropertiesUdpMessage.MESSAGE_TYPE_PROPERTY);
         lastMessageType = messageType;
         UdpMessage result = null;
@@ -57,7 +60,11 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
                 result = new PropertiesTimeSeriesValueMessage(p);
             } else if ( messageType.equals(PropertiesClientAnnouncementMessage.MESSAGE_TYPE)) {
                 result = new PropertiesClientAnnouncementMessage(p);
+            } else {
+                throw new IOException("Unrecognized message type " + messageType + " for PropertiesUdpMessage");
             }
+        } else {
+            throw new IOException("Could not determine message type for PropertiesUdpMessage");
         }
         return result;
     }
@@ -72,5 +79,10 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
 
     public ClientAnnouncementMessage createClientAnnouncementMessage(int port, String description) {
         return new PropertiesClientAnnouncementMessage(port, description);
+    }
+
+    public UdpMessage deserializeFromDatagram(byte[] buffer, int offset, int length) throws IOException {
+        String s = new String(buffer, 0, length, "UTF-8");
+        return getMessage(s);
     }
 }

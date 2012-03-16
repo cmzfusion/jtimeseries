@@ -19,6 +19,7 @@
 package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.UdpMessage;
+import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
@@ -54,14 +55,14 @@ public class UdpServer {
     private volatile boolean stopping;
     private Thread receiveThread;
 
-    private PropertiesMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
+    private UdpMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
     }
 
-    public void setMessageFactory(PropertiesMessageFactory m) {
+    public void setMessageFactory(UdpMessageFactory m) {
         this.propertiesMessageFactory = m;
     }
 
@@ -95,11 +96,6 @@ public class UdpServer {
             }
     }
 
-    private void logUnknownMessage(String messageType) {
-        String message = "Received UDP message with unknown type " + messageType;//p.getProperty(UdpMessage.MESSAGE_TYPE_PROPERTY);
-        limitedLogger.logError(message);
-    }
-
     public int getPort() {
         return port;
     }
@@ -131,17 +127,11 @@ public class UdpServer {
                 try {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
-
-                    String messageXml = new String(buffer, 0, packet.getLength(), "UTF-8");
-                    UdpMessage m = propertiesMessageFactory.getMessage(messageXml);
-                    if ( m != null ) {
-                        fireMessageToListeners(m);
-                    } else {
-                        logUnknownMessage(propertiesMessageFactory.getLastMessageType());
-                    }
+                    UdpMessage m = propertiesMessageFactory.deserializeFromDatagram(buffer, 0, packet.getLength());
+                    fireMessageToListeners(m);
                 }
                 catch (Throwable t) {
-                    limitedLogger.logError("Error receiving UdpClient", t);
+                    limitedLogger.logError("Error receiving UDP message", t);
                 }
             }
             stopping = false;

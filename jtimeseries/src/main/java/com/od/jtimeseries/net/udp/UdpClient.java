@@ -25,6 +25,7 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -121,7 +122,7 @@ public class UdpClient {
 
     public void sendMessage(UdpMessage message) {
         try {
-            byte[] data = message.serialize();
+            byte[] data = createDatagram(message);
             scheduledExecutor.execute(new SendUdpDatagramTask(data));
         } catch (IOException e) {
             logMethods.logError("Could not create UdpClient ", e);
@@ -135,7 +136,7 @@ public class UdpClient {
 
     public void sendRepeatedMessage(UdpMessage message, TimePeriod period) {
         try {
-            byte[] data = message.serialize();
+            byte[] data = createDatagram(message);
             scheduledExecutor.scheduleAtFixedRate(
                 new SendUdpDatagramTask(data),
                 0,
@@ -154,7 +155,15 @@ public class UdpClient {
         }
     }
 
-
+    private byte[] createDatagram(UdpMessage message) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(message.getMaxExpectedSize());
+        message.serialize(bos);
+        byte[] data = bos.toByteArray();
+        if ( data.length > UdpMessage.MAX_PACKET_SIZE_BYTES) {
+            throw new IOException("Cannot send UDP datagram for message " + message + " with size greater than " + UdpMessage.MAX_PACKET_SIZE_BYTES + " bytes of data");
+        }
+        return data;
+    }
 
     private class SendUdpDatagramTask implements Runnable {
 

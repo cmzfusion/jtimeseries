@@ -1,6 +1,8 @@
 package com.od.jtimeseries.net.udp.message;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -30,5 +32,14 @@ public interface UdpMessage {
 
     String getHostname();
 
-    byte[] serialize() throws IOException;
+    void serialize(OutputStream outputStream) throws IOException;
+
+    void deserialize(InputStream inputStream) throws IOException;
+
+    /**
+     * @return maximum expected size for the serialized message in bytes
+     * this is used as an initial buffer size when buffering the message for output,
+     * a value slightly over the actual size will be most efficient
+     */
+    int getMaxExpectedSize();
 }

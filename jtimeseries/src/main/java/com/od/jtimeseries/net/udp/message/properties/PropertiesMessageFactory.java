@@ -3,9 +3,7 @@ package com.od.jtimeseries.net.udp.message.properties;
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,7 +48,7 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
     }
 
     public UdpMessage getMessage(Properties p) throws IOException {
-        String messageType = p.getProperty(PropertiesUdpMessage.MESSAGE_TYPE_PROPERTY);
+        String messageType = p.getProperty(AbstractPropertiesUdpMessage.MESSAGE_TYPE_PROPERTY);
         lastMessageType = messageType;
         UdpMessage result = null;
         if ( messageType != null) {

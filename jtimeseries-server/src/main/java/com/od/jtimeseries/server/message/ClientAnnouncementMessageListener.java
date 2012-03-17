@@ -50,15 +50,15 @@ public class ClientAnnouncementMessageListener implements UdpServer.UdpMessageLi
             try {
                 boolean added = clientToSendUdpServerAnnouncePings.addClientConfig(
                     new UdpClientConfig(
-                        InetAddress.getByName(c.getInetAddress()),
+                        InetAddress.getByName(c.getSourceInetAddress()),
                         c.getPort()
                     )
                 );
                 if ( added ) {
-                    logMethod.logInfo("New client ping received for " + c.getHostname() + " port " + c.getPort());
+                    logMethod.logInfo("New client ping received for " + c.getSourceHostname() + " port " + c.getPort());
                 }
             } catch (UnknownHostException e) {
-                logMethod.logError("Failed to find host " + c.getInetAddress() + " for client ping", e);
+                logMethod.logError("Failed to find host " + c.getSourceInetAddress() + " for client ping", e);
             }
         }
     }

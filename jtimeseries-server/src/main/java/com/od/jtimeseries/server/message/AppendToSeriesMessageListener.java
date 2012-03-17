@@ -134,11 +134,11 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
                 Long lastTimestamp = liveSeriesLastUpdateMap.get(path);
                 if ( lastTimestamp == null) {
                     liveSeriesLastUpdateMap.put(path, System.currentTimeMillis());
-                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getHostname() + " with address " + v.getInetAddress());
+                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getSourceHostname() + " with address " + v.getSourceInetAddress());
                 }
             }
         } catch ( Exception e) {
-            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getInetAddress() + " with address " + v.getInetAddress());
+            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getSourceInetAddress() + " with address " + v.getSourceInetAddress());
             logMethod.logDebug("Error when trying to create timeseries", e);
         }
     }

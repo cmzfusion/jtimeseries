@@ -28,13 +28,14 @@ public interface UdpMessage {
      */
     int MAX_PACKET_SIZE_BYTES = 8192;
 
-    String getInetAddress();
+    String getSourceInetAddress();
 
-    String getHostname();
+    /**
+     * @return hostname from message source, or sourceInetAddress if the hostname is not provided with the message
+     */
+    String getSourceHostname();
 
     void serialize(OutputStream outputStream) throws IOException;
-
-    void deserialize(InputStream inputStream) throws IOException;
 
     /**
      * @return maximum expected size for the serialized message in bytes

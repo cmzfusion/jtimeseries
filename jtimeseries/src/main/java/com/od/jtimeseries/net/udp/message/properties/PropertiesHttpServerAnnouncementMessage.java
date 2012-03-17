@@ -45,7 +45,7 @@ public class PropertiesHttpServerAnnouncementMessage extends PropertiesAnnouncem
     }
 
     public String toString() {
-        return "HttpServerAnnouncementMessage " + getHostname() + ":" + getPort();
+        return "HttpServerAnnouncementMessage " + getSourceHostname() + ":" + getPort();
     }
 
 }

@@ -22,9 +22,7 @@ import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -38,19 +36,19 @@ import java.util.Properties;
  *
  * A message formatted as the XML representation of java.util.Properties
  */
-class PropertiesUdpMessage extends Properties implements UdpMessage {
+abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMessage {
 
-    private static final LogMethods logMethods = LogUtils.getLogMethods(PropertiesUdpMessage.class);
+    private static final LogMethods logMethods = LogUtils.getLogMethods(AbstractPropertiesUdpMessage.class);
 
     public static final String MESSAGE_TYPE_PROPERTY = "MESSAGE_TYPE";
     public static final String SOURCE_INETADDRESS_KEY = "INETADDRESS";
     public static final String SOURCE_HOSTNAME_KEY = "INETHOST";
 
-    public PropertiesUdpMessage(Properties p) {
+    public AbstractPropertiesUdpMessage(Properties p) {
         putAll(p);
     }
 
-    public PropertiesUdpMessage(String messageType) {
+    public AbstractPropertiesUdpMessage(String messageType) {
         setProperty(MESSAGE_TYPE_PROPERTY, messageType);
         String inetAddress = "";
         String hostname = "";
@@ -65,23 +63,18 @@ class PropertiesUdpMessage extends Properties implements UdpMessage {
     }
 
     @Override
-    public String getInetAddress() {
+    public String getSourceInetAddress() {
         return getProperty(SOURCE_INETADDRESS_KEY);
     }
 
     @Override
-    public String getHostname() {
+    public String getSourceHostname() {
         return getProperty(SOURCE_HOSTNAME_KEY);
     }
 
     @Override
     public void serialize(OutputStream outputStream) throws IOException {
         storeToXML(outputStream, null);
-    }
-
-    @Override
-    public void deserialize(InputStream inputStream) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

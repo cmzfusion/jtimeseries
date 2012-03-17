@@ -32,7 +32,7 @@ import java.util.Properties;
  * Time: 23:22:45
  * To change this template use File | Settings | File Templates.
  */
-public class PropertiesTimeSeriesValueMessage extends PropertiesUdpMessage implements TimeSeriesValueMessage {
+public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessage implements TimeSeriesValueMessage {
 
     public static final String MESSAGE_TYPE = "TimeSeriesValueMessage";
     public static final String SERIES_PATH_KEY = "CONTEXT_PATH"; //keep CONTEXT_PATH to support legacy clients although this is series path
@@ -81,7 +81,7 @@ public class PropertiesTimeSeriesValueMessage extends PropertiesUdpMessage imple
     }
 
     public String toString() {
-        return "TimeSeriesValueMessage " + getHostname() + " " + getTimeSeriesItem();
+        return "TimeSeriesValueMessage " + getSourceHostname() + " " + getTimeSeriesItem();
     }
 
 }

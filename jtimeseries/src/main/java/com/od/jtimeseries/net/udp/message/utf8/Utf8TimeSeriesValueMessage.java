@@ -1,53 +1,56 @@
 package com.od.jtimeseries.net.udp.message.utf8;
 
+import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.sun.xml.internal.fastinfoset.util.StringIntMap;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
  * Date: 16/03/12
  * Time: 18:00
+ *
+ *
  */
 public class Utf8TimeSeriesValueMessage extends AbstractUtf8Message implements TimeSeriesValueMessage {
 
+    private static final String PATH_FIELD_KEY ="PATH";
+    private static final String TIMESTAMP_FIELD_KEY ="TIMESTAMP";
+    private static final String VALUE_FIELD_KEY ="VALUE";
+
     private String seriesPath;
-    private String description;
     private TimeSeriesItem timeSeriesItem;
-    private String inetAddress;
-    private String hostname;
 
     public String getSeriesPath() {
         return seriesPath;
     }
 
+    //Send a description as message type TS_DESCRIPTION instead, rather than sending with each value
     public String getDescription() {
-        return description;
+        return null;
     }
 
-    public TimeSeriesItem getTimeSeriesItem() {
+    public TimeSeriesItem getTimeSeriesItem(int index) {
+        if ( index != 0 ) {
+            throw new RuntimeException("No timeseries item for index " + index);
+        }
         return timeSeriesItem;
     }
 
-    public String getSourceInetAddress() {
-        return inetAddress;
+    public int getItemCount() {
+        return 1;
     }
 
-    public String getSourceHostname() {
-        return hostname;
+    protected void writeBodyFieldsToOutputStream(Writer writer, StringBuilder sb) throws IOException {
+        appendValue(writer, PATH_FIELD_KEY, seriesPath, sb );
+        appendValue(writer, TIMESTAMP_FIELD_KEY, String.valueOf(timeSeriesItem.getTimestamp()), sb );
+        appendValue(writer, VALUE_FIELD_KEY, String.valueOf(timeSeriesItem.doubleValue()), sb );
     }
 
-    @Override
-    public void serialize(OutputStream outputStream) throws IOException {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public int getMaxExpectedSize() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+    public MessageType getMessageType() {
+        return MessageType.TS_VALUE;
     }
 }

@@ -42,7 +42,7 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
 
     public static final String MESSAGE_TYPE_PROPERTY = "MESSAGE_TYPE";
     public static final String SOURCE_INETADDRESS_KEY = "INETADDRESS";
-    public static final String SOURCE_HOSTNAME_KEY = "INETHOST";
+    public static final String SOURCE_DESC_KEY = "SOURCE_DESC";
 
     public AbstractPropertiesUdpMessage(Properties p) {
         putAll(p);
@@ -59,25 +59,25 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
             logMethods.logError("Could not find inet address for UdpMessage", e);
         }
         setProperty(SOURCE_INETADDRESS_KEY, inetAddress);
-        setProperty(SOURCE_HOSTNAME_KEY, hostname);
+        setProperty(SOURCE_DESC_KEY, hostname);
     }
 
-    @Override
     public String getSourceInetAddress() {
         return getProperty(SOURCE_INETADDRESS_KEY);
     }
 
-    @Override
-    public String getSourceHostname() {
-        return getProperty(SOURCE_HOSTNAME_KEY);
+    public void setSourceInetAddress(String address) {
+        setProperty(SOURCE_INETADDRESS_KEY, address);
     }
 
-    @Override
+    public String getSourceDescription() {
+        return getProperty(SOURCE_DESC_KEY);
+    }
+
     public void serialize(OutputStream outputStream) throws IOException {
         storeToXML(outputStream, null);
     }
 
-    @Override
     public int getMaxExpectedSize() {
         return 1024;
     }

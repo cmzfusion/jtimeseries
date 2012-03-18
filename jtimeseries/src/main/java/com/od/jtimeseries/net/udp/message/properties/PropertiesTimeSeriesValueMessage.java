@@ -62,18 +62,23 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
         super(p);
     }
 
-    @Override
     public String getSeriesPath() {
         return getProperty(SERIES_PATH_KEY);
     }
 
-    @Override
     public String getDescription() {
         return getProperty(DESCRIPTION_KEY);
     }
 
-    @Override
-    public TimeSeriesItem getTimeSeriesItem() {
+    public int getItemCount() {
+        return 1;  //support only one value for Properties based message
+    }
+
+    public TimeSeriesItem getTimeSeriesItem(int index) {
+        if ( index != 0 ) {
+            throw new RuntimeException("No timeseries item available for index " + index);
+        }
+
         return new DefaultTimeSeriesItem(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),
             DoubleNumeric.valueOf(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
@@ -81,7 +86,7 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
     }
 
     public String toString() {
-        return "TimeSeriesValueMessage " + getSourceHostname() + " " + getTimeSeriesItem();
+        return "TimeSeriesValueMessage " + getSourceDescription() + " " + getTimeSeriesItem(0);
     }
 
 }

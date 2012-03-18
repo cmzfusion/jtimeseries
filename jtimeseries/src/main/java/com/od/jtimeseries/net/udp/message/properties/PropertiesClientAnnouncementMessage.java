@@ -50,6 +50,6 @@ public class PropertiesClientAnnouncementMessage extends PropertiesAnnouncementM
     }
 
     public String toString() {
-        return "ClientAnnouncementMessage " + getSourceHostname() + ":" + getPort();
+        return "ClientAnnouncementMessage " + getSourceDescription() + ":" + getPort();
     }
 }

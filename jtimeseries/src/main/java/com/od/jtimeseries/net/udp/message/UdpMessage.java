@@ -9,8 +9,16 @@ import java.io.OutputStream;
  * User: Nick Ebbutt
  * Date: 14/03/12
  * Time: 18:22
+ *
+ * Mandatory fields:
+ *
+ * Optional fields:
+ * SourceDescription        -  a description of the agent sending the update
  */
 public interface UdpMessage {
+
+    public static final String ENCODING_FIELD_KEY = "ENCODING";
+    public static final String MSGTYPE_FIELD_KEY = "MSGTYPE";
 
     /**
      * Note on choice of MAX_PACKET_SIZE,
@@ -28,13 +36,24 @@ public interface UdpMessage {
      */
     int MAX_PACKET_SIZE_BYTES = 8192;
 
+    /**
+     * @return the ip address of the host which sent the UDP message
+     */
     String getSourceInetAddress();
 
     /**
-     * @return hostname from message source, or sourceInetAddress if the hostname is not provided with the message
+     * Set the source inet address when a message is received
      */
-    String getSourceHostname();
+    void setSourceInetAddress(String sourceInetAddress);
 
+    /**
+     * @return Description of agent sending message, or null if a source description was not provided with the message
+     */
+    String getSourceDescription();
+
+    /**
+     * Serialize the message to outputStream
+     */
     void serialize(OutputStream outputStream) throws IOException;
 
     /**
@@ -43,4 +62,8 @@ public interface UdpMessage {
      * a value slightly over the actual size will be most efficient
      */
     int getMaxExpectedSize();
+
+
+    MessageType getMessageType();
+
 }

@@ -19,6 +19,7 @@
 package com.od.jtimeseries.net.udp.message.properties;
 
 import com.od.jtimeseries.net.udp.message.ClientAnnouncementMessage;
+import com.od.jtimeseries.net.udp.message.MessageType;
 
 import java.util.Properties;
 
@@ -51,5 +52,9 @@ public class PropertiesClientAnnouncementMessage extends PropertiesAnnouncementM
 
     public String toString() {
         return "ClientAnnouncementMessage " + getSourceDescription() + ":" + getPort();
+    }
+
+    public MessageType getMessageType() {
+        return MessageType.CLIENT_ANNOUNCE;
     }
 }

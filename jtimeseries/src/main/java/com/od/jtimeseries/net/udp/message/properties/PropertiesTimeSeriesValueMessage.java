@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp.message.properties;
 
+import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -38,6 +39,8 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
     public static final String SERIES_PATH_KEY = "CONTEXT_PATH"; //keep CONTEXT_PATH to support legacy clients although this is series path
     public static final String TIMESTAMP_KEY = "TIMESTAMP";
     public static final String NUMERIC_VALUE_KEY = "VALUE";
+
+    @Deprecated
     public static final String DESCRIPTION_KEY = "DESCRIPTION";
 
     /**
@@ -46,16 +49,12 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
      * The seriesDescription will be truncated if it might be too large to fit into one datagram packet
      * but for most practical purposes it can be long enough.
      */
-    public PropertiesTimeSeriesValueMessage(String seriesPath, String seriesDescription, TimeSeriesItem timeSeriesItem) {
+    public PropertiesTimeSeriesValueMessage(String seriesPath, TimeSeriesItem timeSeriesItem) {
         super(MESSAGE_TYPE);
-
-        //truncate the description if likely to cause a 'too large' datagram packet
-        seriesDescription = seriesDescription.length() > 3000 ? seriesDescription.substring(0, 3000) : seriesDescription;
 
         setProperty(SERIES_PATH_KEY, seriesPath);
         setProperty(TIMESTAMP_KEY, String.valueOf(timeSeriesItem.getTimestamp()));
         setProperty(NUMERIC_VALUE_KEY, timeSeriesItem.getValue().toString());
-        setProperty(DESCRIPTION_KEY, seriesDescription);
     }
 
     public PropertiesTimeSeriesValueMessage(Properties p) {
@@ -89,4 +88,7 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
         return "TimeSeriesValueMessage " + getSourceDescription() + " " + getTimeSeriesItem(0);
     }
 
+    public MessageType getMessageType() {
+        return MessageType.TS_VALUE;
+    }
 }

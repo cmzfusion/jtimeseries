@@ -19,6 +19,7 @@
 package com.od.jtimeseries.net.udp.message.properties;
 
 import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
+import com.od.jtimeseries.net.udp.message.MessageType;
 
 import java.util.Properties;
 
@@ -48,4 +49,7 @@ public class PropertiesHttpServerAnnouncementMessage extends PropertiesAnnouncem
         return "HttpServerAnnouncementMessage " + getSourceDescription() + ":" + getPort();
     }
 
+    public MessageType getMessageType() {
+        return MessageType.SERVER_ANNOUNCE;
+    }
 }

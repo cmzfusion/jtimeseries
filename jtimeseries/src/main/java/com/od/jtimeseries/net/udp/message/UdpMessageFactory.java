@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public interface UdpMessageFactory {
 
-    TimeSeriesValueMessage createTimeSeriesValueMessage(String path, String description, TimeSeriesItem timeSeriesItem);
+    TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem);
 
     HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName);
 

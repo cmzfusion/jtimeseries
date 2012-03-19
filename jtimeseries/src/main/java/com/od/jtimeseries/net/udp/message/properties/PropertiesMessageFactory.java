@@ -67,8 +67,8 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
         return result;
     }
 
-    public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, String description, TimeSeriesItem timeSeriesItem) {
-        return new PropertiesTimeSeriesValueMessage(path, description, timeSeriesItem);
+    public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
+        return new PropertiesTimeSeriesValueMessage(path, timeSeriesItem);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName) {

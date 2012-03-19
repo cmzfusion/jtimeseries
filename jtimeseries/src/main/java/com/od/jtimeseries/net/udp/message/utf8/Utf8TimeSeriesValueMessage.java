@@ -24,6 +24,11 @@ public class Utf8TimeSeriesValueMessage extends AbstractUtf8Message implements T
     private String seriesPath;
     private TimeSeriesItem timeSeriesItem;
 
+    public Utf8TimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
+        this.seriesPath = path;
+        this.timeSeriesItem = timeSeriesItem;
+    }
+
     public String getSeriesPath() {
         return seriesPath;
     }

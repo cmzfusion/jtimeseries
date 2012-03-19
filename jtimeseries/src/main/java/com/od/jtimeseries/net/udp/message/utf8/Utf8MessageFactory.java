@@ -4,6 +4,7 @@ import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,16 +15,16 @@ import java.io.IOException;
  */
 public class Utf8MessageFactory implements UdpMessageFactory {
 
-    public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, String description, TimeSeriesItem timeSeriesItem) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
+        return new Utf8TimeSeriesValueMessage(path, timeSeriesItem);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new Utf8ServerAnnouncementMessage(httpdPort, serverName);
     }
 
-    public ClientAnnouncementMessage createClientAnnouncementMessage(int port, String description) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public ClientAnnouncementMessage createClientAnnouncementMessage(int port, String host) {
+        return new Utf8ClientAnnouncementMessage(port, host);
     }
 
     public UdpMessage deserializeFromDatagram(byte[] buffer, int offset, int length) throws IOException {

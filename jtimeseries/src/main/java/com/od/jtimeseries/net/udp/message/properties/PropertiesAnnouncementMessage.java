@@ -29,16 +29,16 @@ import java.util.Properties;
  * Time: 12:45:00
  * To change this template use File | Settings | File Templates.
  */
-class PropertiesAnnouncementMessage extends AbstractPropertiesUdpMessage implements AnnouncementMessage {
+abstract class PropertiesAnnouncementMessage extends AbstractPropertiesUdpMessage implements AnnouncementMessage {
 
     public static final String PORT_KEY = "PORT";
     public static final String DESCRIPTION_KEY = "DESCRIPTION";
 
-    public PropertiesAnnouncementMessage(String messageType) {
+    PropertiesAnnouncementMessage(String messageType) {
         super(messageType);
     }
 
-    public PropertiesAnnouncementMessage(Properties p) {
+    PropertiesAnnouncementMessage(Properties p) {
         super(p);
     }
 

@@ -47,8 +47,6 @@ public class AppendToSeriesPerformanceHarness {
 
         TimeSeriesValueMessage timeSeriesValueMessage = new PropertiesMessageFactory().createTimeSeriesValueMessage(
                 path,
-                "test description which is a good few words long in order to effectively simulate a real " +
-                        "description on a real message, after all we are testing performance aspects here.",
                 new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
         );
 

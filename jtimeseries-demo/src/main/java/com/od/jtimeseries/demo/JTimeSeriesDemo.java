@@ -89,6 +89,15 @@ public class JTimeSeriesDemo {
 
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
 
+                //ping ourselves, to advertise our own server to appear in the local server dictionary
+        UdpClient udpClient = new UdpClient(new UdpClientConfig(
+                InetAddress.getLocalHost(),
+                18081
+        ));
+
+        UdpPublishingTreeListener l = new UdpPublishingTreeListener(udpClient);
+        rootContext.addTreeListener(l);
+
         //create some diagnostics time series for the Swing repainting which will appear at the top level/root context
         RepaintManager.setCurrentManager(new BenchmarkingRepaintManager(rootContext, Time.seconds(10)));
 
@@ -122,11 +131,7 @@ public class JTimeSeriesDemo {
         UdpServer udpServer = new UdpServer(UDP_SERVER_PORT);
         udpServer.addUdpMessageListener(serverDictionary);
 
-        //ping ourselves, to advertise our own server to appear in the local server dictionary
-        UdpClient udpClient = new UdpClient(new UdpClientConfig(
-                InetAddress.getLocalHost(),
-                UDP_SERVER_PORT
-        ));
+
         UdpMessageFactory udpMessageFactory = new PropertiesMessageFactory();
         AnnouncementMessage h = udpMessageFactory.createHttpServerAnnouncementMessage(HTTPD_PORT, "Test Server");
         udpClient.sendRepeatedMessage(h, Time.seconds(10));
@@ -140,6 +145,8 @@ public class JTimeSeriesDemo {
         //        ));
         //        AnnouncementMessage m = new ClientAnnouncementMessage(UDP_SERVER_PORT, "JTimeseriesDemoClient");
         //        serverPing.sendRepeatedMessage(m, Time.seconds(5));
+
+
 
         createVisualizer(serverDictionary);
 

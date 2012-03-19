@@ -35,4 +35,6 @@ public interface TimeSeriesValueMessage extends UdpMessage {
     TimeSeriesItem getTimeSeriesItem(int index);
 
     int getItemCount();
+
+    Iterable<TimeSeriesItem> getTimeSeriesItems();
 }

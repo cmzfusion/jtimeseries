@@ -21,11 +21,14 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
+import com.od.jtimeseries.net.udp.message.utf8.AbstractUtf8Message;
+import com.od.jtimeseries.net.udp.message.utf8.Utf8MessageFactory;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
@@ -56,6 +59,7 @@ public class UdpServer {
     private Thread receiveThread;
 
     private UdpMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
+    private UdpMessageFactory utf8MessageFactory = new Utf8MessageFactory();
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
@@ -127,7 +131,9 @@ public class UdpServer {
                 try {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
-                    UdpMessage m = propertiesMessageFactory.deserializeFromDatagram(buffer, 0, packet.getLength());
+                    UdpMessageFactory f = getMessageFactory(buffer);
+                    UdpMessage m = f.deserializeFromDatagram(buffer, 0, packet.getLength());
+                    m.setSourceInetAddress(packet.getAddress().getHostAddress());
                     fireMessageToListeners(m);
                 }
                 catch (Throwable t) {
@@ -135,6 +141,34 @@ public class UdpServer {
                 }
             }
             stopping = false;
+        }
+
+        /**
+         * @return a message factory based on the message encoding by analyzing the datagram header
+         */
+        private UdpMessageFactory getMessageFactory(byte[] buffer) {
+            //default to legacy properties message if no other type found
+            UdpMessageFactory result = propertiesMessageFactory;
+
+            try {
+                if (startsWithChars(buffer, AbstractUtf8Message.UTF8_ENCODING_HEADER_CHARS)) {
+                    result = utf8MessageFactory;
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            return result;
+        }
+
+        private boolean startsWithChars(byte[] buffer, char[] chars) throws UnsupportedEncodingException {
+            boolean result = true;
+            for ( int loop=0; loop < chars.length; loop++) {
+                if ( buffer[loop] != chars[loop]) {
+                    result = false;
+                    break;
+                }
+            }
+            return result;
         }
 
         private void fireMessageToListeners(final UdpMessage m) {

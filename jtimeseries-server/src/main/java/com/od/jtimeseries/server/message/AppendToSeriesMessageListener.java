@@ -124,7 +124,11 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
     private void findOrCreateSeriesAndAddTimepoint(TimeSeriesValueMessage v, String path) {
         try {
             TimeSeries s = rootContext.getOrCreateTimeSeries(path, v.getDescription());
-            s.addItem(v.getTimeSeriesItem());
+            if ( v.getItemCount() == 1 ) {
+                s.addItem(v.getTimeSeriesItem(0));
+            } else {
+                s.addAll(v.getTimeSeriesItems());
+            }
 
             if ( updateMessagesReceivedCounter != null) {
                 updateMessagesReceivedCounter.incrementCount();
@@ -134,11 +138,11 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
                 Long lastTimestamp = liveSeriesLastUpdateMap.get(path);
                 if ( lastTimestamp == null) {
                     liveSeriesLastUpdateMap.put(path, System.currentTimeMillis());
-                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getSourceDescription() + " with address " + v.getSourceInetAddress());
+                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getSourceHostname() + " with address " + v.getSourceInetAddress());
                 }
             }
         } catch ( Exception e) {
-            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getSourceInetAddress() + " with address " + v.getSourceInetAddress());
+            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getSourceInetAddress() + " with address " + v.getSourceInetAddress(), e);
             logMethod.logDebug("Error when trying to create timeseries", e);
         }
     }

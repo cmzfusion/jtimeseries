@@ -3,6 +3,7 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
+import com.od.jtimeseries.net.udp.message.utf8.Utf8MessageFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
@@ -28,11 +29,11 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     private static final int DEFAULT_MAX_MESSAGES = 25;
     private ScheduledExecutorService rateControllingExecutor = NamedExecutors.newSingleThreadScheduledExecutor("UdpPublisherQueue" + this);
     private UdpClient udpClient;
-    private AppendPublishingListener p = new AppendPublishingListener();
+    private AppendPublishingListener appendPublishingListener = new AppendPublishingListener();
     private LinkedBlockingQueue<TimeSeriesValueMessage> messageQueue = new LinkedBlockingQueue<TimeSeriesValueMessage>(10000);
     private AtomicBoolean started = new AtomicBoolean();
     private long delayTimeMicroseconds;
-    private UdpMessageFactory udpMessageFactory = new PropertiesMessageFactory();
+    private UdpMessageFactory udpMessageFactory = new Utf8MessageFactory();
 
     public UdpPublisher(UdpClient udpClient) {
         this(udpClient, DEFAULT_MAX_MESSAGES);
@@ -44,11 +45,11 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     }
 
     public void publishAppends(IdentifiableTimeSeries s) {
-        s.addTimeSeriesListener(p);
+        s.addTimeSeriesListener(appendPublishingListener);
     }
 
     public void stopPublishing(IdentifiableTimeSeries s) {
-        s.removeTimeSeriesListener(p);
+        s.removeTimeSeriesListener(appendPublishingListener);
     }
 
     private class AppendPublishingListener extends TimeSeriesListenerAdapter {
@@ -58,7 +59,6 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
                 if (e.getItems().size() == 1) {
                     TimeSeriesValueMessage m = udpMessageFactory.createTimeSeriesValueMessage(
                         i.getPath(),
-                        i.getDescription(),
                         e.getItems().get(0)
                     );
                     messageQueue.add(m);

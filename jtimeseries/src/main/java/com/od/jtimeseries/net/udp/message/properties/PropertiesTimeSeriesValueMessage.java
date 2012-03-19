@@ -24,6 +24,7 @@ import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -49,7 +50,7 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
      * The seriesDescription will be truncated if it might be too large to fit into one datagram packet
      * but for most practical purposes it can be long enough.
      */
-    public PropertiesTimeSeriesValueMessage(String seriesPath, TimeSeriesItem timeSeriesItem) {
+    PropertiesTimeSeriesValueMessage(String seriesPath, TimeSeriesItem timeSeriesItem) {
         super(MESSAGE_TYPE);
 
         setProperty(SERIES_PATH_KEY, seriesPath);
@@ -57,7 +58,7 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
         setProperty(NUMERIC_VALUE_KEY, timeSeriesItem.getValue().toString());
     }
 
-    public PropertiesTimeSeriesValueMessage(Properties p) {
+    PropertiesTimeSeriesValueMessage(Properties p) {
         super(p);
     }
 
@@ -84,8 +85,12 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
         );
     }
 
+    public Iterable<TimeSeriesItem> getTimeSeriesItems() {
+        return Collections.singletonList(getTimeSeriesItem(0));
+    }
+
     public String toString() {
-        return "TimeSeriesValueMessage " + getSourceDescription() + " " + getTimeSeriesItem(0);
+        return "TimeSeriesValueMessage " + getSourceHostname() + " " + getTimeSeriesItem(0);
     }
 
     public MessageType getMessageType() {

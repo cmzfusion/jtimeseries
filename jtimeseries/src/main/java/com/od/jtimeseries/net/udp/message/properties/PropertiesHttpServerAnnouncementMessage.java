@@ -35,18 +35,18 @@ public class PropertiesHttpServerAnnouncementMessage extends PropertiesAnnouncem
 
     public static final String MESSAGE_TYPE = "HttpServerAnnouncementMessage";
 
-    public PropertiesHttpServerAnnouncementMessage(int httpPort, String serverDescription) {
+    PropertiesHttpServerAnnouncementMessage(int httpPort, String serverDescription) {
         super(MESSAGE_TYPE);
         setProperty(PORT_KEY, String.valueOf(httpPort));
         setProperty(DESCRIPTION_KEY, serverDescription);
     }
 
-    public PropertiesHttpServerAnnouncementMessage(Properties p) {
+    PropertiesHttpServerAnnouncementMessage(Properties p) {
         super(p);
     }
 
     public String toString() {
-        return "HttpServerAnnouncementMessage " + getSourceDescription() + ":" + getPort();
+        return "HttpServerAnnouncementMessage " + getSourceHostname() + ":" + getPort();
     }
 
     public MessageType getMessageType() {

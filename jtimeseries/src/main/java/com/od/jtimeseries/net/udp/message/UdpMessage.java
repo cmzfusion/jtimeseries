@@ -47,9 +47,9 @@ public interface UdpMessage {
     void setSourceInetAddress(String sourceInetAddress);
 
     /**
-     * @return Description of agent sending message, or null if a source description was not provided with the message
+     * @return Host sending the message, or sourceInetAddress if sourceHost was not set
      */
-    String getSourceDescription();
+    String getSourceHostname();
 
     /**
      * Serialize the message to outputStream
@@ -63,7 +63,14 @@ public interface UdpMessage {
      */
     int getMaxExpectedSize();
 
-
+    /**
+     * @return type of this message
+     */
     MessageType getMessageType();
+
+    /**
+     * @return encoding of this message
+     */
+    Encoding getEncoding();
 
 }

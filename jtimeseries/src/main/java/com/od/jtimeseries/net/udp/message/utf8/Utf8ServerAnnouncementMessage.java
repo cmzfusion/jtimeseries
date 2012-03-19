@@ -13,8 +13,10 @@ import com.od.jtimeseries.net.udp.message.MessageType;
  */
 public class Utf8ServerAnnouncementMessage extends Utf8AnnouncementMessage implements HttpServerAnnouncementMessage {
 
-    public Utf8ServerAnnouncementMessage(int httpdPort, String host) {
-        super(httpdPort, host);
+    Utf8ServerAnnouncementMessage() {}
+
+    Utf8ServerAnnouncementMessage(int httpdPort, String hostname, String description) {
+        super(httpdPort, hostname, description);
     }
 
     public MessageType getMessageType() {

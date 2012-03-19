@@ -40,18 +40,18 @@ public class PropertiesClientAnnouncementMessage extends PropertiesAnnouncementM
 
     public static final String MESSAGE_TYPE = "ClientAnnouncementMessage";
 
-    public PropertiesClientAnnouncementMessage(int port, String description) {
+    PropertiesClientAnnouncementMessage(int port, String description) {
         super(MESSAGE_TYPE);
         setProperty(PORT_KEY, String.valueOf(port));
         setProperty(DESCRIPTION_KEY, description);
     }
 
-    public PropertiesClientAnnouncementMessage(Properties p) {
+    PropertiesClientAnnouncementMessage(Properties p) {
         super(p);
     }
 
     public String toString() {
-        return "ClientAnnouncementMessage " + getSourceDescription() + ":" + getPort();
+        return "ClientAnnouncementMessage " + getSourceHostname() + ":" + getPort();
     }
 
     public MessageType getMessageType() {

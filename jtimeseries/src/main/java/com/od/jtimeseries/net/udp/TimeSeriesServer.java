@@ -163,7 +163,7 @@ public class TimeSeriesServer implements Comparable {
     public static TimeSeriesServer create(AnnouncementMessage p) throws UnknownHostException {
         int port = p.getPort();
         String description = p.getDescription();
-        return new TimeSeriesServer(p.getSourceDescription(), port, description, System.currentTimeMillis());
+        return new TimeSeriesServer(p.getSourceHostname(), port, description, System.currentTimeMillis());
     }
 
     public ServerKey getServerKey() {

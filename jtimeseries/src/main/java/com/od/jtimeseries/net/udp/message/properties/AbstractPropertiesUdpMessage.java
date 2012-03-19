@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.net.udp.message.properties;
 
+import com.od.jtimeseries.net.udp.message.Encoding;
 import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -42,7 +43,17 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
 
     public static final String MESSAGE_TYPE_PROPERTY = "MESSAGE_TYPE";
     public static final String SOURCE_INETADDRESS_KEY = "INETADDRESS";
-    public static final String SOURCE_DESC_KEY = "SOURCE_DESC";
+    public static final String HOSTNAME_KEY = "INETHOST";
+
+    private static String hostname = "";
+
+    static {
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            logMethods.logError("Could not find inet address for UdpMessage", e);
+        }
+    }
 
     public AbstractPropertiesUdpMessage(Properties p) {
         putAll(p);
@@ -50,16 +61,11 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
 
     public AbstractPropertiesUdpMessage(String messageType) {
         setProperty(MESSAGE_TYPE_PROPERTY, messageType);
-        String inetAddress = "";
-        String hostname = "";
-        try {
-            inetAddress = InetAddress.getLocalHost().getHostAddress();
-            hostname = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            logMethods.logError("Could not find inet address for UdpMessage", e);
-        }
-        setProperty(SOURCE_INETADDRESS_KEY, inetAddress);
-        setProperty(SOURCE_DESC_KEY, hostname);
+        setProperty(HOSTNAME_KEY, hostname);
+    }
+
+    public Encoding getEncoding() {
+        return Encoding.PROPERTIES_XML;
     }
 
     public String getSourceInetAddress() {
@@ -70,8 +76,12 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
         setProperty(SOURCE_INETADDRESS_KEY, address);
     }
 
-    public String getSourceDescription() {
-        return getProperty(SOURCE_DESC_KEY);
+    public String getSourceHostname() {
+        String result = getProperty(HOSTNAME_KEY);
+        if ( result == null ) {
+            result = getProperty(SOURCE_INETADDRESS_KEY);
+        }
+        return result;
     }
 
     public void serialize(OutputStream outputStream) throws IOException {

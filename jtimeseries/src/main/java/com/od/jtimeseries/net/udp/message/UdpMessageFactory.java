@@ -14,6 +14,8 @@ public interface UdpMessageFactory {
 
     TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem);
 
+    SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description);
+
     HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName);
 
     /**

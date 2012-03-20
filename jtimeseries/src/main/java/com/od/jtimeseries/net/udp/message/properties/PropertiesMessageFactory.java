@@ -58,6 +58,8 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
                 result = new PropertiesTimeSeriesValueMessage(p);
             } else if ( messageType.equals(PropertiesClientAnnouncementMessage.MESSAGE_TYPE)) {
                 result = new PropertiesClientAnnouncementMessage(p);
+            } else if ( messageType.equals(PropertiesDescriptionMessage.MESSAGE_TYPE)) {
+                result = new PropertiesDescriptionMessage(p);
             } else {
                 throw new IOException("Unrecognized message type " + messageType + " for PropertiesUdpMessage");
             }
@@ -69,6 +71,10 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
 
     public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
         return new PropertiesTimeSeriesValueMessage(path, timeSeriesItem);
+    }
+
+    public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {
+        return new PropertiesDescriptionMessage(path, description);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String description) {

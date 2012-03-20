@@ -38,6 +38,10 @@ public class Utf8MessageFactory implements UdpMessageFactory {
         return new Utf8TimeSeriesValueMessage(path, hostname, timeSeriesItem);
     }
 
+    public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {
+        return new Utf8DescriptionMessage(hostname, path, description);
+    }
+
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String description) {
         return new Utf8ServerAnnouncementMessage(httpdPort, hostname, description);
     }

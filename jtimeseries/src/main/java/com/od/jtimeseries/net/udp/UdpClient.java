@@ -120,13 +120,25 @@ public class UdpClient {
         return l;
     }
 
+    /**
+     * Send a single message as a datagram
+     */
     public void sendMessage(UdpMessage message) {
         try {
             byte[] data = createDatagram(message);
             scheduledExecutor.execute(new SendUdpDatagramTask(data));
         } catch (IOException e) {
-            logMethods.logError("Could not create UdpClient ", e);
+            logMethods.logError("Could not send UDP datagram", e);
         }
+    }
+
+    /**
+     * Send one or more messages from the message queue packaged into a single datagram
+     * When used with a messageFactory which supports multiple-message datagrams, this method will attempt to package
+     * as many messages as possible into a single UDP datagram, until the datagram size limit is reached
+     */
+    public void sendMessage(Queue<UdpMessage> messageQueue) {
+
     }
 
     //get a snapshot of the current configs to iterate over

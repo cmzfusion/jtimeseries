@@ -8,8 +8,7 @@ package com.od.jtimeseries.net.udp.message;
  */
 public enum MessageType {
     TS_VALUE,
-    TS_DESCRIPTION,
     SERVER_ANNOUNCE,
     CLIENT_ANNOUNCE,
-    DESCRIPTION
+    SERIES_DESCRIPTION
 }

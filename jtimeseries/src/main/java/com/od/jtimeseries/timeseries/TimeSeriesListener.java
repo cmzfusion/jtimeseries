@@ -22,18 +22,26 @@ public interface TimeSeriesListener {
 
     /**
      * Items were added/inserted to the series
+     *
+     * Due to the reuse of event instances for performance, the event instance may only be valid for the duration of
+     * the callback. Do not hold references and refer to the event subsequently - if you need to do this, take a copy
      */
     void itemsAddedOrInserted(TimeSeriesEvent e);
 
     /**
      * Items in the series were removed
+     *
+     * Due to the reuse of event instances for performance, the event instance may only be valid for the duration of
+     * the callback. Do not hold references and refer to the event subsequently - if you need to do this, take a copy
      */
     void itemsRemoved(TimeSeriesEvent e);
 
     /**
      * The time series changed in a way which could not be efficiently
      * represented using the other event types
-     */
+     *
+     * Due to the reuse of event instances for performance, the event instance may only be valid for the duration of
+     * the callback. Do not hold references and refer to the event subsequently - if you need to do this, take a copy     */
     void seriesChanged(TimeSeriesEvent e);
 
 }

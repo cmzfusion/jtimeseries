@@ -18,7 +18,7 @@ public abstract class AbstractJavaIOMessage implements UdpMessage {
     private String sourceInetAddress;
     private String sourceHostname;
 
-    private static final byte[] JAVA_IO_MESSAGE_HEADER = new byte[] { 'J', 'I', 'O' };
+    public static final byte[] JAVA_IO_MESSAGE_HEADER = new byte[] { 'J', 'I', 'O' };
 
     protected AbstractJavaIOMessage() {
     }
@@ -53,15 +53,23 @@ public abstract class AbstractJavaIOMessage implements UdpMessage {
 
     protected abstract void doSerializeMessageBody(DataOutputStream bos) throws IOException;
 
-    protected abstract void deserialize(DataInputStream is) throws IOException;
+    /**
+     * @param acronymVersion the second char from the message acronym, indicating message version
+     */
+    protected abstract void deserialize(DataInputStream is, char acronymVersion) throws IOException;
 
     protected void writeHeaderFields(OutputStream outputStream) throws IOException {
         outputStream.write(AbstractJavaIOMessage.JAVA_IO_MESSAGE_HEADER);
-        outputStream.write(getMessageType().getAcronym());
+        outputStream.write(getHeaderAcronym());
     }
 
+    /**
+     * @return a two byte value representing the message type and subversion
+     */
+    protected abstract byte[] getHeaderAcronym();
+
     public int getMaxExpectedSize() {
-        return 32; //TODO
+        return 64; //TODO
     }
 
     public Encoding getEncoding() {

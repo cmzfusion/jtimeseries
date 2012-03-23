@@ -11,6 +11,8 @@ import com.od.jtimeseries.net.udp.message.MessageType;
  */
 public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessage implements HttpServerAnnouncementMessage {
 
+    private static byte[] HEADER_ACRONYM = new byte[] { 'S', '0' };
+
     public JavaIOHttpServerAnnouncementMessage(int port, String description) {
         super(port, description);
     }
@@ -20,5 +22,9 @@ public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessa
 
     public MessageType getMessageType() {
         return MessageType.SERVER_ANNOUNCE;
+    }
+
+    protected byte[] getHeaderAcronym() {
+        return HEADER_ACRONYM;
     }
 }

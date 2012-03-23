@@ -1,6 +1,5 @@
 package com.od.jtimeseries.net.udp.message.javaio;
 
-import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.SeriesDescriptionMessage;
 
@@ -16,12 +15,17 @@ import java.io.IOException;
  */
 public class JavaIODescriptionMessage extends AbstractJavaIOMessage implements SeriesDescriptionMessage {
 
+    private static byte[] HEADER_ACRONYM = new byte[] { 'D', '0' };
+
     private String description;
     private String path;
 
     public JavaIODescriptionMessage(String path, String description) {
         this.path = path;
         this.description = description;
+    }
+
+    public JavaIODescriptionMessage() {
     }
 
     public MessageType getMessageType() {
@@ -41,8 +45,12 @@ public class JavaIODescriptionMessage extends AbstractJavaIOMessage implements S
         bos.writeUTF(description);
     }
 
-    protected void deserialize(DataInputStream is) throws IOException {
+    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
         path = is.readUTF();
         description = is.readUTF();
+    }
+
+    protected byte[] getHeaderAcronym() {
+        return HEADER_ACRONYM;
     }
 }

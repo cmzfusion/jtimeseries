@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,13 +52,13 @@ public class Utf8MessageFactory implements UdpMessageFactory {
         return new Utf8ClientAnnouncementMessage(udpPort, hostname, description);
     }
 
-    public UdpMessage deserializeFromDatagram(byte[] buffer, int offset, int length) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(buffer)));
+    public List<UdpMessage> deserializeFromDatagram(byte[] buffer, int length) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(buffer, 0, length)));
         readEncoding(reader);
         MessageType t = readMessageType(reader);
         AbstractUtf8Message message = createMessage(t);
         message.deserialize(reader);
-        return message;
+        return Collections.singletonList((UdpMessage)message);
     }
 
     private void readEncoding(BufferedReader reader) throws IOException {

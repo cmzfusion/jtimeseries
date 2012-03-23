@@ -132,9 +132,10 @@ public class UdpServer {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
                     UdpMessageFactory f = getMessageFactory(buffer);
-                    UdpMessage m = f.deserializeFromDatagram(buffer, 0, packet.getLength());
-                    m.setSourceInetAddress(packet.getAddress().getHostAddress());
-                    fireMessageToListeners(m);
+                    for (UdpMessage m : f.deserializeFromDatagram(buffer, packet.getLength())) {
+                        m.setSourceInetAddress(packet.getAddress().getHostAddress());
+                        fireMessageToListeners(m);
+                    }
                 }
                 catch (Throwable t) {
                     limitedLogger.logError("Error receiving UDP message", t);

@@ -18,6 +18,8 @@ import java.io.IOException;
  */
 public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implements TimeSeriesValueMessage {
 
+    private static byte[] HEADER_ACRONYM = new byte[] { 'V', '0' };
+
     private String path;
     private TimeSeriesItem item;
 
@@ -51,10 +53,14 @@ public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implemen
         d.writeDouble(item.getValue().doubleValue());
     }
 
-    protected void deserialize(DataInputStream is) throws IOException {
+    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
         path = is.readUTF();
         long timestamp = is.readLong();
         double value = is.readDouble();
         item = new DefaultTimeSeriesItem(timestamp, DoubleNumeric.valueOf(value));
+    }
+
+    protected byte[] getHeaderAcronym() {
+        return HEADER_ACRONYM;
     }
 }

@@ -4,6 +4,8 @@ import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,8 +87,8 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
         return new PropertiesClientAnnouncementMessage(port, description);
     }
 
-    public UdpMessage deserializeFromDatagram(byte[] buffer, int offset, int length) throws IOException {
+    public List<UdpMessage> deserializeFromDatagram(byte[] buffer, int length) throws IOException {
         String s = new String(buffer, 0, length, "UTF-8");
-        return getMessage(s);
+        return Collections.singletonList(getMessage(s));
     }
 }

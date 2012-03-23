@@ -1,7 +1,5 @@
 package com.od.jtimeseries.net.udp.message.javaio;
 
-import com.od.jtimeseries.net.udp.message.MessageType;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,7 +35,7 @@ public abstract class JavaIOAnnouncementMessage extends AbstractJavaIOMessage {
         bos.writeUTF(description);
     }
 
-    protected void deserialize(DataInputStream is) throws IOException {
+    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
         port = is.readInt();
         description = is.readUTF();
     }

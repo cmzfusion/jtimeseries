@@ -63,19 +63,8 @@ public class Utf8TimeSeriesValueMessage extends AbstractUtf8Message implements T
         return "";
     }
 
-    public TimeSeriesItem getTimeSeriesItem(int index) {
-        if ( index != 0 ) {
-            throw new RuntimeException("No timeseries item for index " + index);
-        }
+    public TimeSeriesItem getTimeSeriesItem() {
         return timeSeriesItem;
-    }
-
-    public int getItemCount() {
-        return 1;
-    }
-
-    public Iterable<TimeSeriesItem> getTimeSeriesItems() {
-        return Collections.singletonList(timeSeriesItem);
     }
 
     protected void writeBodyFieldsToOutputStream(Writer writer, StringBuilder sb) throws IOException {

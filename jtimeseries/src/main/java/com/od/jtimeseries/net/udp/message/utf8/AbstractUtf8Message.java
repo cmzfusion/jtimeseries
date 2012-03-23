@@ -32,8 +32,11 @@ public abstract class AbstractUtf8Message implements UdpMessage {
     public static final String UTF8_ENCODING = "UTF-8";
     public static final String HOSTNAME_FIELD_KEY = "HOSTNAME";
 
-    public static final String UTF8_ENCODING_HEADER_STRING = UdpMessage.ENCODING_FIELD_KEY + "=UTF-8";
+    public static final String ENCODING_FIELD_KEY = "ENCODING";
+    public static final String UTF8_ENCODING_HEADER_STRING = ENCODING_FIELD_KEY + "=UTF-8";
     public static final char[] UTF8_ENCODING_HEADER_CHARS = UTF8_ENCODING_HEADER_STRING.toCharArray();
+
+    public static final String MSGTYPE_FIELD_KEY = "MSGTYPE";
 
     private String newLine = System.getProperty("line.separator");
     private String sourceInetAddress;
@@ -165,5 +168,9 @@ public abstract class AbstractUtf8Message implements UdpMessage {
             throw new IOException("Could not parse double value for field " + key + " from value " + value);
         }
         return result;
+    }
+
+    public boolean isMessageStreamingSupported() {
+        return false;
     }
 }

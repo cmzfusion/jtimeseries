@@ -134,11 +134,46 @@ public class UdpClient {
 
     /**
      * Send one or more messages from the message queue packaged into a single datagram
-     * When used with a messageFactory which supports multiple-message datagrams, this method will attempt to package
-     * as many messages as possible into a single UDP datagram, until the datagram size limit is reached
+     * When used with a message type which supports message streaming, this method will attempt to package
+     * as many messages as possible into a single UDP datagram, until the max datagram size limit is reached
      */
     public void sendMessage(Queue<UdpMessage> messageQueue) {
+        try {
+            UdpMessage m = messageQueue.peek();
+            if ( m != null) {
+                if ( m.isMessageStreamingSupported()) {
+                    sendMultiple(messageQueue, m);
+                } else {
+                    sendMessage(m);
+                }
+            }
+        } catch (IOException e) {
+            logMethods.logError("Could not send UDP datagram", e);
+        }
+    }
 
+    private void sendMultiple(Queue<UdpMessage> messageQueue, UdpMessage m) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(UdpMessage.MAX_PACKET_SIZE_BYTES);
+
+        while(m != null && bos.size() < (UdpMessage.MAX_PACKET_SIZE_BYTES - m.getMaxExpectedSize())) {
+            ByteArrayOutputStream msgOut = new ByteArrayOutputStream(m.getMaxExpectedSize());
+            m.serialize(msgOut);
+            byte[] msgBytes = msgOut.toByteArray();
+            checkMessageSize(m, msgBytes);
+            if ( bos.size() + msgBytes.length < UdpMessage.MAX_PACKET_SIZE_BYTES) {
+                bos.write(msgBytes);
+                UdpMessage removed = messageQueue.poll();
+                assert(removed == m); //only not the case if we have multiple queue consumers?
+                m = messageQueue.peek(); //try the next message
+            } else {
+                //we can't fit the serialized messages into the packet
+                //so don't remove the message from the incoming message queue, we will try again next time
+                break;
+            }
+        }
+
+        byte[] data = bos.toByteArray();
+        scheduledExecutor.execute(new SendUdpDatagramTask(data));
     }
 
     //get a snapshot of the current configs to iterate over
@@ -171,10 +206,14 @@ public class UdpClient {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(message.getMaxExpectedSize());
         message.serialize(bos);
         byte[] data = bos.toByteArray();
+        checkMessageSize(message, data);
+        return data;
+    }
+
+    private void checkMessageSize(UdpMessage message, byte[] data) throws IOException {
         if ( data.length > UdpMessage.MAX_PACKET_SIZE_BYTES) {
             throw new IOException("Cannot send UDP datagram for message " + message + " with size greater than " + UdpMessage.MAX_PACKET_SIZE_BYTES + " bytes of data");
         }
-        return data;
     }
 
     private class SendUdpDatagramTask implements Runnable {

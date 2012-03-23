@@ -45,12 +45,6 @@
         <artifactId>junit</artifactId>
         <version>4.5</version>
       </dependency>
-      <dependency>
-        <scope>test</scope>
-	    <groupId>com.caucho</groupId>
-	    <artifactId>hessian</artifactId>
-	    <version>4.0.7</version>
-      </dependency>
   </dependencies>
 
 </project>

@@ -8,11 +8,12 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
  * Date: 14/03/12
  * Time: 18:27
  *
- * One or more time series values for a series
+ * A message containing a single time series value
+ * (More efficient support for multiple value messages will be provided in another message type)
  *
  * Mandatory fields:
  * SeriesPath               -  path of time series to be updated
- * TimeSeriesValue (1..n)   -  one or more new time series value
+ * TimeSeriesValue          -  A single time series value
  *
  * Optional fields:
  * SourceDescription        -  a description of the agent sending the update
@@ -32,9 +33,5 @@ public interface TimeSeriesValueMessage extends UdpMessage {
      */
     String getDescription();
 
-    TimeSeriesItem getTimeSeriesItem(int index);
-
-    int getItemCount();
-
-    Iterable<TimeSeriesItem> getTimeSeriesItems();
+    TimeSeriesItem getTimeSeriesItem();
 }

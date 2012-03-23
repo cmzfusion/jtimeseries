@@ -23,7 +23,7 @@ public class Utf8MessageFactory implements UdpMessageFactory {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(Utf8MessageFactory.class);
     private static String hostname = "";
-    private final int LENGTH_OF_MESSAGE_TYPE_PREFIX = UdpMessage.MSGTYPE_FIELD_KEY.length() + 1;
+    private final int LENGTH_OF_MESSAGE_TYPE_PREFIX = AbstractUtf8Message.MSGTYPE_FIELD_KEY.length() + 1;
 
     static {
         try {

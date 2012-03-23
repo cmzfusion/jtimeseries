@@ -9,5 +9,6 @@ package com.od.jtimeseries.net.udp.message;
  */
 public enum Encoding {
     PROPERTIES_XML,
+    JAVA_IO,
     UTF8
 }

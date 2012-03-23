@@ -70,27 +70,15 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
         return getProperty(DESCRIPTION_KEY);
     }
 
-    public int getItemCount() {
-        return 1;  //support only one value for Properties based message
-    }
-
-    public TimeSeriesItem getTimeSeriesItem(int index) {
-        if ( index != 0 ) {
-            throw new RuntimeException("No timeseries item available for index " + index);
-        }
-
+    public TimeSeriesItem getTimeSeriesItem() {
         return new DefaultTimeSeriesItem(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),
             DoubleNumeric.valueOf(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
         );
     }
 
-    public Iterable<TimeSeriesItem> getTimeSeriesItems() {
-        return Collections.singletonList(getTimeSeriesItem(0));
-    }
-
     public String toString() {
-        return "TimeSeriesValueMessage " + getSourceHostname() + " " + getTimeSeriesItem(0);
+        return "TimeSeriesValueMessage " + getSourceHostname() + " " + getTimeSeriesItem();
     }
 
     public MessageType getMessageType() {

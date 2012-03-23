@@ -17,9 +17,6 @@ import java.io.OutputStream;
  */
 public interface UdpMessage {
 
-    public static final String ENCODING_FIELD_KEY = "ENCODING";
-    public static final String MSGTYPE_FIELD_KEY = "MSGTYPE";
-
     /**
      * Note on choice of MAX_PACKET_SIZE,
      * http://book.javanb.com/java-network-programming-3rd/javanp3-CHP-13-SECT-2.html
@@ -73,4 +70,16 @@ public interface UdpMessage {
      */
     Encoding getEncoding();
 
+    /**
+     * Not all messages can be chained, this depends whether a message length is encoded with the message content,
+     * and if the messageFactory has support to decode multiple messages. Including the message length is not so easy
+     * when for example a text based protocol is used - it is nice, for example, to be able to send a message via
+     * netcat without computing a length in bytes
+     *
+     * In some message types sent as UDP packet, there is an assumption that just one message will be sent per datagram
+     * so streaming is not supported
+     *
+     * @return true, if the message factory can support decoding multiple messages from a single stream
+     */
+    boolean isMessageStreamingSupported();
 }

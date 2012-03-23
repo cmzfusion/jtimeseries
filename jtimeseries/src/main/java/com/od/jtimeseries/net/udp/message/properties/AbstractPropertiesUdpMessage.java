@@ -91,4 +91,8 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
     public int getMaxExpectedSize() {
         return 1024;
     }
+
+    public boolean isMessageStreamingSupported() {
+        return false;
+    }
 }

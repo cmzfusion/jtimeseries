@@ -21,7 +21,7 @@ package com.od.jtimeseries.ui.timeseries;
 import com.od.jtimeseries.context.ContextProperties;
 import com.od.jtimeseries.net.httpd.xml.AttributeName;
 import com.od.jtimeseries.net.httpd.xml.ElementName;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.ui.util.AbstractRemoteQuery;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -91,7 +91,7 @@ public class DownloadRemoteTimeSeriesDataQuery extends AbstractRemoteQuery {
 
         //only add latest items
         if ( destinationSeries.size() == 0 || longTimestamp > destinationSeries.getLatestTimestamp()) {
-            TimeSeriesItem newItem = new DefaultTimeSeriesItem(longTimestamp, DoubleNumeric.valueOf(doubleValue));
+            TimeSeriesItem newItem = new Item(longTimestamp, doubleValue);
             itemsToAdd.add(newItem);
         }
     }

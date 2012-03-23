@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.timeseries;
 
+import com.od.jtimeseries.util.numeric.DoubleNumeric;
+import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 
 /**
@@ -26,16 +28,24 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 03-Dec-2008
  * Time: 15:37:48
  *
- * An immutable TimeSeriesItem with a fixed/immutable timestamp, containing a single Numeric value
- *
+ * The default implementation for TimeSeriesItem
+ * A TimeSeriesItem with a fixed/immutable timestamp
  * Equality is defined in terms of both timestamp and value
  */
-public class DefaultTimeSeriesItem implements TimeSeriesItem {
+public class Item implements TimeSeriesItem {
 
     private final long timestamp;
     private final Numeric value;
 
-    public DefaultTimeSeriesItem(long timeStamp, Numeric value) {
+    public Item(long timestamp, double value) {
+        this(timestamp, DoubleNumeric.valueOf(value));
+    }
+
+    public Item(long timestamp, long value) {
+        this(timestamp, LongNumeric.valueOf(value));
+    }
+
+    public Item(long timeStamp, Numeric value) {
         this.timestamp = timeStamp;
         this.value = value;
     }
@@ -69,7 +79,7 @@ public class DefaultTimeSeriesItem implements TimeSeriesItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DefaultTimeSeriesItem that = (DefaultTimeSeriesItem) o;
+        Item that = (Item) o;
 
         if (timestamp != that.timestamp) return false;
         if (value != null ? !value.equals(that.value) : that.value != null) return false;

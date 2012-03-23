@@ -1,6 +1,6 @@
 package com.od.jtimeseries.server.serialization;
 
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -124,8 +124,8 @@ class SerializerOperations {
         return series;
     }
 
-    private DefaultTimeSeriesItem readItem(ByteBuffer b) throws IOException {
-        return new DefaultTimeSeriesItem(b.getLong(), DoubleNumeric.valueOf(b.getDouble()));
+    private Item readItem(ByteBuffer b) throws IOException {
+        return new Item(b.getLong(), b.getDouble());
     }
 
 

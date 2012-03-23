@@ -2,13 +2,12 @@ package com.od.jtimeseries.net.udp.message.utf8;
 
 import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collections;
 
 /**
  * Created by IntelliJ IDEA.
@@ -95,9 +94,9 @@ public class Utf8TimeSeriesValueMessage extends AbstractUtf8Message implements T
             itemTimestamp = System.currentTimeMillis();
         }
 
-        timeSeriesItem = new DefaultTimeSeriesItem(
+        timeSeriesItem = new Item(
             itemTimestamp,
-            DoubleNumeric.valueOf(itemValue)
+            itemValue
         );
     }
 

@@ -29,8 +29,11 @@ package com.od.jtimeseries.util.numeric;
 public class DoubleNumeric implements Numeric {
 
     public static final DoubleNumeric ZERO = new DoubleNumeric(0);
+
+    /**
+     * Use this to represent, a value could not be calculated
+     */
     public static final DoubleNumeric NaN = new DoubleNumeric(Double.NaN);
-    public static final DoubleNumeric Null = new DoubleNumeric(Double.NaN);
 
     private final double d;
 
@@ -46,12 +49,12 @@ public class DoubleNumeric implements Numeric {
         return Double.isNaN(d);
     }
 
-    public boolean isNull() {
-        return this == DoubleNumeric.Null;
-    }
-
     public long longValue() {
-        return isNaN() ? Long.MIN_VALUE : (long)d;
+        if ( Double.isNaN(d) ) {
+            throw new UnsupportedOperationException("Cannot convert a NaN Numeric to primitive long");
+        } else {
+            return (long)d;
+        }
     }
 
     public String toString() {

@@ -2,7 +2,7 @@ package com.od.jtimeseries.net.udp.message.javaio;
 
 import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -57,7 +57,7 @@ public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implemen
         path = is.readUTF();
         long timestamp = is.readLong();
         double value = is.readDouble();
-        item = new DefaultTimeSeriesItem(timestamp, DoubleNumeric.valueOf(value));
+        item = new Item(timestamp,value);
     }
 
     protected byte[] getHeaderAcronym() {

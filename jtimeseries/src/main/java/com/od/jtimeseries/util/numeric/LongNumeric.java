@@ -29,8 +29,13 @@ package com.od.jtimeseries.util.numeric;
 public class LongNumeric implements Numeric {
 
     public static final LongNumeric ZERO = new LongNumeric(0);
-    public static final LongNumeric NaN = new LongNumeric(Long.MIN_VALUE);
-    public static final LongNumeric NULL = new LongNumeric(Long.MIN_VALUE);
+
+    //there is no sensible representation of NaN as a primitive long
+    public static final LongNumeric NaN = new LongNumeric(Long.MIN_VALUE) {
+        public long longValue() {
+            throw new UnsupportedOperationException("Cannot return a long value for NaN");
+        }
+    };
 
     private long l;
 
@@ -46,10 +51,10 @@ public class LongNumeric implements Numeric {
         return l == Long.MIN_VALUE;
     }
 
-    public boolean isNull() {
-        return this == NULL;
-    }
-
+    /**
+     * @return long value as a primitive long
+     * @throws UnsupportedOperationException if you call this method when this value is either the LongNumeric.NULL or LongNumeric.NaN value
+     */
     public long longValue() {
         return l;
     }
@@ -70,8 +75,6 @@ public class LongNumeric implements Numeric {
         LongNumeric result;
         if ( l == 0) {
             result = ZERO;
-        } else if ( Long.MIN_VALUE == l ) {
-            result = NaN;
         } else {
             result = new LongNumeric(l);
         }

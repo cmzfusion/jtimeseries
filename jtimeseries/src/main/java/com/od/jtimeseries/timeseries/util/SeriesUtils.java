@@ -1,6 +1,6 @@
 package com.od.jtimeseries.timeseries.util;
 
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -142,7 +142,7 @@ public class SeriesUtils {
     public static int binarySearchByTimestamp(long timestamp, TimeSeries series) {
         return binarySearch(
             series,
-            new DefaultTimeSeriesItem(timestamp, DoubleNumeric.valueOf(0)),
+            new Item(timestamp,0d),
             new Comparator<TimeSeriesItem>() {
                 public int compare(TimeSeriesItem o1, TimeSeriesItem o2) {
                     return o1.getTimestamp() == o2.getTimestamp() ? 0 :

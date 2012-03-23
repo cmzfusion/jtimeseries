@@ -1,6 +1,6 @@
 package com.od.jtimeseries.timeseries.impl;
 
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import junit.framework.Assert;
@@ -19,16 +19,16 @@ public class TestTimeSeriesItem extends Assert {
     public void testEqualityAndHashcode() {
         long time = System.currentTimeMillis();
         long value = (long)(Math.random() * Long.MAX_VALUE);
-        TimeSeriesItem item1 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value));
-        TimeSeriesItem item2 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value));
+        TimeSeriesItem item1 = new Item(time, value);
+        TimeSeriesItem item2 = new Item(time, value);
         assertEquals(item1, item2);
         assertEquals(item1.hashCode(), item2.hashCode());
 
-        item1 = new DefaultTimeSeriesItem(time, LongNumeric.valueOf(value-1));
+        item1 = new Item(time, value-1);
         assertFalse(item1.equals(item2));
         assertFalse(item1.hashCode() == item2.hashCode());
 
-        item1 = new DefaultTimeSeriesItem(time -1, LongNumeric.valueOf(value));
+        item1 = new Item(time -1, value);
         assertFalse(item1.equals(item2));
     }
 }

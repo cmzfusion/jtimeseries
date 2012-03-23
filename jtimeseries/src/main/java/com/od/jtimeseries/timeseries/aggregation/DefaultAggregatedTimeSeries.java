@@ -120,7 +120,7 @@ public class DefaultAggregatedTimeSeries extends AbstractProxyTimeSeries impleme
         aggregateFunction.clear();
         boolean success = addValuesFromChildSeries(nextTimepoint, aggregateFunction);
         if (success) {
-            addItem(new DefaultTimeSeriesItem(nextTimepoint, aggregateFunction.calculateResult()));
+            addItem(new Item(nextTimepoint, aggregateFunction.calculateResult()));
             lastTimepoint = nextTimepoint;
         }
         return success;

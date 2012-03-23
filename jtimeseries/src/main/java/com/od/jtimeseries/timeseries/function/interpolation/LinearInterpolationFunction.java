@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.timeseries.function.interpolation;
 
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
@@ -46,6 +46,6 @@ public class LinearInterpolationFunction implements InterpolationFunction {
     }
 
     protected TimeSeriesItem createTimeSeriesItem(long timestamp, Numeric value) {
-        return new DefaultTimeSeriesItem(timestamp, value);
+        return new Item(timestamp, value);
     }
 }

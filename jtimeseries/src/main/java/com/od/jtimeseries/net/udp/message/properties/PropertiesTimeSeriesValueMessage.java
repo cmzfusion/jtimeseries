@@ -20,11 +20,10 @@ package com.od.jtimeseries.net.udp.message.properties;
 
 import com.od.jtimeseries.net.udp.message.MessageType;
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
-import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -71,9 +70,9 @@ public class PropertiesTimeSeriesValueMessage extends AbstractPropertiesUdpMessa
     }
 
     public TimeSeriesItem getTimeSeriesItem() {
-        return new DefaultTimeSeriesItem(
+        return new Item(
             Long.parseLong(getProperty(TIMESTAMP_KEY)),
-            DoubleNumeric.valueOf(Double.parseDouble(getProperty(NUMERIC_VALUE_KEY)))
+            Double.parseDouble(getProperty(NUMERIC_VALUE_KEY))
         );
     }
 

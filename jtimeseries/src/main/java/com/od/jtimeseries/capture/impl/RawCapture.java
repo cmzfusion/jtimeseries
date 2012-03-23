@@ -22,7 +22,7 @@ import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.capture.ValueSourceCapture;
 import com.od.jtimeseries.source.ValueSource;
 import com.od.jtimeseries.source.ValueSourceListener;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.logging.LogMethods;
@@ -74,7 +74,7 @@ public class RawCapture extends AbstractCapture implements ValueSourceCapture {
     private void addValueToSeries(final Numeric v) {
         TimeSeries timeSeries = getTimeSeries();
         try {
-            timeSeries.addItem(new DefaultTimeSeriesItem(System.currentTimeMillis(), v));
+            timeSeries.addItem(new Item(System.currentTimeMillis(), v));
             fireCaptureCompleteEvent(v, timeSeries);
         } catch (Throwable t) {
             logMethods.logError("Failed to capture value " + v + " to series " + timeSeries, t);

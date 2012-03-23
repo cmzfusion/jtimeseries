@@ -4,7 +4,7 @@ import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpClientConfig;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
-import com.od.jtimeseries.timeseries.DefaultTimeSeriesItem;
+import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 
@@ -47,7 +47,7 @@ public class AppendToSeriesPerformanceHarness {
 
         TimeSeriesValueMessage timeSeriesValueMessage = new PropertiesMessageFactory().createTimeSeriesValueMessage(
                 path,
-                new DefaultTimeSeriesItem(System.currentTimeMillis(), DoubleNumeric.valueOf(Math.random()))
+                new Item(System.currentTimeMillis(), Math.random())
         );
 
         udpClient.sendMessage(timeSeriesValueMessage);

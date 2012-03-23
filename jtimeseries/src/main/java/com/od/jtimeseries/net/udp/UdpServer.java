@@ -20,6 +20,8 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
+import com.od.jtimeseries.net.udp.message.javaio.AbstractJavaIOMessage;
+import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.net.udp.message.utf8.AbstractUtf8Message;
 import com.od.jtimeseries.net.udp.message.utf8.Utf8MessageFactory;
@@ -60,14 +62,11 @@ public class UdpServer {
 
     private UdpMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
     private UdpMessageFactory utf8MessageFactory = new Utf8MessageFactory();
+    private UdpMessageFactory javaIOMessageFactory = new JavaIOMessageFactory();
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
-    }
-
-    public void setMessageFactory(UdpMessageFactory m) {
-        this.propertiesMessageFactory = m;
     }
 
     public synchronized void startReceive() {
@@ -148,11 +147,12 @@ public class UdpServer {
          * @return a message factory based on the message encoding by analyzing the datagram header
          */
         private UdpMessageFactory getMessageFactory(byte[] buffer) {
-            //default to legacy properties message if no other type found
+            //default to legacy properties message which did not have header bytes defined, if no other type found
             UdpMessageFactory result = propertiesMessageFactory;
-
             try {
-                if (startsWithChars(buffer, AbstractUtf8Message.UTF8_ENCODING_HEADER_CHARS)) {
+                if ( startsWithBytes(buffer, AbstractJavaIOMessage.JAVA_IO_MESSAGE_HEADER)) {
+                    result = javaIOMessageFactory;
+                } else if (startsWithBytes(buffer, AbstractUtf8Message.UTF8_ENCODING_HEADER_CHARS)) {
                     result = utf8MessageFactory;
                 }
             } catch (UnsupportedEncodingException e) {
@@ -161,7 +161,7 @@ public class UdpServer {
             return result;
         }
 
-        private boolean startsWithChars(byte[] buffer, char[] chars) throws UnsupportedEncodingException {
+        private boolean startsWithBytes(byte[] buffer, byte[] chars) throws UnsupportedEncodingException {
             boolean result = true;
             for ( int loop=0; loop < chars.length; loop++) {
                 if ( buffer[loop] != chars[loop]) {
@@ -174,7 +174,7 @@ public class UdpServer {
 
         private void fireMessageToListeners(final UdpMessage m) {
             udpMessageExecutor.execute(
-                        new Runnable() {
+                new Runnable() {
                     public void run() {
                         fireUdpMessageReceived(m);
                     }

@@ -34,7 +34,7 @@ public abstract class AbstractUtf8Message implements UdpMessage {
 
     public static final String ENCODING_FIELD_KEY = "ENCODING";
     public static final String UTF8_ENCODING_HEADER_STRING = ENCODING_FIELD_KEY + "=UTF-8";
-    public static final char[] UTF8_ENCODING_HEADER_CHARS = UTF8_ENCODING_HEADER_STRING.toCharArray();
+    public static final byte[] UTF8_ENCODING_HEADER_CHARS = UTF8_ENCODING_HEADER_STRING.getBytes();
 
     public static final String MSGTYPE_FIELD_KEY = "MSGTYPE";
 

@@ -137,7 +137,7 @@ public class UdpClient {
      * When used with a message type which supports message streaming, this method will attempt to package
      * as many messages as possible into a single UDP datagram, until the max datagram size limit is reached
      */
-    public void sendMessage(Queue<UdpMessage> messageQueue) {
+    public void sendMessages(Queue<UdpMessage> messageQueue) {
         try {
             UdpMessage m = messageQueue.peek();
             if ( m != null) {

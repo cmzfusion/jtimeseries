@@ -131,7 +131,9 @@ public class UdpServer {
                     DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
                     UdpMessageFactory f = getMessageFactory(buffer);
-                    for (UdpMessage m : f.deserializeFromDatagram(buffer, packet.getLength())) {
+                    List<UdpMessage> messages = f.deserializeFromDatagram(buffer, packet.getLength());
+                    //logMethods.logInfo("Received packet with " + messages.size() + " messages");
+                    for (UdpMessage m : messages) {
                         m.setSourceInetAddress(packet.getAddress().getHostAddress());
                         fireMessageToListeners(m);
                     }

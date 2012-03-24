@@ -11,6 +11,9 @@ import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.concurrent.Synchroniser;
 
 import java.net.UnknownHostException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -55,31 +58,56 @@ public class TestUdpPublicationAndSubscription extends TestCase {
 
     public void testSeriesDescriptionMessage() throws InterruptedException {
         final SeriesDescriptionMessage m = udpMessageFactory.createTimeSeriesDescriptionMessage("test.path", "My Description");
-        checkMessageReceived(m);
+        sendAndCheckReceived(m);
     }
 
     public void testTimeSeriesValueMessage() throws InterruptedException {
         final TimeSeriesValueMessage m = udpMessageFactory.createTimeSeriesValueMessage("test.path", new Item(123456, 1.23456));
-        checkMessageReceived(m);
+        sendAndCheckReceived(m);
     }
 
     public void testHttpServerAnnouncementMessage() throws InterruptedException {
         final HttpServerAnnouncementMessage m = udpMessageFactory.createHttpServerAnnouncementMessage(123456, "Test Server");
-        checkMessageReceived(m);
+        sendAndCheckReceived(m);
     }
 
     public void testClientAnnouncementMessage() throws InterruptedException {
         final ClientAnnouncementMessage m = udpMessageFactory.createClientAnnouncementMessage(123456, "Test Client");
-        checkMessageReceived(m);
+        sendAndCheckReceived(m);
     }
 
-    private void checkMessageReceived(final UdpMessage m) throws InterruptedException {
+    public void testSendOneHundredMessages() throws InterruptedException {
+        List<UdpMessage> l = new LinkedList<UdpMessage>();
+        for (int loop=0; loop < 100; loop ++) {
+            l.add(udpMessageFactory.createClientAnnouncementMessage(loop, "Test Client"));
+        }
+        sendAndCheckReceived(l);
+    }
+
+    private void sendAndCheckReceived(final UdpMessage m) throws InterruptedException {
         mockery.checking(new Expectations() {{
             oneOf(mockListener).udpMessageReceived(with(equal(m)));
             then(sendMessageState.is("finished"));
         }});
 
         client.sendMessage(m);
+        synchroniser.waitUntil(sendMessageState.is("finished"));
+    }
+
+    private void sendAndCheckReceived(final List<UdpMessage> l) throws InterruptedException {
+        mockery.checking(new Expectations() {{
+            for ( UdpMessage m : l) {
+                oneOf(mockListener).udpMessageReceived(with(equal(m)));
+            }
+            then(sendMessageState.is("finished"));
+        }});
+
+        LinkedBlockingQueue queue = new LinkedBlockingQueue();
+        queue.addAll(l);
+
+        while(queue.size() > 0) {
+            client.sendMessages(queue);
+        }
         synchroniser.waitUntil(sendMessageState.is("finished"));
     }
 }

@@ -20,7 +20,7 @@ package com.od.jtimeseries.timeseries;
 
 /**
  * Created by IntelliJ IDEA.
- * User: Nick Ebbutt (refactored from EBondMarketService)
+ * User: Nick Ebbutt
  * Date: 11-May-2009
  * Time: 10:53:57
  */

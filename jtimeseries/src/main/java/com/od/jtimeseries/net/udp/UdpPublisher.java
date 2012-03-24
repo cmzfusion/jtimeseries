@@ -54,7 +54,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
 
     private class AppendPublishingListener extends TimeSeriesListenerAdapter {
         public void itemsAddedOrInserted(TimeSeriesEvent e) {
-            if ( e.getEventType() == TimeSeriesEvent.EventType.APPEND ) {
+            if ( e.isAppend() ) {
                 IdentifiableTimeSeries i = (IdentifiableTimeSeries)e.getSource();
                 if (e.getItems().size() == 1) {
                     TimeSeriesValueMessage m = udpMessageFactory.createTimeSeriesValueMessage(

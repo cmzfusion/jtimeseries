@@ -2,6 +2,7 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.TimeSeriesValueMessage;
 import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
+import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.net.udp.message.utf8.Utf8MessageFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
@@ -33,7 +34,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     private LinkedBlockingQueue<TimeSeriesValueMessage> messageQueue = new LinkedBlockingQueue<TimeSeriesValueMessage>(10000);
     private AtomicBoolean started = new AtomicBoolean();
     private long delayTimeMicroseconds;
-    private UdpMessageFactory udpMessageFactory = new Utf8MessageFactory();
+    private UdpMessageFactory udpMessageFactory = new JavaIOMessageFactory();
 
     public UdpPublisher(UdpClient udpClient) {
         this(udpClient, DEFAULT_MAX_MESSAGES);
@@ -42,6 +43,10 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     public UdpPublisher(UdpClient udpClient, int maxMessagesPerSecond) {
         this.udpClient = udpClient;
         delayTimeMicroseconds = 1000000 / maxMessagesPerSecond;
+    }
+
+    public void setUdpMessageFactory(UdpMessageFactory udpMessageFactory) {
+        this.udpMessageFactory = udpMessageFactory;
     }
 
     public void publishAppends(IdentifiableTimeSeries s) {

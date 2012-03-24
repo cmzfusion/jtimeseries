@@ -79,4 +79,22 @@ public abstract class AbstractJavaIOMessage implements UdpMessage {
     public boolean isMessageStreamingSupported() {
         return true;
     }
+
+    //source ip is not considered in equals comparison
+    //this would be unhelpful for testing, since only set on server side on receipt
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractJavaIOMessage that = (AbstractJavaIOMessage) o;
+
+        if (sourceHostname != null ? !sourceHostname.equals(that.sourceHostname) : that.sourceHostname != null)
+            return false;
+        return true;
+    }
+
+    public String toString() {
+        return "sourceInetAddress='" + sourceInetAddress + '\'' +
+                ", sourceHostname='" + sourceHostname + '\'';
+    }
 }

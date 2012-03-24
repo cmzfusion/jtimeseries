@@ -27,4 +27,18 @@ public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessa
     protected byte[] getHeaderAcronym() {
         return HEADER_ACRONYM;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        return true;
+    }
+
+    public String toString() {
+        return "JavaIOHttpServerAnnouncementMessage{" +
+                super.toString() +
+                "} ";
+    }
+
 }

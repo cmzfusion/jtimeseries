@@ -1,5 +1,7 @@
 package com.od.jtimeseries.net.udp.message.javaio;
 
+import com.od.jtimeseries.net.udp.message.AnnouncementMessage;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,24 +42,22 @@ public abstract class JavaIOAnnouncementMessage extends AbstractJavaIOMessage {
         description = is.readUTF();
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || ! (o instanceof AnnouncementMessage)) return false;
         if (!super.equals(o)) return false;
 
-        JavaIOAnnouncementMessage that = (JavaIOAnnouncementMessage) o;
+        AnnouncementMessage that = (AnnouncementMessage) o;
 
-        if (port != that.port) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
+        if (getPort() != that.getPort()) return false;
+        if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) return false;
 
         return true;
     }
 
-    @Override
     public int hashCode() {
-        int result = port;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
+        int result = getPort();
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
         return result;
     }
 }

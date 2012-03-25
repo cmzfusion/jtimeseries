@@ -42,13 +42,30 @@ abstract class PropertiesAnnouncementMessage extends AbstractPropertiesUdpMessag
         super(p);
     }
 
-    @Override
     public int getPort() {
         return Integer.parseInt(getProperty(PORT_KEY));
     }
 
-    @Override
     public String getDescription() {
         return getProperty(DESCRIPTION_KEY);
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! (o instanceof AnnouncementMessage)) return false;
+        if (!super.equals(o)) return false;
+
+        AnnouncementMessage that = (AnnouncementMessage) o;
+
+        if (getPort() != that.getPort()) return false;
+        if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result = getPort();
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        return result;
     }
 }

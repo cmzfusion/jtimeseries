@@ -66,27 +66,27 @@ public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implemen
 
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || ! ( o instanceof TimeSeriesValueMessage)) return false;
         if (!super.equals(o)) return false;
 
-        JavaIOTimeSeriesValueMessage that = (JavaIOTimeSeriesValueMessage) o;
+        TimeSeriesValueMessage that = (TimeSeriesValueMessage) o;
 
-        if (item != null ? !item.equals(that.item) : that.item != null) return false;
-        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+        if (getTimeSeriesItem() != null ? !getTimeSeriesItem().equals(that.getTimeSeriesItem()) : that.getTimeSeriesItem() != null) return false;
+        if (getSeriesPath() != null ? !getSeriesPath().equals(that.getSeriesPath()) : that.getSeriesPath() != null) return false;
 
         return true;
     }
 
     public int hashCode() {
-        int result = path != null ? path.hashCode() : 0;
-        result = 31 * result + (item != null ? item.hashCode() : 0);
+        int result = getSeriesPath() != null ? getSeriesPath().hashCode() : 0;
+        result = 31 * result + (getTimeSeriesItem() != null ? getTimeSeriesItem().hashCode() : 0);
         return result;
     }
 
     public String toString() {
-        return "JavaIOTimeSeriesValueMessage{" +
-                "path='" + path + '\'' +
-                ", item=" + item +
+        return getClass().getSimpleName() + "{" +
+                "path='" + getSeriesPath() + '\'' +
+                ", item=" + getTimeSeriesItem() +
                 super.toString() +
                 "} ";
     }

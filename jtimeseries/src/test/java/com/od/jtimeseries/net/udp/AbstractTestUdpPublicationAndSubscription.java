@@ -1,7 +1,7 @@
 package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.*;
-import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
+import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.timeseries.Item;
 import junit.framework.TestCase;
 import org.jmock.Expectations;
@@ -22,14 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date: 24/03/12
  * Time: 16:49
  */
-public class TestUdpPublicationAndSubscription extends TestCase {
+public abstract class AbstractTestUdpPublicationAndSubscription extends TestCase {
 
     private Synchroniser synchroniser = new Synchroniser();
     private Mockery mockery = new JUnit4Mockery() {{
         setThreadingPolicy(synchroniser);
     }};
 
-    private UdpMessageFactory udpMessageFactory = new JavaIOMessageFactory();
+    private UdpMessageFactory mf;
+
     private UdpServer server;
     private UdpClient client;
     private UdpServer.UdpMessageListener mockListener;
@@ -45,7 +46,10 @@ public class TestUdpPublicationAndSubscription extends TestCase {
         mockListener = mockery.mock(UdpServer.UdpMessageListener.class);
         sendMessageState = mockery.states("sending");
         server.addUdpMessageListener(mockListener);
+        mf = createMessageFactory();
     }
+
+    protected abstract UdpMessageFactory createMessageFactory();
 
     public void tearDown() {
         server.stop();
@@ -56,30 +60,57 @@ public class TestUdpPublicationAndSubscription extends TestCase {
         sendMessageState = null;
     }
 
+    //test messages generated from subtype factory are equal to properties messages
+    public void testAllMessagesAreCreatedEqual() {
+        PropertiesMessageFactory p = new PropertiesMessageFactory();
+        assertEqualBothWays(
+            p.createTimeSeriesDescriptionMessage("test.paths.match", "test.descriptions.match"),
+            mf.createTimeSeriesDescriptionMessage("test.paths.match", "test.descriptions.match")
+        );
+        assertEqualBothWays(
+            p.createClientAnnouncementMessage(123, "test.descriptions.match"),
+            mf.createClientAnnouncementMessage(123, "test.descriptions.match")
+        );
+        assertEqualBothWays(
+            p.createHttpServerAnnouncementMessage(123, "test.descriptions.match"),
+            mf.createHttpServerAnnouncementMessage(123, "test.descriptions.match")
+        );
+        assertEqualBothWays(
+            p.createTimeSeriesValueMessage("my.path", new Item(1000000, 100000d)),
+            mf.createTimeSeriesValueMessage("my.path", new Item(1000000, 100000d))
+        );
+
+    }
+
+    private void assertEqualBothWays(Object o1, Object o2) {
+        assertEquals(o1, o2);
+        assertEquals(o2, o1);
+    }
+
     public void testSeriesDescriptionMessage() throws InterruptedException {
-        final SeriesDescriptionMessage m = udpMessageFactory.createTimeSeriesDescriptionMessage("test.path", "My Description");
+        final SeriesDescriptionMessage m = mf.createTimeSeriesDescriptionMessage("test.path", "My Description");
         sendAndCheckReceived(m);
     }
 
     public void testTimeSeriesValueMessage() throws InterruptedException {
-        final TimeSeriesValueMessage m = udpMessageFactory.createTimeSeriesValueMessage("test.path", new Item(123456, 1.23456));
+        final TimeSeriesValueMessage m = mf.createTimeSeriesValueMessage("test.path", new Item(123456, 1.23456));
         sendAndCheckReceived(m);
     }
 
     public void testHttpServerAnnouncementMessage() throws InterruptedException {
-        final HttpServerAnnouncementMessage m = udpMessageFactory.createHttpServerAnnouncementMessage(123456, "Test Server");
+        final HttpServerAnnouncementMessage m = mf.createHttpServerAnnouncementMessage(123456, "Test Server");
         sendAndCheckReceived(m);
     }
 
     public void testClientAnnouncementMessage() throws InterruptedException {
-        final ClientAnnouncementMessage m = udpMessageFactory.createClientAnnouncementMessage(123456, "Test Client");
+        final ClientAnnouncementMessage m = mf.createClientAnnouncementMessage(123456, "Test Client");
         sendAndCheckReceived(m);
     }
 
     public void testSendOneHundredMessages() throws InterruptedException {
         List<UdpMessage> l = new LinkedList<UdpMessage>();
         for (int loop=0; loop < 100; loop ++) {
-            l.add(udpMessageFactory.createClientAnnouncementMessage(loop, "Test Client"));
+            l.add(mf.createClientAnnouncementMessage(loop, "Test Client"));
         }
         sendAndCheckReceived(l);
     }

@@ -95,4 +95,18 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
     public boolean isMessageStreamingSupported() {
         return false;
     }
+
+    //source hostname and ip are not considered in equals comparison
+    //this would be unhelpful for testing, since only set on server side on receipt
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! (o instanceof UdpMessage)) return false;
+        return true;
+    }
+
+    public String toString() {
+        return "sourceInetAddress='" + getSourceInetAddress() + '\'' +
+                ", sourceHostname='" + getSourceHostname() + '\'';
+    }
+
 }

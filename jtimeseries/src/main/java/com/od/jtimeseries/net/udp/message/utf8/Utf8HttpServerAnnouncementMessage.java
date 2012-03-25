@@ -1,4 +1,4 @@
-package com.od.jtimeseries.net.udp.message.javaio;
+package com.od.jtimeseries.net.udp.message.utf8;
 
 import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.udp.message.MessageType;
@@ -6,26 +6,21 @@ import com.od.jtimeseries.net.udp.message.MessageType;
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
- * Date: 23/03/12
- * Time: 18:00
+ * Date: 19/03/12
+ * Time: 06:35
+ *
+ * Announce to a client that a timeseries http server is active
  */
-public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessage implements HttpServerAnnouncementMessage {
+public class Utf8HttpServerAnnouncementMessage extends Utf8AnnouncementMessage implements HttpServerAnnouncementMessage {
 
-    private static byte[] HEADER_ACRONYM = new byte[] { 'S', '0' };
+    Utf8HttpServerAnnouncementMessage() {}
 
-    public JavaIOHttpServerAnnouncementMessage(int port, String description) {
-        super(port, description);
-    }
-
-    public JavaIOHttpServerAnnouncementMessage() {
+    Utf8HttpServerAnnouncementMessage(int httpdPort, String hostname, String description) {
+        super(httpdPort, hostname, description);
     }
 
     public MessageType getMessageType() {
         return MessageType.SERVER_ANNOUNCE;
-    }
-
-    protected byte[] getHeaderAcronym() {
-        return HEADER_ACRONYM;
     }
 
     public boolean equals(Object o) {
@@ -40,5 +35,4 @@ public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessa
                 super.toString() +
                 "} ";
     }
-
 }

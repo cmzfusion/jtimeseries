@@ -22,4 +22,17 @@ public class Utf8ClientAnnouncementMessage extends Utf8AnnouncementMessage imple
     public MessageType getMessageType() {
         return MessageType.CLIENT_ANNOUNCE;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! (o instanceof ClientAnnouncementMessage)) return false;
+        if (!super.equals(o)) return false;
+        return true;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                super.toString() +
+                "} ";
+    }
 }

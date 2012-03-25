@@ -145,6 +145,7 @@ public class UdpClient {
                     sendMultiple(messageQueue, m);
                 } else {
                     sendMessage(m);
+                    messageQueue.remove();
                 }
             }
         } catch (IOException e) {

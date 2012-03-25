@@ -104,4 +104,31 @@ public class Utf8TimeSeriesValueMessage extends AbstractUtf8Message implements T
     public MessageType getMessageType() {
         return MessageType.TS_VALUE;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! ( o instanceof TimeSeriesValueMessage)) return false;
+        if (!super.equals(o)) return false;
+
+        TimeSeriesValueMessage that = (TimeSeriesValueMessage) o;
+
+        if (getTimeSeriesItem() != null ? !getTimeSeriesItem().equals(that.getTimeSeriesItem()) : that.getTimeSeriesItem() != null) return false;
+        if (getSeriesPath() != null ? !getSeriesPath().equals(that.getSeriesPath()) : that.getSeriesPath() != null) return false;
+
+        return true;
+    }
+
+    public int hashCode() {
+        int result = getSeriesPath() != null ? getSeriesPath().hashCode() : 0;
+        result = 31 * result + (getTimeSeriesItem() != null ? getTimeSeriesItem().hashCode() : 0);
+        return result;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                "path='" + getSeriesPath() + '\'' +
+                ", item=" + getTimeSeriesItem() +
+                super.toString() +
+                "} ";
+    }
 }

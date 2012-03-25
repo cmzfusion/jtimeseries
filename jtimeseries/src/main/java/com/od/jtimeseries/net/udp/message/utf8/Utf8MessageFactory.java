@@ -45,7 +45,7 @@ public class Utf8MessageFactory implements UdpMessageFactory {
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String description) {
-        return new Utf8ServerAnnouncementMessage(httpdPort, hostname, description);
+        return new Utf8HttpServerAnnouncementMessage(httpdPort, hostname, description);
     }
 
     public ClientAnnouncementMessage createClientAnnouncementMessage(int udpPort, String description) {
@@ -91,10 +91,13 @@ public class Utf8MessageFactory implements UdpMessageFactory {
                 message = new Utf8ClientAnnouncementMessage();
                 break;
             case SERVER_ANNOUNCE:
-                message = new Utf8ServerAnnouncementMessage();
+                message = new Utf8HttpServerAnnouncementMessage();
                 break;
             case TS_VALUE:
                 message = new Utf8TimeSeriesValueMessage();
+                break;
+            case SERIES_DESCRIPTION:
+                message = new Utf8DescriptionMessage();
                 break;
             default :
                 throw new IOException("Unsupported message type for UTF-8 message decoding");

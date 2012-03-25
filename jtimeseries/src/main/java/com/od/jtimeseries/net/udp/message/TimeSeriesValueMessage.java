@@ -8,7 +8,7 @@ import com.od.jtimeseries.timeseries.TimeSeriesItem;
  * Date: 14/03/12
  * Time: 18:27
  *
- * A message containing a single time series value
+ * Send a single time series value, expressed as a timestamp and the doubleValue() of a TimeSeriesItem
  * (More efficient support for multiple value messages will be provided in another message type)
  *
  * Mandatory fields:

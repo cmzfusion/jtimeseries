@@ -50,11 +50,21 @@ public class PropertiesClientAnnouncementMessage extends PropertiesAnnouncementM
         super(p);
     }
 
-    public String toString() {
-        return "ClientAnnouncementMessage " + getSourceHostname() + ":" + getPort();
-    }
-
     public MessageType getMessageType() {
         return MessageType.CLIENT_ANNOUNCE;
     }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! (o instanceof ClientAnnouncementMessage)) return false;
+        if (!super.equals(o)) return false;
+        return true;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                super.toString() +
+                "} ";
+    }
+
 }

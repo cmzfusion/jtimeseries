@@ -31,13 +31,13 @@ public class JavaIOClientAnnouncementMessage extends JavaIOAnnouncementMessage i
 
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || ! (o instanceof ClientAnnouncementMessage)) return false;
         if (!super.equals(o)) return false;
         return true;
     }
 
     public String toString() {
-        return "JavaIOClientAnnouncementMessage{" +
+        return getClass().getSimpleName() + "{" +
                 super.toString() +
                 "} ";
     }

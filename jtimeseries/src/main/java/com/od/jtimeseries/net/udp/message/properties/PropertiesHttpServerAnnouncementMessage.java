@@ -45,11 +45,20 @@ public class PropertiesHttpServerAnnouncementMessage extends PropertiesAnnouncem
         super(p);
     }
 
-    public String toString() {
-        return "HttpServerAnnouncementMessage " + getSourceHostname() + ":" + getPort();
-    }
-
     public MessageType getMessageType() {
         return MessageType.SERVER_ANNOUNCE;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || ! ( o instanceof HttpServerAnnouncementMessage)) return false;
+        if (!super.equals(o)) return false;
+        return true;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+                super.toString() +
+                "} ";
     }
 }

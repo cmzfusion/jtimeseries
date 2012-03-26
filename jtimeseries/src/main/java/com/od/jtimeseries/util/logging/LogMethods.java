@@ -23,6 +23,11 @@ package com.od.jtimeseries.util.logging;
  * User: Nick Ebbutt
  * Date: 03-Dec-2008
  * Time: 12:14:38
+ *
+ * JTimeseries logs to this interface, to enable the actual logging implementation to be
+ * swapped out, adapters for log4j, java util logging and standard out are provided.
+ *
+ * The methods are selected to be identical to log4j where possible
  */
 public interface LogMethods {
 

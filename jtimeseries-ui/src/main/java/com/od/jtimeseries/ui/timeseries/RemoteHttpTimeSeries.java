@@ -233,7 +233,7 @@ public class RemoteHttpTimeSeries extends DefaultUITimeSeries implements ChartSe
         private class SetStaleOnErrorListener extends TaskListenerAdapter {
 
             public void error(Task task, Throwable error) {
-                logMethods.logWarning("Failed to load series " + task + " " + error.getClass().getSimpleName());
+                logMethods.warn("Failed to load series " + task + " " + error.getClass().getSimpleName());
                 failureCount++;
                 if ( failureCount >= MAX_FAILURES_BEFORE_STALE) {
                     setStale(true);

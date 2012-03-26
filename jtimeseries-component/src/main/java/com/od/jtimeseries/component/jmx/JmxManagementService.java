@@ -46,7 +46,7 @@ public class JmxManagementService {
 
     public void startJmxManagementService(int jmxManagementPort) {
         try {
-            logMethods.logInfo("Starting JMX Management Service on port " + jmxManagementPort);
+            logMethods.info("Starting JMX Management Service on port " + jmxManagementPort);
             LocateRegistry.createRegistry(jmxManagementPort);
             MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             serviceUrl = "service:jmx:rmi:///jndi/rmi://localhost:" + jmxManagementPort + "/jmxrmi";
@@ -54,7 +54,7 @@ public class JmxManagementService {
             connectorServer = JMXConnectorServerFactory.newJMXConnectorServer(url, null, server);
             connectorServer.start();
         } catch (IOException e) {
-            logMethods.logError("Error creating jmx server", e);
+            logMethods.error("Error creating jmx server", e);
         }
     }
 

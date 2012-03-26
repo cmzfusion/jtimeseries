@@ -72,12 +72,12 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     public JTimeSeriesServer() {}
 
     private void startup() {
-        logMethods.logInfo("Starting JTimeSeriesServer");
+        logMethods.info("Starting JTimeSeriesServer");
         try {
             doStartup();
-            logMethods.logInfo("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
+            logMethods.info("JTimeSeriesServer is up. Time taken to start was " + serverConfigJmx.getSecondsToStartServer() + " seconds");
         } catch ( Throwable t) {
-            logMethods.logError("Error starting JTimeseriesServer", t);
+            logMethods.error("Error starting JTimeseriesServer", t);
         }
     }
 
@@ -106,37 +106,37 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void startServerAnnouncementPings() {
-        logMethods.logInfo("Starting Server Announcement Pings");
+        logMethods.info("Starting Server Announcement Pings");
         udpClient.sendRepeatedMessage(serverAnnouncementMessage, Time.seconds(serverAnnouncementPingPeriodSeconds));
     }
 
     private void startUdpServer() {
-        logMethods.logInfo("Adding UDP message listeners");
+        logMethods.info("Adding UDP message listeners");
         udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext, pathMapper));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
-        logMethods.logInfo("Starting UDP server on port " + udpServer.getPort());
+        logMethods.info("Starting UDP server on port " + udpServer.getPort());
         udpServer.startReceive();
     }
 
     private void setupServerMetrics() {
-        logMethods.logInfo("Setting up server metrics series");
+        logMethods.info("Setting up server metrics series");
         managedMetricInitializer.initializeServerMetrics();
     }
 
     private void startSummaryStats() {
-        logMethods.logInfo("Starting summary stats");
+        logMethods.info("Starting summary stats");
         summaryStatisticsCalculator.start();
     }
 
     private void startSeriesDirectoryManager() {
-        logMethods.logInfo("Starting Series Directory Manager");
+        logMethods.info("Starting Series Directory Manager");
         SeriesDirectoryManager seriesDirectoryManager = (SeriesDirectoryManager)ctx.getBean("seriesDirectoryManager");
         seriesDirectoryManager.removeOldTimeseriesFiles();
         seriesDirectoryManager.loadExistingSeries();
     }
 
     private void startJmx() {
-        logMethods.logInfo("Starting JMX Html Adapter Interface on port " + htmlAdaptorServer.getPort());
+        logMethods.info("Starting JMX Html Adapter Interface on port " + htmlAdaptorServer.getPort());
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
@@ -146,12 +146,12 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
             htmlAdaptorServer.start();
         } catch (Exception e) {
-            logMethods.logError("Failed to start JMX interface", e);
+            logMethods.error("Failed to start JMX interface", e);
         }
     }
 
     private void startTimeSeriesHttpServer() throws IOException {
-        logMethods.logInfo("Starting HTTP Server on port " + httpdServer.getPort());
+        logMethods.info("Starting HTTP Server on port " + httpdServer.getPort());
         httpdServer.setRequestMonitor(new ServerHttpRequestMonitor());
         httpdServer.setHandlerFactory(new ServerHttpHandlerFactory(rootContext));
         httpdServer.start();

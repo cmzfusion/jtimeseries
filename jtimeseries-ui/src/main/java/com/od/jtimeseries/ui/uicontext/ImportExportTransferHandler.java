@@ -61,7 +61,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
                 result = getRootContext().canImportFromExternalConfig(supp.getComponent(), target);
             }
         } catch (Throwable t) {
-           logMethods.logError("Failed during canImportFromExternalConfig", t);
+           logMethods.error("Failed during canImportFromExternalConfig", t);
         }
         return result;
     }
@@ -93,7 +93,7 @@ public class ImportExportTransferHandler extends NoImportsSelectorTransferHandle
                   getRootContext().doImport(supp.getComponent(), configs, target);
             }
         } catch (Throwable t) {
-            logMethods.logError("Error in importData", t);
+            logMethods.error("Error in importData", t);
         }
         return true;
     }

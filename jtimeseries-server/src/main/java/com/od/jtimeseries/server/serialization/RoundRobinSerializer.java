@@ -67,7 +67,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
 
     private void checkRootDirectory(File rootDirectory) {
         if ( ! rootDirectory.canWrite()) {
-            logMethods.logError("Timeseries Directory at " + rootDirectory.getAbsolutePath() + " does not exist or is not writable, cannot start server");
+            logMethods.error("Timeseries Directory at " + rootDirectory.getAbsolutePath() + " does not exist or is not writable, cannot start server");
             throw new RuntimeException("Timeseries Directory at " + rootDirectory.getAbsolutePath() + " does not exist or is not writable, cannot start server");
         }
     }
@@ -96,7 +96,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
             serializerOperations.writeHeader(fileHeader, properties, b);
             serializerOperations.writeBody(t, b);
         } catch (Throwable e) {
-            logMethods.logError("Failed to write time series file " + f);
+            logMethods.error("Failed to write time series file " + f);
             fileErrorCounter.incrementCount();
             throw new SerializationException("Failed to write time series file " + f, e);
         } finally {
@@ -137,7 +137,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
             f = getFile(fileHeader);
             result = f.exists();
         } catch (SerializationException e) {
-            logMethods.logError("Error checking file exists " + f, e);
+            logMethods.error("Error checking file exists " + f, e);
         }
         return result;
     }
@@ -261,7 +261,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
     private void checkFileWriteable(File file) throws SerializationException {
         if ( ! file.canWrite()) {
             String error = "Cannot write to file " + file + ". This file no longer exists or is not writeable";
-            logMethods.logError(error);
+            logMethods.error(error);
             throw new SerializationException(error);
         }
     }
@@ -272,14 +272,14 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
         if ( ! shutdownHandlingDisabled) {
             Runtime.getRuntime().addShutdownHook( new Thread() {
                 public void run() {
-                    logMethods.logInfo("Shutdown Starting");
+                    logMethods.info("Shutdown Starting");
                     shutdownNow();
                     try {
                         Thread.sleep(250); //just in the hope that 250ms is enough for that log statement to make it into the logs
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    logMethods.logInfo("Shutdown complete");
+                    logMethods.info("Shutdown complete");
 
                 }
             });
@@ -300,7 +300,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
             try {
                 c.close();
             } catch (IOException e) {
-                logMethods.logError("Error closing file channel " + f, e);
+                logMethods.error("Error closing file channel " + f, e);
             }
         }
 
@@ -308,7 +308,7 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
             try {
                 r.close();
             } catch (IOException e) {
-                logMethods.logError("Error closing file " + f, e);
+                logMethods.error("Error closing file " + f, e);
             }
         }
     }

@@ -81,19 +81,19 @@ public abstract class TimeSeriesLogger {
     protected abstract void writeToLogs(IdentifiableTimeSeries series);
 
     protected void logInfo(String s) {
-        logMethods.logInfo(s);
+        logMethods.info(s);
     }
 
     protected void logDebug(String s) {
-        logMethods.logDebug(s);
+        logMethods.debug(s);
     }
 
     protected void logError(String s) {
-        logMethods.logError(s);
+        logMethods.error(s);
     }
 
     protected void logError(Throwable t, String s) {
-        logMethods.logError(s, t);
+        logMethods.error(s, t);
     }
 
     private static void schedule(TimerTask t, long delay, long period) {

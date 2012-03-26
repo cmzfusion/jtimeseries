@@ -128,7 +128,7 @@ public class UdpClient {
             byte[] data = createDatagram(message);
             scheduledExecutor.execute(new SendUdpDatagramTask(data));
         } catch (IOException e) {
-            logMethods.logError("Could not send UDP datagram", e);
+            logMethods.error("Could not send UDP datagram", e);
         }
     }
 
@@ -149,7 +149,7 @@ public class UdpClient {
                 }
             }
         } catch (IOException e) {
-            logMethods.logError("Could not send UDP datagram", e);
+            logMethods.error("Could not send UDP datagram", e);
         }
     }
 
@@ -192,7 +192,7 @@ public class UdpClient {
                 TimeUnit.MILLISECONDS
             );
         } catch (IOException e) {
-            logMethods.logError("Could not create UdpClient ", e);
+            logMethods.error("Could not create UdpClient ", e);
         }
     }
 
@@ -245,7 +245,7 @@ public class UdpClient {
 
         } catch (Throwable t) {
             limitedLogger.logError("Failed to send datagram", t);
-            logMethods.logDebug("Failed to send datagram ");
+            logMethods.debug("Failed to send datagram ");
 
             //close socket if there was an error
             if ( socket != null ) {

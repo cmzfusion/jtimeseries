@@ -42,7 +42,7 @@ public class LoggingPropertyPlaceholderConfigurer extends PropertyPlaceholderCon
     protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
         super.processProperties(beanFactoryToProcess, props);
         for ( Map.Entry<Object,Object> e : props.entrySet()) {
-            m.logInfo("Property-->'" + e.getKey() + "'='" + e.getValue() + "'");
+            m.info("Property-->'" + e.getKey() + "'='" + e.getValue() + "'");
         }
     }
 

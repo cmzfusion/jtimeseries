@@ -29,7 +29,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
     private ThreadLocal<Long> requestStartTimes = new ThreadLocal<Long>();
 
     public void requestStarting(long requestId, Socket mySocket) {
-        logMethods.logDebug("Starting HTTPD request " + requestId + " from client " + mySocket.getInetAddress());
+        logMethods.debug("Starting HTTPD request " + requestId + " from client " + mySocket.getInetAddress());
         requestCounter.incrementCount();
         requestStartTimes.set(System.currentTimeMillis());
     }
@@ -44,7 +44,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
             logProperties(header, sb, ", Header:");
         }
         logProperties(params, sb, ", Param:");
-        logMethods.logInfo(sb.toString());
+        logMethods.info(sb.toString());
     }
 
     private void logProperties(Properties header, StringBuilder sb, String keyDescription) {
@@ -56,7 +56,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
 
     public void finishedRequest(long requestId, Socket mySocket) {
         long timeTaken = logQueryTime();
-        logMethods.logDebug("Finished HTTPD request " + requestId + " in " + timeTaken + " millis");
+        logMethods.debug("Finished HTTPD request " + requestId + " in " + timeTaken + " millis");
     }
 
     private long logQueryTime() {
@@ -75,7 +75,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
 
     public void invalidRequest(long requestId, Socket mySocket, String httpErrorType) {
         requestInvalidCounter.incrementCount();
-        logMethods.logWarning("Processed invalid HTTPD request " + requestId + " " + httpErrorType);
+        logMethods.warn("Processed invalid HTTPD request " + requestId + " " + httpErrorType);
     }
 
     public static void setHttpRequestTimeValueRecorder(ValueRecorder htpRequestTimeValueRecorder) {

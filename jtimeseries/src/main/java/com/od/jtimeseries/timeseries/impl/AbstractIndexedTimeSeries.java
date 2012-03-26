@@ -222,9 +222,9 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         if ( listenerAdded) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
-                    logMethods.logDebug("Firing event " + e);
+                    logMethods.debug("Firing event " + e);
                     timeSeriesListenerSupport.fireSeriesChanged(e);
-                    logMethods.logDebug("Finished firing event " + e);
+                    logMethods.debug("Finished firing event " + e);
                 }
             };
             queueEvent(t);
@@ -235,9 +235,9 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         if ( listenerAdded ) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
-                    logMethods.logDebug("Firing event " + e);
+                    logMethods.debug("Firing event " + e);
                     timeSeriesListenerSupport.fireItemsAddedOrInserted(e);
-                    logMethods.logDebug("Finished firing event " + e);
+                    logMethods.debug("Finished firing event " + e);
                 }
             };
             queueEvent(t);
@@ -248,9 +248,9 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         if ( listenerAdded) { //only fire event if there might be a listener to receive it
             Runnable t = new Runnable() {
                 public void run() {
-                    logMethods.logDebug("Firing event " + e);
+                    logMethods.debug("Firing event " + e);
                     timeSeriesListenerSupport.fireItemsRemoved(e);
-                    logMethods.logDebug("Finished firing event " + e);
+                    logMethods.debug("Finished firing event " + e);
                 }
             };
             queueEvent(t);

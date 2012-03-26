@@ -217,8 +217,8 @@ public class FileHeader extends LockingFileHeader {
         public String setProperty(String key, String value) {
             String result = null;
             if ( key.length() > MAX_PROPERTY_LENGTH || value.length() > MAX_PROPERTY_LENGTH) {
-                logMethods.logWarning("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
-                    ", start of key " + key.substring(0, Math.min(124, key.length())));
+                logMethods.warn("Cannot persist timeseries property with key or value length > " + MAX_PROPERTY_LENGTH +
+                        ", start of key " + key.substring(0, Math.min(124, key.length())));
             } else {
                 result = (String) wrappedProperties.setProperty(key, value);
                 seriesPropertiesChanged = true;

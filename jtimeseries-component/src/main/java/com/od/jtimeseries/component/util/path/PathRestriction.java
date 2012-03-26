@@ -34,7 +34,7 @@ public class PathRestriction extends AbstractPathProcessingRule {
                 Pattern p = Pattern.compile(s);
                 patterns.add(p);
             } catch (Throwable t) {
-                logMethods.logError("Failed to compile pattern " + s + " will permit any paths for this pattern");
+                logMethods.error("Failed to compile pattern " + s + " will permit any paths for this pattern");
             }
         }
     }

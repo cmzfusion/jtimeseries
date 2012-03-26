@@ -42,17 +42,17 @@ public class LimitedErrorLogger {
 
     public void logError(String s, Throwable t) {
         if ( errors++ < maxInitialErrors ) {
-            logMethods.logError(s, t);
+            logMethods.error(s, t);
         } else if ( errors++ % subsequentSkipRatio == 0) {
-            logMethods.logError(s, t);
+            logMethods.error(s, t);
         }
     }
 
     public void logError(String s) {
         if ( errors++ < maxInitialErrors ) {
-            logMethods.logError(s);
+            logMethods.error(s);
         } else if ( errors++ % subsequentSkipRatio == 0) {
-            logMethods.logError(s);
+            logMethods.error(s);
         }
     }
 }

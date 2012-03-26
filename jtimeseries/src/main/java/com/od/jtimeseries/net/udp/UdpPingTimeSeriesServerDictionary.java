@@ -93,7 +93,7 @@ public class UdpPingTimeSeriesServerDictionary implements TimeSeriesServerDictio
                 remoteTimeSeriesServer = TimeSeriesServer.create((HttpServerAnnouncementMessage)udpMessage);
                 addServer(remoteTimeSeriesServer);
             } catch (UnknownHostException e) {
-                logMethods.logError("Failed to add TimeSeriesServer ", e);
+                logMethods.error("Failed to add TimeSeriesServer ", e);
             }
         }
     }

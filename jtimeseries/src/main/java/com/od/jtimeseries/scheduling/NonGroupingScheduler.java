@@ -108,7 +108,7 @@ public class NonGroupingScheduler extends AbstractScheduler {
             try {
                 t.trigger(System.currentTimeMillis());
             } catch (Throwable e) {
-                logMethods.logError("Error on trigger() for triggerable " + t, e);
+                logMethods.error("Error on trigger() for triggerable " + t, e);
             }
         }
 

@@ -136,28 +136,40 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
             setLogLevel(timeseriesLibraryLogLevel);
         }
 
-        public void logInfo(String s) {
+        public void info(String s) {
             s = addThreadDetails(s);
-            standardOutMethods.logInfo(s);
+            standardOutMethods.info(s);
             logger.log(Level.INFO, s);
         }
 
-        public void logDebug(String s) {
+        public boolean isInfoEnabled() {
+            return logger.isLoggable(Level.INFO);
+        }
+
+        public void debug(String s) {
             s = addThreadDetails(s);
-            standardOutMethods.logDebug(s);
+            standardOutMethods.debug(s);
             logger.log(Level.FINEST, s);
         }
 
-        public void logDebug(String s, Throwable t) {
+        public boolean isDebugEnabled() {
+            return logger.isLoggable(Level.FINEST);
+        }
+
+        public void debug(String s, Throwable t) {
             s = addThreadDetails(s);
-            standardOutMethods.logDebug(s, t);
+            standardOutMethods.debug(s, t);
             logger.log(Level.FINEST, s, t);
         }
 
-        public void logWarning(String s) {
+        public void warn(String s) {
             s = addThreadDetails(s);
-            standardOutMethods.logWarning(s);
+            standardOutMethods.warn(s);
             logger.log(Level.WARNING, s);
+        }
+
+        public boolean isWarnEnabled() {
+            return logger.isLoggable(Level.WARNING);
         }
 
         public void logWarning(String s, Throwable t) {
@@ -166,15 +178,15 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
             logger.log(Level.WARNING, s, t);
         }
 
-        public void logError(String s) {
+        public void error(String s) {
             s = addThreadDetails(s);
-            standardOutMethods.logError(s);
+            standardOutMethods.error(s);
             logger.log(Level.SEVERE, s);
         }
 
-        public void logError(String s, Throwable t) {
+        public void error(String s, Throwable t) {
             s = addThreadDetails(s);
-            standardOutMethods.logError(s, t);
+            standardOutMethods.error(s, t);
             logger.log(Level.SEVERE, s, t);
         }
 

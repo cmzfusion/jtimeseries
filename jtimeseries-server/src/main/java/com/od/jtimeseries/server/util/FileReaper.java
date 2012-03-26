@@ -69,7 +69,7 @@ public class FileReaper {
         this.maxCumulativeSize = maxCumulativeSize;
         this.maxAgeInMillis = maxAgeInMillis;
         pattern = java.util.regex.Pattern.compile(fileSearchRegExp);
-        log.logInfo("Created FileReaper " + name + " for timeseries dir " + parentDirectory.getPath() +
+        log.info("Created FileReaper " + name + " for timeseries dir " + parentDirectory.getPath() +
                 ", pattern [" + fileSearchRegExp + "], max file count " + maxFileCount +
                 ", maxCumulativeSize " + maxCumulativeSize + ", maxAge " + maxAgeInMillis);
     }
@@ -110,7 +110,7 @@ public class FileReaper {
                     currentFileAge = System.currentTimeMillis() - currentFile.lastModified();
 
                     ReaperAction a = shouldDeleteFile(currentFile, fileCount, cumulativeSize, currentFileAge);
-                    log.logDebug("checked file " + currentFile +
+                    log.debug("checked file " + currentFile +
                             " size " + currentFileLength +
                             " (cumulativeSize now " + cumulativeSize + ")" +
                             ", file count " + fileCount +
@@ -136,9 +136,9 @@ public class FileReaper {
                 }
             }
 
-            log.logInfo("FileReaper " + name + " deleted " + reapCount + " files out of " + matches + " matching candidates, failed to delete " + reapFail);
+            log.info("FileReaper " + name + " deleted " + reapCount + " files out of " + matches + " matching candidates, failed to delete " + reapFail);
             if ( reapCount > 0 )  {
-                log.logInfo("FileReaper " + name + " deleted " + sizeDeletes + " files due to exceeding cumulative file size " + maxCumulativeSize + ", " + ageDeletes + " due to timestamp more than " + maxAgeInMillis + " millis old, and " + countDeletes + " due to the max count of " + maxFileCount + " being exceeded");
+                log.info("FileReaper " + name + " deleted " + sizeDeletes + " files due to exceeding cumulative file size " + maxCumulativeSize + ", " + ageDeletes + " due to timestamp more than " + maxAgeInMillis + " millis old, and " + countDeletes + " due to the max count of " + maxFileCount + " being exceeded");
             }
         }
     }

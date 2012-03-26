@@ -42,18 +42,18 @@ public class InputProcessor {
     }
 
     public void start() {
-        logMethods.logInfo("Starting InputProcessor");
+        logMethods.info("Starting InputProcessor");
         new Thread(new Runnable() {
             public void run() {
                 Thread.currentThread().setName("InputProcessor");
-                logMethods.logInfo("InputProcessor started");
+                logMethods.info("InputProcessor started");
                 BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
                 try {
                     while (true) {
                         processLine(in);
                     }
                 } catch (Throwable t) {
-                    logMethods.logError("Failed while trying to read from standard in", t);
+                    logMethods.error("Failed while trying to read from standard in", t);
                 }
             }
         }).start();
@@ -62,12 +62,12 @@ public class InputProcessor {
     private void processLine(BufferedReader in) throws IOException {
         String s = in.readLine();
         if ( s != null && s.length() > 0) {
-            logMethods.logDebug("InputProcessor " + this + " input :='" + s + "'");
+            logMethods.debug("InputProcessor " + this + " input :='" + s + "'");
             for (InputHandler h : inputHandlerSource.getInputHandlers()) {
                 try {
                     h.parseInput(s);
                 } catch (Throwable t) {
-                    logMethods.logError("Error processing input " + s + " using handler " + h, t);
+                    logMethods.error("Error processing input " + s + " using handler " + h, t);
                 }
             }
         }

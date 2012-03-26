@@ -51,7 +51,7 @@ abstract class AbstractPropertiesUdpMessage extends Properties implements UdpMes
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logMethods.logError("Could not find inet address for UdpMessage", e);
+            logMethods.error("Could not find inet address for UdpMessage", e);
         }
     }
 

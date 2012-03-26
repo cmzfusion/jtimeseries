@@ -75,7 +75,7 @@ public class VisualizerRootContext extends AbstractUIRootContext {
                     create(newLocalPath, c.getDescription(), UIPropertiesTimeSeries.class, c);
                 }
             } catch (Exception e) {
-                logMethods.logError("Failed to create series for config " + c, e);
+                logMethods.error("Failed to create series for config " + c, e);
             }
         }
     }

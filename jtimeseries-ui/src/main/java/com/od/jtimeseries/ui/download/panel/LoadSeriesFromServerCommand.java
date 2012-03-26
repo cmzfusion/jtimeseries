@@ -46,14 +46,14 @@ public class LoadSeriesFromServerCommand extends SwingCommand<TimeSeriesServer, 
                 public void error(Task task, Throwable error) {
                     TimeSeriesServer s = (TimeSeriesServer)task.getParameters();
                     s.setConnectionFailed(true);
-                    logMethods.logWarning("Failed to load series from server " + task.getParameters());
-                    logMethods.logDebug("Failed to load series from server " + task.getParameters(), error);
+                    logMethods.warn("Failed to load series from server " + task.getParameters());
+                    logMethods.debug("Failed to load series from server " + task.getParameters(), error);
                 }
 
                 public void success(Task task) {
                     TimeSeriesServer s = (TimeSeriesServer)task.getParameters();
                     s.setConnectionFailed(false);
-                    logMethods.logInfo("Loaded series from server " + task.getParameters());
+                    logMethods.info("Loaded series from server " + task.getParameters());
                 }
             }
         );

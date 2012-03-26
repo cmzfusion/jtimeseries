@@ -138,7 +138,7 @@ public class JmxMetric implements ManagedMetric {
         try {
             url = new JMXServiceURL(serviceUrl);
         } catch (MalformedURLException e) {
-            logMethods.logError("Failed to set up JMX Metric - bad URL " + serviceUrl, e);
+            logMethods.error("Failed to set up JMX Metric - bad URL " + serviceUrl, e);
         }
 
         createJmxMeasurementTasks(rootContext, pathMapper);
@@ -160,7 +160,7 @@ public class JmxMetric implements ManagedMetric {
                     break;
                 case DENY:
                 default:
-                    logMethods.logWarning("Cannot set up JMX metric at path " + path + " this path is denied by PathMapper rules");
+                    logMethods.warn("Cannot set up JMX metric at path " + path + " this path is denied by PathMapper rules");
             }
         }
     }
@@ -188,7 +188,7 @@ public class JmxMetric implements ManagedMetric {
                     try {
                         collectMetricData();
                     } catch ( Throwable t) {
-                        logMethods.logError("Failed to collect metric data for " + JmxMetric.this, t);
+                        logMethods.error("Failed to collect metric data for " + JmxMetric.this, t);
                     } finally {
                         queuedForProcessing.getAndSet(false);
                     }
@@ -200,7 +200,7 @@ public class JmxMetric implements ManagedMetric {
             if ( ! queuedForProcessing.getAndSet(true)) {
                 TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
             } else {
-                logMethods.logWarning("Not running JMX Metric " + this + " last run did not complete, " +
+                logMethods.warn("Not running JMX Metric " + this + " last run did not complete, " +
                         "there is a problem with this metric or a backlog of queued jmx tasks?");
             }
         }
@@ -227,9 +227,9 @@ public class JmxMetric implements ManagedMetric {
             } catch (Throwable t) {
                 if (t instanceof IOException || t instanceof ServiceUnavailableException) {
                     //stop stack traces for connect exceptions filling the logs
-                    logMethods.logWarning("Could not get JMX connection to JMX management service for " + JmxMetric.this);
+                    logMethods.warn("Could not get JMX connection to JMX management service for " + JmxMetric.this);
                 } else {
-                    logMethods.logError("Error running jmx query for " + JmxMetric.this + " will close the current jmx connection", t);
+                    logMethods.error("Error running jmx query for " + JmxMetric.this + " will close the current jmx connection", t);
                 }
             }
             return w;
@@ -250,13 +250,13 @@ public class JmxMetric implements ManagedMetric {
                     } catch ( JmxValueException t) {
                         //a non critical failure due to reading a specific value
                         failed = true;
-                        logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
+                        logMethods.warn("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
                     } catch ( Throwable t ) {
                         //a critical failure, abort all the measurements for this connection
                         failed = criticalFailure = true;
                         if ( ! firstErrorForThisMetric(m)) {
                             //don't log a stack every time, just the first it fails
-                            logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
+                            logMethods.warn("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
                         } else {
                             logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w, t);
                         }

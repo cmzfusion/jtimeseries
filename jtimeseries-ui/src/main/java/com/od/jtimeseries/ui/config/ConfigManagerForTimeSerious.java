@@ -46,23 +46,23 @@ public class ConfigManagerForTimeSerious extends ConfigManager {
         ConfigLogImplementation.setLogMethods(new od.configutil.util.LogMethods() {
 
             public void info(String s) {
-                logMethods.logInfo(s);
+                logMethods.info(s);
             }
 
             public void error(String description, Throwable cause) {
-                logMethods.logError(description, cause);
+                logMethods.error(description, cause);
             }
 
             public void error(String description) {
-                logMethods.logError(description);
+                logMethods.error(description);
             }
 
             public void debug(String s) {
-                logMethods.logDebug(s);
+                logMethods.debug(s);
             }
 
             public void warn(String s) {
-                logMethods.logWarning(s);
+                logMethods.warn(s);
             }
         });
     }

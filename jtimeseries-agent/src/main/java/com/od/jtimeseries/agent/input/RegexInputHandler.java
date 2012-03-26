@@ -59,7 +59,7 @@ public class RegexInputHandler implements InputHandler {
                     try {
                         h.parseInputValue(m);
                     } catch ( Throwable t) {
-                        logMethods.logError("RegexValueHandler " + h + " failed to process value from input " + input, t);
+                        logMethods.error("RegexValueHandler " + h + " failed to process value from input " + input, t);
                     }
                 }
             }

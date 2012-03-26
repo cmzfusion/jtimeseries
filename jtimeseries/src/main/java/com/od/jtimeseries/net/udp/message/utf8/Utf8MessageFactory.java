@@ -31,7 +31,7 @@ public class Utf8MessageFactory implements UdpMessageFactory {
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            logMethods.logError("Could not find inet address for Utf8MessageFactory", e);
+            logMethods.error("Could not find inet address for Utf8MessageFactory", e);
         }
     }
 

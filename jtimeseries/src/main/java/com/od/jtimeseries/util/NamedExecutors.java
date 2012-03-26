@@ -55,7 +55,7 @@ public class NamedExecutors {
         public void uncaughtException(Thread t, Throwable e) {
             super.uncaughtException(t, e);
             if ( ! (e instanceof ThreadDeath)) {
-                logMethods.logError("An Uncaught Exception Shut Down Thread " + t.getName(), e);
+                logMethods.error("An Uncaught Exception Shut Down Thread " + t.getName(), e);
             }
         }
     }

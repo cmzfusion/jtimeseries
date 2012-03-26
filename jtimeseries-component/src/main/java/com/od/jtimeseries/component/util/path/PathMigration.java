@@ -36,7 +36,7 @@ public class PathMigration extends AbstractPathProcessingRule {
                 Pattern p = Pattern.compile(s.getKey());
                 compiledPatternToReplacement.put(p, s.getValue());
             } catch (Throwable t) {
-                logMethods.logError("Failed to compile pattern " + s + " will not translate any paths for this pattern");
+                logMethods.error("Failed to compile pattern " + s + " will not translate any paths for this pattern");
             }
         }
     }

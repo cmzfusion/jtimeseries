@@ -70,9 +70,9 @@ public class AbstractJTimeSeriesComponent {
         if ( logMethodsOk ) {
             LogUtils.setLogMethodFactory(f);
         } else {
-            LogUtils.getLogMethods(logClass).logInfo(
-                    "Cannot write to directory for logfile path " + ((File)loggingContext.getBean("logFileDirectory")).getAbsolutePath() +
-                    ". Will log to standard out"
+            LogUtils.getLogMethods(logClass).info(
+                    "Cannot write to directory for logfile path " + ((File) loggingContext.getBean("logFileDirectory")).getAbsolutePath() +
+                            ". Will log to standard out"
             );
         }
     }
@@ -86,13 +86,13 @@ public class AbstractJTimeSeriesComponent {
                 result = result.substring(0, lastPeriod);
             }
         } catch (UnknownHostException e) {
-            LogUtils.getLogMethods(logClass).logError("Failed to find hostname", e);
+            LogUtils.getLogMethods(logClass).error("Failed to find hostname", e);
         }
         return result;
     }
 
     protected static void initializeApplicationContext() {
-        logMethods.logInfo("Reading Spring Application Context");
+        logMethods.info("Reading Spring Application Context");
         ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
     }
 }

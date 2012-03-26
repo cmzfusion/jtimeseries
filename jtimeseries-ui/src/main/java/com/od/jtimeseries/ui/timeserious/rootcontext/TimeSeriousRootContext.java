@@ -112,7 +112,7 @@ public class TimeSeriousRootContext extends AbstractUIRootContext implements Con
                     c.getDescription()
                 );
             } catch (UnknownHostException e) {
-                logMethods.logError("Could not create server " + serverDictionary, e);
+                logMethods.error("Could not create server " + serverDictionary, e);
             }
         }
     }

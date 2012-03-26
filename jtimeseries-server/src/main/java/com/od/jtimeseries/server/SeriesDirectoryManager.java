@@ -80,22 +80,22 @@ public class SeriesDirectoryManager {
     }
 
     public void loadExistingSeries() {
-        logMethods.logInfo("Loading series from directory " + seriesDirectory);
+        logMethods.info("Loading series from directory " + seriesDirectory);
         File[] candidateFiles = getCandidateSeriesFiles();
-        logMethods.logInfo("Found " + candidateFiles.length + " possible timeseries files, about to commence loading..");
+        logMethods.info("Found " + candidateFiles.length + " possible timeseries files, about to commence loading..");
         long startTime = System.currentTimeMillis();
         for (File f : candidateFiles) {
             if ( ! f.isDirectory()) {
                 if ( f.canRead() ) {
                     loadTimeSeries(f);
                 } else {
-                    logMethods.logInfo("Cannot read time series file " + f + " - will skip loading this one");
+                    logMethods.info("Cannot read time series file " + f + " - will skip loading this one");
                 }
             }
 
         }
         long loadTime = System.currentTimeMillis() - startTime;
-        logMethods.logInfo("Loaded " + loadCount + " series in " + loadTime + " milliseconds");
+        logMethods.info("Loaded " + loadCount + " series in " + loadTime + " milliseconds");
 
     }
 
@@ -105,9 +105,9 @@ public class SeriesDirectoryManager {
             String path = header.getPath();
             PathMappingResult r = pathMapper.getPathMapping(path);
             if (r.getType() == PathMappingResult.ResultType.DENY) {
-                logMethods.logWarning("Not loading series at path " + path + " since this path is denied by path mapping rules");
+                logMethods.warn("Not loading series at path " + path + " since this path is denied by path mapping rules");
             } else if ( ! r.getNewPath().equals(path)) {
-                logMethods.logInfo("Migrating series at path " + path + " to " + r.getNewPath() + " since this path is migrated by path mapping rules");
+                logMethods.info("Migrating series at path " + path + " to " + r.getNewPath() + " since this path is migrated by path mapping rules");
                 timeseriesSerializer.migratePath(header, r.getNewPath());
                 loadSeriesFile(header);
             } else {
@@ -115,7 +115,7 @@ public class SeriesDirectoryManager {
             }
 
         } catch (SerializationException e) {
-            logMethods.logError("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);
+            logMethods.error("Failed to read series file " + f + ", this series is possibly corrupted, and will not be loaded, please remove it", e);
         }
     }
 
@@ -123,7 +123,7 @@ public class SeriesDirectoryManager {
         //the type of time series which will be created depends on the TimeSeriesFactory set on the context
         //we are expecting FilesystemTimeSeries
         if ( ! rootContext.contains(header.getPath())) { //this may be a server metrics series which has already been created
-            logMethods.logInfo("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
+            logMethods.info("Setting up series " + header.getPath() + " with current size " + header.getCurrentSeriesSize());
             rootContext.create(header.getPath(), header.getDescription(), IdentifiableTimeSeries.class, header);
             loadCount++;
         }
@@ -138,7 +138,7 @@ public class SeriesDirectoryManager {
     }
 
     public void removeOldTimeseriesFiles() {
-        logMethods.logInfo("Removing old timeseries files");
+        logMethods.info("Removing old timeseries files");
         reaper.reap();
     }
 }

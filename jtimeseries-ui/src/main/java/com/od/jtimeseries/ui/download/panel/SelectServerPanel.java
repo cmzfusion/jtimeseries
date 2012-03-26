@@ -202,7 +202,7 @@ public class SelectServerPanel extends AbstractDownloadWizardPanel {
                 }
             }
         } catch (MalformedURLException e1) {
-            logMethods.logError("Bad URL specified", e1);
+            logMethods.error("Bad URL specified", e1);
         }
     }
 

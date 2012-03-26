@@ -58,11 +58,11 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
         this.regExCaptureGroup = regExCaptureGroup;
         this.captureFunctions = captureFunctions;
 
-        logMethods.logInfo("Creating DoubleRegexValueHandler for path " + destinationSeriesPath);        
+        logMethods.info("Creating DoubleRegexValueHandler for path " + destinationSeriesPath);
     }
 
     public void parseInputValue(Matcher m) {
-        logMethods.logDebug("initial group count: " + m.groupCount());
+        logMethods.debug("initial group count: " + m.groupCount());
         if ( m.groupCount() < regExCaptureGroup) {
             logGroupError();
         } else {
@@ -84,14 +84,14 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
 
         ValueRecorder v = getOrCreateSeries(expandedSeriesPath, expandedDescription);
         String value = m.group(regExCaptureGroup);
-        logMethods.logDebug("DoubleRegexValueHandler processing value [" + value + "] for series " + expandedSeriesPath);
+        logMethods.debug("DoubleRegexValueHandler processing value [" + value + "] for series " + expandedSeriesPath);
         try {
             Double d = Double.parseDouble(value);
             v.newValue(d);
         } catch ( NumberFormatException nfe) {
             if ( ! errorLogged.getAndSet(true)) {
                 //don't want to log this for every line of input
-                logMethods.logError("Cannot read values for series " + destinationSeriesPath + ". The parsed value " + value +
+                logMethods.error("Cannot read values for series " + destinationSeriesPath + ". The parsed value " + value +
                         " for group " + regExCaptureGroup + " appears not to be numeric");
             }
         }
@@ -100,13 +100,13 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
     private ValueRecorder getOrCreateSeries(String expandedSeriesPath, String expandedDescription) {
         ValueRecorder result = expandedSeriesToValueRecorderMap.get(expandedSeriesPath);
         if ( result == null ) {
-            logMethods.logInfo("Creating series for path " + expandedSeriesPath);
+            logMethods.info("Creating series for path " + expandedSeriesPath);
             if ( rootContext.findValueSources(expandedSeriesPath).getNumberOfMatches() > 0 ) {
                 throw new RuntimeException("There is already a series set up with path " + expandedSeriesPath + ". Cannot set up this value handler");
             }
 
             result = rootContext.createValueRecorderSeries(expandedSeriesPath, expandedDescription, captureFunctions);
-            logMethods.logInfo("Creating valueRecorder for path " + expandedSeriesPath);
+            logMethods.info("Creating valueRecorder for path " + expandedSeriesPath);
 
             expandedSeriesToValueRecorderMap.put(expandedSeriesPath, result);
         }
@@ -116,7 +116,7 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
     private void logGroupError() {
         //don't want to log this for every line of input
         if ( ! errorLogged.getAndSet(true) ) {
-            logMethods.logError("Cannot read values for series " + destinationSeriesPath + ". This regular expression matcher does not have " + regExCaptureGroup + " capture groups");
+            logMethods.error("Cannot read values for series " + destinationSeriesPath + ". This regular expression matcher does not have " + regExCaptureGroup + " capture groups");
         }
     }
 }

@@ -102,12 +102,12 @@ public class LocalJmxMetrics {
     }
 
     public void startJmxManagementService(int port) {
-        logMethods.logInfo("Starting jmx management service");
+        logMethods.info("Starting jmx management service");
         jmxService.startJmxManagementService(port);
     }
 
     public void startLocalMetricCollection() {
-        logMethods.logInfo("Starting local metric connection");
+        logMethods.info("Starting local metric connection");
 
         JmxMeasurement cpu = JmxMeasurements.cpuTimePercentage(metricRootPath);
         JmxMeasurement memoryPercentOfMax = JmxMeasurements.heapMemoryPercentageOfMax(metricRootPath);

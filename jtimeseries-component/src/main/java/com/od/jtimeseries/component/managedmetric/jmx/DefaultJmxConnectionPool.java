@@ -51,7 +51,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
     }
 
     public JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception {
-        logMethods.logDebug("Getting JMX connection to service " + serviceUrl);
+        logMethods.debug("Getting JMX connection to service " + serviceUrl);
         getConnectionLock(serviceUrl).acquireUninterruptibly();
         JmxConnectionWrapper w = connectionMap.get(serviceUrl);
         if ( w == null) {
@@ -72,7 +72,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
         if ( connectionMap.containsKey(key)) {
             throw new UnsupportedOperationException("Connection pool already contains a connection for " + key);
         } else {
-            logMethods.logInfo("Creating JMX connection to service " + key);
+            logMethods.info("Creating JMX connection to service " + key);
             JmxConnectionWrapperImpl c = new JmxConnectionWrapperImpl(key, connectorEnvironment);
             connectionMap.put(key, c);
             jmxConnectionCounter.incrementCount();
@@ -106,12 +106,12 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
     }
 
     private void doCloseAndRemove(JmxConnectionWrapperImpl connection) {
-        logMethods.logDebug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
+        logMethods.debug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
         if ( ! connection.closed) {
             try {
                 connection.close();
             } catch (Throwable t) {
-                logMethods.logWarning("Failed to close connection " + connection + " this connection may have been disconnected already");
+                logMethods.warn("Failed to close connection " + connection + " this connection may have been disconnected already");
             }
         }
         if ( connectionMap.remove(connection.getServiceURL()) != null ) {
@@ -194,7 +194,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
                 try {
                     connector.close();
                 } catch (IOException e) {
-                    logMethods.logError("Failed to close JMX connection to " + serviceURL, e);
+                    logMethods.error("Failed to close JMX connection to " + serviceURL, e);
                 }
             }
         }
@@ -212,12 +212,12 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
             public void handleNotification(Notification notification, Object handback) {
                 JMXConnectionNotification n = (JMXConnectionNotification)notification;
                 if ( handback == JmxConnectionWrapperImpl.this && JMXConnectionNotification.CLOSED.equals(n.getType())) {
-                     logMethods.logWarning("JMXConnection " + JmxConnectionWrapperImpl.this +
+                     logMethods.warn("JMXConnection " + JmxConnectionWrapperImpl.this +
                              " event recieved with connection status " + n.getType() + ", will remove from pool");
                       closed = true;
                       closeAndRemove(JmxConnectionWrapperImpl.this);
                 } else if ( handback == JmxConnectionWrapperImpl.this && JMXConnectionNotification.NOTIFS_LOST.equals(n.getType())) {
-                    logMethods.logWarning("JMXConnection " + JmxConnectionWrapperImpl.this +
+                    logMethods.warn("JMXConnection " + JmxConnectionWrapperImpl.this +
                             " lost notifications, but I'm not taking any action");
                     //we don't use the notification mechanism so this is probably ok
                 }

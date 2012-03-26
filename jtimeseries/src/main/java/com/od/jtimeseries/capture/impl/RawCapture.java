@@ -77,7 +77,7 @@ public class RawCapture extends AbstractCapture implements ValueSourceCapture {
             timeSeries.addItem(new Item(System.currentTimeMillis(), v));
             fireCaptureCompleteEvent(v, timeSeries);
         } catch (Throwable t) {
-            logMethods.logError("Failed to capture value " + v + " to series " + timeSeries, t);
+            logMethods.error("Failed to capture value " + v + " to series " + timeSeries, t);
         }
     }
 

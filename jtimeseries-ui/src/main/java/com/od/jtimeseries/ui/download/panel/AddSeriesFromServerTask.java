@@ -116,7 +116,7 @@ public class AddSeriesFromServerTask implements Callable<List<ReadTimeSeriesInde
             //update the summary stats on the shared remote http series, if it exists
             RemoteHttpTimeSeries.updateSummaryStats(config, series.getSummaryStatsProperties());
         } catch (Throwable t) {
-            logMethods.logError("Error adding series from server " + path + " in context " + destinationRootContext, t);
+            logMethods.error("Error adding series from server " + path + " in context " + destinationRootContext, t);
         }
     }
 

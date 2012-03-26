@@ -67,7 +67,7 @@ public class ConfigInitializer {
             try {
                 result = configManager.loadConfig(MAIN_CONFIG_NAME, TimeSeriousConfig.class);
             } catch (NoConfigFoundException nfe) {
-                logMethods.logWarning("Could not find a config " + MAIN_CONFIG_NAME + " config, will use default config");
+                logMethods.warn("Could not find a config " + MAIN_CONFIG_NAME + " config, will use default config");
             } catch (ConfigManagerException n) {
                 logMethods.logWarning("Could not load " + MAIN_CONFIG_NAME + " config, will use default config", n);
             }
@@ -88,7 +88,7 @@ public class ConfigInitializer {
         if ( canSave ) {
             doSave(config);
         } else {
-            logMethods.logInfo("Not saving, config manager not initialized");
+            logMethods.info("Not saving, config manager not initialized");
         }
         return canSave;
     }
@@ -129,10 +129,10 @@ public class ConfigInitializer {
         if ( ! defaultConfigFolder.exists()) {
              boolean created = defaultConfigFolder.mkdir();
              if ( created) {
-                 logMethods.logInfo("Created default config directory at " + defaultConfigFolder);
+                 logMethods.info("Created default config directory at " + defaultConfigFolder);
                  configManager = createConfigManager(defaultConfigFolder);
              } else {
-                 logMethods.logInfo("Could not create default config directory at " + defaultConfigFolder);
+                 logMethods.info("Could not create default config directory at " + defaultConfigFolder);
              }
         }
     }
@@ -146,7 +146,7 @@ public class ConfigInitializer {
     }
 
     private ConfigManager showConfigDirectorySelector(JFrame mainFrame) {
-        logMethods.logInfo("Showing config directory selector");
+        logMethods.info("Showing config directory selector");
         ConfigDirectorySelector s = new ConfigDirectorySelector(mainFrame);
         s.showSelectorDialog();
         File f = s.getSelectedDirectory();
@@ -163,7 +163,7 @@ public class ConfigInitializer {
                 result = showConfigDirectorySelector(mainFrame);
             }
         }
-        logMethods.logInfo("User selected directory " + f + " configManager initialized: " + isInitializedAndWritable());
+        logMethods.info("User selected directory " + f + " configManager initialized: " + isInitializedAndWritable());
         return result;
     }
 
@@ -181,7 +181,7 @@ public class ConfigInitializer {
         try {
             configManager.saveConfig(MAIN_CONFIG_NAME, c, new FileSink(selectedFile));
         } catch (ConfigManagerException e) {
-            logMethods.logError("Failed to export config to file " + selectedFile, e);
+            logMethods.error("Failed to export config to file " + selectedFile, e);
             JOptionPane.showMessageDialog(mainFrame, "Failed to export config", "Error exporting config", JOptionPane.ERROR_MESSAGE);
         }
 
@@ -196,7 +196,7 @@ public class ConfigInitializer {
             ConfigManagerForTimeSerious c = new ConfigManagerForTimeSerious();
             result = c.loadConfig(MAIN_CONFIG_NAME, ExportableConfig.class, new FileSource(selectedFile));
         } catch (ConfigManagerException e) {
-            logMethods.logError("Failed to import config to file " + selectedFile, e);
+            logMethods.error("Failed to import config to file " + selectedFile, e);
             JOptionPane.showMessageDialog(mainFrame, "Failed to import config", "Error importing config", JOptionPane.ERROR_MESSAGE);
         }
         return result;

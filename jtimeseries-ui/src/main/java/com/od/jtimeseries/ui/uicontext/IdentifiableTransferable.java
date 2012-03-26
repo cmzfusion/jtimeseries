@@ -105,7 +105,7 @@ public class IdentifiableTransferable implements Transferable {
                     files.add(tmpFile);
                     tmpFile.deleteOnExit();
                 } catch (ConfigManagerException e) {
-                    logMethods.logError("Failed to write temporary exportable config", e);
+                    logMethods.error("Failed to write temporary exportable config", e);
                 }
             }
             result = files;

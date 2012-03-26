@@ -42,36 +42,48 @@ public class ApacheLog4jLogMethodsFactory implements LogMethodsFactory {
             this.logger = Logger.getLogger(c.getName());
         }
 
-        public void logInfo(String s) {
+        public void info(String s) {
             logger.info(s);
         }
 
-        public void logDebug(String s) {
+        public void debug(String s) {
             logger.debug(s);
         }
 
-        public void logDebug(String s, Throwable t) {
+        public void debug(String s, Throwable t) {
             logger.debug(s, t);
         }
 
-        public void logWarning(String s) {
+        public void warn(String s) {
             logger.warn(s);
+        }
+
+        public boolean isWarnEnabled() {
+            return true;
         }
 
         public void logWarning(String s, Throwable t) {
             logger.warn(s, t);
         }
 
-        public void logError(String s) {
+        public void error(String s) {
             logger.error(s);
         }
 
-        public void logError(String s, Throwable t) {
+        public void error(String s, Throwable t) {
             logger.error(s, t);
         }
 
         public void setLogLevel(LogLevel l) {
             logger.setLevel(getLevel(l));
+        }
+
+        public boolean isDebugEnabled() {
+            return logger.isDebugEnabled();
+        }
+
+        public boolean isInfoEnabled() {
+            return logger.isInfoEnabled();
         }
 
         private Level getLevel(LogLevel l) {

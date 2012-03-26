@@ -63,7 +63,7 @@ public class SummaryStatisticsCalculator {
 
     public void start() {
         if ( statistics.size() > 0) {
-            logMethods.logInfo("Starting summary statistics calculation every " + summaryRecalculationSleepTime);
+            logMethods.info("Starting summary statistics calculation every " + summaryRecalculationSleepTime);
             Thread t = new Thread(new SummaryStatisticsRecalculator());
             t.setDaemon(true);
             t.setName("SummaryStatsRecalculation");
@@ -85,7 +85,7 @@ public class SummaryStatisticsCalculator {
             try {
                 runSummaryStatsLoop();
             } catch ( Throwable t) {
-                logMethods.logError("Summary stats thread died!");
+                logMethods.error("Summary stats thread died!");
             }
         }
 
@@ -102,9 +102,9 @@ public class SummaryStatisticsCalculator {
 
         private void doRecalculations(QueryResult<FilesystemTimeSeries> r, int numberOfSeries) {
             long requiredSleepTime = summaryRecalculationSleepTime.getLengthInMillis();
-            logMethods.logDebug("Summary statistics calculator sleep time is " + requiredSleepTime +
-                ", it will take at least " + (numberOfSeries * requiredSleepTime / 1000) + " seconds to " +
-                "recalculate all series stats for this run");
+            logMethods.debug("Summary statistics calculator sleep time is " + requiredSleepTime +
+                    ", it will take at least " + (numberOfSeries * requiredSleepTime / 1000) + " seconds to " +
+                    "recalculate all series stats for this run");
 
             for (FilesystemTimeSeries s : r.getAllMatches()) {
                 if ( requiresRecalculation(s)) {
@@ -127,7 +127,7 @@ public class SummaryStatisticsCalculator {
             try {
                 Thread.sleep(requiredSleepTime);
             } catch (InterruptedException e) {
-                logMethods.logError("Interrupted when sleeping for summary stats", e);
+                logMethods.error("Interrupted when sleeping for summary stats", e);
             }
         }
 
@@ -152,7 +152,7 @@ public class SummaryStatisticsCalculator {
                     //always use NaN as the String NaN representation
                     s.setProperty(propertyName, Double.isNaN(value) ? "NaN" : doubleFormat.format(value));
                 } catch (Throwable t) {
-                    logMethods.logError("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);
+                    logMethods.error("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);
                 }
             }
         }

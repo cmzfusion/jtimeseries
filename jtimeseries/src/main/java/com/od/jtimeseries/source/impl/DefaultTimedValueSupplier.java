@@ -60,7 +60,7 @@ public class DefaultTimedValueSupplier extends AbstractValueSource implements Ti
                         newSourceValue(value);
                     }
                 } catch (Throwable t) {
-                    logMethods.logError("Failed to get new value from ValueSupplier", t);
+                    logMethods.error("Failed to get new value from ValueSupplier", t);
                 }
             }
         };

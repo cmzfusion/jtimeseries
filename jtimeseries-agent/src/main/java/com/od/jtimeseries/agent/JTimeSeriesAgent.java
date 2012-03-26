@@ -25,8 +25,6 @@ import com.od.jtimeseries.component.AbstractJTimeSeriesComponent;
 import com.od.jtimeseries.component.jmx.JmxManagementService;
 import com.od.jtimeseries.component.managedmetric.ManagedMetricInitializer;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
-import com.od.jtimeseries.identifiable.PathParser;
 import com.od.jtimeseries.net.httpd.JTimeSeriesHttpd;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpPublishingTreeListener;
@@ -66,12 +64,12 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
     public JTimeSeriesAgent() {}
 
     private void startup() {
-        logMethods.logInfo("Starting JTimeSeriesAgent");
+        logMethods.info("Starting JTimeSeriesAgent");
         try {
             doStartup();
-            logMethods.logInfo("JTimeSeriesAgent is up.");
+            logMethods.info("JTimeSeriesAgent is up.");
         } catch ( Throwable t) {
-            logMethods.logError("Error starting JTimeSeriesAgent", t);
+            logMethods.error("Error starting JTimeSeriesAgent", t);
         }
     }
 
@@ -108,15 +106,15 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
     private void setupManagedMetrics() {
         if ( ! sendAgentMetricsToServer ) {
-            logMethods.logInfo("Not sending agent self-monitoring stats to timeseries-server");
+            logMethods.info("Not sending agent self-monitoring stats to timeseries-server");
         }
 
-        logMethods.logInfo("Setting up server metrics series");
+        logMethods.info("Setting up server metrics series");
         managedMetricInitializer.initializeServerMetrics();
     }
 
     private void startJmx() {
-        logMethods.logInfo("Starting JMX Html Adapter Interface");
+        logMethods.info("Starting JMX Html Adapter Interface");
         try {
             MBeanServer mBeanServer = MBeanServerFactory.createMBeanServer();
 
@@ -126,7 +124,7 @@ public class JTimeSeriesAgent extends AbstractJTimeSeriesComponent {
 
             htmlAdaptorServer.start();
         } catch (Exception e) {
-            logMethods.logError("Failed to start JMX interface", e);
+            logMethods.error("Failed to start JMX interface", e);
         }
     }
 

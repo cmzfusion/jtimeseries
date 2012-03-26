@@ -76,7 +76,7 @@ public class TimeSerious implements ConfigAware {
             config = configInitializer.loadConfig();
             configTreeManager.restoreConfig(config);
         } catch (ConfigManagerException e) {
-            logMethods.logError("Failed to load config or create default config, canot start TimeSerious", e);
+            logMethods.error("Failed to load config or create default config, canot start TimeSerious", e);
         }
 
     }
@@ -127,7 +127,7 @@ public class TimeSerious implements ConfigAware {
             JTimeSeriesHttpd httpd = new JTimeSeriesHttpd(httpdPort, localJmxMetrics.getRootContext());
             httpd.start();
         } catch (IOException e) {
-            logMethods.logError("Could not start timeserious httpd for local metrics", e);
+            logMethods.error("Could not start timeserious httpd for local metrics", e);
         }
     }
 
@@ -136,12 +136,12 @@ public class TimeSerious implements ConfigAware {
 
         public void run() {
             try {
-                logMethods.logInfo("Starting services");
+                logMethods.info("Starting services");
                 startJmxAndLocalHttpd();
                 startServerForUdpServerUpdates();
-                logMethods.logInfo("Finished starting services");
+                logMethods.info("Finished starting services");
             } catch (Throwable t) {
-                logMethods.logError("Error starting services", t);
+                logMethods.error("Error starting services", t);
             }
         }
     }

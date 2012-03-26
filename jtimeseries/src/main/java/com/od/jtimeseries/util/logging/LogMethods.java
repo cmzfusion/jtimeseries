@@ -26,19 +26,25 @@ package com.od.jtimeseries.util.logging;
  */
 public interface LogMethods {
 
-    void logInfo(String s);
+    void info(String s);
 
-    void logDebug(String s);
+    boolean isInfoEnabled();
 
-    void logDebug(String s, Throwable t);
+    void debug(String s);
 
-    void logWarning(String s);
+    boolean isDebugEnabled();
+
+    void debug(String s, Throwable t);
+
+    void warn(String s);
+
+    boolean isWarnEnabled();
 
     void logWarning(String s, Throwable t);
 
-    void logError(String s);
+    void error(String s);
 
-    void logError(String s, Throwable t);
+    void error(String s, Throwable t);
 
     void setLogLevel(LogLevel l);
 

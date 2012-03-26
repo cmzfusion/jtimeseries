@@ -55,25 +55,25 @@ public class ManagedMetricInitializer {
     }
 
     public void initializeServerMetrics() {
-        logMethods.logInfo("Initializing Managed Metrics");
+        logMethods.info("Initializing Managed Metrics");
 
-        logMethods.logInfo("Creating JMX Executor Service " + jmxExecutorService);
+        logMethods.info("Creating JMX Executor Service " + jmxExecutorService);
         JmxMetric.setJmxConnectionPool(jmxExecutorService);
 
         for ( ManagedMetricSource s : managedMetricSourceList) {
             for ( ManagedMetric m : s.getManagedMetrics()) {
-                logMethods.logInfo("Setting up metric " + m);
+                logMethods.info("Setting up metric " + m);
                 setupMetric(m);
             }
         }
-        logMethods.logInfo("Finished initializing Managed Metrics");
+        logMethods.info("Finished initializing Managed Metrics");
     }
 
     private void setupMetric(ManagedMetric m) {
         try {
             m.initializeMetrics(rootContext, pathMapper);
         } catch (Throwable t) {
-            logMethods.logError("Failed to set up managed metric " + m.getClass() + " " + m, t);
+            logMethods.error("Failed to set up managed metric " + m.getClass() + " " + m, t);
         }
     }
 

@@ -83,7 +83,7 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
                     while(i.hasNext()) {
                         Map.Entry<String, Long> e = i.next();
                         if ( currentTime - e.getValue() > STALE_SERIES_DELAY.getLengthInMillis() ) {
-                            logMethod.logInfo("Series " + e.getKey() + " has received no updates for one hour, " +
+                            logMethod.info("Series " + e.getKey() + " has received no updates for one hour, " +
                                     "it is likely this series is no longer being published");
                             i.remove();
                         }
@@ -108,11 +108,11 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
         PathMappingResult result = pathMapper.getPathMapping(path);
         if ( result.getType() == PathMappingResult.ResultType.DENY) {
             if ( loggedDeniedPaths.add(path)) {
-                logMethod.logInfo("Not creating a series for path " + path + ", this is an invalid series path which is denied by path mapping rules configuration");
+                logMethod.info("Not creating a series for path " + path + ", this is an invalid series path which is denied by path mapping rules configuration");
             }
         } else if ( result.getType() == PathMappingResult.ResultType.MIGRATE) {
             if ( loggedMigratedPaths.add(path)) {
-                logMethod.logInfo("Series with path " + path + " will be migrated to path " + result.getNewPath() + " due to path mapping rules configuration");
+                logMethod.info("Series with path " + path + " will be migrated to path " + result.getNewPath() + " due to path mapping rules configuration");
             }
             path = result.getNewPath();
             findOrCreateSeriesAndAddTimepoint(v, path);
@@ -134,12 +134,12 @@ public class AppendToSeriesMessageListener implements UdpServer.UdpMessageListen
                 Long lastTimestamp = liveSeriesLastUpdateMap.get(path);
                 if ( lastTimestamp == null) {
                     liveSeriesLastUpdateMap.put(path, System.currentTimeMillis());
-                    logMethod.logInfo("Started to receive UDP updates for series " + path + " from host " + v.getSourceHostname() + " with address " + v.getSourceInetAddress());
+                    logMethod.info("Started to receive UDP updates for series " + path + " from host " + v.getSourceHostname() + " with address " + v.getSourceInetAddress());
                 }
             }
         } catch ( Exception e) {
-            logMethod.logError("Error when trying to create timeseries for UDP series "  + path + " from host " + v.getSourceInetAddress() + " with address " + v.getSourceInetAddress(), e);
-            logMethod.logDebug("Error when trying to create timeseries", e);
+            logMethod.error("Error when trying to create timeseries for UDP series " + path + " from host " + v.getSourceInetAddress() + " with address " + v.getSourceInetAddress(), e);
+            logMethod.debug("Error when trying to create timeseries", e);
         }
     }
 

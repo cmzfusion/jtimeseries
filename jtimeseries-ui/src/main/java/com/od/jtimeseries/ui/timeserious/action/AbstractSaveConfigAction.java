@@ -77,7 +77,7 @@ public abstract class AbstractSaveConfigAction extends AbstractAction {
         try {
             configInitializer.saveConfig(mainFrame, config);
         } catch (ConfigManagerException e1) {
-            logMethods.logError("Failed to save config", e1);
+            logMethods.error("Failed to save config", e1);
             JOptionPane.showMessageDialog(mainFrame, "Failed to save your config", "Save Failed", JOptionPane.ERROR_MESSAGE);
             result = false;
         }

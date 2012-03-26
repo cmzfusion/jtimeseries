@@ -30,27 +30,39 @@ public class StandardOutputLogMethods implements LogMethods {
 
     private volatile LogLevel currentLogLevel = LogLevel.INFO;
 
-    public void logInfo(String s) {
+    public void info(String s) {
         System.out.println("JTIMESERIES INFO--> " + new Date() + " " + s);
     }
 
-    public void logDebug(String s) {
+    public boolean isInfoEnabled() {
+        return currentLogLevel.equalsOrExceeds(LogLevel.INFO);
+    }
+
+    public void debug(String s) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.DEBUG)) {
             System.out.println("JTIMESERIES DEBUG--> " + new Date() + " " + s);
         }
     }
 
-    public void logDebug(String s, Throwable t) {
+    public boolean isDebugEnabled() {
+        return currentLogLevel.equalsOrExceeds(LogLevel.DEBUG);
+    }
+
+    public void debug(String s, Throwable t) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.DEBUG)) {
             System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
             t.printStackTrace();
         }
     }
 
-    public void logWarning(String s) {
+    public void warn(String s) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.WARNING)) {
             System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
         }
+    }
+
+    public boolean isWarnEnabled() {
+        return currentLogLevel.equalsOrExceeds(LogLevel.WARNING);
     }
 
     public void logWarning(String s, Throwable t) {
@@ -60,14 +72,14 @@ public class StandardOutputLogMethods implements LogMethods {
         }
     }
 
-    public void logError(String s) {
+    public void error(String s) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.ERROR)) {
             System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
             System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
         }
     }
 
-    public void logError(String s, Throwable t) {
+    public void error(String s, Throwable t) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.ERROR)) {
             System.out.println("JTIMESERIES ERROR--> " + new Date() + " " + s);
             System.err.println("JTIMESERIES ERROR--> " + new Date() + " " + s);

@@ -245,7 +245,7 @@ public class UdpClient {
 
         } catch (Throwable t) {
             limitedLogger.logError("Failed to send datagram", t);
-            logMethods.debug("Failed to send datagram ");
+            if (logMethods.isDebugEnabled()) logMethods.debug("Failed to send datagram ");
 
             //close socket if there was an error
             if ( socket != null ) {

@@ -62,7 +62,7 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
     }
 
     public void parseInputValue(Matcher m) {
-        logMethods.debug("initial group count: " + m.groupCount());
+        if (logMethods.isDebugEnabled()) logMethods.debug("initial group count: " + m.groupCount());
         if ( m.groupCount() < regExCaptureGroup) {
             logGroupError();
         } else {
@@ -84,7 +84,7 @@ public class DoubleRegexValueHandler implements RegexValueHandler {
 
         ValueRecorder v = getOrCreateSeries(expandedSeriesPath, expandedDescription);
         String value = m.group(regExCaptureGroup);
-        logMethods.debug("DoubleRegexValueHandler processing value [" + value + "] for series " + expandedSeriesPath);
+        if (logMethods.isDebugEnabled()) logMethods.debug("DoubleRegexValueHandler processing value [" + value + "] for series " + expandedSeriesPath);
         try {
             Double d = Double.parseDouble(value);
             v.newValue(d);

@@ -102,7 +102,7 @@ public class SummaryStatisticsCalculator {
 
         private void doRecalculations(QueryResult<FilesystemTimeSeries> r, int numberOfSeries) {
             long requiredSleepTime = summaryRecalculationSleepTime.getLengthInMillis();
-            logMethods.debug("Summary statistics calculator sleep time is " + requiredSleepTime +
+            if (logMethods.isDebugEnabled()) logMethods.debug("Summary statistics calculator sleep time is " + requiredSleepTime +
                     ", it will take at least " + (numberOfSeries * requiredSleepTime / 1000) + " seconds to " +
                     "recalculate all series stats for this run");
 

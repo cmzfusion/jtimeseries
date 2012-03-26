@@ -51,7 +51,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
     }
 
     public JmxConnectionWrapper getConnection(JMXServiceURL serviceUrl) throws Exception {
-        logMethods.debug("Getting JMX connection to service " + serviceUrl);
+        if (logMethods.isDebugEnabled()) logMethods.debug("Getting JMX connection to service " + serviceUrl);
         getConnectionLock(serviceUrl).acquireUninterruptibly();
         JmxConnectionWrapper w = connectionMap.get(serviceUrl);
         if ( w == null) {
@@ -106,7 +106,7 @@ public class DefaultJmxConnectionPool implements JmxConnectionPool {
     }
 
     private void doCloseAndRemove(JmxConnectionWrapperImpl connection) {
-        logMethods.debug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
+        if (logMethods.isDebugEnabled()) logMethods.debug("Closing JMX connection " + connection + " which is " + connection.getAge() + " millis old");
         if ( ! connection.closed) {
             try {
                 connection.close();

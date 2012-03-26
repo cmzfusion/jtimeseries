@@ -143,7 +143,7 @@ public class DefaultTimedCapture extends AbstractCapture implements TimedCapture
                     );
                     fireCaptureCompleteEvent(value, timeSeries);
                 } catch (Throwable t) {
-                    logMethods.debug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, t);
+                    if (logMethods.isDebugEnabled()) logMethods.debug("Failed to calculate and add new value " + value + " to timeseries " + timeSeries + " using function " + oldFunctionInstance, t);
                 }
             }
         };

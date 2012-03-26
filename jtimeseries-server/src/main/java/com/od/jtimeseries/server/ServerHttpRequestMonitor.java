@@ -29,7 +29,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
     private ThreadLocal<Long> requestStartTimes = new ThreadLocal<Long>();
 
     public void requestStarting(long requestId, Socket mySocket) {
-        logMethods.debug("Starting HTTPD request " + requestId + " from client " + mySocket.getInetAddress());
+        if (logMethods.isDebugEnabled()) logMethods.debug("Starting HTTPD request " + requestId + " from client " + mySocket.getInetAddress());
         requestCounter.incrementCount();
         requestStartTimes.set(System.currentTimeMillis());
     }
@@ -56,7 +56,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
 
     public void finishedRequest(long requestId, Socket mySocket) {
         long timeTaken = logQueryTime();
-        logMethods.debug("Finished HTTPD request " + requestId + " in " + timeTaken + " millis");
+        if (logMethods.isDebugEnabled()) logMethods.debug("Finished HTTPD request " + requestId + " in " + timeTaken + " millis");
     }
 
     private long logQueryTime() {

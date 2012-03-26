@@ -37,7 +37,7 @@ public class Utf8MessageFactory implements UdpMessageFactory {
 
 
     public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
-        return new Utf8TimeSeriesValueMessage(path, hostname, timeSeriesItem);
+        return new Utf8TimeSeriesValueMessage(hostname, path, timeSeriesItem);
     }
 
     public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {

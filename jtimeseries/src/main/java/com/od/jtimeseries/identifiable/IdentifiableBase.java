@@ -50,8 +50,11 @@ public class IdentifiableBase extends LockingIdentifiable {
     }
 
     public IdentifiableBase(String id, String description) {
+        checkId(id);
+        description = description != null ? description : "";
+        checkDescription(description);
         this.id = id;
-        this.description = description;
+        this.description = description == null ? "" : description;
     }
 
     public String getId() {
@@ -216,10 +219,16 @@ public class IdentifiableBase extends LockingIdentifiable {
         }
     }
 
-    protected void checkId(String id) {
+    private void checkId(String id) {
         String problem = IdentifiablePathUtils.checkId(id);
         if ( problem != null) {
             throw new IdentifierException(problem);
+        }
+    }
+
+    private void checkDescription(String description) {
+        if ( description.length() > DESCRIPTION_MAX_LENGTH) {
+            throw new IdentifierException("Description cannot be greater than " + DESCRIPTION_MAX_LENGTH + " characters in length");
         }
     }
 

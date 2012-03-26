@@ -37,6 +37,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public interface Identifiable {
 
     String NAMESPACE_SEPARATOR = ".";
+    int DESCRIPTION_MAX_LENGTH = 256;
 
     String getId();
 
@@ -47,6 +48,9 @@ public interface Identifiable {
      */
     String getPath();
 
+    /**
+     * @param description, must not be greater than 256 characters in length since this may be sent over the network and/or displayed
+     */
     void setDescription(String description);
 
     String getDescription();

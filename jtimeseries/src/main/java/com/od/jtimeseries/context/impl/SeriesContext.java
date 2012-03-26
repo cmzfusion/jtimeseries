@@ -85,7 +85,6 @@ public class SeriesContext extends LockingTimeSeriesContext {
      */
     public SeriesContext(String id, String description, boolean createRootContextResources, boolean initialize) {
         super(id, description);
-        checkId(id);
         if (createRootContextResources) {
             createRootContextResources();
         }

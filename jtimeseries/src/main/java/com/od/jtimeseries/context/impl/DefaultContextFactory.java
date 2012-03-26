@@ -38,8 +38,8 @@ public class DefaultContextFactory extends IdentifiableBase implements ContextFa
     }
 
     public TimeSeriesContext createContext(TimeSeriesContext parent, String id, String description, Class classType, Object... parameters) {
-        if (classType.isAssignableFrom(DefaultTimeSeriesContext.class)) {
-            return new DefaultTimeSeriesContext(id, description, false);
+        if (classType.isAssignableFrom(SeriesContext.class)) {
+            return new SeriesContext(id, description, false);
         } else {
             throw new UnsupportedOperationException("Cannot create a context of type " + classType);
         }

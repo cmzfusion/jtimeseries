@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.identifiable;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.net.udp.TimeSeriesServer;
 import com.od.jtimeseries.ui.util.Displayable;
 import com.od.swing.util.UIUtilities;
@@ -34,7 +34,7 @@ import java.beans.PropertyChangeListener;
  * Time: 14:13:37
  * To change this template use File | Settings | File Templates.
  */
-public class TimeSeriesServerContext extends DefaultTimeSeriesContext implements Displayable {
+public class TimeSeriesServerContext extends SeriesContext implements Displayable {
 
     private TimeSeriesServer server;
     private boolean loading;

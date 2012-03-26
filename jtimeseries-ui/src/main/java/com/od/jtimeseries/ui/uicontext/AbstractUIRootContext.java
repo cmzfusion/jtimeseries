@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.uicontext;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -39,7 +39,7 @@ import java.util.List;
  * Date: 23/02/11
  * Time: 06:48
  */
-public abstract class AbstractUIRootContext extends DefaultTimeSeriesContext {
+public abstract class AbstractUIRootContext extends SeriesContext {
 
     protected static final LogMethods logMethods = LogUtils.getLogMethods(AbstractUIRootContext.class);
     private ContextImportExportHandler importExportHandler = new DummyImportExportHandler();

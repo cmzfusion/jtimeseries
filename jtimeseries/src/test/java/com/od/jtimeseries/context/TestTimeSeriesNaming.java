@@ -1,6 +1,6 @@
 package com.od.jtimeseries.context;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.Time;
 import junit.framework.TestCase;
@@ -30,7 +30,7 @@ public class TestTimeSeriesNaming extends TestCase {
 
     @Before
     public void setUp() {
-        rootContext = new DefaultTimeSeriesContext("Test Root Context", "Test Root Context");
+        rootContext = new SeriesContext("Test Root Context", "Test Root Context");
     }
 
     public void testMilliseconds() {

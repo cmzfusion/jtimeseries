@@ -19,7 +19,7 @@
 package com.od.jtimeseries.ui.identifiable;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 
 /**
@@ -35,7 +35,7 @@ import com.od.jtimeseries.ui.config.ExportableConfig;
  * When the peer component is hidden, it's config is stored so that it can be restored and
  * shown again later
  */
-public abstract class HidablePeerContext<E extends ExportableConfig, P> extends DefaultTimeSeriesContext {
+public abstract class HidablePeerContext<E extends ExportableConfig, P> extends SeriesContext {
 
     public static final String SHOWN_PROPERTY = "shown";
 

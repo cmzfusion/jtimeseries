@@ -22,7 +22,7 @@
         <constructor-arg value="${maxRoundRobinSeriesSize}"/>
     </bean>
 
-    <bean id="rootContext" class="com.od.jtimeseries.context.impl.DefaultTimeSeriesContext">
+    <bean id="rootContext" class="com.od.jtimeseries.context.impl.SeriesContext">
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
         <property name="timeSeriesFactory" ref="timeSeriesFactory"/>

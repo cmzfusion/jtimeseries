@@ -34,7 +34,7 @@
 
     <bean id="scheduler" class="com.od.jtimeseries.scheduling.NonGroupingScheduler"/>
 
-    <bean id="rootContext" class="com.od.jtimeseries.context.impl.DefaultTimeSeriesContext" init-method="initializeRootContext">
+    <bean id="rootContext" class="com.od.jtimeseries.context.impl.SeriesContext" init-method="initializeRootContext">
         <constructor-arg value="${rootContextName}"/>
         <constructor-arg value="${rootContextDescription}"/>
         <constructor-arg value="true"/>

@@ -3,7 +3,7 @@ package com.od.jtimeseries.util;
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureState;
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.source.*;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
@@ -39,7 +39,7 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
 
     @Before
     public void setUp() {
-        rootContext = new DefaultTimeSeriesContext("Test Root Context", "Test Root Context");
+        rootContext = new SeriesContext("Test Root Context", "Test Root Context");
         doExtraSetUp();
     }
 

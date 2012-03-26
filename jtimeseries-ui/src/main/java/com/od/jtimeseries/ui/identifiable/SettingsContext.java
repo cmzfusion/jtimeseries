@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.identifiable;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,7 +27,7 @@ import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
  * Time: 09:20
  * To change this template use File | Settings | File Templates.
  */
-public class SettingsContext extends DefaultTimeSeriesContext {
+public class SettingsContext extends SeriesContext {
 
     public static final String SETTINGS_NODE_NAME = "Settings";
 

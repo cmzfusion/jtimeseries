@@ -18,7 +18,7 @@
  */
 package com.od.jtimeseries.ui.identifiable;
 
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.ui.config.ExportableConfig;
 import com.od.jtimeseries.ui.config.ExportableConfigHolder;
 import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
@@ -29,7 +29,7 @@ import com.od.jtimeseries.ui.displaypattern.DisplayNameCalculator;
  * Date: 12/05/11
  * Time: 08:12
  */
-public class DisplayNamesContext extends DefaultTimeSeriesContext implements ExportableConfigHolder {
+public class DisplayNamesContext extends SeriesContext implements ExportableConfigHolder {
 
     public static final String DISPLAY_NAME_NODE_NAME = "Display Name Rules";
 

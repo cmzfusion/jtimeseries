@@ -1,7 +1,7 @@
 package com.od.jtimeseries.server.timeseries;
 
 import com.od.jtimeseries.context.TimeSeriesContext;
-import com.od.jtimeseries.context.impl.DefaultTimeSeriesContext;
+import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.server.serialization.*;
 import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
 import com.od.jtimeseries.util.time.Time;
@@ -33,7 +33,7 @@ public class TestFilesystemTimeSeries extends TestCase {
     }
 
     public FilesystemTimeSeries getTimeSeriesInstance() throws Exception {
-        TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
+        TimeSeriesContext context = new SeriesContext().createContext(TEST_CONTEXT);
         FilesystemTimeSeries s = new FilesystemTimeSeries(
                 context.getPath(),
                 "id" + (int)(Math.random() * 100000000),
@@ -127,7 +127,7 @@ public class TestFilesystemTimeSeries extends TestCase {
 
     @Test
     public void testMaximumSize() throws SerializationException {
-        TimeSeriesContext c = new DefaultTimeSeriesContext().createContext("test");
+        TimeSeriesContext c = new SeriesContext().createContext("test");
         int maxSize = 3;
         FilesystemTimeSeries series = new FilesystemTimeSeries(c.getPath(), "id" + (int)(Math.random() * 100000000), "description", timeseriesSerializer, maxSize, Time.seconds(10), Time.seconds(10));
         c.addChild(series);
@@ -195,7 +195,7 @@ public class TestFilesystemTimeSeries extends TestCase {
         series.flush();
         assertEquals(3, series.getFileHeader().getMostRecentItemTimestamp());
 
-        TimeSeriesContext context = new DefaultTimeSeriesContext().createContext(TEST_CONTEXT);
+        TimeSeriesContext context = new SeriesContext().createContext(TEST_CONTEXT);
         FilesystemTimeSeries s = new FilesystemTimeSeries(context.getPath(), series.getId(), "description", timeseriesSerializer, 10000, Time.seconds(10), Time.seconds(10));
         context.addChild(s);
         assertEquals(3, s.getLatestTimestamp());

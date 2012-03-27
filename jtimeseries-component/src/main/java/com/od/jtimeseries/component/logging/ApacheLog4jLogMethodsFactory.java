@@ -62,7 +62,7 @@ public class ApacheLog4jLogMethodsFactory implements LogMethodsFactory {
             return true;
         }
 
-        public void logWarning(String s, Throwable t) {
+        public void warn(String s, Throwable t) {
             logger.warn(s, t);
         }
 

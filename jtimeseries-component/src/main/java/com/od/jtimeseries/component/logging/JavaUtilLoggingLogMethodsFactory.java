@@ -172,9 +172,9 @@ public class JavaUtilLoggingLogMethodsFactory implements LogMethodsFactory{
             return logger.isLoggable(Level.WARNING);
         }
 
-        public void logWarning(String s, Throwable t) {
+        public void warn(String s, Throwable t) {
             s = addThreadDetails(s);
-            standardOutMethods.logWarning(s, t);
+            standardOutMethods.warn(s, t);
             logger.log(Level.WARNING, s, t);
         }
 

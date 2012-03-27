@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public interface Identifiable {
 
     String NAMESPACE_SEPARATOR = ".";
-    int DESCRIPTION_MAX_LENGTH = 256;
+    int DESCRIPTION_MAX_LENGTH = 350; //sized to allow description to easily fit into a single UDP packet of 512bytes
 
     String getId();
 
@@ -49,7 +49,8 @@ public interface Identifiable {
     String getPath();
 
     /**
-     * @param description, must not be greater than 256 characters in length since this may be sent over the network and/or displayed
+     * @param description, must not be greater than 350 characters in length since this may be sent over the network
+     * in a UDP package, or displayed in a UI which requires a maximum sizing
      */
     void setDescription(String description);
 

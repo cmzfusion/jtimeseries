@@ -258,7 +258,7 @@ public class JmxMetric implements ManagedMetric {
                             //don't log a stack every time, just the first it fails
                             logMethods.warn("Could not read JmxMeasurement " + m + " from connection " + w + ", " + t.getClass().getSimpleName() + ", " + t.getMessage());
                         } else {
-                            logMethods.logWarning("Could not read JmxMeasurement " + m + " from connection " + w, t);
+                            logMethods.warn("Could not read JmxMeasurement " + m + " from connection " + w, t);
                         }
                     }
                 }

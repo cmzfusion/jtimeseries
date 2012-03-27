@@ -70,7 +70,7 @@ public class ServerHttpRequestMonitor implements HttpRequestMonitor {
 
     public void exceptionDuringProcessing(long requestId, Socket mySocket, Throwable t) {
         requestErrorCounter.incrementCount();
-        logMethods.logWarning("Error processing HTTPD request " + requestId, t);
+        logMethods.warn("Error processing HTTPD request " + requestId, t);
     }
 
     public void invalidRequest(long requestId, Socket mySocket, String httpErrorType) {

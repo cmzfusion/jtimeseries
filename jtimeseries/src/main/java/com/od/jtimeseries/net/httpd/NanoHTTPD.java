@@ -153,7 +153,7 @@ public class NanoHTTPD {
                         new HTTPSession(ss.accept());
                     }
                 } catch (Throwable t) {
-                    logMethods.logWarning("Error in HttpdSocketAccept", t);
+                    logMethods.warn("Error in HttpdSocketAccept", t);
                 }
             }
         });
@@ -231,20 +231,20 @@ public class NanoHTTPD {
                 try {
                     sendError(e.getHttpErrorType(), e.getErrorDescription());
                 } catch (Exception x) {
-                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", x);
+                    logMethods.warn("Failed to send error response to client, perhaps the connection is already closed", x);
                 }
             } catch (Throwable t) {
                 try {
                     requestMonitor.exceptionDuringProcessing(requestId, mySocket, t);
                     sendError(HTTP_INTERNALERROR, "Unhandled exception processing HTTP Request");
                 } catch (Exception x) {
-                    logMethods.logWarning("Failed to send error response to client, perhaps the connection is already closed", x);
+                    logMethods.warn("Failed to send error response to client, perhaps the connection is already closed", x);
                 }
             } finally {
                 try {
                     mySocket.close();
                 } catch (Throwable t) {
-                    logMethods.logWarning("Failed to close client socket, perhaps it was already closed?" + mySocket, t);
+                    logMethods.warn("Failed to close client socket, perhaps it was already closed?" + mySocket, t);
                 }
 
                 if ( ! HTTP_OK.equals(response.status)) {

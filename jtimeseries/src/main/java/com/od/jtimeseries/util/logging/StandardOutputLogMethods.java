@@ -65,7 +65,7 @@ public class StandardOutputLogMethods implements LogMethods {
         return currentLogLevel.equalsOrExceeds(LogLevel.WARNING);
     }
 
-    public void logWarning(String s, Throwable t) {
+    public void warn(String s, Throwable t) {
         if ( currentLogLevel.equalsOrExceeds(LogLevel.WARNING)) {
             System.out.println("JTIMESERIES WARN--> " + new Date() + " " + s);
             t.printStackTrace();

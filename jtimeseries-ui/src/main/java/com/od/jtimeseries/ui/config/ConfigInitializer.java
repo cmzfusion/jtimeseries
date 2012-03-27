@@ -69,7 +69,7 @@ public class ConfigInitializer {
             } catch (NoConfigFoundException nfe) {
                 logMethods.warn("Could not find a config " + MAIN_CONFIG_NAME + " config, will use default config");
             } catch (ConfigManagerException n) {
-                logMethods.logWarning("Could not load " + MAIN_CONFIG_NAME + " config, will use default config", n);
+                logMethods.warn("Could not load " + MAIN_CONFIG_NAME + " config, will use default config", n);
             }
         }
         return result;

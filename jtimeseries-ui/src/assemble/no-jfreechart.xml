@@ -10,7 +10,11 @@
       <unpack>true</unpack>
       <unpackOptions>
 	      <excludes>
-	      	<exclude>Thumbs.db</exclude>
+              <exclude>Thumbs.db</exclude>
+              <exclude>org/aopalliance</exclude>
+              <exclude>org/apache</exclude>
+              <exclude>org/springframework</exclude>
+              <exclude>org/xmlpull</exclude>
 	      </excludes>
       </unpackOptions>
       <scope>runtime</scope>
@@ -20,7 +24,9 @@
           <exclude>log4j:log4j</exclude>
           <exclude>org.springframework:spring-context</exclude>
           <exclude>com.sun.jdmk:jmxtools</exclude>
+          <exclude>xpp3:xpp3</exclude>
       </excludes>
+      <useTransitiveFiltering>true</useTransitiveFiltering>
     </dependencySet>
   </dependencySets>
 </assembly>

@@ -45,7 +45,7 @@ import java.util.*;
  * - access to items by index is very fast (implement RandomAccess)
  *
  */
-class RandomAccessDeque<E> extends AbstractCollection<E> implements Deque<E>, Serializable, RandomAccess, ModCount {
+class RandomAccessDeque<E> extends AbstractCollection<E> implements Serializable, RandomAccess, ModCount {
 
     /**
      * The array in which the elements of the deque are stored.

@@ -45,7 +45,7 @@ public interface LogMethods {
 
     boolean isWarnEnabled();
 
-    void logWarning(String s, Throwable t);
+    void warn(String s, Throwable t);
 
     void error(String s);
 

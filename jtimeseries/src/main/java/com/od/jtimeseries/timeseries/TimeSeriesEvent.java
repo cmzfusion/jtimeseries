@@ -88,7 +88,7 @@ public class TimeSeriesEvent implements Cloneable {
     }
 
     public boolean isAppend() {
-        return eventType == EventType.APPEND;
+        return getEventType() == EventType.APPEND;
     }
 
     public long getSeriesModCount() {

@@ -1,3 +1,4 @@
+<!-- No jfreechart, log4j, spring or jmxtools-->
 <assembly>
   <id>nojfree</id>
   <formats>
@@ -16,6 +17,9 @@
       <excludes>
           <exclude>jfree:jfreechart</exclude>
           <exclude>jfree:jcommon</exclude>
+          <exclude>log4j:log4j</exclude>
+          <exclude>org.springframework:spring-context</exclude>
+          <exclude>com.sun.jdmk:jmxtools</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

@@ -52,9 +52,9 @@ public class IdentifiableBase extends LockingIdentifiable {
     public IdentifiableBase(String id, String description) {
         checkId(id);
         description = description != null ? description : "";
-        checkDescription(description);
+        description = checkDescription(description);
         this.id = id;
-        this.description = description == null ? "" : description;
+        this.description = description;
     }
 
     public String getId() {
@@ -226,10 +226,14 @@ public class IdentifiableBase extends LockingIdentifiable {
         }
     }
 
-    private void checkDescription(String description) {
+    private String checkDescription(String description) {
+        description = description == null ? "" : description;
+        //keep only the first DESCRIPTION_MAX_LENGTH chars, better to fail quietly since the impact is likely minimal
+        //this may sometimes happen due to dynamic description calculations, and we don't want to crash a component
         if ( description.length() > DESCRIPTION_MAX_LENGTH) {
-            throw new IdentifierException("Description cannot be greater than " + DESCRIPTION_MAX_LENGTH + " characters in length");
+            description = description.substring(0, DESCRIPTION_MAX_LENGTH);
         }
+        return description;
     }
 
     public String toString() {

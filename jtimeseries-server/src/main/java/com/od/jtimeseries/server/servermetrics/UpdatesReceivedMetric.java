@@ -21,7 +21,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.ServerUdpMessageListener;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST_COUNT;
@@ -60,7 +60,7 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
             COUNT_OVER(countPeriod),
             LATEST_COUNT(countPeriod)
         );
-        AppendToSeriesMessageListener.setUpdateMessagesReceivedCounter(counter);
+        ServerUdpMessageListener.setUpdateMessagesReceivedCounter(counter);
     }
 
 }

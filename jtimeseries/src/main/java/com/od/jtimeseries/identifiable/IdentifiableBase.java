@@ -51,7 +51,6 @@ public class IdentifiableBase extends LockingIdentifiable {
 
     public IdentifiableBase(String id, String description) {
         checkId(id);
-        description = description != null ? description : "";
         description = checkDescription(description);
         this.id = id;
         this.description = description;

@@ -27,7 +27,7 @@ import com.od.jtimeseries.net.udp.message.HttpServerAnnouncementMessage;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.server.jmx.ServerConfigJmx;
-import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.ServerUdpMessageListener;
 import com.od.jtimeseries.server.message.ClientAnnouncementMessageListener;
 import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.server.summarystats.SummaryStatisticsCalculator;
@@ -112,7 +112,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     private void startUdpServer() {
         logMethods.info("Adding UDP message listeners");
-        udpServer.addUdpMessageListener(new AppendToSeriesMessageListener(rootContext, pathMapper));
+        udpServer.addUdpMessageListener(new ServerUdpMessageListener(rootContext, pathMapper));
         udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
         logMethods.info("Starting UDP server on port " + udpServer.getPort());
         udpServer.startReceive();

@@ -21,7 +21,7 @@ package com.od.jtimeseries.server.servermetrics;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.message.AppendToSeriesMessageListener;
+import com.od.jtimeseries.server.message.ServerUdpMessageListener;
 import com.od.jtimeseries.source.ValueRecorder;
 
 /**
@@ -45,7 +45,7 @@ public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        ValueRecorder v = rootContext.createValueRecorderSeries(path, "A count of the series which have received UDP updates during the last " + AppendToSeriesMessageListener.STALE_SERIES_DELAY);
-        AppendToSeriesMessageListener.setLiveSeriesTotalValueRecorder(v);
+        ValueRecorder v = rootContext.createValueRecorderSeries(path, "A count of the series which have received UDP updates during the last " + ServerUdpMessageListener.STALE_SERIES_DELAY);
+        ServerUdpMessageListener.setLiveSeriesTotalValueRecorder(v);
     }
 }

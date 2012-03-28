@@ -2,6 +2,7 @@ package com.od.jtimeseries.net.udp.message.javaio;
 
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
+import com.od.jtimeseries.util.HostName;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -19,15 +20,15 @@ import java.util.List;
 public class JavaIOMessageFactory implements UdpMessageFactory {
 
     public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
-        return new JavaIOTimeSeriesValueMessage(path, timeSeriesItem);
+        return new JavaIOTimeSeriesValueMessage(HostName.getLocalHostname(),path, timeSeriesItem);
     }
 
     public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {
-        return new JavaIODescriptionMessage(path, description);
+        return new JavaIODescriptionMessage(HostName.getLocalHostname(), path, description);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName) {
-        return new JavaIOHttpServerAnnouncementMessage(httpdPort, serverName);
+        return new JavaIOHttpServerAnnouncementMessage(HostName.getLocalHostname(), httpdPort, serverName);
     }
 
     public List<UdpMessage> deserializeFromDatagram(byte[] buffer, int length) throws IOException {
@@ -62,13 +63,13 @@ public class JavaIOMessageFactory implements UdpMessageFactory {
                 default :
                     throw new IOException("Unidentified Java IO Message type with acronym " + messageAcronym);
             }
-            message.deserialize(is, (char)messageAcronym[1]);
+            message.deserialize(is, (char) messageAcronym[1]);
             messages.add(message);
         }
         return messages;
     }
 
     public ClientAnnouncementMessage createClientAnnouncementMessage(int port, String description) {
-        return new JavaIOClientAnnouncementMessage(port, description);
+        return new JavaIOClientAnnouncementMessage(HostName.getLocalHostname(), port, description);
     }
 }

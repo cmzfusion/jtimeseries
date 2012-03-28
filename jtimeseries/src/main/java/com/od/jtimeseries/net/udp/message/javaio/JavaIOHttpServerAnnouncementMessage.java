@@ -13,8 +13,8 @@ public class JavaIOHttpServerAnnouncementMessage extends JavaIOAnnouncementMessa
 
     private static byte[] HEADER_ACRONYM = new byte[] { 'S', '0' };
 
-    public JavaIOHttpServerAnnouncementMessage(int port, String description) {
-        super(port, description);
+    public JavaIOHttpServerAnnouncementMessage(String sourceHostname, int port, String description) {
+        super(sourceHostname, port, description);
     }
 
     public JavaIOHttpServerAnnouncementMessage() {

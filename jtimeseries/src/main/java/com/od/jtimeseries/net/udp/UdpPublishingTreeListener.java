@@ -27,6 +27,10 @@ public class UdpPublishingTreeListener extends IdentifiableTreeListenerAdapter {
         this.udpPublisher = new UdpPublisher(udpClient);
     }
 
+    public UdpPublishingTreeListener(UdpClient udpClient, int maxDatagramsPerSecond) {
+        this.udpPublisher = new UdpPublisher(udpClient, maxDatagramsPerSecond);
+    }
+
     public void descendantAdded(IdentifiableTreeEvent contextTreeEvent) {
         contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<IdentifiableTimeSeries>() {
             public void process(IdentifiableTimeSeries identifiable) {

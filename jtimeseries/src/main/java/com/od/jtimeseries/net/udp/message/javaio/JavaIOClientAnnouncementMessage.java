@@ -14,8 +14,8 @@ public class JavaIOClientAnnouncementMessage extends JavaIOAnnouncementMessage i
 
     private static byte[] HEADER_ACRONYM = new byte[] { 'C', '0' };
 
-    public JavaIOClientAnnouncementMessage(int port, String description) {
-        super(port, description);
+    public JavaIOClientAnnouncementMessage(String sourceHostname, int port, String description) {
+        super(sourceHostname, port, description);
     }
 
     public JavaIOClientAnnouncementMessage() {

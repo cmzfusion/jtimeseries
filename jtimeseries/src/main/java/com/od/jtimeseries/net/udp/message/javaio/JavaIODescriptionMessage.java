@@ -20,7 +20,8 @@ public class JavaIODescriptionMessage extends AbstractJavaIOMessage implements S
     private String description;
     private String path;
 
-    public JavaIODescriptionMessage(String path, String description) {
+    public JavaIODescriptionMessage(String sourceHostname, String path, String description) {
+        super(sourceHostname);
         this.path = path;
         this.description = description;
     }
@@ -45,7 +46,7 @@ public class JavaIODescriptionMessage extends AbstractJavaIOMessage implements S
         bos.writeUTF(description);
     }
 
-    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
+    protected void doDeserialize(DataInputStream is, char acronymVersion) throws IOException {
         path = is.readUTF();
         description = is.readUTF();
     }

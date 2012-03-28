@@ -25,7 +25,8 @@ public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implemen
 
     public JavaIOTimeSeriesValueMessage() {}
 
-    public JavaIOTimeSeriesValueMessage(String path, TimeSeriesItem item) {
+    public JavaIOTimeSeriesValueMessage(String sourceHostname, String path, TimeSeriesItem item) {
+        super(sourceHostname);
         this.path = path;
         this.item = item;
     }
@@ -53,7 +54,7 @@ public class JavaIOTimeSeriesValueMessage extends AbstractJavaIOMessage implemen
         d.writeDouble(item.getValue().doubleValue());
     }
 
-    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
+    protected void doDeserialize(DataInputStream is, char acronymVersion) throws IOException {
         path = is.readUTF();
         long timestamp = is.readLong();
         double value = is.readDouble();

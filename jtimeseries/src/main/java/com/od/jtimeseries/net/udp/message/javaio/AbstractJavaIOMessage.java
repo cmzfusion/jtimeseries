@@ -23,6 +23,10 @@ public abstract class AbstractJavaIOMessage implements UdpMessage {
     protected AbstractJavaIOMessage() {
     }
 
+    protected AbstractJavaIOMessage(String sourceHostname) {
+        this.sourceHostname = sourceHostname;
+    }
+
     public String getSourceInetAddress() {
         return sourceInetAddress;
     }
@@ -47,18 +51,24 @@ public abstract class AbstractJavaIOMessage implements UdpMessage {
     private void writeBody(OutputStream outputStream) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream(32);
         DataOutputStream d = new DataOutputStream(bos);
+        d.writeUTF(getSourceHostname());
         doSerializeMessageBody(d);
         outputStream.write(bos.toByteArray());
     }
 
     protected abstract void doSerializeMessageBody(DataOutputStream bos) throws IOException;
 
+    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
+        sourceHostname = is.readUTF();
+        doDeserialize(is, acronymVersion);
+    }
+
     /**
      * @param acronymVersion the second char from the message acronym, indicating message version
      */
-    protected abstract void deserialize(DataInputStream is, char acronymVersion) throws IOException;
+    protected abstract void doDeserialize(DataInputStream is, char acronymVersion) throws IOException;
 
-    protected void writeHeaderFields(OutputStream outputStream) throws IOException {
+    private void writeHeaderFields(OutputStream outputStream) throws IOException {
         outputStream.write(AbstractJavaIOMessage.JAVA_IO_MESSAGE_HEADER);
         outputStream.write(getHeaderAcronym());
     }

@@ -17,7 +17,8 @@ public abstract class JavaIOAnnouncementMessage extends AbstractJavaIOMessage {
     private int port;
     private String description;
 
-    protected JavaIOAnnouncementMessage(int port, String description) {
+    protected JavaIOAnnouncementMessage(String sourceHostname, int port, String description) {
+        super(sourceHostname);
         this.port = port;
         this.description = description;
     }
@@ -37,7 +38,7 @@ public abstract class JavaIOAnnouncementMessage extends AbstractJavaIOMessage {
         bos.writeUTF(description);
     }
 
-    protected void deserialize(DataInputStream is, char acronymVersion) throws IOException {
+    protected void doDeserialize(DataInputStream is, char acronymVersion) throws IOException {
         port = is.readInt();
         description = is.readUTF();
     }

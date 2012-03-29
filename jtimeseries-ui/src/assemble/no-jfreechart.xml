@@ -1,4 +1,4 @@
-<!-- No jfreechart, log4j, spring or jmxtools-->
+<!-- No jfreechart, log4j, spring or jmxtools, or in fact jtimeseries ui -->
 <assembly>
   <id>nojfree</id>
   <formats>
@@ -15,6 +15,8 @@
               <exclude>org/apache</exclude>
               <exclude>org/springframework</exclude>
               <exclude>org/xmlpull</exclude>
+              <exclude>com/od/jtimeseries/ui</exclude>
+              <exclude>com/jidesoft</exclude>
 	      </excludes>
       </unpackOptions>
       <scope>runtime</scope>
@@ -25,6 +27,12 @@
           <exclude>org.springframework:spring-context</exclude>
           <exclude>com.sun.jdmk:jmxtools</exclude>
           <exclude>xpp3:xpp3</exclude>
+          <exclude>com.jidesoft:jide-common</exclude>
+          <exclude>com.jidesoft:jide-components</exclude>
+          <exclude>com.jidesoft:jide-grids</exclude>
+          <exclude>com.jidesoft:jide-dialogs</exclude>
+          <exclude>od:configutil</exclude>
+          <exclude>com.thoughtworks.xstream:xstream</exclude>
       </excludes>
       <useTransitiveFiltering>true</useTransitiveFiltering>
     </dependencySet>

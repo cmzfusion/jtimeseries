@@ -42,7 +42,7 @@ public class ApiExamples {
         Counter counter = context.createCounterSeries(
                 "mychild.ExampleCounter",
                 "Maintaining a count in my application",
-                LATEST_COUNT(Time.minutes(1)),  //record the latest value of the counter every 1 minute
+                LATEST(Time.minutes(1)),  //record the latest value of the counter every 1 minute
                 RAW_VALUES  //record a value to timeseries every time the count changes
         );
 

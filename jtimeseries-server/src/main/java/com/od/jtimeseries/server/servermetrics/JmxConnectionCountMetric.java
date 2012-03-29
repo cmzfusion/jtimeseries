@@ -7,7 +7,7 @@ import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST_COUNT;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +34,7 @@ public class JmxConnectionCountMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Count of connections in jmx connection pool", LATEST_COUNT(captureTime));
+        Counter c = rootContext.createCounterSeries(path, "Count of connections in jmx connection pool", LATEST(captureTime));
         DefaultJmxConnectionPool.setJmxConnectionCounter(c);
     }
 }

@@ -91,4 +91,8 @@ public class PropertiesMessageFactory implements UdpMessageFactory {
         String s = new String(buffer, 0, length, "UTF-8");
         return Collections.singletonList(getMessage(s));
     }
+
+    public String toString() {
+        return getClass().getSimpleName() + System.identityHashCode(this);
+    }
 }

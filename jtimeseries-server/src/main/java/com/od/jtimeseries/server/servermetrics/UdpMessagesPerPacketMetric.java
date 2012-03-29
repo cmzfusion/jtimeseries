@@ -22,8 +22,9 @@ import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.message.ServerSeriesUdpMessageListener;
-import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.net.udp.UdpServer;
+import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,13 +33,21 @@ import com.od.jtimeseries.source.Counter;
  * Time: 19:33:20
  * To change this template use File | Settings | File Templates.
  */
-public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
+public class UdpMessagesPerPacketMetric extends AbstractManagedMetric {
 
-    private static final String id = "SeriesReceivingUdpUpdates";
+    private static final String id = "UdpMessagesPerPacket";
     private String parentContextPath;
+    private UdpServer udpServer;
+    private TimePeriod timePeriod;
 
-    public SeriesReceivingUdpUpdates(String parentContextPath) {
+    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer udpServer) {
+        this(parentContextPath, udpServer, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    }
+
+    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer udpServer, TimePeriod timePeriod) {
         this.parentContextPath = parentContextPath;
+        this.udpServer = udpServer;
+        this.timePeriod = timePeriod;
     }
 
    protected String getSeriesPath() {
@@ -46,12 +55,12 @@ public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(
-            path,
-            "A count of the series which are receiving UDP updates",
-            CaptureFunctions.LATEST(ServerSeriesUdpMessageListener.STALE_SERIES_DELAY),
-            CaptureFunctions.CHANGE(ServerSeriesUdpMessageListener.STALE_SERIES_DELAY)
+        ValueRecorder v = rootContext.createValueRecorderSeries(
+                path,
+                "Number of messages in each UDP packet",
+                CaptureFunctions.MEAN(timePeriod),
+                CaptureFunctions.MAX(timePeriod)
         );
-        ServerSeriesUdpMessageListener.setLiveSeriesCounter(c);
+        udpServer.setMessagesPerDatagramValueRecorder(v);
     }
 }

@@ -35,7 +35,6 @@ public class UdpPublishingTreeListener extends IdentifiableTreeListenerAdapter {
         contextTreeEvent.processNodesAndDescendants(new IdentifiableTreeEvent.IdentifiableProcessor<IdentifiableTimeSeries>() {
             public void process(IdentifiableTimeSeries identifiable) {
                 addListener(identifiable);
-                udpPublisher.publishDescription(identifiable);
             }
         }, IdentifiableTimeSeries.class);
     }

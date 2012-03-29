@@ -20,6 +20,7 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.NetworkUtils;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -154,14 +155,14 @@ public class UdpClient {
     }
 
     private void sendMultiple(Queue<UdpMessage> messageQueue, UdpMessage m) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(UdpMessage.MAX_PACKET_SIZE_BYTES);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(NetworkUtils.getMaxBytesPerDatagramPacket());
 
-        while(m != null && bos.size() < (UdpMessage.MAX_PACKET_SIZE_BYTES - m.getMaxExpectedSize())) {
+        while(m != null && bos.size() < (NetworkUtils.getMaxBytesPerDatagramPacket() - m.getMaxExpectedSize())) {
             ByteArrayOutputStream msgOut = new ByteArrayOutputStream(m.getMaxExpectedSize());
             m.serialize(msgOut);
             byte[] msgBytes = msgOut.toByteArray();
             checkMessageSize(m, msgBytes);
-            if ( bos.size() + msgBytes.length < UdpMessage.MAX_PACKET_SIZE_BYTES) {
+            if ( bos.size() + msgBytes.length < NetworkUtils.getMaxBytesPerDatagramPacket()) {
                 bos.write(msgBytes);
                 UdpMessage removed = messageQueue.poll();
                 assert(removed == m); //only not the case if we have multiple queue consumers?
@@ -212,8 +213,8 @@ public class UdpClient {
     }
 
     private void checkMessageSize(UdpMessage message, byte[] data) throws IOException {
-        if ( data.length > UdpMessage.MAX_PACKET_SIZE_BYTES) {
-            throw new IOException("Cannot send UDP datagram for message " + message + " with size greater than " + UdpMessage.MAX_PACKET_SIZE_BYTES + " bytes of data");
+        if ( data.length > NetworkUtils.getMaxBytesPerDatagramPacket()) {
+            throw new IOException("Cannot send UDP datagram for message " + message + " with size greater than " + NetworkUtils.getMaxBytesPerDatagramPacket() + " bytes of data, consider setting the " + NetworkUtils.MAX_BYTES_PER_DATAGRAM_PROPERTY + " system property to allow larger packets");
         }
     }
 

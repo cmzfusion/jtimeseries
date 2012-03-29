@@ -25,7 +25,12 @@ import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.net.udp.message.utf8.AbstractUtf8Message;
 import com.od.jtimeseries.net.udp.message.utf8.Utf8MessageFactory;
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.source.impl.DefaultCounter;
+import com.od.jtimeseries.source.impl.DefaultValueRecorder;
 import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.NetworkUtils;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
@@ -63,6 +68,9 @@ public class UdpServer {
     private UdpMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
     private UdpMessageFactory utf8MessageFactory = new Utf8MessageFactory();
     private UdpMessageFactory javaIOMessageFactory = new JavaIOMessageFactory();
+
+    private Counter udpDatagramCounter = DefaultCounter.NULL_COUNTER;
+    private ValueRecorder messagesPerDatagram = DefaultValueRecorder.NULL_VALUE_RECORDER;
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
@@ -103,6 +111,14 @@ public class UdpServer {
         return port;
     }
 
+    public void setUdpDatagramsReceivedCounter(Counter udpDatagramCounter) {
+        this.udpDatagramCounter = udpDatagramCounter;
+    }
+
+    public void setMessagesPerDatagramValueRecorder(ValueRecorder messagesPerDatagram) {
+        this.messagesPerDatagram = messagesPerDatagram;
+    }
+
     public static interface UdpMessageListener {
         void udpMessageReceived(UdpMessage m);
     }
@@ -115,7 +131,7 @@ public class UdpServer {
         }
 
         public void run() {
-            byte[] buffer = new byte[UdpMessage.MAX_PACKET_SIZE_BYTES];
+            byte[] buffer = new byte[NetworkUtils.MAX_ALLOWABLE_PACKET_SIZE_BYTES];
             try {
                 DatagramSocket server = new DatagramSocket(port);
                 processMessages(buffer, server);
@@ -127,11 +143,14 @@ public class UdpServer {
 
         private void processMessages(byte[] buffer, DatagramSocket server) {
             while (! stopping) {
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                 try {
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
                     server.receive(packet);
+                    udpDatagramCounter.incrementCount();
                     UdpMessageFactory f = getMessageFactory(buffer);
+
                     List<UdpMessage> messages = f.deserializeFromDatagram(buffer, packet.getLength());
+                    messagesPerDatagram.newValue(messages.size());
                     //logMethods.logInfo("Received packet with " + messages.size() + " messages");
                     for (UdpMessage m : messages) {
                         m.setSourceInetAddress(packet.getAddress().getHostAddress());

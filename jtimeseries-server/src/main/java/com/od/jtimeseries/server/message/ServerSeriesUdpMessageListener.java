@@ -26,9 +26,7 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.component.util.path.PathMapper;
 import com.od.jtimeseries.component.util.path.PathMappingResult;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.source.impl.DefaultCounter;
-import com.od.jtimeseries.source.impl.DefaultValueRecorder;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.NamedExecutors;
@@ -53,14 +51,14 @@ import java.util.concurrent.TimeUnit;
 *
 * Keeps a running tally of the number of series for which data is being received, and the overall update count.
 */
-public class ServerUdpMessageListener implements UdpServer.UdpMessageListener {
+public class ServerSeriesUdpMessageListener implements UdpServer.UdpMessageListener {
 
-    private static LogMethods logMethod = LogUtils.getLogMethods(ServerUdpMessageListener.class);
+    private static LogMethods logMethod = LogUtils.getLogMethods(ServerSeriesUdpMessageListener.class);
 
-    public static final TimePeriod STALE_SERIES_DELAY = Time.hours(1);
+    public static final TimePeriod STALE_SERIES_DELAY = Time.minutes(15);
 
     private static volatile Counter updateMessagesReceivedCounter = DefaultCounter.NULL_COUNTER;
-    private static volatile ValueRecorder liveSeriesTotalValueRecorder = DefaultValueRecorder.NULL_VALUE_RECORDER;
+    private static volatile Counter liveSeriesCounter = DefaultCounter.NULL_COUNTER;
 
     private final Map<String, Long> liveSeriesLastUpdateMap = new HashMap<String, Long>();
 
@@ -71,11 +69,11 @@ public class ServerUdpMessageListener implements UdpServer.UdpMessageListener {
     private Set<String> loggedMigratedPaths = Collections.synchronizedSet(new HashSet<String>());
 
 
-    public ServerUdpMessageListener(TimeSeriesContext rootContext, PathMapper pathMapper) {
+    public ServerSeriesUdpMessageListener(TimeSeriesContext rootContext, PathMapper pathMapper) {
         this.rootContext = rootContext;
         this.pathMapper = pathMapper;
 
-        scheduleReportingAndCleanup(NamedExecutors.newSingleThreadScheduledExecutor(ServerUdpMessageListener.class.getSimpleName()));
+        scheduleReportingAndCleanup(NamedExecutors.newSingleThreadScheduledExecutor(ServerSeriesUdpMessageListener.class.getSimpleName()));
     }
 
     public void udpMessageReceived(UdpMessage m) {
@@ -161,8 +159,8 @@ public class ServerUdpMessageListener implements UdpServer.UdpMessageListener {
                             i.remove();
                         }
                     }
-                    if ( liveSeriesTotalValueRecorder != null) {
-                        liveSeriesTotalValueRecorder.newValue(liveSeriesLastUpdateMap.size());
+                    if ( liveSeriesCounter != null) {
+                        liveSeriesCounter.setCount(liveSeriesLastUpdateMap.size());
                     }
                 }
             }
@@ -171,10 +169,10 @@ public class ServerUdpMessageListener implements UdpServer.UdpMessageListener {
 
 
     public static void setUpdateMessagesReceivedCounter(Counter updateMessagesReceivedCounter) {
-        ServerUdpMessageListener.updateMessagesReceivedCounter = updateMessagesReceivedCounter;
+        ServerSeriesUdpMessageListener.updateMessagesReceivedCounter = updateMessagesReceivedCounter;
     }
 
-    public static void setLiveSeriesTotalValueRecorder(ValueRecorder liveSeriesTotalValueRecorder) {
-        ServerUdpMessageListener.liveSeriesTotalValueRecorder = liveSeriesTotalValueRecorder;
+    public static void setLiveSeriesCounter(Counter liveSeriesTotalValueRecorder) {
+        ServerSeriesUdpMessageListener.liveSeriesCounter = liveSeriesTotalValueRecorder;
     }
 }

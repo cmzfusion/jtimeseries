@@ -2,7 +2,7 @@ package com.od.jtimeseries.net.udp.message.javaio;
 
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.util.HostName;
+import com.od.jtimeseries.util.NetworkUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -20,15 +20,15 @@ import java.util.List;
 public class JavaIOMessageFactory implements UdpMessageFactory {
 
     public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
-        return new JavaIOTimeSeriesValueMessage(HostName.getLocalHostname(),path, timeSeriesItem);
+        return new JavaIOTimeSeriesValueMessage(NetworkUtils.getLocalHostname(),path, timeSeriesItem);
     }
 
     public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {
-        return new JavaIODescriptionMessage(HostName.getLocalHostname(), path, description);
+        return new JavaIODescriptionMessage(NetworkUtils.getLocalHostname(), path, description);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String serverName) {
-        return new JavaIOHttpServerAnnouncementMessage(HostName.getLocalHostname(), httpdPort, serverName);
+        return new JavaIOHttpServerAnnouncementMessage(NetworkUtils.getLocalHostname(), httpdPort, serverName);
     }
 
     public List<UdpMessage> deserializeFromDatagram(byte[] buffer, int length) throws IOException {
@@ -70,6 +70,10 @@ public class JavaIOMessageFactory implements UdpMessageFactory {
     }
 
     public ClientAnnouncementMessage createClientAnnouncementMessage(int port, String description) {
-        return new JavaIOClientAnnouncementMessage(HostName.getLocalHostname(), port, description);
+        return new JavaIOClientAnnouncementMessage(NetworkUtils.getLocalHostname(), port, description);
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + System.identityHashCode(this);
     }
 }

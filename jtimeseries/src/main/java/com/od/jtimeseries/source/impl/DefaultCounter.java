@@ -40,8 +40,8 @@ public class DefaultCounter implements Counter {
 
     public static final Counter NULL_COUNTER = new DefaultCounter("Dummy", "Dummy");
 
-    private DefaultValueRecorder simpleSource;
-    private final AtomicLong currentValue = new AtomicLong();
+    private final DefaultValueRecorder simpleSource;
+    private long currentValue;
 
     public DefaultCounter(String id, String description, ValueSourceListener... sourceDataListeners) {
         simpleSource = new DefaultValueRecorder(id, description, sourceDataListeners);
@@ -56,27 +56,49 @@ public class DefaultCounter implements Counter {
     }
 
     public void incrementCount() {
-        simpleSource.newValue(currentValue.incrementAndGet());
+        synchronized (simpleSource) {
+            simpleSource.newValue(++currentValue);
+        }
     }
 
     public void incrementCount(long n) {
-        simpleSource.newValue(currentValue.addAndGet(n));
+        synchronized (simpleSource) {
+            currentValue += n;
+            simpleSource.newValue(currentValue);
+        }
     }
 
     public void decrementCount() {
-        simpleSource.newValue(currentValue.decrementAndGet());
+        synchronized (simpleSource) {
+            simpleSource.newValue(--currentValue);
+        }
     }
 
     public void decrementCount(long n) {
-        simpleSource.newValue(currentValue.addAndGet(-n));
+        synchronized (simpleSource) {
+            currentValue -= n;
+            simpleSource.newValue(currentValue);
+        }
+    }
+
+    public void setCount(long n) {
+        synchronized (simpleSource) {
+            currentValue = n;
+            simpleSource.newValue(currentValue);
+        }
     }
 
     public void reset() {
-        currentValue.set(0);
+        synchronized (simpleSource) {
+            currentValue = 0;
+            simpleSource.newValue(0);
+        }
     }
 
     public long getCount() {
-        return currentValue.get();
+        synchronized (simpleSource) {
+            return currentValue;
+        }
     }
 
     public String getId() {

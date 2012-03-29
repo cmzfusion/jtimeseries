@@ -18,12 +18,16 @@
  */
 package com.od.jtimeseries.server.servermetrics;
 
-import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.message.ServerSeriesUdpMessageListener;
+import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
+import com.od.jtimeseries.util.time.TimePeriod;
+
+import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,13 +36,21 @@ import com.od.jtimeseries.source.Counter;
  * Time: 19:33:20
  * To change this template use File | Settings | File Templates.
  */
-public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
+public class UdpDatagramsReceivedMetric extends AbstractManagedMetric {
 
-    private static final String id = "SeriesReceivingUdpUpdates";
+    private static final String id = "UdpPacketsReceived";
     private String parentContextPath;
+    private UdpServer udpServer;
+    private TimePeriod timePeriod;
 
-    public SeriesReceivingUdpUpdates(String parentContextPath) {
+    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer udpServer) {
+        this(parentContextPath, udpServer, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    }
+
+    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer udpServer, TimePeriod timePeriod) {
         this.parentContextPath = parentContextPath;
+        this.udpServer = udpServer;
+        this.timePeriod = timePeriod;
     }
 
    protected String getSeriesPath() {
@@ -48,10 +60,10 @@ public class SeriesReceivingUdpUpdates extends AbstractManagedMetric {
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
         Counter c = rootContext.createCounterSeries(
             path,
-            "A count of the series which are receiving UDP updates",
-            CaptureFunctions.LATEST(ServerSeriesUdpMessageListener.STALE_SERIES_DELAY),
-            CaptureFunctions.CHANGE(ServerSeriesUdpMessageListener.STALE_SERIES_DELAY)
+            "Number of UDP packets received",
+            MEAN_COUNT_OVER(Time.seconds(1), timePeriod),
+            LATEST(timePeriod)
         );
-        ServerSeriesUdpMessageListener.setLiveSeriesCounter(c);
+        udpServer.setUdpDatagramsReceivedCounter(c);
     }
 }

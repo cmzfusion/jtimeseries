@@ -2,7 +2,7 @@ package com.od.jtimeseries.net.udp.message.utf8;
 
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
-import com.od.jtimeseries.util.HostName;
+import com.od.jtimeseries.util.NetworkUtils;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -24,19 +24,19 @@ public class Utf8MessageFactory implements UdpMessageFactory {
 
 
     public TimeSeriesValueMessage createTimeSeriesValueMessage(String path, TimeSeriesItem timeSeriesItem) {
-        return new Utf8TimeSeriesValueMessage(HostName.getLocalHostname(), path, timeSeriesItem);
+        return new Utf8TimeSeriesValueMessage(NetworkUtils.getLocalHostname(), path, timeSeriesItem);
     }
 
     public SeriesDescriptionMessage createTimeSeriesDescriptionMessage(String path, String description) {
-        return new Utf8DescriptionMessage(HostName.getLocalHostname(), path, description);
+        return new Utf8DescriptionMessage(NetworkUtils.getLocalHostname(), path, description);
     }
 
     public HttpServerAnnouncementMessage createHttpServerAnnouncementMessage(int httpdPort, String description) {
-        return new Utf8HttpServerAnnouncementMessage(httpdPort, HostName.getLocalHostname(), description);
+        return new Utf8HttpServerAnnouncementMessage(httpdPort, NetworkUtils.getLocalHostname(), description);
     }
 
     public ClientAnnouncementMessage createClientAnnouncementMessage(int udpPort, String description) {
-        return new Utf8ClientAnnouncementMessage(udpPort, HostName.getLocalHostname(), description);
+        return new Utf8ClientAnnouncementMessage(udpPort, NetworkUtils.getLocalHostname(), description);
     }
 
     public List<UdpMessage> deserializeFromDatagram(byte[] buffer, int length) throws IOException {
@@ -90,6 +90,10 @@ public class Utf8MessageFactory implements UdpMessageFactory {
                 throw new IOException("Unsupported message type for UTF-8 message decoding");
         }
         return message;
+    }
+
+    public String toString() {
+        return getClass().getSimpleName() + System.identityHashCode(this);
     }
 
 }

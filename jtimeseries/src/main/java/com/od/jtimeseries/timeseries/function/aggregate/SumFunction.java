@@ -26,6 +26,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
 * User: Nick Ebbutt
 * Date: 21-Jan-2009
 * Time: 16:20:41
+*
+* The sum of all values submitted during a time period
 */
 class SumFunction extends AbstractDoubleBasedAggregateFunction {
 
@@ -48,7 +50,7 @@ class SumFunction extends AbstractDoubleBasedAggregateFunction {
         return DESCRIPTION;
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new SumFunction();
     }
 }

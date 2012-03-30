@@ -65,10 +65,4 @@ public abstract class AbstractDoubleBasedAggregateFunction implements AggregateF
     public String toString() {
         return getDescription();
     }
-
-    public final AggregateFunction newInstance(Numeric initialValue) {
-        AggregateFunction a = newInstance();
-        a.addValue(initialValue);
-        return a;
-    }
 }

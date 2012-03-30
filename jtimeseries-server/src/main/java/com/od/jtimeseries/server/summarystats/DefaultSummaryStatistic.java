@@ -33,7 +33,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 public class DefaultSummaryStatistic implements SummaryStatistic {
 
     private String name;
-    private final AggregateFunction function;
+    private AggregateFunction function;
 
     public DefaultSummaryStatistic(String name, AggregateFunction function) {
         this.name = name;
@@ -41,7 +41,7 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
     }
 
     public Numeric calculateSummaryStatistic(TimeSeries timeSeries) {
-        AggregateFunction f = function.newInstance();  //not supporting chaining functions
+        function = function.nextInstance();  //support chaining functions
         long startTime = getStartTime();
         long endTime = getEndTime();
         try {
@@ -49,14 +49,14 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
             for ( TimeSeriesItem i : timeSeries.unsafeIterable()) {
                 long timestamp = i.getTimestamp();
                 if (timestamp >= startTime && timestamp <= endTime) {
-                    f.addValue(i.getValue());
+                    function.addValue(i.getValue());
                 }
             }
         } finally {
             timeSeries.readLock().unlock();
         }
 
-        return f.calculateResult();
+        return function.calculateResult();
     }
 
     protected long getStartTime() {

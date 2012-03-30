@@ -27,12 +27,20 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 01-Feb-2010
  * Time: 22:59:54
  *
- * Take the latest value from a collection of values
+ * The latest value submitted to a timeseries
+ * If no values were added during a time period, the latest value from a previous period will be the result
  */
-public class LatestFunction extends AbstractDoubleBasedAggregateFunction {
+class LatestFunction extends AbstractDoubleBasedAggregateFunction implements ChainedFunction{
 
     private static final String DESCRIPTION = "Latest";
     private double latest = Double.NaN;
+
+    public LatestFunction() {
+    }
+
+    public LatestFunction(double latest) {
+        this.latest = latest;
+    }
 
     protected void doAddValue(double d) {
         latest = d;
@@ -50,7 +58,7 @@ public class LatestFunction extends AbstractDoubleBasedAggregateFunction {
         latest = Double.NaN;
     }
 
-    public AggregateFunction newInstance() {
-        return new LatestFunction();
+    public AggregateFunction nextInstance() {
+        return new LatestFunction(latest);
     }
 }

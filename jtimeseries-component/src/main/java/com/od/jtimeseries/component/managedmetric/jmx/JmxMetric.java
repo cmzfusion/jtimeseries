@@ -299,7 +299,7 @@ public class JmxMetric implements ManagedMetric {
             result = DoubleNumeric.NaN;
             retreiveAndAddValues(jmxConnection, aggregateFunction);
             result = aggregateFunction.calculateResult();
-            aggregateFunction = aggregateFunction.newInstance(); //allow chaining
+            aggregateFunction = aggregateFunction.nextInstance(); //allow chaining
             if ( measurement.getDivisor() != 1) {
                 result = DoubleNumeric.valueOf(result.doubleValue() / measurement.getDivisor());
             }

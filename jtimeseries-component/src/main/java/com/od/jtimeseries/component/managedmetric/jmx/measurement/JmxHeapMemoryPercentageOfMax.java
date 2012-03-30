@@ -76,7 +76,7 @@ class JmxHeapMemoryPercentageOfMax extends JmxMeasurement {
             values.clear();
         }
 
-        public AggregateFunction newInstance() {
+        public AggregateFunction nextInstance() {
             return new PercentageOfMaxMemoryFunction();
         }
     }

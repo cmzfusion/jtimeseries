@@ -28,8 +28,8 @@ import java.util.List;
 public abstract class AbstractSimpleCaptureFixture extends Assert {
 
     protected TimeSeriesContext rootContext;
-    protected TimePeriod sleepPeriod = Time.milliseconds((int)(100));
-    protected TimePeriod capturePeriod = Time.milliseconds((int)(500));
+    protected TimePeriod sleepPeriod = Time.milliseconds(100);
+    protected TimePeriod capturePeriod = Time.milliseconds(500);
 
     //sources, if adding, change also getListOfSources()
     protected volatile Counter counter;

@@ -28,7 +28,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Time: 15:48:50
  * To change this template use File | Settings | File Templates.
  *
- * Count of the number of values
+ * Count of the number of values submitted during a time period
  */
 class CountFunction extends AbstractDoubleBasedAggregateFunction {
 
@@ -51,7 +51,7 @@ class CountFunction extends AbstractDoubleBasedAggregateFunction {
         count = 0;
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new CountFunction();
     }
 }

@@ -69,11 +69,7 @@ public abstract class AbstractDelegatingAggregateFunction implements AggregateFu
         return wrappedFunction;
     }
 
-    public AggregateFunction newInstance() {
-        return wrappedFunction.newInstance();
-    }
-
-    public final AggregateFunction newInstance(Numeric initialValue) {
-        return wrappedFunction.newInstance(initialValue);
+    public AggregateFunction nextInstance() {
+        return wrappedFunction.nextInstance();
     }
 }

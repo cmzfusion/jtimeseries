@@ -26,6 +26,8 @@ import com.od.jtimeseries.util.numeric.Numeric;
 * User: Nick Ebbutt
 * Date: 21-Jan-2009
 * Time: 16:19:55
+*
+* The maximum value submitted during a time period
 */
 class MaxFunction extends AbstractDoubleBasedAggregateFunction implements AggregateFunction {
 
@@ -48,7 +50,7 @@ class MaxFunction extends AbstractDoubleBasedAggregateFunction implements Aggreg
         return DESCRIPTION;
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new MaxFunction();
     }
 }

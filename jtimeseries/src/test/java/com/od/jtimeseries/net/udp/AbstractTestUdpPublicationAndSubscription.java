@@ -36,7 +36,7 @@ public abstract class AbstractTestUdpPublicationAndSubscription extends TestCase
     private UdpServer.UdpMessageListener mockListener;
     private States sendMessageState;
 
-    private static AtomicInteger serverPort = new AtomicInteger(25015);
+    private static AtomicInteger serverPort = new AtomicInteger(25115);
 
     public void setUp() throws UnknownHostException {
         int port = serverPort.addAndGet(1);

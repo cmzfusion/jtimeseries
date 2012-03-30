@@ -21,13 +21,11 @@ package com.od.jtimeseries.capture.function;
 import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import com.od.jtimeseries.timeseries.function.aggregate.ChainedFunction;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.LongNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 import com.od.jtimeseries.util.time.TimePeriod;
-
-import static com.od.jtimeseries.capture.function.ChainingMode.LAST_VALUE_CHAINING;
-import static com.od.jtimeseries.capture.function.ChainingMode.NO_CHAINING;
 
 public class CaptureFunctions {
 
@@ -44,30 +42,30 @@ public class CaptureFunctions {
      *  CaptureFunctions.RAW_VALUES
      * )
      */
-    public static final CaptureFunction RAW_VALUES = new DefaultCaptureFunction(null, null, null);
+    public static final CaptureFunction RAW_VALUES = new DefaultCaptureFunction(null, null);
 
     public static CaptureFunction MAX(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MAX(), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MAX());
     }
 
     public static CaptureFunction MIN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MIN(), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MIN());
     }
 
     public static CaptureFunction MEAN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN(), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEAN());
     }
 
     public static CaptureFunction MEDIAN(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEDIAN(), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.MEDIAN());
     }
 
     public static CaptureFunction PERCENTILE(TimePeriod timePeriod, int percentile) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.PERCENTILE(percentile), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.PERCENTILE(percentile));
     }
 
     public static CaptureFunction SUM(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM(), NO_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.SUM());
     }
 
     /**
@@ -83,7 +81,7 @@ public class CaptureFunctions {
     public static CaptureFunction CHANGE(TimePeriod timePeriod, Numeric initialValue) {
         AggregateFunction change = AggregateFunctions.CHANGE();
         change.addValue(initialValue);
-        return new DefaultCaptureFunction(timePeriod, change, ChainingMode.LAST_VALUE_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, change);
     }
 
     /**
@@ -99,16 +97,15 @@ public class CaptureFunctions {
      * as a mean change over timeIntervalToExpressCount
      */
     public static CaptureFunction MEAN_CHANGE(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, Numeric initialValue) {
-        MeanChangeFunction f = new MeanChangeFunction(timeIntervalToExpressCount, timePeriod);
-        f.addValue(initialValue);
-        return new DefaultCaptureFunction(timePeriod, f, LAST_VALUE_CHAINING);
+        MeanChangeFunction f = new MeanChangeFunction(initialValue, timeIntervalToExpressCount, timePeriod);
+        return new DefaultCaptureFunction(timePeriod, f);
     }
 
     /**
      * @return a function which measures the number of values received from ValueSource over the period, a true count rather than the sum of the values received
      */
     public static CaptureFunction VALUE_COUNT(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT(), NO_CHAINING) {
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.COUNT()) {
             protected String doGetDescription() {
                 return "ValueCount" + " " + getCapturePeriod();
             }
@@ -116,7 +113,7 @@ public class CaptureFunctions {
     }
 
     /**
-     * @return a function which measures the change in a counter over a time period, eg my overall count to date is 1000, the count over the
+     * @return a function which measures the change in a counter over a time period, starting from zero. eg my overall count to date is 1000, the count over the
      * last minute was 50. This function is intended for use with Counter value source.
      */
     public static CaptureFunction COUNT_OVER(TimePeriod timePeriod) {
@@ -124,19 +121,19 @@ public class CaptureFunctions {
     }
 
     /**
-     * @return a function which measures the change in a count over a time period, expressed as a mean change per timeIntervalToExpressCount over that period
+     * @return a function which measures the change in a count over a time period, starting frm zero, expressed as a mean change per timeIntervalToExpressCount over that period
      * eg my overall count to date is 1000, the mean count per second over the last minute was 5. This function is intended for use with Counter value source
      */
     public static CaptureFunction MEAN_COUNT_OVER(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
         MeanCountOverFunction f = new MeanCountOverFunction(LongNumeric.ZERO, timeIntervalToExpressCount, timePeriod);
-        return new DefaultCaptureFunction(timePeriod, f, LAST_VALUE_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, f);
     }
 
     /**
      * @return a function which records the latest (most recent value overall) at the end of each time period
      */
     public static CaptureFunction LATEST(TimePeriod timePeriod) {
-        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST(), LAST_VALUE_CHAINING);
+        return new DefaultCaptureFunction(timePeriod, AggregateFunctions.LATEST());
     }
 
     /**
@@ -146,17 +143,6 @@ public class CaptureFunctions {
         return RAW_VALUES;
     }
 
-    private static class MeanChangeFunction extends MeanPerXTimeOverYTimeFunction {
-
-        public MeanChangeFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
-            super(AggregateFunctions.CHANGE(), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
-        }
-
-        public AggregateFunction newInstance() {
-            return new MeanChangeFunction(getTimeIntervalToExpressCount(), getTimePeriod());
-        }
-    }
-
     /**
      * This function is intended to be used with Counter and is logically identical to 'Change' function, but labelled as a 'Count' rather than 'Change'
      * It seems to be more intuitive to describe a metric as a 'count over 5 minutes' rather than a 'the change in value of a counter over five minutes'.
@@ -164,7 +150,7 @@ public class CaptureFunctions {
     private static class CountOverFunction extends DefaultCaptureFunction {
 
         public CountOverFunction(TimePeriod timePeriod, Numeric initialValue) {
-            super(timePeriod, AggregateFunctions.CHANGE(initialValue), LAST_VALUE_CHAINING);
+            super(timePeriod, AggregateFunctions.CHANGE(initialValue));
         }
 
         protected String doGetDescription() {
@@ -172,33 +158,54 @@ public class CaptureFunctions {
         }
     }
 
-    private static class MeanCountOverFunction extends MeanPerXTimeOverYTimeFunction {
+    private static class MeanChangeFunction extends MeanPerXTimeOverYTimeFunction implements ChainedFunction {
+
+        public MeanChangeFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
+            super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
+        }
+
+        MeanChangeFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, AggregateFunction function) {
+            super(function, timeIntervalToExpressCount, timePeriod, "Change Per " + timeIntervalToExpressCount + " Over");
+        }
+
+        protected AggregateFunction doNewInstance() {
+            return new MeanChangeFunction(getTimeIntervalToExpressCount(), getTimePeriod(), getWrappedFunction().nextInstance());
+        }
+    }
+
+    private static class MeanCountOverFunction extends MeanPerXTimeOverYTimeFunction implements ChainedFunction{
 
         public MeanCountOverFunction(Numeric initialValue, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod) {
             super(AggregateFunctions.CHANGE(initialValue), timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
         }
 
-        public AggregateFunction newInstance() {
-            return new MeanCountOverFunction(getLastAddedValue(), getTimeIntervalToExpressCount(), getTimePeriod());
+        MeanCountOverFunction(TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, AggregateFunction function) {
+            super(function, timeIntervalToExpressCount, timePeriod, "Count Per " + timeIntervalToExpressCount + " Over");
+        }
+
+        protected AggregateFunction doNewInstance() {
+            return new MeanCountOverFunction(getTimeIntervalToExpressCount(), getTimePeriod(), getWrappedFunction().nextInstance());
         }
     }
 
     private abstract static class MeanPerXTimeOverYTimeFunction extends AbstractDelegatingAggregateFunction {
 
         private String description;
-        private double divisor;
         private TimePeriod timeIntervalToExpressCount;
         private TimePeriod timePeriod;
+        private long startTime;
 
         public MeanPerXTimeOverYTimeFunction(AggregateFunction aggregateFunction, TimePeriod timeIntervalToExpressCount, TimePeriod timePeriod, String description) {
             super(aggregateFunction);
             this.timeIntervalToExpressCount = timeIntervalToExpressCount;
             this.timePeriod = timePeriod;
-            this.divisor =  ((double) timePeriod.getLengthInMillis()) / timeIntervalToExpressCount.getLengthInMillis();
+            this.startTime = System.currentTimeMillis();
             this.description = description;
         }
 
         public Numeric calculateResult() {
+            //calculate actual length of period and divide by time interval to express count
+            double divisor = ((double)(System.currentTimeMillis() - startTime) / timeIntervalToExpressCount.getLengthInMillis());
             return DoubleNumeric.valueOf(getWrappedFunction().calculateResult().doubleValue() / divisor);
         }
 
@@ -213,6 +220,15 @@ public class CaptureFunctions {
         public TimePeriod getTimePeriod() {
             return timePeriod;
         }
+
+        public final AggregateFunction nextInstance() {
+            return doNewInstance();
+        }
+
+        /**
+         * @return subclass should implement this to return the next instance of the function
+         */
+        protected abstract AggregateFunction doNewInstance();
     }
 
 }

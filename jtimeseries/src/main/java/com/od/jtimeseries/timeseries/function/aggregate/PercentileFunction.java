@@ -82,7 +82,7 @@ public class PercentileFunction extends AbstractDoubleBasedAggregateFunction {
         values.clear();
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new PercentileFunction(description, percentile);
     }
 }

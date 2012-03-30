@@ -21,6 +21,7 @@ package com.od.jtimeseries.component.managedmetric.jmx.measurement;
 import com.od.jtimeseries.timeseries.function.aggregate.AbstractDelegatingAggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunctions;
+import com.od.jtimeseries.timeseries.function.aggregate.ChainedFunction;
 import com.od.jtimeseries.util.numeric.DoubleNumeric;
 import com.od.jtimeseries.util.numeric.Numeric;
 
@@ -38,7 +39,7 @@ import com.od.jtimeseries.util.numeric.Numeric;
 *  e.g. If the process has 500ms added to total process CPU time in a 1000ms period, then it has used 50% of a processor
 *       (if there are more than one processors, this value may exceed 100%, which is expected)
 */
-class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
+class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction implements ChainedFunction {
 
     private long oldTotalTime;
     private long lastTriggerTime;
@@ -76,7 +77,7 @@ class JmxPercentageOfTimeFunction extends AbstractDelegatingAggregateFunction {
         return oldTotalTime < newTotalTime;
     }
 
-    public AggregateFunction newInstance() {
+    public AggregateFunction nextInstance() {
         return new JmxPercentageOfTimeFunction(oldTotalTime, lastTriggerTime);
     }
 }

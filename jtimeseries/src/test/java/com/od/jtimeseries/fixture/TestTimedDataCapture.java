@@ -30,13 +30,15 @@ import static com.od.jtimeseries.capture.function.CaptureFunctions.*;
  */
 public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
 
+    public final int CAPTURE_DIVISOR_FOR_MEAN_CHANGE = 5;
+
     protected void doExtraSetUp() {
         rootContext.stopScheduling(); //now started by default
         counter = rootContext.createCounterSeries("TestCounter", "Test Counter Description",
                 CaptureFunctions.COUNT_OVER(capturePeriod),
                 CaptureFunctions.CHANGE(capturePeriod),
-                CaptureFunctions.MEAN_CHANGE(Time.milliseconds((int)capturePeriod.getLengthInMillis() / 5), capturePeriod),
-                CaptureFunctions.MEAN_COUNT_OVER(Time.milliseconds((int) capturePeriod.getLengthInMillis() / 5), capturePeriod),
+                CaptureFunctions.MEAN_CHANGE(Time.milliseconds((int)capturePeriod.getLengthInMillis() / CAPTURE_DIVISOR_FOR_MEAN_CHANGE), capturePeriod),
+                CaptureFunctions.MEAN_COUNT_OVER(Time.milliseconds((int) capturePeriod.getLengthInMillis() / CAPTURE_DIVISOR_FOR_MEAN_CHANGE), capturePeriod),
                 CaptureFunctions.RAW_VALUES()
         );
 
@@ -98,16 +100,16 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(0.4, i1.doubleValue(), 0.0001);
-        assertEquals(0.4, i2.doubleValue(), 0.0001);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.05);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.05);
 
         //this series is the mean change in the counter value (the count during the period)
         s = rootContext.findTimeSeries("TestCounter \\(Count Per").getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(0.4, i1.doubleValue(), 0.0001);
-        assertEquals(0.4, i2.doubleValue(), 0.0001);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.05);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.05);
 
         s = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
         i = s.iterator();

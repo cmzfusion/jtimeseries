@@ -23,11 +23,9 @@ import com.od.jtimeseries.util.time.TimePeriod;
 public abstract class AbstractCaptureFunction implements CaptureFunction {
 
     private TimePeriod timePeriod;
-    private ChainingMode chainingMode;
 
-    public AbstractCaptureFunction(TimePeriod timePeriod, ChainingMode chainingMode) {
+    public AbstractCaptureFunction(TimePeriod timePeriod) {
         this.timePeriod = timePeriod;
-        this.chainingMode = chainingMode;
     }
 
     public TimePeriod getCapturePeriod() {
@@ -36,10 +34,6 @@ public abstract class AbstractCaptureFunction implements CaptureFunction {
 
     public final String getDescription() {
         return "(" + doGetDescription() + ")";
-    }
-
-    public ChainingMode getChainingMode() {
-        return chainingMode;
     }
 
     protected abstract String doGetDescription();

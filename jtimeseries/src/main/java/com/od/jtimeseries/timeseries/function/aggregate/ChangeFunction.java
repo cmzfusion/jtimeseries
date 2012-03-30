@@ -27,14 +27,14 @@ import com.od.jtimeseries.util.numeric.Numeric;
  * Date: 21-Jan-2009
  * Time: 16:19:39
  *
- * A function used to measure net change, i.e. the difference between the initial value and the last value
- * This can be useful to calculate net change during a time period, e.g. how much a count has increased
+ * A function used to measure net change, i.e. the difference between the initial value and the last value during a time
+ * period. This can be useful to calculate net change during a time period, e.g. how much a count has increased
  *
  * nextInstance returns a new ChangeFunction which takes the final value of the current function
  * as its initial value. (If this was not the case, we would lose track of any change between the final
  * value captured into one function and the first value captured into the second)
 */
-class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
+class ChangeFunction extends AbstractDoubleBasedAggregateFunction implements ChainedFunction {
 
     private String description = "Change";
     private double initialValue = Double.NaN;
@@ -42,15 +42,20 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
 
 
     ChangeFunction() {
-        this("Change");
+        this("Change", Double.NaN);
+    }
+
+    ChangeFunction(double initialValue) {
+        this("Change", initialValue);
     }
 
     /**
      * Change function where initial value is specified up front
      */
-    ChangeFunction(String description) {
+    ChangeFunction(String description, double initialValue) {
         this.description = description;
-        addValue(initialValue);
+        this.initialValue = initialValue;
+        this.currentValue = initialValue;
     }
 
     public void doAddValue(double value) {
@@ -77,7 +82,7 @@ class ChangeFunction extends AbstractDoubleBasedAggregateFunction {
         return description;
     }
 
-    public AggregateFunction newInstance() {
-        return new ChangeFunction();
+    public AggregateFunction nextInstance() {
+        return new ChangeFunction(description, currentValue);
     }
 }

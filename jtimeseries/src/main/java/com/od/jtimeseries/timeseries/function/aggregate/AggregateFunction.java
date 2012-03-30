@@ -20,6 +20,13 @@ package com.od.jtimeseries.timeseries.function.aggregate;
 
 import com.od.jtimeseries.util.numeric.Numeric;
 
+/**
+ * Implement a function which calculates a result from a number of input values
+ *
+ * A new instance of the AggregateFunction is generally created for each calculation, using the
+ * nextInstance() method. This enables the implementation to seed the new function with initial
+ * values where this is useful - this is termed function chaining in jTimeSeries
+ */
 public interface AggregateFunction {
 
     void addValue(Numeric value);
@@ -41,14 +48,8 @@ public interface AggregateFunction {
     void clear();
 
     /**
-     * This method is to enable the use of the prototype pattern, so that an AggregateFunction instance can be used
-     * as a prototype.
+     * @return the next function instance to use
      */
-    AggregateFunction newInstance();
-
-    /**
-     * Create a new instance of the AggregateFunction, passing in an initial value
-     */
-    AggregateFunction newInstance(Numeric initialValue);
+    AggregateFunction nextInstance();
 
 }

@@ -35,6 +35,7 @@ import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
+import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -62,8 +63,8 @@ public class UdpServer {
     private final List<UdpMessageListener> udpMessageListeners = Collections.synchronizedList(new ArrayList<UdpMessageListener>());
 
     private Executor udpMessageExecutor = NamedExecutors.newSingleThreadExecutor("UdpServer");
-    private volatile boolean stopping;
     private Thread receiveThread;
+    private volatile boolean stopping;
 
     private UdpMessageFactory propertiesMessageFactory = new PropertiesMessageFactory();
     private UdpMessageFactory utf8MessageFactory = new Utf8MessageFactory();
@@ -71,6 +72,7 @@ public class UdpServer {
 
     private Counter udpDatagramCounter = DefaultCounter.NULL_COUNTER;
     private ValueRecorder messagesPerDatagram = DefaultValueRecorder.NULL_VALUE_RECORDER;
+    private volatile boolean shuttingDown;
 
     public UdpServer(int port) {
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
@@ -134,6 +136,7 @@ public class UdpServer {
             byte[] buffer = new byte[NetworkUtils.MAX_ALLOWABLE_PACKET_SIZE_BYTES];
             try {
                 DatagramSocket server = new DatagramSocket(port);
+                addShutdownHook(server);
                 processMessages(buffer, server);
             } catch (SocketException e) {
                 limitedLogger.logError("Error creating UdpServer socket, will try again later", e);
@@ -158,7 +161,9 @@ public class UdpServer {
                     }
                 }
                 catch (Throwable t) {
-                    limitedLogger.logError("Error receiving UDP message", t);
+                    if ( ! shuttingDown ) {
+                        limitedLogger.logError("Error receiving UDP message", t);
+                    }
                 }
             }
             stopping = false;
@@ -211,5 +216,16 @@ public class UdpServer {
             }
             startReceive();
         }
+    }
+
+    private void addShutdownHook(final DatagramSocket server) {
+        //getting errors in tests on win2007 if not explicitly closing socket
+        logMethods.info("Shutting down " + getClass().getSimpleName() + " due to process shutdown");
+        Runtime.getRuntime().addShutdownHook(new Thread("Shutdown " + getClass().getSimpleName()) {
+            public void run() {
+                shuttingDown = true;
+                server.close();
+            }
+        });
     }
 }

@@ -49,17 +49,17 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     /**
      * percentage of max cache size at which least utilised items will start to be removed
      */
-    public double cacheRemovalThresholdPercent = 0.95;
+    public double cacheRemovalThresholdPercent;
 
     /**
      * percentage of least utilised items to remove on each cache removal
      */
-    public int removalPercentage = 10;
+    public int removalPercentage;
 
     /**
      * memory usage percentage after which cache increases are denied
      */
-    public int maxCacheHeapUtilisationPercent = 50;
+    public int maxCacheHeapUtilisationPercent;
 
 
     private volatile int maxSize = DEFAULT_INITIAL_SIZE;
@@ -243,6 +243,7 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
                 Map.Entry<K, CacheUsageCounter<E>> o = i.next();
                 if ( removeCount < itemsToRemove) {
                     cacheRemoves.incrementCount();
+                    cacheItemCount.decrementCount();
                     cache.remove(o.getKey());
                     removeCount++;
                 }
@@ -263,7 +264,7 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
                 public int compare(Map.Entry<K, CacheUsageCounter<E>> o1, Map.Entry<K, CacheUsageCounter<E>> o2) {
                     Integer l1 = o1.getValue().usageCount.get();
                     Integer l2 = o2.getValue().usageCount.get();
-                    return l2.compareTo(l1);
+                    return l1.compareTo(l2);
                 }
             });
             return entries;

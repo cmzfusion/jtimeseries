@@ -47,19 +47,24 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     private int DEFAULT_INITIAL_SIZE = 256;
 
     /**
+     * percentage by which to increase cache size when the cache is expanded
+     */
+    private final int expansionPercent;
+
+    /**
      * percentage of max cache size at which least utilised items will start to be removed
      */
-    public double cacheRemovalThresholdPercent;
+    public final double cacheRemovalThresholdPercent;
 
     /**
      * percentage of least utilised items to remove on each cache removal
      */
-    public int removalPercentage;
+    public final int removalPercentage;
 
     /**
-     * memory usage percentage after which cache increases are denied
+     * memory usage percentage after which cache expansions are denied
      */
-    public int maxCacheHeapUtilisationPercent;
+    public final int maxCacheHeapUtilisationPercent;
 
 
     private volatile int maxSize = DEFAULT_INITIAL_SIZE;
@@ -81,15 +86,16 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     private ScheduledExecutorService cacheExecutorService = NamedExecutors.newSingleThreadScheduledExecutor(getClass().getSimpleName());
 
     public TimeSeriesMapCache() {
-        this(256, 50, Time.seconds(10), 95, 5, Time.seconds(120));
+        this(256, 20, 70, Time.seconds(10), 95, 5, Time.seconds(120));
     }
 
     public TimeSeriesMapCache(int maxInitialSize) {
-        this(maxInitialSize, 50, Time.seconds(10), 95, 5, Time.seconds(120));
+        this(maxInitialSize, 20, 50, Time.seconds(10), 95, 5, Time.seconds(120));
     }
 
-    public TimeSeriesMapCache(int maxInitialSize, int maxCacheHeapUtilisationPercent, TimePeriod minimumExpansionInterval, double cacheRemovalThresholdPercent, int removalPercentage, TimePeriod removalPeriod) {
+    public TimeSeriesMapCache(int maxInitialSize, int expansionPercent, int maxCacheHeapUtilisationPercent, TimePeriod minimumExpansionInterval, double cacheRemovalThresholdPercent, int removalPercentage, TimePeriod removalPeriod) {
         this.maxSize = maxInitialSize;
+        this.expansionPercent = expansionPercent;
         this.maxCacheHeapUtilisationPercent = maxCacheHeapUtilisationPercent;
         this.minimumExpansionInterval = minimumExpansionInterval;
         this.cacheRemovalThresholdPercent = cacheRemovalThresholdPercent;
@@ -141,26 +147,6 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
     public void remove(K key) {
         cache.remove(key);
-    }
-
-    public void setMinimumExpansionInterval(TimePeriod minimumExpansionInterval) {
-        this.minimumExpansionInterval = minimumExpansionInterval;
-    }
-
-    public void setRemovalPercentage(int removalPercentage) {
-        this.removalPercentage = removalPercentage;
-    }
-
-    public void setCacheRemovalThresholdPercent(double cacheRemovalThresholdPercent) {
-        this.cacheRemovalThresholdPercent = cacheRemovalThresholdPercent;
-    }
-
-    public void setMaxCacheHeapUtilisationPercent(int maxCacheHeapUtilisationPercent) {
-        this.maxCacheHeapUtilisationPercent = maxCacheHeapUtilisationPercent;
-    }
-
-    public void setCacheRemovalPeriod(TimePeriod cacheRemovalPeriod) {
-        this.cacheRemovalPeriod = cacheRemovalPeriod;
     }
 
     public void setCacheSizeCounter(Counter cacheSizeCounter) {
@@ -216,7 +202,7 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
 
             if ( utilisationRatio < maxCacheHeapUtilisationPercent / 100f) {
-                maxSize *= 2;
+                maxSize *= ( 100 + expansionPercent ) / 100f;
                 logMethods.info("Used memory " + utilisationRatio * 100 + " percent, max for increase " + maxCacheHeapUtilisationPercent + ", will increase cache size to " + maxSize);
                 cacheSizeCounter.setCount(maxSize);
             }

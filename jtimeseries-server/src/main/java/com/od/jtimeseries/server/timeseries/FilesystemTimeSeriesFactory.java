@@ -24,6 +24,7 @@ import com.od.jtimeseries.server.serialization.SerializationException;
 import com.od.jtimeseries.server.serialization.TimeSeriesSerializer;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 /**
@@ -39,9 +40,11 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
     private TimePeriod fileAppendDelay;
     private TimePeriod fileRewriteDelay;
     private int seriesLength;
+    private TimeSeriesCache<Identifiable,RoundRobinTimeSeries> timeSeriesCache;
 
-    public FilesystemTimeSeriesFactory(TimeSeriesSerializer timeseriesSerializer, TimePeriod fileAppendDelay, TimePeriod fileRewriteDelay, int seriesLength) {
+    public FilesystemTimeSeriesFactory(TimeSeriesSerializer timeseriesSerializer, TimeSeriesCache<Identifiable,RoundRobinTimeSeries> timeSeriesCache, TimePeriod fileAppendDelay, TimePeriod fileRewriteDelay, int seriesLength) {
         this.timeseriesSerializer = timeseriesSerializer;
+        this.timeSeriesCache = timeSeriesCache;
         this.fileAppendDelay = fileAppendDelay;
         this.fileRewriteDelay = fileRewriteDelay;
         this.seriesLength = seriesLength;
@@ -54,9 +57,9 @@ public class FilesystemTimeSeriesFactory extends DefaultTimeSeriesFactory {
                 if ( parameters.length == 1 && parameters[0] instanceof FileHeader) {
                     FileHeader h = (FileHeader)parameters[0];
                     //series exists on disk already, we have a header
-                    result = new FilesystemTimeSeries(h, timeseriesSerializer, fileAppendDelay, fileRewriteDelay);
+                    result = new FilesystemTimeSeries(h, timeseriesSerializer, timeSeriesCache, fileAppendDelay, fileRewriteDelay);
                 } else {
-                    result = new FilesystemTimeSeries(parent.getPath(), id, description, timeseriesSerializer, seriesLength, fileAppendDelay, fileRewriteDelay);
+                    result = new FilesystemTimeSeries(parent.getPath(), id, description, timeseriesSerializer, timeSeriesCache, seriesLength, fileAppendDelay, fileRewriteDelay);
                 }
                 return result;
             } catch (SerializationException e) {

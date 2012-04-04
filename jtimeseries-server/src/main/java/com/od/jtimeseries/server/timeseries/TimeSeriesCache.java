@@ -1,5 +1,8 @@
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.ValueRecorder;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
@@ -22,4 +25,14 @@ public interface TimeSeriesCache<K, E> {
 
 
     void remove(K key);
+
+    void setCacheSizeCounter(Counter cacheSizeCounter);
+
+    void setCacheSeriesCounter(Counter cacheItemCount);
+
+    void setCacheRemovesCounter(Counter cacheRemoves);
+
+    void setCacheHitPercentage(ValueRecorder cacheHitPercentage);
+
+    void setCacheRequestCounter(Counter c);
 }

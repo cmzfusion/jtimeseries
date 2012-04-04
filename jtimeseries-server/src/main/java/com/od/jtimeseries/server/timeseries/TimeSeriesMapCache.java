@@ -1,17 +1,21 @@
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.source.impl.DefaultCounter;
+import com.od.jtimeseries.source.impl.DefaultValueRecorder;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
-import org.omg.CORBA.TIMEOUT;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,6 +31,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
     private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesMapCache.class);
+
+    private Counter cacheRequests = DefaultCounter.NULL_COUNTER;
+    private long lastRequestCount;
+    private AtomicLong cacheHits = new AtomicLong();
+    private Counter cacheSizeCounter = DefaultCounter.NULL_COUNTER;
+    private Counter cacheItemCount = DefaultCounter.NULL_COUNTER;
+    private Counter cacheRemoves = DefaultCounter.NULL_COUNTER;
+    private ValueRecorder cacheHitPercentage = DefaultValueRecorder.NULL_VALUE_RECORDER;
+
 
     /**
      * Initial max size of cache
@@ -68,11 +81,11 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     private ScheduledExecutorService cacheExecutorService = NamedExecutors.newSingleThreadScheduledExecutor(getClass().getSimpleName());
 
     public TimeSeriesMapCache() {
-        this(256, 50, Time.seconds(10), 95, 5, Time.seconds(60));
+        this(256, 50, Time.seconds(10), 95, 5, Time.seconds(120));
     }
 
     public TimeSeriesMapCache(int maxInitialSize) {
-        this(maxInitialSize, 50, Time.seconds(10), 95, 5, Time.seconds(60));
+        this(maxInitialSize, 50, Time.seconds(10), 95, 5, Time.seconds(120));
     }
 
     public TimeSeriesMapCache(int maxInitialSize, int maxCacheHeapUtilisationPercent, TimePeriod minimumExpansionInterval, double cacheRemovalThresholdPercent, int removalPercentage, TimePeriod removalPeriod) {
@@ -83,16 +96,35 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
         this.removalPercentage = removalPercentage;
         this.cacheRemovalPeriod = removalPeriod;
         scheduleRemoveLeastUtilisedItems();
+        scheduleCacheHitPercentageCalculation();
     }
+
+    private void scheduleCacheHitPercentageCalculation() {
+        cacheExecutorService.scheduleWithFixedDelay(new Runnable() {
+            public void run() {
+                long currentCount = cacheRequests.getCount();
+                double cacheHitPercent = ((double) cacheHits.getAndSet(0)) / (currentCount - lastRequestCount) * 100;
+                lastRequestCount = currentCount;
+                cacheHitPercentage.newValue(cacheHitPercent);
+            }
+        }, 60, 60, TimeUnit.SECONDS);
+    }
+
 
     private void scheduleRemoveLeastUtilisedItems() {
         cacheExecutorService.scheduleWithFixedDelay(new RemoveLeastActiveItemsTask(), cacheRemovalPeriod.getLengthInMillis(), cacheRemovalPeriod.getLengthInMillis(), TimeUnit.MILLISECONDS);
     }
 
     public E get(K key) {
+        E result = null;
+        cacheRequests.incrementCount();
         CacheUsageCounter<E> c = cache.get(key);
-        c.usageCount.incrementAndGet();
-        return c.value;
+        if ( c != null) {
+            c.usageCount.incrementAndGet();
+            cacheHits.incrementAndGet();
+            result = c.value;
+        }
+        return result;
     }
 
     public E put(K key, E value) {
@@ -100,6 +132,7 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
         if ( cache.size() < maxSize ) {
             CacheUsageCounter<E> v = cache.put(key, new CacheUsageCounter<E>(value));
             result = v == null ? null : v.value;
+            cacheItemCount.incrementCount();
         } else {
             scheduleCacheSizeIncrease();
         }
@@ -128,6 +161,27 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
     public void setCacheRemovalPeriod(TimePeriod cacheRemovalPeriod) {
         this.cacheRemovalPeriod = cacheRemovalPeriod;
+    }
+
+    public void setCacheSizeCounter(Counter cacheSizeCounter) {
+        cacheSizeCounter.setCount(maxSize);
+        this.cacheSizeCounter = cacheSizeCounter;
+    }
+
+    public void setCacheSeriesCounter(Counter cacheItemCount) {
+        this.cacheItemCount = cacheItemCount;
+    }
+
+    public void setCacheRemovesCounter(Counter cacheRemoves) {
+        this.cacheRemoves = cacheRemoves;
+    }
+
+    public void setCacheHitPercentage(ValueRecorder cacheHitPercentage) {
+        this.cacheHitPercentage = cacheHitPercentage;
+    }
+
+    public void setCacheRequestCounter(Counter cacheRequestCounter) {
+        this.cacheRequests = cacheRequestCounter;
     }
 
     private void scheduleCacheSizeIncrease() {
@@ -163,7 +217,8 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
             if ( utilisationRatio < maxCacheHeapUtilisationPercent / 100f) {
                 maxSize *= 2;
-                logMethods.debug("Avail memory " + utilisationRatio * 100 + " percent, will increase cache size to " + maxSize);
+                logMethods.info("Used memory " + utilisationRatio * 100 + " percent, max for increase " + maxCacheHeapUtilisationPercent + ", will increase cache size to " + maxSize);
+                cacheSizeCounter.setCount(maxSize);
             }
         }
     }
@@ -171,21 +226,30 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     private class RemoveLeastActiveItemsTask implements Runnable {
 
         public void run() {
-            float cacheUsageRatio = ((float) cache.size()) / maxSize;
+            int currentCacheSize = cache.size();
+            float cacheUsageRatio = ((float) currentCacheSize) / maxSize;
             if ( cacheUsageRatio > cacheRemovalThresholdPercent / 100f) {
-                int itemsToRemove = (int)(cache.size() * (removalPercentage / 100f));
-                logMethods.debug("Cache usage " + cacheUsageRatio * 100 + " percent, removing least utilised " + itemsToRemove + " items from " + cache.size());
-                removeFromCache(itemsToRemove);
+                int itemsToRemove = (int)(currentCacheSize * (removalPercentage / 100f));
+                logMethods.info("Cache usage " + cacheUsageRatio * 100 + " percent, removing least utilised " + itemsToRemove + " items from " + currentCacheSize);
+                removeFromCacheAndResetUsageCounts(itemsToRemove);
             }
         }
 
-        private void removeFromCache(int itemsToRemove) {
+        private void removeFromCacheAndResetUsageCounts(int itemsToRemove) {
             List<Map.Entry<K, CacheUsageCounter<E>>> entries = getLeastActiveItems();
             Iterator<Map.Entry<K, CacheUsageCounter<E>>> i = entries.iterator();
             int removeCount = 0;
-            while(i.hasNext() && removeCount++ < itemsToRemove) {
+            while(i.hasNext()) {
                 Map.Entry<K, CacheUsageCounter<E>> o = i.next();
-                cache.remove(o.getKey());
+                if ( removeCount < itemsToRemove) {
+                    cacheRemoves.incrementCount();
+                    cache.remove(o.getKey());
+                    removeCount++;
+                }
+
+                //clear all entry usage count to zero, so on each period all
+                //series start with a zero count, otherwise removal favours most recently added
+                o.getValue().usageCount.set(0);
             }
         }
 

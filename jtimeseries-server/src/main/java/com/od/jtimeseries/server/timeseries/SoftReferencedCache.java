@@ -1,5 +1,8 @@
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.source.ValueRecorder;
+
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,5 +31,21 @@ public class SoftReferencedCache<K,V> implements TimeSeriesCache<K,V> {
 
     public void remove(K key) {
         cache.remove(key);
+    }
+
+    //metrics not yet supported for soft referenced cache
+    public void setCacheSizeCounter(Counter cacheSizeCounter) {
+    }
+
+    public void setCacheSeriesCounter(Counter cacheItemCount) {
+    }
+
+    public void setCacheRemovesCounter(Counter cacheRemoves) {
+    }
+
+    public void setCacheHitPercentage(ValueRecorder cacheHitPercentage) {
+    }
+
+    public void setCacheRequestCounter(Counter c) {
     }
 }

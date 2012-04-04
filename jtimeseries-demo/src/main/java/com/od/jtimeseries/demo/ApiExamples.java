@@ -38,7 +38,8 @@ public class ApiExamples {
 
         //A period, or full stop, is interpreted as a tree path separator by jTimeSeries
         //The line below creates a Counter and two Captures with associated TimeSeries
-        //because of the prefix 'mychild.' these items are created one level further down the context tree structure, within 'mychild' sub-context of the root node
+        //because of the prefix 'mychild.' these items are created one level further down the tree structure,
+        //within 'mychild' sub-context of the root node
         Counter counter = context.createCounterSeries(
                 "mychild.ExampleCounter",
                 "Maintaining a count in my application",
@@ -50,7 +51,7 @@ public class ApiExamples {
         //At some point later, on this Thread or on another ...
         counter.incrementCount();
         counter.decrementCount();
-        counter.incrementCount(10);
+        counter.setCount(10);
 
         //To find the TimeSeries where MEDIAN values from the ValueRecorder are being recorded
         TimeSeries s = context.findTimeSeries(v).getFirstMatch();

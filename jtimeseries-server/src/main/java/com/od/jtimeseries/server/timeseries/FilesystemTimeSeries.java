@@ -69,11 +69,11 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     private static ScheduledExecutorService clearCacheExecutor = NamedExecutors.newSingleThreadScheduledExecutor("FilesystemTimeSeriesClearCache");
 
     private Executor eventExecutor = TimeSeriesExecutorFactory.getExecutorForTimeSeriesEvents(this);
-    private SoftReference<RoundRobinTimeSeries> softSeriesReference = new SoftReference<RoundRobinTimeSeries>(null);
     private TimeSeriesSerializer timeseriesSerializer;
     private TimePeriod appendPeriod;
     private TimePeriod rewritePeriod;
     private FileHeader fileHeader;
+    private TimeSeriesCache<Identifiable,RoundRobinTimeSeries> timeSeriesCache;
     private ProxyTimeSeriesEventHandler timeSeriesEventHandler = new LocalModCountProxyTimeSeriesEventHandler(this);
     private WriteBehindCache writeBehindCache;
     private volatile long lastTimestamp = -1;
@@ -85,9 +85,10 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     /**
      *  Create a FilesystemTimeSeries for a series which already exists on disk, passing in the FileHeader, which must have been updated to match the latest state of the file
      */
-    public FilesystemTimeSeries(FileHeader fileHeader, TimeSeriesSerializer timeseriesSerializer, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+    public FilesystemTimeSeries(FileHeader fileHeader, TimeSeriesSerializer timeseriesSerializer, TimeSeriesCache<Identifiable,RoundRobinTimeSeries> timeSeriesCache, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(fileHeader.getId(), fileHeader.getDescription());
         this.fileHeader = fileHeader;
+        this.timeSeriesCache = timeSeriesCache;
         setFields(timeseriesSerializer, appendPeriod, rewritePeriod, fileHeader);
     }
 
@@ -96,8 +97,9 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      *  The series may more may not already exist on disk, if it does exist a FileHeader will be created and synced with existing series, of not a new series file will be
      *  created
      */
-    public FilesystemTimeSeries(String parentPath, String id, String description, TimeSeriesSerializer timeseriesSerializer, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
+    public FilesystemTimeSeries(String parentPath, String id, String description, TimeSeriesSerializer timeseriesSerializer, TimeSeriesCache<Identifiable,RoundRobinTimeSeries> timeSeriesCache, int seriesLength, TimePeriod appendPeriod, TimePeriod rewritePeriod) throws SerializationException {
         super(id, description);
+        this.timeSeriesCache = timeSeriesCache;
         this.fileHeader = createFileHeader(timeseriesSerializer, parentPath, seriesLength);
         setFields(timeseriesSerializer, appendPeriod, rewritePeriod, fileHeader);
     }
@@ -342,7 +344,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
      * FilesystemTimeSeries as a List of items - to do so would require us to deserialize from disk, which would be a bad idea
      */
     public int hashCode() {
-        return super.hashCode();
+        return getId().hashCode();
     }
 
     public long getModCount() {
@@ -396,7 +398,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     }
 
     private RoundRobinTimeSeries getRoundRobinSeries(boolean deserializeIfRequired) {
-        RoundRobinTimeSeries s = isSeriesInWriteCache() ? writeBehindCache.getSeries() : softSeriesReference.get();
+        RoundRobinTimeSeries s = isSeriesInWriteCache() ? writeBehindCache.getSeries() : timeSeriesCache.get(this);
         if ( s == null && deserializeIfRequired ) {
             try {
                 s = timeseriesSerializer.readSeries(fileHeader);
@@ -414,7 +416,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
                 //nb. the items stay in the cache append list, so we keep track that we still haven't written them to disk
 
                 s.addTimeSeriesListener(timeSeriesEventHandler);
-                softSeriesReference = new SoftReference<RoundRobinTimeSeries>(s);
+                timeSeriesCache.put(this, s);
             } catch (SerializationException e) {
                 throw new RuntimeException("Could not load timeseries values", e);
             }
@@ -594,7 +596,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     void triggerGarbageCollection() {
         try {
             readWriteLock.writeLock().lock();
-            softSeriesReference.clear();
+            timeSeriesCache.remove(this);
         } finally {
             readWriteLock.writeLock().unlock();
         }
@@ -605,7 +607,7 @@ public class FilesystemTimeSeries extends IdentifiableBase implements Identifiab
     boolean isSeriesCollected() {
         try {
             readWriteLock.readLock().lock();
-            return softSeriesReference.get() == null;
+            return timeSeriesCache.get(this) == null;
         } finally {
             readWriteLock.readLock().unlock();
         }

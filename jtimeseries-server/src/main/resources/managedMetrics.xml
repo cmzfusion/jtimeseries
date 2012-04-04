@@ -120,6 +120,36 @@
                                 <constructor-arg value="${serverMetricsContextPath}.jmx"/>
                             </bean>
 
+                            <!-- Hit ratio of requests made to time series memory cache during the last measurement period -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.MemoryCacheHitRatioMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.cache"/>
+                                <constructor-arg ref="timeSeriesMemoryCache"/>
+                            </bean>
+
+                            <!-- Current maximum size of memory cache  -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.MemoryCacheSizeMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.cache"/>
+                                <constructor-arg ref="timeSeriesMemoryCache"/>
+                            </bean>
+
+                             <!-- Count of series currently in memory cache  -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.MemoryCacheSeriesCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.cache"/>
+                                <constructor-arg ref="timeSeriesMemoryCache"/>
+                            </bean>
+
+                            <!-- Count of requests made for series to memory cache -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.MemoryCacheRequestCountMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.cache"/>
+                                <constructor-arg ref="timeSeriesMemoryCache"/>
+                            </bean>
+
+                              <!-- Count of items removed from memory cache during -->
+                            <bean class="com.od.jtimeseries.server.servermetrics.MemoryCacheSeriesRemoveMetric">
+                                <constructor-arg value="${serverMetricsContextPath}.cache"/>
+                                <constructor-arg ref="timeSeriesMemoryCache"/>
+                            </bean>
+
                              <!-- This section defines a group of JMX measurements taken by connecting to the timeseries server's own JMX management service -->
                             <bean class="com.od.jtimeseries.component.managedmetric.jmx.JmxMetric">
                                 <constructor-arg>

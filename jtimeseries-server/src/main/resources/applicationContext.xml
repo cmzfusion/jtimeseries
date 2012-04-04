@@ -17,8 +17,13 @@
         <constructor-arg value="${seriesDirectory}"/>
     </bean>
 
+    <bean id="timeSeriesMemoryCache" class="com.od.jtimeseries.server.timeseries.TimeSeriesMapCache">
+        <constructor-arg value="${initialMemoryCacheSize}"/>
+    </bean>
+
     <bean id="timeSeriesFactory" class="com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory">
         <constructor-arg ref="fileSerializer"/>
+        <constructor-arg ref="timeSeriesMemoryCache"/>
         <constructor-arg>
             <bean class="com.od.jtimeseries.util.time.Time" factory-method="milliseconds">
                 <constructor-arg value="${fileAppendDelayMillis}"/>

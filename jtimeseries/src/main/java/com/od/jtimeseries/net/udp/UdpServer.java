@@ -220,9 +220,9 @@ public class UdpServer {
 
     private void addShutdownHook(final DatagramSocket server) {
         //getting errors in tests on win2007 if not explicitly closing socket
-        logMethods.info("Shutting down " + getClass().getSimpleName() + " due to process shutdown");
         Runtime.getRuntime().addShutdownHook(new Thread("Shutdown " + getClass().getSimpleName()) {
             public void run() {
+                logMethods.info("Shutting down " + UdpServer.class.getSimpleName() + " due to process shutdown");
                 shuttingDown = true;
                 server.close();
             }

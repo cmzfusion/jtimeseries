@@ -136,7 +136,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     }
 
     private void startPublisherQueue() {
-        rateControllingExecutor.scheduleWithFixedDelay(new Runnable() {
+        rateControllingExecutor.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 try {
                     udpClient.sendMessages(messageQueue);

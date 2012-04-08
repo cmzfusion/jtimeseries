@@ -21,13 +21,24 @@ package com.od.jtimeseries.demo;
 import com.od.jtimeseries.JTimeSeries;
 import com.od.jtimeseries.capture.function.CaptureFunctions;
 import com.od.jtimeseries.context.TimeSeriesContext;
+import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.net.udp.UdpClient;
 import com.od.jtimeseries.net.udp.UdpClientConfig;
+import com.od.jtimeseries.net.udp.UdpPublishingTreeListener;
 import com.od.jtimeseries.source.ValueRecorder;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultIdentifiableTimeSeries;
+import com.od.jtimeseries.timeseries.impl.DefaultTimeSeriesFactory;
+import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
+import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.time.Time;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,24 +57,32 @@ public class TimeSeriesUdpClient {
                 18081
         ));
 
+        int timeSeriesCount = 1000;
+
         TimeSeriesContext rootContext = JTimeSeries.createRootContext();
 //        rootContext.setTimeSeriesFactory(new UdpRemoteTimeSeriesFactory(udpClient));
 
-        TimeSeriesContext fooContext = rootContext.createContext("Udp Context", "A context for foo");
-        TimeSeriesContext testContext = rootContext.createContext("Udp Context.test");
+        rootContext.addTreeListener(new UdpPublishingTreeListener(udpClient, timeSeriesCount, 20000));
 
-        ValueRecorder v = fooContext.createValueRecorderSeries("Foo Benchmark", "Foo Benchmark Description", CaptureFunctions.MAX(Time.seconds(1)));
-        ValueRecorder f = testContext.createValueRecorderSeries("Wibble Benchmark", "Wibble Benchmark Description", CaptureFunctions.MEAN(Time.seconds(2)));
-        rootContext.startScheduling().startDataCapture();
-
-        while(true) {
-            v.newValue(Math.random() * 100);
-            f.newValue(Math.random() * 50);
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        rootContext.setTimeSeriesFactory(new DefaultTimeSeriesFactory() {
+            public IdentifiableTimeSeries createTimeSeries(Identifiable parent, String path, String id, String description, Class classType, Object... parameters) {
+                return new DefaultIdentifiableTimeSeries(id, description, new RoundRobinTimeSeries(10));
             }
+        });
+
+        final List<ValueRecorder> l = new ArrayList<ValueRecorder>();
+        for ( int loop=0; loop < timeSeriesCount; loop++) {
+            l.add(rootContext.createValueRecorderSeries(TimeSeriesUdpClient.class.getName() + loop, TimeSeriesUdpClient.class.getName()));
         }
+
+        ScheduledExecutorService s = NamedExecutors.newSingleThreadScheduledExecutor("TimeSeriesUdpClient");
+        s.scheduleWithFixedDelay(new Runnable() {
+            public void run() {
+                long value = System.currentTimeMillis();
+                for (ValueRecorder r : l) {
+                    r.newValue(value);
+                }
+            }
+        }, 0, 1, TimeUnit.SECONDS);
     }
 }

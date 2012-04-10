@@ -12,7 +12,7 @@
             <!-- Be careful with this value since recalculations will trigger persistence/appends for timeseries which
             have had no new timepoints since the last recalculation, and this value limits these operations -->
             <bean class="com.od.jtimeseries.util.time.Time" factory-method="milliseconds">
-                <constructor-arg value="200"/>
+                <constructor-arg value="1000"/>
             </bean>
         </constructor-arg>
         <constructor-arg>
@@ -20,13 +20,6 @@
             <!-- by default, the median, median today, 90th percentile, 90th percentile today -->
             <list>
                 <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEDIAN"/>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="PERCENTILE">
-                    <constructor-arg value="90"/>
-                </bean>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="MEDIAN_TODAY"/>
-                <bean class="com.od.jtimeseries.server.summarystats.SummaryStatistics" factory-method="PERCENTILE_TODAY">
-                    <constructor-arg value="90"/>
-                </bean>
             </list>
         </constructor-arg>
     </bean>

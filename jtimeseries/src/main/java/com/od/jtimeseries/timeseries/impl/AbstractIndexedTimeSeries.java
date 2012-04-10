@@ -95,6 +95,16 @@ abstract class AbstractIndexedTimeSeries extends AbstractLockedTimeSeries implem
         return result;
     }
 
+    protected void removeEarliestItems(int itemsToRemove) {
+        List<TimeSeriesItem> removed = new ArrayList<TimeSeriesItem>(itemsToRemove);
+        for ( int loop=0; loop < itemsToRemove; loop++) {
+            if ( series.size() > 0) {
+                removed.add(series.removeFirst());
+            }
+        }
+        queueItemsRemovedEvent(TimeSeriesEvent.createItemsRemovedEvent(this, removed, getModCount()));
+    }
+
     protected void locked_removeAll(Iterable<TimeSeriesItem> items) {
         List<TimeSeriesItem> removed = new ArrayList<TimeSeriesItem>();
         for (TimeSeriesItem i : items) {

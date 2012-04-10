@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +25,12 @@ class SerializerOperations {
     static final int MAX_LENGTH_OFFSET = VERSION_STRING_LENGTH + 4;
     static final int HEADER_SECTION_2_OFFSET = 20;
 
+    static final AtomicReference<byte[]> byteArrayOne = new AtomicReference<byte[]>();
+    static final AtomicReference<byte[]> byteArrayTwo = new AtomicReference<byte[]>();
+    static final AtomicReference<byte[]> byteArrayThree = new AtomicReference<byte[]>();
+
     /**
+     *
      *  Write the in memory header information to the series file, c must be at position zero
      */
     void writeHeader(FileHeader fileHeader, byte[] properties, AuditedFileChannel c) throws IOException {
@@ -35,7 +41,7 @@ class SerializerOperations {
     //properties which are not changed in an 'append'
     private void writeHeaderSectionOne(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
         c.position(0);
-        ByteBuffer b = ByteBuffer.allocate(HEADER_SECTION_2_OFFSET);
+        ByteBuffer b = getByteBuffer(byteArrayOne, HEADER_SECTION_2_OFFSET);
         b.put(VERSION_STRING.getBytes()); //add a version description, to support future versioning
         b.putInt(fileHeader.getHeaderLength());  //offset where data will start
         b.putInt(fileHeader.getSeriesMaxLength());
@@ -46,7 +52,7 @@ class SerializerOperations {
     private void writeHeaderSectionTwo(FileHeader fileHeader, boolean writeProperties, byte[] properties, AuditedFileChannel c) throws IOException {
         c.position(HEADER_SECTION_2_OFFSET);
         int toWrite = writeProperties ? (fileHeader.getHeaderLength() - HEADER_SECTION_2_OFFSET) : 16;
-        ByteBuffer b = ByteBuffer.allocate(toWrite);
+        ByteBuffer b = getByteBuffer(byteArrayOne, toWrite);
         b.putInt(fileHeader.getCurrentHead());  //start index in rr structure
         b.putInt(fileHeader.getCurrentTail());
         b.putLong(fileHeader.getMostRecentItemTimestamp());
@@ -71,7 +77,7 @@ class SerializerOperations {
      *  Write the in memory time series data to the series file, c must be at start of series data offset
      */
     void writeBody(RoundRobinTimeSeries t, AuditedFileChannel c) throws IOException {
-        ByteBuffer b = ByteBuffer.allocate(t.size() * 16);
+        ByteBuffer b = getByteBuffer(byteArrayOne, t.size() * 16);
         for ( TimeSeriesItem i : t) {
             writeItem(b, i);
         }
@@ -89,7 +95,7 @@ class SerializerOperations {
      */
     RoundRobinTimeSeries readBody(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
         c.position(fileHeader.getHeaderLength());
-        ByteBuffer b = ByteBuffer.allocate((int)(c.size() - c.position()));
+        ByteBuffer b = getByteBuffer(byteArrayOne, (int) (c.size() - c.position()));
         c.readCompletely(b);
 
         RoundRobinTimeSeries series = new RoundRobinTimeSeries(fileHeader.getSeriesMaxLength());
@@ -134,7 +140,7 @@ class SerializerOperations {
      */
     void readHeader(FileHeader fileHeader, AuditedFileChannel c) throws IOException {
         c.position(0);
-        ByteBuffer b = ByteBuffer.allocate(MAX_LENGTH_OFFSET);
+        ByteBuffer b = getByteBuffer(byteArrayOne, MAX_LENGTH_OFFSET);
         c.readCompletely(b);
         b.position(0);
 
@@ -146,7 +152,7 @@ class SerializerOperations {
         }
         int headerLength = b.getInt();
 
-        b = ByteBuffer.allocate(headerLength - MAX_LENGTH_OFFSET);
+        b = getByteBuffer(byteArrayOne, headerLength - MAX_LENGTH_OFFSET);
         c.readCompletely(b);
         b.position(0);
 
@@ -187,25 +193,25 @@ class SerializerOperations {
             int newHead = (currentHead + headAdjust) % header.getSeriesMaxLength();
             int newTail = (header.getCurrentTail() + toAppend.size()) % header.getSeriesMaxLength();
 
-            ByteBuffer appendBuffer = ByteBuffer.allocate(toAppend.size() * 16);
+            ByteBuffer appendBuffer = getByteBuffer(byteArrayOne, toAppend.size() * 16);
             for (TimeSeriesItem i : toAppend) {
                 writeItem(appendBuffer, i);
             }
 
-            int bytesToWriteAtEnd = Math.min(appendBuffer.capacity(), (header.getSeriesMaxLength() - header.getCurrentTail()) * 16);
-            int bytesToWriteAtStart = appendBuffer.capacity() - bytesToWriteAtEnd;
+            int bytesToWriteAtEnd = Math.min(appendBuffer.limit(), (header.getSeriesMaxLength() - header.getCurrentTail()) * 16);
+            int bytesToWriteAtStart = appendBuffer.limit() - bytesToWriteAtEnd;
 
             byte[] appendArray = appendBuffer.array();
             if ( bytesToWriteAtStart > 0) {
-                ByteBuffer startBuffer = ByteBuffer.allocate(bytesToWriteAtStart);
-                startBuffer.put(appendArray, appendArray.length - startBuffer.capacity(), startBuffer.capacity());
+                ByteBuffer startBuffer = getByteBuffer(byteArrayTwo, bytesToWriteAtStart);
+                startBuffer.put(appendArray, appendBuffer.limit() - startBuffer.limit(), startBuffer.limit());
                 c.position(header.getHeaderLength());
                 c.writeCompletely(startBuffer);
             }
 
             if ( bytesToWriteAtEnd > 0 ) {
-                ByteBuffer endBuffer = ByteBuffer.allocate(bytesToWriteAtEnd);
-                endBuffer.put(appendArray, 0, endBuffer.capacity());
+                ByteBuffer endBuffer = getByteBuffer(byteArrayThree, bytesToWriteAtEnd);
+                endBuffer.put(appendArray, 0, endBuffer.limit());
                 c.position(header.getHeaderLength() + (header.getCurrentTail() * 16));
                 c.writeCompletely(endBuffer);
             }
@@ -223,5 +229,20 @@ class SerializerOperations {
 
     private void skipItems(ByteBuffer b, int itemsToSkip) {
         b.position(b.position() + (itemsToSkip * 16));
+    }
+
+    /**
+     * Get a ByteBuffer using the referenced byte[] array
+     * If the refernced array is null or is too small, use a new byte[] and update the reference
+     */
+    private ByteBuffer getByteBuffer(AtomicReference<byte[]> arrayToWrap, int writableLength) {
+        byte[] b = arrayToWrap.get();
+        if ( b != null && b.length >= writableLength ) {
+            return ByteBuffer.wrap(b, 0, writableLength);
+        } else {
+            byte[] newArray = new byte[writableLength];
+            arrayToWrap.set(newArray);
+            return ByteBuffer.wrap(newArray, 0, writableLength);
+        }
     }
 }

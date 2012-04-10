@@ -26,7 +26,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * Hold references to timeseries in a strong referenced map which may increase in size until
  * a configurable percentage of available memory is used
  *
- * A periodic task
+ * This may be a preferable caching strategy than the use of SoftReference caching, since some gc algorithms
+ * are not well-optimised for clearing down soft references. Also, this caching strategy allow the least utilised
+ * series to be removed from the cache rather than a random assortment
  */
 public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
@@ -40,6 +42,10 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
     private Counter cacheRemoves = DefaultCounter.NULL_COUNTER;
     private ValueRecorder cacheHitPercentage = DefaultValueRecorder.NULL_VALUE_RECORDER;
 
+    /**
+     * Decrease the cache size if memory use rises above this percentage value
+     */
+    public final int DECREASE_CACHE_MEMORY_THRESHOLD_PERCENT = 85;
 
     /**
      * Initial max size of cache
@@ -119,7 +125,9 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
 
     private void scheduleRemoveLeastUtilisedItemsTask() {
-        cacheExecutorService.scheduleWithFixedDelay(new RemoveLeastActiveItemsTask(), cacheRemovalPeriod.getLengthInMillis(), cacheRemovalPeriod.getLengthInMillis(), TimeUnit.MILLISECONDS);
+        cacheExecutorService.scheduleWithFixedDelay(new RemoveLeastActiveItemsTask(),
+                cacheRemovalPeriod.getLengthInMillis(), cacheRemovalPeriod.getLengthInMillis(), TimeUnit.MILLISECONDS
+        );
     }
 
     private void scheduleShrinkCacheTask() {
@@ -202,7 +210,8 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
             if ( utilisationPercent < maxCacheHeapUtilisationPercent) {
                 maxSize *= ( 100 + expansionPercent ) / 100f;
-                logMethods.info("Used memory " + utilisationPercent + " percent, max for increase " + maxCacheHeapUtilisationPercent + ", will increase cache size to " + maxSize);
+                logMethods.info("Used memory " + utilisationPercent + " percent, max for increase " +
+                        maxCacheHeapUtilisationPercent + ", will increase cache size to " + maxSize);
                 cacheSizeCounter.setCount(maxSize);
             }
         }
@@ -212,10 +221,11 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
 
         public void run() {
             double utilisationPercent = getMemoryUtilisationPercent();
-            if ( utilisationPercent > 65 ) {
+            if ( utilisationPercent > DECREASE_CACHE_MEMORY_THRESHOLD_PERCENT) {
                 maxSize *= ( 100 - expansionPercent ) / 100f;
                 cacheSizeCounter.setCount(maxSize);
-                logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " + expansionPercent + " percent to " + maxSize);
+                logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " +
+                        expansionPercent + " percent to " + maxSize);
                 int toRemove = cache.size() - maxSize;
                 while ( toRemove > 0) {
                     removeFromCacheAndResetUsageCounts(toRemove, false);
@@ -232,7 +242,8 @@ public class TimeSeriesMapCache<K,E> implements TimeSeriesCache<K,E> {
             float cacheUsageRatio = ((float) currentCacheSize) / maxSize;
             if ( cacheUsageRatio > cacheRemovalThresholdPercent / 100f) {
                 int itemsToRemove = (int)(currentCacheSize * (removalPercentage / 100f));
-                logMethods.info("Cache usage " + cacheUsageRatio * 100 + " percent, removing least utilised " + itemsToRemove + " items from " + currentCacheSize);
+                logMethods.info("Cache usage " + cacheUsageRatio * 100 + " percent, removing least utilised " +
+                        itemsToRemove + " items from " + currentCacheSize);
                 removeFromCacheAndResetUsageCounts(itemsToRemove, true);
             }
         }

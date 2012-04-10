@@ -39,7 +39,7 @@ public class AuditedFileChannel {
         } while (nwritten != -1 && b.hasRemaining());
 
         bytesWritten += b.position();
-        if ( b.position() != b.capacity()) { //should never happen?
+        if ( b.position() != b.limit()) { //should never happen?
             throw new IOException("Failed to write whole ByteBuffer to FileChannel");
         }
         b.position(0);
@@ -56,7 +56,7 @@ public class AuditedFileChannel {
         } while (nread != -1 && b.hasRemaining());
 
         bytesRead += b.position();
-        if ( b.position() != b.capacity()) {
+        if ( b.position() != b.limit()) {
             throw new IOException("Failed to read whole ByteBuffer from FileChannel");
         }
         b.position(0);

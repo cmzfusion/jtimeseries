@@ -68,8 +68,9 @@ public class RoundRobinTimeSeries extends DefaultTimeSeries {
     }
 
     private void checkSize() {
-        while (size() > maxSize) {
-            removeItem(getEarliestItem());
+        int itemsToRemove = size() - maxSize;
+        if ( itemsToRemove > 0) {
+            removeEarliestItems(itemsToRemove);
         }
     }
 

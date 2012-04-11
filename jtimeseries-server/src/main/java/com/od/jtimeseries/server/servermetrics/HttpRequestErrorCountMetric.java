@@ -5,9 +5,10 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.ServerHttpRequestMonitor;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
@@ -36,7 +37,11 @@ public class HttpRequestErrorCountMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Count of HTTP requests with errors", COUNT_OVER(captureTime), LATEST(captureTime));
+        Counter c = rootContext.createCounterSeries(
+                path,
+                "Count of HTTP requests with errors",
+                MEAN_COUNT_OVER(Time.seconds(1), captureTime),
+                LATEST(captureTime));
         ServerHttpRequestMonitor.setHttpRequestErrorCounter(c);
     }
 }

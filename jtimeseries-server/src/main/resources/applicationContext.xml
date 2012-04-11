@@ -18,7 +18,15 @@
     </bean>
 
     <bean id="timeSeriesMemoryCache" class="com.od.jtimeseries.server.timeseries.TimeSeriesMapCache">
-        <constructor-arg value="${initialMemoryCacheSize}"/>
+        <constructor-arg value="${cacheInitialMaxSize}"/>
+        <constructor-arg value="${cacheShrinkOrGrowPercent}"/>
+        <constructor-arg value="${cacheGrowMaxMemoryPercent}"/>
+         <constructor-arg>
+            <bean class="com.od.jtimeseries.util.time.Time" factory-method="seconds">
+                <constructor-arg value="${cacheGrowCheckSeconds}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg value="${cacheShrinkMinMemoryPercent}"/>
     </bean>
 
     <bean id="timeSeriesFactory" class="com.od.jtimeseries.server.timeseries.FilesystemTimeSeriesFactory">

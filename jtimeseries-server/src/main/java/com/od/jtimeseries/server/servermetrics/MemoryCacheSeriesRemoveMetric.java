@@ -23,10 +23,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.timeseries.TimeSeriesCache;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.CHANGE;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,7 +62,7 @@ public class MemoryCacheSeriesRemoveMetric extends AbstractManagedMetric {
             path,
             "Count of series removed from memory cache, periodically the least utilised series are removed",
             LATEST(timePeriod),
-            CHANGE(timePeriod)
+            MEAN_COUNT_OVER(Time.seconds(1), timePeriod)
         );
         cache.setCacheRemovesCounter(c);
     }

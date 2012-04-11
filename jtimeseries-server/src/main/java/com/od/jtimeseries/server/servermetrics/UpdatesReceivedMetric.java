@@ -23,9 +23,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.message.ServerSeriesUdpMessageListener;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,8 +58,8 @@ public class UpdatesReceivedMetric extends AbstractManagedMetric {
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
         Counter counter = rootContext.createCounterSeries(
             path,
-            "A count of series data update UDP datagram messages received",
-            COUNT_OVER(countPeriod),
+            "A count of series data updates via UDP messages",
+            MEAN_COUNT_OVER(Time.seconds(1), countPeriod),
             LATEST(countPeriod)
         );
         ServerSeriesUdpMessageListener.setUpdateMessagesReceivedCounter(counter);

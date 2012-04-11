@@ -23,9 +23,10 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.timeseries.impl.RoundRobinTimeSeries;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.COUNT_OVER;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
@@ -59,7 +60,8 @@ public class GarbageCollectedSeriesMetric extends AbstractManagedMetric {
                 path,
                 "A count of the series deallocated for memory efficiency, we would expect a heavily loaded server to " +
                 "regularly deallocate series data once it is no longer possible to maintain all series data in RAM",
-                COUNT_OVER(countPeriod), LATEST(countPeriod));
+                MEAN_COUNT_OVER(Time.seconds(1), countPeriod),
+                LATEST(countPeriod));
         RoundRobinTimeSeries.setGarbageCollectionCounter(counter);
     }
 

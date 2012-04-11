@@ -36,7 +36,11 @@ public class HttpRequestTimeMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        ValueRecorder v = rootContext.createValueRecorderSeries(path, "Length of time taken to process HTTP requests in milliseconds", MEDIAN(captureTime), MAX(captureTime));
+        ValueRecorder v = rootContext.createValueRecorderSeries(
+                path,
+                "Length of time taken to process HTTP requests in milliseconds",
+                MEDIAN(captureTime), MAX(captureTime)
+        );
         ServerHttpRequestMonitor.setHttpRequestTimeValueRecorder(v);
     }
 }

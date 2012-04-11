@@ -34,7 +34,11 @@ public class JmxConnectionCreationCountMetric extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Count of connections created by jmx connection pool", LATEST(captureTime));
+        Counter c = rootContext.createCounterSeries(
+            path,
+            "Count of connections created by jmx connection pool",
+            LATEST(captureTime)
+        );
         DefaultJmxConnectionPool.setJmxConnectionCreationCounter(c);
     }
 }

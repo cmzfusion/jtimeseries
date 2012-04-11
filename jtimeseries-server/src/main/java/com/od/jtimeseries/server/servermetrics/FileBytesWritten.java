@@ -6,7 +6,11 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.serialization.RoundRobinSerializer;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
+
+import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +38,12 @@ public class FileBytesWritten extends AbstractManagedMetric {
     }
 
     public void doInitializeMetric(TimeSeriesContext rootContext, String path) {
-        Counter c = rootContext.createCounterSeries(path, "Bytes written to timeseries files", CaptureFunctions.COUNT_OVER(captureTime), CaptureFunctions.LATEST(captureTime));
+        Counter c = rootContext.createCounterSeries(
+                path,
+                "Bytes written to timeseries files",
+                MEAN_COUNT_OVER(Time.seconds(1), captureTime),
+                LATEST(captureTime)
+        );
         RoundRobinSerializer.setFileBytesWritten(c);
     }
 }

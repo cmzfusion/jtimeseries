@@ -23,9 +23,10 @@ import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.timeseries.TimeSeriesCache;
 import com.od.jtimeseries.source.Counter;
+import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import static com.od.jtimeseries.capture.function.CaptureFunctions.CHANGE;
+import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 
 /**
@@ -61,7 +62,7 @@ public class MemoryCacheSeriesCountMetric extends AbstractManagedMetric {
             path,
             "Number of timeseries in Memory Cache",
             LATEST(timePeriod),
-            CHANGE(timePeriod)
+            MEAN_COUNT_OVER(Time.seconds(1), timePeriod)
         );
         cache.setCacheSeriesCounter(c);
     }

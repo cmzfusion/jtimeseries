@@ -1,4 +1,4 @@
-package com.od.jtimeseries.server.timeseries;
+package com.od.jtimeseries.component.util.cache;
 
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.source.ValueRecorder;
@@ -23,16 +23,18 @@ public interface TimeSeriesCache<K, E> {
      */
     E put(K key, E value);
 
-
-    void remove(K key);
+    /**
+     * remove an item from the cache
+     */
+    E remove(K key);
 
     void setCacheSizeCounter(Counter cacheSizeCounter);
 
-    void setCacheSeriesCounter(Counter cacheItemCount);
+    void setCacheOccupancyCounter(Counter cacheItemCount);
 
     void setCacheRemovesCounter(Counter cacheRemoves);
 
-    void setCacheHitPercentage(ValueRecorder cacheHitPercentage);
+    void setCacheHitPercentageValueRecorder(ValueRecorder cacheHitPercentage);
 
     void setCacheRequestCounter(Counter c);
 }

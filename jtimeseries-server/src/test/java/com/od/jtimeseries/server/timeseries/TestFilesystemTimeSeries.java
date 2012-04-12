@@ -1,5 +1,6 @@
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.component.util.cache.LRUCache;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.server.serialization.*;
@@ -38,7 +39,7 @@ public class TestFilesystemTimeSeries extends TestCase {
                 context.getPath(),
                 "id" + (int)(Math.random() * 100000000),
                 "description", timeseriesSerializer,
-                new TimeSeriesMapCache(),
+                new LRUCache(),
                 10000,
                 Time.seconds(10),
                 Time.seconds(10));
@@ -134,7 +135,7 @@ public class TestFilesystemTimeSeries extends TestCase {
             c.getPath(),
             "id" + (int)(Math.random() * 100000000),
             "description", timeseriesSerializer,
-            new TimeSeriesMapCache(),
+            new LRUCache(),
             maxSize,
             Time.seconds(10),
             Time.seconds(10)
@@ -210,7 +211,7 @@ public class TestFilesystemTimeSeries extends TestCase {
                 series.getId(),
                 "description",
                 timeseriesSerializer,
-                new TimeSeriesMapCache(),
+                new LRUCache(),
                 10000,
                 Time.seconds(10),
                 Time.seconds(10)

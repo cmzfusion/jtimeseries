@@ -19,15 +19,13 @@
 package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
+import com.od.jtimeseries.component.util.cache.TimeSeriesCache;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.timeseries.TimeSeriesCache;
 import com.od.jtimeseries.source.Counter;
-import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
-import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
 /**
  * Created by IntelliJ IDEA.

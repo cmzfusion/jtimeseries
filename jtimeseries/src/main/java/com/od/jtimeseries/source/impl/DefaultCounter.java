@@ -38,10 +38,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DefaultCounter implements Counter {
 
-    public static final Counter NULL_COUNTER = new DefaultCounter("Dummy", "Dummy");
+    public static final Counter NULL_COUNTER = new DefaultCounter("NULL_COUNTER");
 
     private final DefaultValueRecorder simpleSource;
     private long currentValue;
+
+    public DefaultCounter(String id, ValueSourceListener... sourceDataListeners) {
+        this(id, id, sourceDataListeners);
+    }
 
     public DefaultCounter(String id, String description, ValueSourceListener... sourceDataListeners) {
         simpleSource = new DefaultValueRecorder(id, description, sourceDataListeners);

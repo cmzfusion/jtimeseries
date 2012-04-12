@@ -1,9 +1,9 @@
 package com.od.jtimeseries.server.serialization;
 
+import com.od.jtimeseries.component.util.cache.LRUCache;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.server.timeseries.FilesystemTimeSeries;
-import com.od.jtimeseries.server.timeseries.TimeSeriesMapCache;
 import com.od.jtimeseries.server.util.ServerDefaults;
 import com.od.jtimeseries.timeseries.Item;
 import com.od.jtimeseries.timeseries.IndexedTimeSeries;
@@ -139,7 +139,7 @@ public class TestRoundRobinSerializer extends TestCase {
             "id",
             "description",
             serializer,
-            new TimeSeriesMapCache(),
+            new LRUCache(),
             SERIES_LENGTH,
             Time.seconds(10),
             Time.seconds(10)

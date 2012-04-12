@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.component.util.cache.TimeSeriesCache;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.identifiable.IdentifiableBase;
 import com.od.jtimeseries.server.serialization.FileHeader;
@@ -32,7 +33,6 @@ import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
-import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;

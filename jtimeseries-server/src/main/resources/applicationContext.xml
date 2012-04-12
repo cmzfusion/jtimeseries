@@ -17,7 +17,7 @@
         <constructor-arg value="${seriesDirectory}"/>
     </bean>
 
-    <bean id="timeSeriesMemoryCache" class="com.od.jtimeseries.server.timeseries.TimeSeriesMapCache">
+    <bean id="timeSeriesMemoryCache" class="com.od.jtimeseries.component.util.cache.LRUCache">
         <constructor-arg value="${cacheInitialMaxSize}"/>
         <constructor-arg value="${cacheShrinkOrGrowPercent}"/>
         <constructor-arg value="${cacheGrowMaxMemoryPercent}"/>

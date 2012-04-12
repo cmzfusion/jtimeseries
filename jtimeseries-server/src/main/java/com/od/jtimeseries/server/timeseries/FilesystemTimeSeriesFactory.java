@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.timeseries;
 
+import com.od.jtimeseries.component.util.cache.TimeSeriesCache;
 import com.od.jtimeseries.identifiable.Identifiable;
 import com.od.jtimeseries.server.serialization.FileHeader;
 import com.od.jtimeseries.server.serialization.SerializationException;

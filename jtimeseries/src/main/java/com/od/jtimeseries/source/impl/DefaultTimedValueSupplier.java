@@ -41,6 +41,10 @@ public class DefaultTimedValueSupplier extends AbstractValueSource implements Ti
     private TimePeriod timePeriod;
     private ValueSupplier valueSupplier;
 
+    public DefaultTimedValueSupplier(String id, ValueSupplier valueSupplier, TimePeriod timerPeriod, ValueSourceListener... sourceDataListeners) {
+        this(id, id, valueSupplier, timerPeriod, sourceDataListeners);
+    }
+
     public DefaultTimedValueSupplier(String id, String description, ValueSupplier valueSupplier, TimePeriod timerPeriod, ValueSourceListener... sourceDataListeners) {
         super(id, description, sourceDataListeners);
         this.valueSupplier = valueSupplier;

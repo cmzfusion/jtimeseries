@@ -19,9 +19,9 @@
 package com.od.jtimeseries.server.servermetrics;
 
 import com.od.jtimeseries.component.managedmetric.AbstractManagedMetric;
+import com.od.jtimeseries.component.util.cache.TimeSeriesCache;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.identifiable.Identifiable;
-import com.od.jtimeseries.server.timeseries.TimeSeriesCache;
 import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
@@ -64,6 +64,6 @@ public class MemoryCacheSeriesCountMetric extends AbstractManagedMetric {
             LATEST(timePeriod),
             MEAN_COUNT_OVER(Time.seconds(1), timePeriod)
         );
-        cache.setCacheSeriesCounter(c);
+        cache.setCacheOccupancyCounter(c);
     }
 }

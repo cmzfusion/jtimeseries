@@ -30,7 +30,11 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public class DefaultValueRecorder extends AbstractValueSource implements ValueRecorder {
 
-    public static final ValueRecorder NULL_VALUE_RECORDER = new DefaultValueRecorder("Dummy", "Dummy");
+    public static final ValueRecorder NULL_VALUE_RECORDER = new DefaultValueRecorder("NULL_VALUE_RECORDER");
+
+    public DefaultValueRecorder(String id, ValueSourceListener... sourceDataListeners) {
+        this(id, id, sourceDataListeners);
+    }
 
     public DefaultValueRecorder(String id, String description, ValueSourceListener... sourceDataListeners) {
         super(id, description, sourceDataListeners);

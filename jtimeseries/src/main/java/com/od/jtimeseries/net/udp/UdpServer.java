@@ -34,14 +34,14 @@ import com.od.jtimeseries.util.NetworkUtils;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
+import sun.security.krb5.internal.UDPClient;
 
 import java.awt.*;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -57,6 +57,7 @@ public class UdpServer {
     private static LogMethods logMethods = LogUtils.getLogMethods(UdpServer.class);
 
     private static final int RESTART_WAIT = 600000; //10 mins
+    private static final int DEFAULT_RECEIVE_BUFFER_SIZE = 524288;
 
     private LimitedErrorLogger limitedLogger;
     private int port;
@@ -70,13 +71,32 @@ public class UdpServer {
     private UdpMessageFactory utf8MessageFactory = new Utf8MessageFactory();
     private UdpMessageFactory javaIOMessageFactory = new JavaIOMessageFactory();
 
+    private List<UdpClientWithSocket> replicationClientsWithSocket = new LinkedList<UdpClientWithSocket>();
+
     private Counter udpDatagramCounter = DefaultCounter.NULL_COUNTER;
     private ValueRecorder messagesPerDatagram = DefaultValueRecorder.NULL_VALUE_RECORDER;
     private volatile boolean shuttingDown;
+    private int receiveBufferSize;
 
     public UdpServer(int port) {
+        this(port, DEFAULT_RECEIVE_BUFFER_SIZE, Collections.<UdpClientConfig>emptyList());
+    }
+
+    public UdpServer(int port, int receiveBufferSize) {
+        this(port, receiveBufferSize, Collections.<UdpClientConfig>emptyList());
+    }
+
+    public UdpServer(int port, int receiveBufferSize, Collection<UdpClientConfig> replicationClients) {
+        this.receiveBufferSize = receiveBufferSize;
         limitedLogger = new LimitedErrorLogger(logMethods, 10, 100);
         this.port = port;
+        createReplicationClients(replicationClients);
+    }
+
+    private void createReplicationClients(Collection<UdpClientConfig> replicationClients) {
+        for ( UdpClientConfig c : replicationClients) {
+            replicationClientsWithSocket.add(new UdpClientWithSocket(c));
+        }
     }
 
     public synchronized void startReceive() {
@@ -136,6 +156,7 @@ public class UdpServer {
             byte[] buffer = new byte[NetworkUtils.MAX_ALLOWABLE_PACKET_SIZE_BYTES];
             try {
                 DatagramSocket server = new DatagramSocket(port);
+                server.setReceiveBufferSize(receiveBufferSize);
                 addShutdownHook(server);
                 processMessages(buffer, server);
             } catch (SocketException e) {
@@ -159,6 +180,8 @@ public class UdpServer {
                         m.setSourceInetAddress(packet.getAddress().getHostAddress());
                         fireMessageToListeners(m);
                     }
+
+                    sendForReplication(buffer, packet);
                 }
                 catch (Throwable t) {
                     if ( ! shuttingDown ) {
@@ -167,6 +190,13 @@ public class UdpServer {
                 }
             }
             stopping = false;
+        }
+
+        //now replicate the packet to replication destinations, if configured
+        private void sendForReplication(byte[] buffer, DatagramPacket packet) {
+            for (UdpClientWithSocket s : replicationClientsWithSocket) {
+                s.sendDatagram(buffer, packet.getLength());
+            }
         }
 
         /**

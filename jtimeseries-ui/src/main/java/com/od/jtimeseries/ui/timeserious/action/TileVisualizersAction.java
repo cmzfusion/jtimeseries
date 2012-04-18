@@ -15,10 +15,14 @@ import java.awt.event.ActionEvent;
  * Time: 12:54
  *
  * Tile visualizers, and hide the series selector panels amd controls
+ *
+ * Subsequent presses toggle between 1 column to MAX_COLS columns
  */
 public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
 
     private TimeSeriousDesktopPane desktopPane;
+    private int lastCols = -1;
+    private final int MAX_COLS = 6;
 
     public TileVisualizersAction(TimeSeriousDesktopPane desktopPane) {
         super("Tile Visualizers", ImageUtils.TILE_VISUALIZERS_ICON_16x16);
@@ -37,15 +41,8 @@ public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
         if (count == 0) return;
 
         // Determine the necessary grid size
-        int sqrt = (int)Math.sqrt(count);
-        int rows = sqrt;
-        int cols = sqrt;
-        if (rows * cols < count) {
-            cols++;
-            if (rows * cols < count) {
-                rows++;
-            }
-        }
+        int cols = getNextColumnCount(count);
+        int rows = (int)Math.ceil(count / (float)cols);
 
         // Define some initial values for size & location.
         Dimension size = desk.getSize();
@@ -69,6 +66,26 @@ public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
             y += h; // start the next row
             x = 0;
         }
+    }
+
+    private int getNextColumnCount(int frameCount) {
+        int result;
+        if ( lastCols == -1) {
+            result = getStartingColumnCount(frameCount);
+        } else {
+            result = lastCols + 1;
+            lastCols = ++lastCols % MAX_COLS;
+        }
+        return result;
+    }
+
+    private int getStartingColumnCount(int frameCount) {
+        //try to find a sensible starting configuration which favours width over height
+        //a square grid would be sqrt frameCount, desired scaling is 1.5/1 so /1.5 first
+        float f = frameCount / 1.5f;
+        double s = Math.sqrt(f);
+        lastCols = (int) Math.ceil(s);
+        return lastCols;
     }
 
     private void hideControls(JInternalFrame f) {

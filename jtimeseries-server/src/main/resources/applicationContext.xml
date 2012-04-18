@@ -74,8 +74,15 @@
 
     <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient"/>
 
+    <!-- Can be passed to the udpServer to replicate received packets to another server instance
+    <bean id="replicationClient" class="com.od.jtimeseries.net.udp.UdpClientConfig">
+        <constructor-arg value="localhost"/>
+        <constructor-arg value="18091"/>
+    </bean> -->
+
     <bean id="udpServer" class="com.od.jtimeseries.net.udp.UdpServer">
         <constructor-arg value="${udpServerPort}"/>
+        <!-- <constructor-arg ref="replicationClient"/> -->
     </bean>
 
     <bean id="httpdServer" class="com.od.jtimeseries.net.httpd.JTimeSeriesHttpd">

@@ -21,16 +21,12 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.net.udp.message.UdpMessage;
 import com.od.jtimeseries.util.NamedExecutors;
 import com.od.jtimeseries.util.NetworkUtils;
-import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 import com.od.jtimeseries.util.time.TimePeriod;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,13 +41,12 @@ public class UdpClient {
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(UdpClient.class);
     
-    private final LimitedErrorLogger limitedLogger = new LimitedErrorLogger(logMethods, 5, 100);
     private final ScheduledExecutorService scheduledExecutor = NamedExecutors.newSingleThreadScheduledExecutor("UdpClient");
 
     //using the set to check whether already in the list without iterating
     //want to preserve the order in which clients are sent messages so keeping the list
-    private final Set<ConfigWithSocket> configSet = Collections.synchronizedSet(new HashSet<ConfigWithSocket>());
-    private final List<ConfigWithSocket> configs = Collections.synchronizedList(new LinkedList<ConfigWithSocket>());
+    private final Set<UdpClientWithSocket> configSet = Collections.synchronizedSet(new HashSet<UdpClientWithSocket>());
+    private final List<UdpClientWithSocket> configs = Collections.synchronizedList(new LinkedList<UdpClientWithSocket>());
 
     /**
      * Create a UdpClient, but this won't send any messages until at least one client
@@ -79,7 +74,7 @@ public class UdpClient {
 
     public boolean addClientConfig(UdpClientConfig config) {
         synchronized (configs) {
-            ConfigWithSocket c = new ConfigWithSocket(config);
+            UdpClientWithSocket c = new UdpClientWithSocket(config);
             boolean added = configSet.add(c);
             if (added) {
                 configs.add(c);
@@ -101,7 +96,7 @@ public class UdpClient {
 
     private boolean doRemoveConfig(UdpClientConfig c) {
         synchronized (configs) {
-            ConfigWithSocket cc = new ConfigWithSocket(c);
+            UdpClientWithSocket cc = new UdpClientWithSocket(c);
             boolean removed = configSet.remove(cc);
             if ( removed ) {
                 configs.remove(cc);
@@ -115,7 +110,7 @@ public class UdpClient {
      */
     public List<UdpClientConfig> getClientConfigs() {
         List<UdpClientConfig> l = new ArrayList<UdpClientConfig>();
-        for ( ConfigWithSocket c : getClientConfigSnapshot()) {
+        for ( UdpClientWithSocket c : getClientConfigSnapshot()) {
             l.add(c.getUdpClientConfig());
         }
         return l;
@@ -179,8 +174,8 @@ public class UdpClient {
     }
 
     //get a snapshot of the current configs to iterate over
-    private List<ConfigWithSocket> getClientConfigSnapshot() {
-        return new ArrayList<ConfigWithSocket>(configs);
+    private List<UdpClientWithSocket> getClientConfigSnapshot() {
+        return new ArrayList<UdpClientWithSocket>(configs);
     }
 
     public void sendRepeatedMessage(UdpMessage message, TimePeriod period) {
@@ -199,7 +194,7 @@ public class UdpClient {
 
     public synchronized void stop() {
         scheduledExecutor.shutdown();
-        for (ConfigWithSocket c : configs) {
+        for (UdpClientWithSocket c : configs) {
             c.closeSocket();
         }
     }
@@ -227,99 +222,10 @@ public class UdpClient {
         }
 
         public void run() {
-            for(ConfigWithSocket clientConfig : getClientConfigSnapshot()) {
-                doSendDatagram(clientConfig, data);
+            for(UdpClientWithSocket clientConfig : getClientConfigSnapshot()) {
+                clientConfig.sendDatagram(data);
             }
         }
-    }
-
-    private void doSendDatagram(ConfigWithSocket config, byte[] data) {
-        DatagramPacket datagramPacket = new DatagramPacket(data, data.length, config.getInetAddress(), config.getPort());
-        DatagramSocket socket = config.getDatagramSocket();
-
-        try {
-            if ( socket == null || socket.isClosed()) {
-                socket = new DatagramSocket();
-                config.setDatagramSocket(socket);
-            }
-            socket.send(datagramPacket);
-
-        } catch (Throwable t) {
-            limitedLogger.logError("Failed to send datagram", t);
-            if (logMethods.isDebugEnabled()) logMethods.debug("Failed to send datagram ");
-
-            //close socket if there was an error
-            if ( socket != null ) {
-                try {
-                    socket.close();
-                } catch (Throwable th) {
-                    limitedLogger.logError("Failed to close datagramSocket", th);
-                }
-            }
-        }
-    }
-
-    /**
-     * A wrapper around UdpClientConfig which also maintains a  DatagramSocket
-     */
-    private class ConfigWithSocket {
-
-        private UdpClientConfig c;
-        private DatagramSocket datagramSocket;
-
-        private ConfigWithSocket(UdpClientConfig c) {
-            this.c = c;
-        }
-
-        public int getPort() {
-            return c.getPort();
-        }
-
-        public InetAddress getInetAddress() {
-            return c.getInetAddress();
-        }
-
-        public DatagramSocket getDatagramSocket() {
-            return datagramSocket;
-        }
-
-        public void setDatagramSocket(DatagramSocket datagramSocket) {
-            this.datagramSocket = datagramSocket;
-        }
-
-        public UdpClientConfig getUdpClientConfig() {
-            return c;
-        }
-
-        public void closeSocket() {
-            if ( datagramSocket != null) {
-                try {
-                    datagramSocket.close();
-                } catch (Throwable t) {
-                    System.err.println("Failed to close datagram socket");
-                    t.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            ConfigWithSocket that = (ConfigWithSocket) o;
-
-            if (c != null ? !c.equals(that.c) : that.c != null) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = c != null ? c.hashCode() : 0;
-            return result;
-        }
-
     }
 
 }

@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 * User: nick
 * Date: 20-May-2009
 * Time: 22:11:48
-* To change this template use File | Settings | File Templates.
 *
 * Appends a value to a series when a message is received, if necessary creating the series
 * according to the context path and id received in the message.
@@ -119,7 +118,7 @@ public class ServerSeriesUdpMessageListener implements UdpServer.UdpMessageListe
     private void addItem(TimeSeriesValueMessage v, String path) {
         TimeSeries s = findOrCreateSeries(path, v.getDescription(), v.getSourceHostname(), v.getSourceInetAddress());
         updateLiveSeriesMap(v, path);
-        if ( v != null ) { //series created successfully
+        if ( s != null ) { //series created successfully
             s.addItem(v.getTimeSeriesItem());
         }
     }

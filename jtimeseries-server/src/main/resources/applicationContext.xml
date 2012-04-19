@@ -74,15 +74,24 @@
 
     <bean id="udpClient" class="com.od.jtimeseries.net.udp.UdpClient"/>
 
-    <!-- Can be passed to the udpServer to replicate received packets to another server instance
+    <!-- The server listens for UDP messages on a primary UDP server, and optionally a secondary server for replication
+    messages. This enables a pair of servers to be set up. The primary UDP server of each is configured with a UdpClientConfig
+    pointing to the replication socket of the other, so that messaged received on the primary port are replicated across -->
+
+    <!-- One or more UdpClientConfig can be passed to the primary udpServer to cause it to replicate received packets
+    to the udpServerForReplication on another server instance
     <bean id="replicationClient" class="com.od.jtimeseries.net.udp.UdpClientConfig">
-        <constructor-arg value="localhost"/>
-        <constructor-arg value="18091"/>
+        <constructor-arg value="${replicationDestinationHost}"/>
+        <constructor-arg value="${replicationDestinationPort}"/>
     </bean> -->
 
     <bean id="udpServer" class="com.od.jtimeseries.net.udp.UdpServer">
         <constructor-arg value="${udpServerPort}"/>
         <!-- <constructor-arg ref="replicationClient"/> -->
+    </bean>
+
+    <bean id="udpServerForReplication" class="com.od.jtimeseries.net.udp.UdpServer">
+        <constructor-arg value="${udpServerForReplicationPort}" />
     </bean>
 
     <bean id="httpdServer" class="com.od.jtimeseries.net.httpd.JTimeSeriesHttpd">
@@ -113,6 +122,7 @@
         <property name="httpdServer" ref="httpdServer"/>
         <property name="udpClient" ref="udpClient"/>
         <property name="udpServer" ref="udpServer"/>
+        <property name="udpServerForReplication" ref="udpServerForReplication"/>
         <property name="fileSerializer" ref="fileSerializer"/>
         <property name="serverAnnouncementMessage" ref="serverAnnouncementMessage"/>
         <property name="serverConfigJmx" ref="serverConfigJmx"/>

@@ -59,6 +59,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     private HttpServerAnnouncementMessage serverAnnouncementMessage;
     private ServerConfigJmx serverConfigJmx;
     private UdpServer udpServer;
+    private UdpServer udpServerForReplication;
     private ManagedMetricInitializer managedMetricInitializer;
     private SummaryStatisticsCalculator summaryStatisticsCalculator;
     private HtmlAdaptorServer htmlAdaptorServer;
@@ -96,6 +97,7 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
         startJmxManagementService();
         startSummaryStats();
         startUdpServer();
+        startUdpServerForReplication();
         startServerAnnouncementPings();
         startJmx();
         startTimeSeriesHttpServer();
@@ -111,11 +113,23 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
     }
 
     private void startUdpServer() {
-        logMethods.info("Adding UDP message listeners");
-        udpServer.addUdpMessageListener(new ServerSeriesUdpMessageListener(rootContext, pathMapper));
-        udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
-        logMethods.info("Starting UDP server on port " + udpServer.getPort());
-        udpServer.startReceive();
+        if ( udpServer != null) {
+            logMethods.info("Adding UDP message listeners");
+            udpServer.addUdpMessageListener(new ServerSeriesUdpMessageListener(rootContext, pathMapper));
+            udpServer.addUdpMessageListener(new ClientAnnouncementMessageListener(udpClient));
+            logMethods.info("Starting UDP server on port " + udpServer.getPort());
+            udpServer.startReceive();
+        }
+    }
+
+    //handle packets routed for replication from another JTimeseriesServer
+    private void startUdpServerForReplication() {
+        if ( udpServerForReplication != null) {
+            logMethods.info("Adding UDP message listeners for replication");
+            udpServerForReplication.addUdpMessageListener(new ServerSeriesUdpMessageListener(rootContext, pathMapper));
+            logMethods.info("Starting UDP server on port " + udpServerForReplication.getPort());
+            udpServerForReplication.startReceive();
+        }
     }
 
     private void setupServerMetrics() {
@@ -183,6 +197,10 @@ public class JTimeSeriesServer extends AbstractJTimeSeriesComponent {
 
     public void setUdpServer(UdpServer udpServer) {
         this.udpServer = udpServer;
+    }
+
+    public void setUdpServerForReplication(UdpServer udpServerForReplication) {
+        this.udpServerForReplication = udpServerForReplication;
     }
 
     public void setManagedMetricInitializer(ManagedMetricInitializer metricInitializer) {

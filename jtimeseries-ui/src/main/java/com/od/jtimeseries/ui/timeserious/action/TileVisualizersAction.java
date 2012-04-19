@@ -22,7 +22,7 @@ public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
 
     private TimeSeriousDesktopPane desktopPane;
     private int lastCols = -1;
-    private final int MAX_COLS = 6;
+    private final int MAX_COLS = 8;  //never exceed this number of cols even if there are more frames
 
     public TileVisualizersAction(TimeSeriousDesktopPane desktopPane) {
         super("Tile Visualizers", ImageUtils.TILE_VISUALIZERS_ICON_16x16);
@@ -74,7 +74,8 @@ public class TileVisualizersAction extends AbstractArrangeInternalFrameAction {
             result = getStartingColumnCount(frameCount);
         } else {
             result = lastCols + 1;
-            lastCols = ++lastCols % MAX_COLS;
+            int max = Math.min(frameCount, MAX_COLS);
+            lastCols = ++lastCols % max;
         }
         return result;
     }

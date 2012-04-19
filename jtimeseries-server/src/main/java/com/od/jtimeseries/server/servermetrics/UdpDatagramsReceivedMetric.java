@@ -40,16 +40,16 @@ public class UdpDatagramsReceivedMetric extends AbstractManagedMetric {
 
     private static final String id = "UdpPacketsReceived";
     private String parentContextPath;
-    private UdpServer udpServer;
+    private UdpServer[] udpServers;
     private TimePeriod timePeriod;
 
-    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer udpServer) {
-        this(parentContextPath, udpServer, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer... udpServers) {
+        this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS, udpServers);
     }
 
-    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer udpServer, TimePeriod timePeriod) {
+    public UdpDatagramsReceivedMetric(String parentContextPath, TimePeriod timePeriod, UdpServer... udpServers) {
         this.parentContextPath = parentContextPath;
-        this.udpServer = udpServer;
+        this.udpServers = udpServers;
         this.timePeriod = timePeriod;
     }
 
@@ -64,6 +64,10 @@ public class UdpDatagramsReceivedMetric extends AbstractManagedMetric {
             MEAN_COUNT_OVER(Time.seconds(1), timePeriod),
             LATEST(timePeriod)
         );
-        udpServer.setUdpDatagramsReceivedCounter(c);
+
+        //the overall count across all udpServers
+        for ( UdpServer s : udpServers) {
+            s.setUdpDatagramsReceivedCounter(c);
+        }
     }
 }

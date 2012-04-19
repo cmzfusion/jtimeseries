@@ -38,11 +38,13 @@
                             <bean class="com.od.jtimeseries.server.servermetrics.UdpDatagramsReceivedMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.udpd"/>
                                 <constructor-arg ref="udpServer"/>
+                                <constructor-arg ref="udpServerForReplication"/>
                             </bean>
 
                             <bean class="com.od.jtimeseries.server.servermetrics.UdpMessagesPerPacketMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.udpd"/>
                                 <constructor-arg ref="udpServer"/>
+                                <constructor-arg ref="udpServerForReplication"/>
                             </bean>
 
                             <!-- Count of UDP updates received -->

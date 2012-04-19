@@ -37,16 +37,16 @@ public class UdpMessagesPerPacketMetric extends AbstractManagedMetric {
 
     private static final String id = "UdpMessagesPerPacket";
     private String parentContextPath;
-    private UdpServer udpServer;
+    private UdpServer[] udpServers;
     private TimePeriod timePeriod;
 
-    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer udpServer) {
-        this(parentContextPath, udpServer, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS);
+    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer... udpServers) {
+        this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS, udpServers);
     }
 
-    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer udpServer, TimePeriod timePeriod) {
+    public UdpMessagesPerPacketMetric(String parentContextPath, TimePeriod timePeriod, UdpServer... udpServers) {
         this.parentContextPath = parentContextPath;
-        this.udpServer = udpServer;
+        this.udpServers = udpServers;
         this.timePeriod = timePeriod;
     }
 
@@ -61,6 +61,9 @@ public class UdpMessagesPerPacketMetric extends AbstractManagedMetric {
                 CaptureFunctions.MEAN(timePeriod),
                 CaptureFunctions.MAX(timePeriod)
         );
-        udpServer.setMessagesPerDatagramValueRecorder(v);
+
+        for ( UdpServer s : udpServers) {
+            s.setMessagesPerDatagramValueRecorder(v);
+        }
     }
 }

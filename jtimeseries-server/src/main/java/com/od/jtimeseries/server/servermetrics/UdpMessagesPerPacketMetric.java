@@ -26,6 +26,8 @@ import com.od.jtimeseries.net.udp.UdpServer;
 import com.od.jtimeseries.source.ValueRecorder;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  * User: nick
@@ -37,14 +39,14 @@ public class UdpMessagesPerPacketMetric extends AbstractManagedMetric {
 
     private static final String id = "UdpMessagesPerPacket";
     private String parentContextPath;
-    private UdpServer[] udpServers;
+    private List<UdpServer> udpServers;
     private TimePeriod timePeriod;
 
-    public UdpMessagesPerPacketMetric(String parentContextPath, UdpServer... udpServers) {
+    public UdpMessagesPerPacketMetric(String parentContextPath, List<UdpServer> udpServers) {
         this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS, udpServers);
     }
 
-    public UdpMessagesPerPacketMetric(String parentContextPath, TimePeriod timePeriod, UdpServer... udpServers) {
+    public UdpMessagesPerPacketMetric(String parentContextPath, TimePeriod timePeriod, List<UdpServer> udpServers) {
         this.parentContextPath = parentContextPath;
         this.udpServers = udpServers;
         this.timePeriod = timePeriod;

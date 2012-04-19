@@ -37,14 +37,18 @@
 
                             <bean class="com.od.jtimeseries.server.servermetrics.UdpDatagramsReceivedMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.udpd"/>
-                                <constructor-arg ref="udpServer"/>
-                                <constructor-arg ref="udpServerForReplication"/>
+                                <constructor-arg><list>
+                                    <ref bean="udpServer"/>
+                                    <ref bean="udpServerForReplication"/>
+                                </list></constructor-arg>
                             </bean>
 
                             <bean class="com.od.jtimeseries.server.servermetrics.UdpMessagesPerPacketMetric">
                                 <constructor-arg value="${serverMetricsContextPath}.udpd"/>
-                                <constructor-arg ref="udpServer"/>
-                                <constructor-arg ref="udpServerForReplication"/>
+                                <constructor-arg><list>
+                                    <ref bean="udpServer"/>
+                                    <ref bean="udpServerForReplication"/>
+                                </list></constructor-arg>
                             </bean>
 
                             <!-- Count of UDP updates received -->

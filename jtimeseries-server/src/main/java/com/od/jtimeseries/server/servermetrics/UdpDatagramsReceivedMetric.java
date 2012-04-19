@@ -26,6 +26,8 @@ import com.od.jtimeseries.source.Counter;
 import com.od.jtimeseries.util.time.Time;
 import com.od.jtimeseries.util.time.TimePeriod;
 
+import java.util.List;
+
 import static com.od.jtimeseries.capture.function.CaptureFunctions.LATEST;
 import static com.od.jtimeseries.capture.function.CaptureFunctions.MEAN_COUNT_OVER;
 
@@ -40,14 +42,14 @@ public class UdpDatagramsReceivedMetric extends AbstractManagedMetric {
 
     private static final String id = "UdpPacketsReceived";
     private String parentContextPath;
-    private UdpServer[] udpServers;
+    private List<UdpServer> udpServers;
     private TimePeriod timePeriod;
 
-    public UdpDatagramsReceivedMetric(String parentContextPath, UdpServer... udpServers) {
+    public UdpDatagramsReceivedMetric(String parentContextPath, List<UdpServer> udpServers) {
         this(parentContextPath, DEFAULT_TIME_PERIOD_FOR_SERVER_METRICS, udpServers);
     }
 
-    public UdpDatagramsReceivedMetric(String parentContextPath, TimePeriod timePeriod, UdpServer... udpServers) {
+    public UdpDatagramsReceivedMetric(String parentContextPath, TimePeriod timePeriod, List<UdpServer> udpServers) {
         this.parentContextPath = parentContextPath;
         this.udpServers = udpServers;
         this.timePeriod = timePeriod;

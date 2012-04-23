@@ -43,7 +43,6 @@ import com.od.jtimeseries.util.logging.LogUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class TimeSeriesVisualizer extends JPanel {
     private ChartControlPanel chartControlPanel;
     private boolean toolbarVisible = true;
     private DisplayNameCalculator displayNameCalculator;
-    private FixedIconsCollapsiblePane chartControlsCollapsiblePane = new FixedIconsCollapsiblePane("Controls");
+    private JTabbedPane tabbedPane;
 
     public TimeSeriesVisualizer(String title, TimeSeriesServerDictionary timeSeriesServerDictionary) {
         this(title, timeSeriesServerDictionary, new DisplayNameCalculator());
@@ -91,19 +90,23 @@ public class TimeSeriesVisualizer extends JPanel {
         chart = new TimeSeriesChart(title);
         createControlPanel();
         createDisplayNameAction();
-        JPanel chartPanel = createChartPanel();
         createSeriesSelectionPanel();
+        createTabbedPane();
         createToolbar();
-        createSplitPane(chartPanel);
+        createSplitPane(chart);
         layoutVisualizer();
         addSeriesSelectionListener();
         LocalJmxMetrics.getInstance().getVisualizerCount().incrementCount();
     }
 
+    private void createTabbedPane() {
+        tabbedPane = new JTabbedPane();
+        tabbedPane.add("Series Selector", seriesSelectionPanel);
+        tabbedPane.add("Chart Controls", chartControlPanel);
+    }
+
     private void createControlPanel() {
         chartControlPanel = new ChartControlPanel(chart);
-        chartControlsCollapsiblePane.setSteps(3);
-        chartControlsCollapsiblePane.setStepDelay(100);
     }
 
     public static VisualizerConfiguration createVisualizerConfiguration(TimeSeriesVisualizer visualizer) {
@@ -157,7 +160,7 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     private void createSplitPane(JPanel chartPanel) {
-        splitPane.setLeftComponent(seriesSelectionPanel);
+        splitPane.setLeftComponent(tabbedPane);
         splitPane.setRightComponent(chartPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.5d);
@@ -257,15 +260,12 @@ public class TimeSeriesVisualizer extends JPanel {
     }
 
     public void setChartControlsVisible(boolean visible) {
-        try {
-            chartControlsCollapsiblePane.setCollapsed(! visible);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-        }
+        JComponent component = visible ? chartControlPanel : seriesSelectionPanel;
+        tabbedPane.setSelectedComponent(component);
     }
 
     public boolean isChartControlsVisible() {
-        return ! chartControlsCollapsiblePane.isCollapsed();
+        return tabbedPane.getSelectedComponent() == chartControlPanel;
     }
 
     public void setShowLegendOnChart(boolean showLegendOnChart) {
@@ -316,26 +316,15 @@ public class TimeSeriesVisualizer extends JPanel {
     private void createToolbar() {
         toolbar = new JToolBar();
         toolbar.add(new JButton(
-            new ShowDownloadSeriesDialogAction(
-                timeSeriesServerDictionary,
-                this,
-                rootContext,
-                displayNameCalculator
-            )
+                new ShowDownloadSeriesDialogAction(
+                        timeSeriesServerDictionary,
+                        this,
+                        rootContext,
+                        displayNameCalculator
+                )
         ));
         toolbar.add(Box.createHorizontalStrut(5));
         toolbar.add(new JButton(editDisplayNameAction));
-    }
-
-    private JPanel createChartPanel() {
-        chartControlsCollapsiblePane.setContentPane(chartControlPanel);
-        chartControlsCollapsiblePane.setContentPaneHeight(60);
-        chartControlsCollapsiblePane.setEmphasized(true);
-
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(chart, BorderLayout.CENTER);
-        p.add(chartControlsCollapsiblePane, BorderLayout.SOUTH);
-        return p;
     }
 
     public List<UiTimeSeriesConfig> getChartConfigs() {

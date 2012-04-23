@@ -18,6 +18,8 @@
  */
 package com.od.jtimeseries.ui.visualizer.chart;
 
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import com.jidesoft.combobox.AbstractComboBox;
 import com.jidesoft.combobox.ColorComboBox;
 import com.od.jtimeseries.ui.config.ChartRangeMode;
@@ -124,7 +126,6 @@ public class ChartControlPanel extends JPanel {
     }
 
     private void createShowLegendCheckbox() {
-        showLegendCheckbox = new JCheckBox("Legend");
         showLegendCheckbox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 timeSeriesChart.setShowLegend(showLegendCheckbox.isSelected());
@@ -133,8 +134,6 @@ public class ChartControlPanel extends JPanel {
     }
 
     private void createColorCombo() {
-        colorComboBox.setPreferredSize(new Dimension(65, colorComboBox.getPreferredSize().height));
-        colorComboBox.setMaximumSize(colorComboBox.getPreferredSize());
         colorComboBox.setColorValueVisible(false);
         colorComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -144,51 +143,56 @@ public class ChartControlPanel extends JPanel {
     }
 
     private void layoutPanel() {
-        Box b = Box.createHorizontalBox();
-        b.add(Box.createHorizontalGlue());
 
-        JComponent displayControls = createDisplayControls();
-        b.add(createWidgetBox(displayControls, "Display", true));
-        addSpacing(b);
-        b.add(createWidgetBox(rangeModeCombo, "Range", true));
-        addSpacing(b);
-        b.add(createWidgetBox(timeSelector, "Time", true));
-        addSpacing(b);
-        b.add(createWidgetBox(dataFilterCombo, "Filters", true));
-        //b.add(Box.createHorizontalGlue());
+        FormLayout l = new FormLayout("10px, pref:grow, 10px", "10px, pref, 5px, pref, 5px, pref, 5px, pref, 10px:grow");
+        CellConstraints cc = new CellConstraints();
 
-        setPreferredSize(new Dimension(getPreferredSize().width, getPreferredSize().height + 30));
-        setLayout(new BorderLayout());
-        add(b, BorderLayout.CENTER);
+        JComponent d = createDisplayControls();
+        JComponent rangeControls = createWidgetBox(rangeModeCombo, "Range");
+        JComponent displayControls = createWidgetBox(d, "Display");
+        JComponent timeControls = createWidgetBox(timeSelector, "Time");
+        JComponent filterControls = createWidgetBox(dataFilterCombo, "Filters");
+
+        setLayout(l);
+        add(rangeControls, cc.xy(2, 2));
+        add(displayControls, cc.xy(2, 4));
+        add(timeControls, cc.xy(2, 6));
+        add(filterControls, cc.xy(2, 8));
     }
 
     private JComponent createDisplayControls() {
-        Box b = Box.createHorizontalBox();
-        b.add(colorComboBox);
-        addSpacing(b);
-        b.add(showLegendCheckbox);
-        addSpacing(b);
-        b.add(chartTypeCombo);
+        Box b = Box.createVerticalBox();
+        addLeftAligned(b, colorComboBox);
+        addVerticalSpacing(b);
+        addLeftAligned(b, showLegendCheckbox);
+        addVerticalSpacing(b);
+        addLeftAligned(b, chartTypeCombo);
         return b;
     }
 
-    private JComponent createWidgetBox(JComponent widget, String title, boolean addLowerBorder) {
-        Box b = Box.createVerticalBox();
-        b.add(Box.createVerticalGlue());
-        b.add(widget);
-        if ( addLowerBorder) {
-            b.add(Box.createVerticalStrut(5));
-        }
+    private void addLeftAligned(Box b, JComponent component) {
+        Box box = Box.createHorizontalBox();
+        box.add(component);
+        box.add(Box.createHorizontalGlue());
+        b.add(box);
+    }
 
+    private JComponent createWidgetBox(JComponent widget, String title) {
         TitledBorder border = new TitledBorder(title);
         border.setTitleFont(border.getTitleFont().deriveFont(9f));
+        Box b = Box.createHorizontalBox();
+        b.add(widget);
+        b.add(Box.createHorizontalGlue());
         b.setBorder(border);
-        b.setMaximumSize(b.getPreferredSize());
         return b;
     }
 
     private void addSpacing(Box b) {
         b.add(Box.createRigidArea(new Dimension(20, 0)));
+    }
+
+    private void addVerticalSpacing(Box b) {
+        b.add(Box.createRigidArea(new Dimension(0, 20)));
     }
 
 }

@@ -143,56 +143,41 @@ public class ChartControlPanel extends JPanel {
     }
 
     private void layoutPanel() {
-
-        FormLayout l = new FormLayout("10px, pref:grow, 10px", "10px, pref, 5px, pref, 5px, pref, 5px, pref, 10px:grow");
-        CellConstraints cc = new CellConstraints();
-
-        JComponent d = createDisplayControls();
-        JComponent rangeControls = createWidgetBox(rangeModeCombo, "Range");
-        JComponent displayControls = createWidgetBox(d, "Display");
-        JComponent timeControls = createWidgetBox(timeSelector, "Time");
-        JComponent filterControls = createWidgetBox(dataFilterCombo, "Filters");
-
+        FormLayout l = new FormLayout(
+            "10px, pref:grow, 10px",
+            "10px, pref, 5px, pref, 5px, pref, 5px, pref, 10px:grow"
+        );
         setLayout(l);
-        add(rangeControls, cc.xy(2, 2));
-        add(displayControls, cc.xy(2, 4));
-        add(timeControls, cc.xy(2, 6));
-        add(filterControls, cc.xy(2, 8));
+        CellConstraints cc = new CellConstraints();
+        add(createWidgetBox(createDisplayControls(), "Display"), cc.xy(2, 2));
+        add(createWidgetBox(rangeModeCombo, "Range"), cc.xy(2, 4));
+        add(createWidgetBox(timeSelector, "Time"), cc.xy(2, 6));
+        add(createWidgetBox(dataFilterCombo, "Filters"), cc.xy(2, 8));
     }
 
     private JComponent createDisplayControls() {
-        Box b = Box.createVerticalBox();
-        addLeftAligned(b, colorComboBox);
-        addVerticalSpacing(b);
-        addLeftAligned(b, showLegendCheckbox);
-        addVerticalSpacing(b);
-        addLeftAligned(b, chartTypeCombo);
-        return b;
-    }
-
-    private void addLeftAligned(Box b, JComponent component) {
-        Box box = Box.createHorizontalBox();
-        box.add(component);
-        box.add(Box.createHorizontalGlue());
-        b.add(box);
+        FormLayout f = new FormLayout("pref:grow", "pref, 10px, pref, 10px, pref, 10px");
+        JPanel p = new JPanel();
+        p.setLayout(f);
+        CellConstraints cc = new CellConstraints();
+        p.add(colorComboBox, cc.xy(1, 1));
+        p.add(chartTypeCombo, cc.xy(1, 3));
+        p.add(showLegendCheckbox, cc.xy(1, 5));
+        return p;
     }
 
     private JComponent createWidgetBox(JComponent widget, String title) {
+
+        FormLayout f = new FormLayout("10px, max(175px;pref), 10px:grow", "5px,pref,5px");
+        JPanel p = new JPanel();
+        p.setLayout(f);
+        CellConstraints cc = new CellConstraints();
+        p.add(widget, cc.xy(2, 2));
+
         TitledBorder border = new TitledBorder(title);
-        border.setTitleFont(border.getTitleFont().deriveFont(9f));
-        Box b = Box.createHorizontalBox();
-        b.add(widget);
-        b.add(Box.createHorizontalGlue());
-        b.setBorder(border);
-        return b;
-    }
-
-    private void addSpacing(Box b) {
-        b.add(Box.createRigidArea(new Dimension(20, 0)));
-    }
-
-    private void addVerticalSpacing(Box b) {
-        b.add(Box.createRigidArea(new Dimension(0, 20)));
+        border.setTitleFont(border.getTitleFont());
+        p.setBorder(border);
+        return p;
     }
 
 }

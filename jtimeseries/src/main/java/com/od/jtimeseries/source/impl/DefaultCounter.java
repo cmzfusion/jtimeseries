@@ -38,7 +38,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class DefaultCounter implements Counter {
 
-    public static final Counter NULL_COUNTER = new DefaultCounter("NULL_COUNTER");
+    /**
+     * Can be used as a default Counter, injecting a real Counter instance only if the metric is required
+     */
+    public static final Counter NULL_COUNTER = new NullCounter();
 
     private final DefaultValueRecorder simpleSource;
     private long currentValue;
@@ -255,5 +258,30 @@ public class DefaultCounter implements Counter {
 
     public boolean contains(String path) {
         return simpleSource.contains(path);
+    }
+
+    /**
+     *  Override DefaultCounter methods for performance, to ensure we take no locks
+     */
+    private static class NullCounter extends DefaultCounter {
+        public NullCounter() {
+            super("NULL_COUNTER");
+        }
+
+        public void incrementCount() {}
+
+        public void incrementCount(long n) {}
+
+        public void decrementCount() {}
+
+        public void decrementCount(long n) {}
+
+        public void setCount(long n) {}
+
+        public void reset() {}
+
+        public long getCount() {
+            return 0;
+        }
     }
 }

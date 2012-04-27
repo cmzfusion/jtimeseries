@@ -38,6 +38,7 @@ public class DefaultTimedValueSupplier extends AbstractValueSource implements Ti
 
     private static final LogMethods logMethods = LogUtils.getLogMethods(DefaultTimedValueSupplier.class);
 
+    private final Runnable takeValueRunnable = new TakeValueRunnable();
     private TimePeriod timePeriod;
     private ValueSupplier valueSupplier;
 
@@ -56,18 +57,19 @@ public class DefaultTimedValueSupplier extends AbstractValueSource implements Ti
     }
 
     public void trigger(long timestamp) {
-        Runnable runnable = new Runnable() {
-            public void run() {
-                try {
-                    Numeric value = valueSupplier.getValue();
-                    if ( value != null) {
-                        newSourceValue(value);
-                    }
-                } catch (Throwable t) {
-                    logMethods.error("Failed to get new value from ValueSupplier", t);
+        TimeSeriesExecutorFactory.getTimedValueSupplierExecutor(this).execute(takeValueRunnable);
+    }
+
+    private class TakeValueRunnable implements Runnable {
+        public void run() {
+            try {
+                Numeric value = valueSupplier.getValue();
+                if ( value != null) {
+                    newSourceValue(value);
                 }
+            } catch (Throwable t) {
+                logMethods.error("Failed to get new value from ValueSupplier", t);
             }
-        };
-        TimeSeriesExecutorFactory.getTimedValueSupplierExecutor(this).execute(runnable);
+        }
     }
 }

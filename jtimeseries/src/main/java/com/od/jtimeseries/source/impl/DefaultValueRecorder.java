@@ -30,7 +30,10 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public class DefaultValueRecorder extends AbstractValueSource implements ValueRecorder {
 
-    public static final ValueRecorder NULL_VALUE_RECORDER = new DefaultValueRecorder("NULL_VALUE_RECORDER");
+    /**
+     * Can be used as a default ValueRecorder, injecting a real ValueRecorder instance only if the metric is required
+     */
+    public static final ValueRecorder NULL_VALUE_RECORDER = new NullValueRecorder();
 
     public DefaultValueRecorder(String id, ValueSourceListener... sourceDataListeners) {
         this(id, id, sourceDataListeners);
@@ -52,4 +55,18 @@ public class DefaultValueRecorder extends AbstractValueSource implements ValueRe
         newSourceValue(d);
     }
 
+    /**
+     * Override DefaultValueRecorder methods for performance, to ensure we take no locks
+     */
+    private static class NullValueRecorder extends DefaultValueRecorder {
+        public NullValueRecorder() {
+            super("NULL_VALUE_RECORDER");
+        }
+
+        public void newValue(Numeric l) {}
+
+        public void newValue(long l) {}
+
+        public void newValue(double d) {}
+    }
 }

@@ -28,7 +28,10 @@ import com.od.jtimeseries.source.ValueSourceListener;
  */
 public class DefaultEventTimer extends AbstractValueSource implements EventTimer {
 
-    public static final EventTimer NULL_EVENT_TIMER = new DefaultEventTimer("NULL_EVENT_TIMER");
+    /**
+     * Can be used as a default EventTimer, injecting a real EventTimer instance only if the metric is required
+     */
+    public static final EventTimer NULL_EVENT_TIMER = new NullEventTimer();
 
     private long startTime;
     private final Object internalLock = new Object();
@@ -53,4 +56,16 @@ public class DefaultEventTimer extends AbstractValueSource implements EventTimer
         }
     }
 
+    /**
+     * Override DefaultEventTimer for performance, to ensure we take no locks
+     */
+    private static class NullEventTimer extends DefaultEventTimer {
+        public NullEventTimer() {
+            super("NULL_EVENT_TIMER");
+        }
+
+        public void startEventTimer() {}
+
+        public void stopEventTimer() {}
+    }
 }

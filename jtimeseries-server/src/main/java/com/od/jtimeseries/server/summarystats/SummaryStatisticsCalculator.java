@@ -31,6 +31,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 
@@ -55,19 +56,31 @@ public class SummaryStatisticsCalculator {
         }
     };
 
+    public SummaryStatisticsRecalculator recalculator;
+    private volatile boolean running;
+
     public SummaryStatisticsCalculator(TimeSeriesContext rootContext, TimePeriod summaryRecalculationSleepTime, List<SummaryStatistic> statistics) {
         this.rootContext = rootContext;
         this.summaryRecalculationSleepTime = summaryRecalculationSleepTime;
         this.statistics = statistics;
     }
 
-    public void start() {
-        if ( statistics.size() > 0) {
+    public synchronized void start() {
+        if ( ! running && statistics.size() > 0) {
             logMethods.info("Starting summary statistics calculation every " + summaryRecalculationSleepTime);
-            Thread t = new Thread(new SummaryStatisticsRecalculator());
+            recalculator = new SummaryStatisticsRecalculator();
+            Thread t = new Thread(recalculator);
             t.setDaemon(true);
             t.setName("SummaryStatsRecalculation");
             t.start();
+            running = true;
+        }
+    }
+
+    public synchronized void stop() {
+        if ( running ) {
+            recalculator.stop();
+            running = false;
         }
     }
 
@@ -79,7 +92,7 @@ public class SummaryStatisticsCalculator {
      */
     private class SummaryStatisticsRecalculator implements Runnable {
 
-        private final DecimalFormat doubleFormat = new DecimalFormat("#.####");
+        private volatile boolean stopping;
 
         public void run() {
             try {
@@ -89,10 +102,14 @@ public class SummaryStatisticsCalculator {
             }
         }
 
+        public void stop() {
+            this.stopping = true;
+        }
+
         private void runSummaryStatsLoop() {
-            while(true) {
+            while(! stopping) {
                 //if there are no series requiring recalc we still need to pause between runs or we'll max out cpu
-                sleepFor(5000);
+                sleepFor(100);
 
                 QueryResult<FilesystemTimeSeries> r = rootContext.findAll(FilesystemTimeSeries.class);
                 int numberOfSeries = r.getNumberOfMatches();
@@ -107,9 +124,26 @@ public class SummaryStatisticsCalculator {
                     "recalculate all series stats for this run");
 
             for (FilesystemTimeSeries s : r.getAllMatches()) {
-                if ( requiresRecalculation(s)) {
-                    long startTime = System.currentTimeMillis();
-                    recalculateStats(s);
+
+                if ( stopping ) {
+                    break;
+                }
+
+                long startTime = System.currentTimeMillis();
+
+                //remove any stats properties no longer configured
+                boolean legacyStatsRemoved = removeLegacyStats(s);
+
+                String lastRecalcValue = s.getProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY);
+                long lastRecalcTimestamp = lastRecalcValue == null ? -1 : Long.valueOf(lastRecalcValue);
+                long latestTimestamp = s.getLatestTimestamp();
+
+                //check whether any stats need updating or deletion
+                boolean requiresUpdateOrDelete = statsRequireUpdateOrDelete(s, latestTimestamp, lastRecalcTimestamp);
+
+                if ( legacyStatsRemoved || requiresUpdateOrDelete ) {
+
+                    recalculateStats(s, latestTimestamp, lastRecalcTimestamp);
                     Date d = new Date();
                     s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY, String.valueOf(d.getTime()));
                     s.setProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIME_PROPERTY, simpleDateFormat.get().format(d));
@@ -123,6 +157,32 @@ public class SummaryStatisticsCalculator {
             }
         }
 
+        /**
+         * @return true, if a stat was removed since no longer configured
+         */
+        private boolean removeLegacyStats(FilesystemTimeSeries s) {
+            //first remove all summary properties which are no longer supported
+            HashSet<String> stats = new HashSet<String>();
+            Properties p = s.getProperties();
+            for ( Object o : p.keySet() ) {
+                String key = (String)o;
+                if ( ContextProperties.isSummaryStatsProperty(key)) {
+                    stats.add(key);
+                }
+            }
+
+            for ( SummaryStatistic stat : statistics) {
+                stats.remove(stat.getSummaryStatProperty());
+            }
+            stats.remove(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY);
+            stats.remove(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIME_PROPERTY);
+
+            for ( String key : stats) {
+                s.removeProperty(key);
+            }
+            return stats.size() > 0;
+        }
+
         private void sleepFor(long requiredSleepTime) {
             try {
                 Thread.sleep(requiredSleepTime);
@@ -131,48 +191,39 @@ public class SummaryStatisticsCalculator {
             }
         }
 
-        private void recalculateStats(IdentifiableTimeSeries s) {
-            //first remove all current summary properties, these may include legacy properties which are
-            //no longer in server config - we are not going to recalculate those
-            Properties p = s.getProperties();
-            for ( Object o : p.keySet() ) {
-                String key = (String)o;
-                if ( ContextProperties.isSummaryStatsProperty(key)) {
-                    s.removeProperty(key);
-                }
-            }
-
+        private void recalculateStats(IdentifiableTimeSeries s, long lastUpdateTimestamp, long lastRecalcTimestamp) {
             for ( SummaryStatistic stat : statistics) {
                 try {
-                    Numeric n = stat.calculateSummaryStatistic(s);
+                    if ( stat.shouldDelete(lastUpdateTimestamp, lastRecalcTimestamp)) {
+                        stat.deleteSummaryStatistic(s);
+                    } else if ( stat.shouldRecalc(lastUpdateTimestamp, lastRecalcTimestamp)) {
+                       stat.recalcSummaryStatistic(s);
+                    }
 
-                    //all stats will be doubles currently
-                    String propertyName = ContextProperties.createSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
-                    double value = n.doubleValue();
-                    //always use NaN as the String NaN representation
-                    s.setProperty(propertyName, Double.isNaN(value) ? "NaN" : doubleFormat.format(value));
                 } catch (Throwable t) {
                     logMethods.error("Error calculating Summary Stat " + stat.getStatisticName() + " for series " + s.getPath(), t);
                 }
             }
         }
 
-
-        /**
-         *  No need to recalculate if there hasn't been an update since the last recalculation
-         */
-        private boolean requiresRecalculation(FilesystemTimeSeries s) {
-            boolean result = true;
-            String lastRecalcValue = s.getProperty(ContextProperties.SUMMARY_STATS_LAST_UPDATE_TIMESTAMP_PROPERTY);
-            if ( lastRecalcValue != null ) {
-                long lastUpdateTimestamp = s.getLatestTimestamp();
-                long lastRecalc = Long.valueOf(lastRecalcValue);
-                result = lastUpdateTimestamp > lastRecalc;
+        private boolean statsRequireUpdateOrDelete(IdentifiableTimeSeries s, long lastUpdateTimestamp, long lastRecalcTimestamp) {
+            boolean result = false;
+            for ( SummaryStatistic stat : statistics) {
+                //not passing the series as a parameter here because otherwise implementation of shouldRecalc / shouldDelete
+                //could trigger deserialization, the point here is to eliminate unnecessary deserializations based on the time
+                //properties of the series and stats
+                if ( stat.shouldRecalc(lastUpdateTimestamp, lastRecalcTimestamp) ||
+                     s.getProperty(stat.getSummaryStatProperty()) != null && stat.shouldDelete(lastUpdateTimestamp, lastRecalcTimestamp) ) {
+                    result = true;
+                    break;
+                }
             }
             return result;
         }
+
+//        private String getSummaryStatProperty(SummaryStatistic stat) {
+//            return ContextProperties.createSummaryStatsPropertyName(stat.getStatisticName(), ContextProperties.SummaryStatsDataType.DOUBLE);
+//        }
     }
-
-
 
 }

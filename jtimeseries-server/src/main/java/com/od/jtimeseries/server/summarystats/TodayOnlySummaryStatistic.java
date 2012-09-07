@@ -56,4 +56,11 @@ public class TodayOnlySummaryStatistic extends DefaultSummaryStatistic {
         return c;
     }
 
+    /**
+     * @return true, if series has not been updated since start of day
+     */
+    public boolean shouldDelete(long latestTimestampInSeries, long lastRecalcTimestamp) {
+        return latestTimestampInSeries < getStartTime();
+    }
+
 }

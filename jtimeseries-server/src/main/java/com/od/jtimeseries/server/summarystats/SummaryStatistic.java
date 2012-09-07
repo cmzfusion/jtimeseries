@@ -18,6 +18,7 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeries;
 import com.od.jtimeseries.util.numeric.Numeric;
 
@@ -30,8 +31,28 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public interface SummaryStatistic {
 
-    public Numeric calculateSummaryStatistic(TimeSeries timeSeries);
 
     public String getStatisticName();
 
+    /**
+     * @return true, if a stat should be recalculated for series with these times properties
+     */
+    boolean shouldRecalc(long latestTimestampInSeries, long lastRecalcTimestamp);
+
+    /**
+     * Recacalculate the summary stat
+     */
+    void recalcSummaryStatistic(IdentifiableTimeSeries timeSeries);
+
+    /**
+     * @return true, if a stat should be recalculated for series with these times properties
+     */
+    boolean shouldDelete(long latestTimestampInSeries, long lastRecalcTimestamp);
+
+    /**
+     * Delete the summary stat
+     */
+    void deleteSummaryStatistic(IdentifiableTimeSeries series);
+
+    String getSummaryStatProperty();
 }

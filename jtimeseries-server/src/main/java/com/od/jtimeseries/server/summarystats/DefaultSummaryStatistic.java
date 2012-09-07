@@ -18,10 +18,13 @@
  */
 package com.od.jtimeseries.server.summarystats;
 
-import com.od.jtimeseries.timeseries.TimeSeries;
+import com.od.jtimeseries.context.ContextProperties;
+import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesItem;
 import com.od.jtimeseries.timeseries.function.aggregate.AggregateFunction;
 import com.od.jtimeseries.util.numeric.Numeric;
+
+import java.text.DecimalFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,15 +35,26 @@ import com.od.jtimeseries.util.numeric.Numeric;
  */
 public class DefaultSummaryStatistic implements SummaryStatistic {
 
-    private String name;
+    private final String summaryStatProperty;
+    private final String name;
     private AggregateFunction function;
+
+    private ThreadLocal<DecimalFormat> decimalFormat = new ThreadLocal<DecimalFormat>() {
+        public DecimalFormat initialValue() {
+            return  new DecimalFormat("#.####");
+        }
+    };
 
     public DefaultSummaryStatistic(String name, AggregateFunction function) {
         this.name = name;
         this.function = function;
+        this.summaryStatProperty = ContextProperties.createSummaryStatsPropertyName(
+            name,
+            ContextProperties.SummaryStatsDataType.DOUBLE
+        );
     }
 
-    public Numeric calculateSummaryStatistic(TimeSeries timeSeries) {
+    public void recalcSummaryStatistic(IdentifiableTimeSeries timeSeries) {
         function = function.nextInstance();  //support chaining functions
         long startTime = getStartTime();
         long endTime = getEndTime();
@@ -56,7 +70,13 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
             timeSeries.readLock().unlock();
         }
 
-        return function.calculateResult();
+        Numeric result = function.calculateResult();
+        double d = result.doubleValue();
+
+        //always use NaN as the String NaN representation
+        timeSeries.setProperty(
+            summaryStatProperty, Double.isNaN(d) ? "NaN" : decimalFormat.get().format(d)
+        );
     }
 
     protected long getStartTime() {
@@ -69,5 +89,21 @@ public class DefaultSummaryStatistic implements SummaryStatistic {
 
     public String getStatisticName() {
         return name;
+    }
+
+    public boolean shouldDelete(long latestTimestampInSeries, long lastRecalcTimestamp) {
+        return false;
+    }
+
+    public void deleteSummaryStatistic(IdentifiableTimeSeries series) {
+        series.removeProperty(summaryStatProperty);
+    }
+
+    public String getSummaryStatProperty() {
+        return summaryStatProperty;
+    }
+
+    public boolean shouldRecalc(long latestTimestampInSeries, long lastRecalcTimestamp) {
+        return lastRecalcTimestamp < latestTimestampInSeries;
     }
 }

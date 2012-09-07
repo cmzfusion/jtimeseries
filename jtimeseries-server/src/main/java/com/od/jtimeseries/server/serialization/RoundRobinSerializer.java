@@ -280,7 +280,6 @@ public class RoundRobinSerializer extends AbstractLockedSerializer {
                         e.printStackTrace();
                     }
                     logMethods.info("Shutdown complete");
-
                 }
             });
         }

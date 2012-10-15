@@ -14,7 +14,7 @@ JTimeSeries consists of
  Key Modules:
   jtimeseries               This is the API itself, which allows timeseries data to be recorded locally and/or published
   jtimeseries-server        A Round Robin timeseries database.
-  jtimeseries-agent         Agent to collect and publish stats from a server, parses standard input to capture numeric values
+  jtimeseries-agent         Agent to collect and publish stats, parses standard input to capture numeric values and publish them to a server
   jtimeseries-ui            This is TimeSerious - A rich client UI to subscribe to and graph data from a jtimeseries http service
 
  Also included are:

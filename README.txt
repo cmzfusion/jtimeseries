@@ -5,11 +5,9 @@ JTimeSeries consists of
 - A Round Robin database to subscribe to UDP published series data and store it to flat files
 - A rich client front end UI (TimeSerious) to view it
 - An agent, to run server-side, collect data and publish that data to a server instance
-- The API also includes a simple embedded web server (based on NanoHTTP) which allows to provide a restful web service
-  so that data can be viewed in a browser or queried by a remote process
+- The API also includes a simple embedded web server (based on NanoHTTP) which allows to provide a restful web service so that data can be viewed in a browser or queried by a remote process
 
- Up to this point, jtimeseries has mostly been used to collect and analyze component performance metrics, although there
- is no reason why the series data recorded could not represent something else entirely
+ Up to this point, jtimeseries has mostly been used to collect and analyze component performance metrics, although there is no reason why the series data recorded could not represent something else entirely
 
  JTimeSeries consists of a number of maven modules
 

@@ -34,7 +34,6 @@ import com.od.jtimeseries.util.NetworkUtils;
 import com.od.jtimeseries.util.logging.LimitedErrorLogger;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
-import sun.security.krb5.internal.UDPClient;
 
 import java.awt.*;
 import java.io.UnsupportedEncodingException;

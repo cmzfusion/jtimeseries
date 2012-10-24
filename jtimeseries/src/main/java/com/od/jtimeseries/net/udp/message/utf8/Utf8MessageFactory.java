@@ -66,7 +66,7 @@ public class Utf8MessageFactory implements UdpMessageFactory {
             String messageType = l.substring(LENGTH_OF_MESSAGE_TYPE_PREFIX);
             t = MessageType.valueOf(messageType);
         } catch (Exception i) {
-            throw new IOException("Unrecognised message type " + l + " when decoding UTF-8 message", i);
+            throw new IOException("Unrecognised message type " + l + " when decoding UTF-8 message " + i.toString());
         }
         return t;
     }

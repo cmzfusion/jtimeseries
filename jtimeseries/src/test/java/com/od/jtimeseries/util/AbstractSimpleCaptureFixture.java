@@ -2,6 +2,8 @@ package com.od.jtimeseries.util;
 
 import com.od.jtimeseries.capture.Capture;
 import com.od.jtimeseries.capture.CaptureState;
+import com.od.jtimeseries.capture.TimedCapture;
+import com.od.jtimeseries.context.ContextQueries;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.source.*;
@@ -16,6 +18,7 @@ import org.junit.Before;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -57,21 +60,38 @@ public abstract class AbstractSimpleCaptureFixture extends Assert {
     }
 
     protected CaptureCompleteCountdown createCapturePeriodListener() {
-        List<ValueSource> l = getListOfSources();
-        CaptureCompleteCountdown w = new CaptureCompleteCountdown(l.size());
-        for ( ValueSource v : l) {
-            rootContext.findCaptures(v).getFirstMatch().addCaptureListener(w);
+        List<Capture> timedCaptures = getAllTimedCaptures();
+
+        CaptureCompleteCountdown w = new CaptureCompleteCountdown(timedCaptures.size());
+        for ( Capture c : timedCaptures) {
+            c.addCaptureListener(w);
         }
         return w;
     }
 
     protected CaptureStartedCountdown createCaptureStartedListener() {
-        List<ValueSource> l = getListOfSources();
-        CaptureStartedCountdown w = new CaptureStartedCountdown(l.size());
-        for ( ValueSource v : l) {
-            rootContext.findCaptures(v).getFirstMatch().addCaptureListener(w);
+        List<Capture> timedCaptures = getAllTimedCaptures();
+
+        CaptureStartedCountdown w = new CaptureStartedCountdown(timedCaptures.size());
+        for ( Capture c : timedCaptures) {
+            c.addCaptureListener(w);
         }
         return w;
+    }
+
+    private List<Capture> getAllTimedCaptures() {
+        List<ValueSource> l = getListOfSources();
+
+        List<Capture> timedCaptures = new LinkedList<Capture>();
+        for ( ValueSource v : l) {
+            List<Capture> captures = rootContext.findCaptures(v).getAllMatches();
+            for ( Capture c : captures) {
+                if ( c instanceof TimedCapture) {
+                    timedCaptures.add(c);
+                }
+            }
+        }
+        return timedCaptures;
     }
 
     private List<ValueSource> getListOfSources() {

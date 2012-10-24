@@ -1,6 +1,6 @@
 <!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Nick Ebbutt (Object Definitions Ltd.) -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 C:\maven\maven-2.0.2\maven-v4.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>od</groupId>
     <version>1.0.18-SNAPSHOT</version>

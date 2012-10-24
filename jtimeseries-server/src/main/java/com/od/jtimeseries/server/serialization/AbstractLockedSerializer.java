@@ -63,7 +63,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
     /**
      * Serialize the series to the file, and update the fileHeader
      */
-    @Override
     public void writeSeries(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException {
         try {
             fileHeader.writeLock().lock();
@@ -80,7 +79,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract void doWriteSeries(FileHeader fileHeader, RoundRobinTimeSeries t) throws SerializationException;
 
-    @Override
     public RoundRobinTimeSeries readSeries(FileHeader fileHeader) throws SerializationException {
         try {
             fileHeader.writeLock().lock();
@@ -93,7 +91,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract RoundRobinTimeSeries doReadSeries(FileHeader fileHeader) throws SerializationException;
 
-    @Override
     public FileHeader readHeader(File f) throws SerializationException {
         synchronized (readWriteLock) {
             return doReadHeader(f);
@@ -102,7 +99,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract FileHeader doReadHeader(File f) throws SerializationException;
 
-    @Override
     public boolean fileExists(FileHeader fileHeader) {
         synchronized (readWriteLock) {
             return doFileExists(fileHeader);
@@ -114,7 +110,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
     /**
      * Update the fileHeader by reading the file header information from disk
      */
-    @Override
     public void readHeader(FileHeader fileHeader) throws SerializationException {
         try {
             fileHeader.writeLock().lock();
@@ -132,7 +127,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
     /**
      * Move the series file based on the new path, and update the path in header
      */
-    @Override
     public void migratePath(FileHeader fileHeader, String newPath) throws SerializationException {
         try {
            fileHeader.writeLock().lock();
@@ -151,7 +145,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
      * Append items to the timeseries file and re-write the file header to reflect new start and end points
      * and any modified header properties
      */
-    @Override
     public void appendToSeries(FileHeader header, RoundRobinTimeSeries l) throws SerializationException {
         try {
             header.writeLock().lock();
@@ -166,7 +159,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract void doAppendToSeries(FileHeader header, RoundRobinTimeSeries l) throws SerializationException;
 
-    @Override
     public File getFile(FileHeader f) throws SerializationException {
         try {
             f.readLock().lock();
@@ -181,7 +173,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract File doGetFile(FileHeader f) throws SerializationException;
 
-    @Override
     public File createFile(FileHeader fileHeader) throws SerializationException {
         try {
             fileHeader.writeLock().lock();
@@ -196,7 +187,6 @@ public abstract class AbstractLockedSerializer implements TimeSeriesSerializer {
 
     protected abstract File doCreateFile(FileHeader fileHeader) throws SerializationException;
 
-    @Override
     public void writeHeaderProperties(FileHeader header) throws SerializationException {
         try {
             header.writeLock().lock();

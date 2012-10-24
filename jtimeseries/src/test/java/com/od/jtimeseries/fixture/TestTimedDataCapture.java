@@ -75,7 +75,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(7, allSeries.size());
         for (IdentifiableTimeSeries s : allSeries) {
             if ( s != rawValueSeries) {
-                assertEquals(2, s.size());
+                assertEquals("series " + s + " did not have 2 values", 2, s.size());
             }
         }
 

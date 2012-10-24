@@ -204,8 +204,10 @@ public class CaptureFunctions {
         }
 
         public Numeric calculateResult() {
-            //calculate actual length of period and divide by time interval to express count
-            double divisor = ((double)(System.currentTimeMillis() - startTime) / timeIntervalToExpressCount.getLengthInMillis());
+            //calculate actual elapsed length of period and divide by time interval to express count
+            //the actual length may differ slightly from the capture period due to thread scheduling
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            double divisor = ((double) elapsedTime / timeIntervalToExpressCount.getLengthInMillis());
             return DoubleNumeric.valueOf(getWrappedFunction().calculateResult().doubleValue() / divisor);
         }
 

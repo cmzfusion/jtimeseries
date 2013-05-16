@@ -56,7 +56,11 @@ public class TimeSerious implements ConfigAware {
     private UiTimeSeriesServerDictionary udpPingHttpServerDictionary = new UiTimeSeriesServerDictionary();
     private DisplayNameCalculator displayNameCalculator = new DisplayNameCalculator();
     private ConfigAwareTreeManager configTreeManager = new ConfigAwareTreeManager(this);
-    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(udpPingHttpServerDictionary, displayNameCalculator, configTreeManager);
+    private TimeSeriousRootContext rootContext = new TimeSeriousRootContext(
+        udpPingHttpServerDictionary,
+        displayNameCalculator,
+        configTreeManager
+    );
 
     private FrameManager frameManager = new FrameManager(
         udpPingHttpServerDictionary,
@@ -76,7 +80,7 @@ public class TimeSerious implements ConfigAware {
             config = configInitializer.loadConfig();
             configTreeManager.restoreConfig(config);
         } catch (ConfigManagerException e) {
-            logMethods.error("Failed to load config or create default config, canot start TimeSerious", e);
+            logMethods.error("Failed to load config or create default config, cannot start TimeSerious", e);
         }
 
     }

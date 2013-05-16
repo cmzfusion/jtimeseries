@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 	<groupId>od</groupId>
-	<version>1.0.18</version>
+	<version>1.0.19-SNAPSHOT</version>
 	<artifactId>jtimeseries-project</artifactId>
 	<packaging>pom</packaging>
 	<name>JTimeseries Project</name>

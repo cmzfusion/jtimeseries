@@ -35,6 +35,9 @@ public class TimeSeriesServerConfig {
     private int port;
     private String description;
 
+    public TimeSeriesServerConfig() {
+    }
+    
     public TimeSeriesServerConfig(String hostName, int port, String description) {
         this.hostName = hostName;
         this.port = port;

@@ -18,6 +18,9 @@
  */
 package com.od.jtimeseries.util;
 
+import com.od.jtimeseries.util.logging.LogMethods;
+import com.od.jtimeseries.util.logging.LogUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -33,6 +36,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * Controls the Executors/threads used for various library level tasks, such as event propagation
  */
 public class TimeSeriesExecutorFactory {
+
+    private static LogMethods logMethods = LogUtils.getLogMethods(TimeSeriesExecutorFactory.class);
 
     private static volatile ExecutorSource executorSource = new DefaultExecutorSource();
 
@@ -133,6 +138,10 @@ public class TimeSeriesExecutorFactory {
         TimeSeriesExecutorFactory.executorSource = executorSource;
     }
 
+    public static void shutdown() {
+        executorSource.shutdown();
+    }
+
 
     public static interface ExecutorSource {
 
@@ -200,7 +209,9 @@ public class TimeSeriesExecutorFactory {
         
         
         List<ExecutorService> getAllExecutors();
-        
+
+
+        void shutdown();
     }
 
     public static class DefaultExecutorSource implements ExecutorSource {
@@ -213,9 +224,9 @@ public class TimeSeriesExecutorFactory {
         private ExecutorService valueSupplierExecutor = NamedExecutors.newFixedThreadPool("JTS-ValueSupplierProcessing", 2);
         private ExecutorService httpExecutor = NamedExecutors.newFixedThreadPool("JTS-HttpRequestProcessor", 3, NamedExecutors.DAEMON_THREAD_CONFIGURER);
         private ExecutorService jmxMetricExecutor = NamedExecutors.newFixedThreadPool("JTS-JmxMetricProcessor", 3);
-        private ScheduledExecutorService udpPublisherService = NamedExecutors.newSingleThreadScheduledExecutor("JTS-UdpPublisher");
-        private ScheduledExecutorService udpClientService = NamedExecutors.newSingleThreadScheduledExecutor("JTS-UdpClientr");
 
+        //reuse the same executor for the UdpPublisher and UdpClient by default, these were originally separate
+        private ScheduledExecutorService udpPublisherService = NamedExecutors.newSingleThreadScheduledExecutor("JTS-UdpPublisher");
 
         public ExecutorService getExecutorForTimeSeriesEvents(Object timeSeries) {
             return timeSeriesEventExecutor;
@@ -255,7 +266,22 @@ public class TimeSeriesExecutorFactory {
         }
 
         public ScheduledExecutorService geUdpClientScheduledExecutor(Object publisherInstance) {
-            return udpClientService;
+            return udpPublisherService;
+        }
+
+        public void shutdown() {
+            logMethods.info("Shutting down JTimeSeries executors");
+            for ( ExecutorService s : getAllExecutors()) {
+                logMethods.info("Shutting down executor " + s);
+                abortDelayedTasks(s);
+                s.shutdown();
+            }
+        }
+
+        private void abortDelayedTasks(ExecutorService s) {
+            if ( s instanceof ScheduledThreadPoolExecutor) {
+                ((ScheduledThreadPoolExecutor)s).setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+            }
         }
 
         public List<ExecutorService> getAllExecutors() {
@@ -269,21 +295,10 @@ public class TimeSeriesExecutorFactory {
             executorServiceList.add(jmxMetricExecutor);
             executorServiceList.add(httpExecutor);
             executorServiceList.add(udpPublisherService);
-            executorServiceList.add(udpClientService);
             return executorServiceList;
         }
+
+
     }
 
-    public static void shutdown() {
-        for ( ExecutorService s : executorSource.getAllExecutors()) {
-            abortDelayedTasks(s);
-            s.shutdown();
-        }
-    }
-
-    private static void abortDelayedTasks(ExecutorService s) {
-        if ( s instanceof ScheduledThreadPoolExecutor) {
-            ((ScheduledThreadPoolExecutor)s).setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
-        }
-    }
 }

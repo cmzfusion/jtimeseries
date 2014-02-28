@@ -75,7 +75,7 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         assertEquals(7, allSeries.size());
         for (IdentifiableTimeSeries s : allSeries) {
             if ( s != rawValueSeries) {
-                assertEquals(2, s.size());
+                assertEquals("series " + s + " did not have 2 values", 2, s.size());
             }
         }
 
@@ -100,16 +100,20 @@ public class TestTimedDataCapture extends AbstractSimpleCaptureFixture {
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.05);
-        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.05);
+        //the accuracy of the test here is relaxed since indeterminate thread scheduling may
+        //affect the captured value significantly
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.2);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.2);
 
         //this series is the mean change in the counter value (the count during the period)
+        //the accuracy of the test here is relaxed since indeterminate thread scheduling may
+        //affect the captured value significantly
         s = rootContext.findTimeSeries("TestCounter \\(Count Per").getFirstMatch();
         i = s.iterator();
         i1 = i.next();
         i2 = i.next();
-        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.05);
-        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.05);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i1.doubleValue(), 0.2);
+        assertEquals(2d / CAPTURE_DIVISOR_FOR_MEAN_CHANGE, i2.doubleValue(), 0.2);
 
         s = rootContext.findTimeSeries(valueRecorder).getFirstMatch();
         i = s.iterator();

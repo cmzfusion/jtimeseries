@@ -53,7 +53,7 @@ public class VisualizerConfiguration implements ExportableConfig {
     private Rectangle frameLocation;
     private boolean isIcon;
     private boolean isShown = true;
-    private Boolean chartControlsVisible = true;
+    private Boolean chartControlsVisible = false;
     private int zPosition; //the z position of JInternalFrame containing the visualizer
 
     //no params constructor required for bean xml persistence

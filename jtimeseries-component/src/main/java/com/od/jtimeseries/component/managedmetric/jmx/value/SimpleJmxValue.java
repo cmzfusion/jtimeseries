@@ -50,12 +50,10 @@ public class SimpleJmxValue implements JmxValue {
         this.attribute = attribute;
     }
 
-    @Override
     public String getObjectName() {
         return objectName;
     }
 
-    @Override
     public String getAttribute() {
         return attribute;
     }
@@ -63,7 +61,6 @@ public class SimpleJmxValue implements JmxValue {
     /**
      * Read value(s) from the mbeans via the jmx connection into the aggregate function supplied
      */
-    @Override
     public void readValues(MBeanServerConnection jmxConnection, AggregateFunction f) throws Exception {
 
         //one or more MBeans may match the object name specified, we add the values from each matching bean

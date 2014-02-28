@@ -9,11 +9,10 @@ import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
 import com.od.jtimeseries.timeseries.IdentifiableTimeSeries;
 import com.od.jtimeseries.timeseries.TimeSeriesEvent;
 import com.od.jtimeseries.timeseries.TimeSeriesListenerAdapter;
-import com.od.jtimeseries.util.NamedExecutors;
+import com.od.jtimeseries.util.TimeSeriesExecutorFactory;
 import com.od.jtimeseries.util.logging.LogMethods;
 import com.od.jtimeseries.util.logging.LogUtils;
 
-import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,7 +32,7 @@ public class UdpPublisher extends TimeSeriesListenerAdapter {
     private static final LogMethods logMethods = LogUtils.getLogMethods(UdpPublisher.class);
     private static final int DEFAULT_MAX_MESSAGES_PER_SECOND = 25;
 
-    private ScheduledExecutorService rateControllingExecutor = NamedExecutors.newSingleThreadScheduledExecutor("UdpPublisherQueue" + this);
+    private ScheduledExecutorService rateControllingExecutor = TimeSeriesExecutorFactory.getUdpPublisherScheduledExecutor(this);
     private UdpClient udpClient;
     private int maxDatagramsPerSecond;
     private int maxQueueSize;

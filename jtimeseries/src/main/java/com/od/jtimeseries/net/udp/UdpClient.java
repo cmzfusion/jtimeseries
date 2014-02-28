@@ -193,7 +193,6 @@ public class UdpClient {
     }
 
     public synchronized void stop() {
-        scheduledExecutor.shutdown();
         for (UdpClientWithSocket c : configs) {
             c.closeSocket();
         }

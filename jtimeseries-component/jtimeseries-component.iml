@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_6" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -14,7 +14,8 @@
     <orderEntry type="library" name="Maven: jfree:jfreechart:1.0.9" level="project" />
     <orderEntry type="library" name="Maven: jfree:jcommon:1.0.12" level="project" />
     <orderEntry type="library" name="Maven: com.sun.jdmk:jmxtools:1.2.1" level="project" />
-    <orderEntry type="module" module-name="jtimeseries" scope="TEST" />
+    <orderEntry type="module" module-name="jtimeseries" scope="TEST" production-on-test="" />
+    <orderEntry type="library" scope="TEST" name="Maven: od:jtimeseries:tests:1.0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:2.5.6" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
     <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />

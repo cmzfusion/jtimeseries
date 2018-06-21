@@ -1,0 +1,12 @@
+rootProject.name = 'od-jtimeseries-project'
+
+include 'jtimeseries'
+//        'jtimeseries-agent',
+//        'jtimeseries-component',
+//        'jtimeseries-demo',
+//        'jtimeseries-server',
+//        'jtimeseries-ui',
+//        'jtimeseries-ui-webapp',
+//        'jtimeseries-ui-webstart'
+
+project(':jtimeseries').projectDir = file("jtimeseries")

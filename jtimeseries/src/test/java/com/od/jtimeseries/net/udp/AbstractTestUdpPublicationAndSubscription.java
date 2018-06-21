@@ -3,12 +3,12 @@ package com.od.jtimeseries.net.udp;
 import com.od.jtimeseries.net.udp.message.*;
 import com.od.jtimeseries.net.udp.message.properties.PropertiesMessageFactory;
 import com.od.jtimeseries.timeseries.Item;
-import junit.framework.TestCase;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.concurrent.Synchroniser;
+import org.junit.Test;
 
 import java.net.UnknownHostException;
 import java.util.LinkedList;
@@ -16,13 +16,17 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.*;
+
+
 /**
  * Created by IntelliJ IDEA.
  * User: Nick Ebbutt
  * Date: 24/03/12
  * Time: 16:49
  */
-public abstract class AbstractTestUdpPublicationAndSubscription extends TestCase {
+public abstract class AbstractTestUdpPublicationAndSubscription {
 
     private Synchroniser synchroniser = new Synchroniser();
     private Mockery mockery = new JUnit4Mockery() {{
@@ -87,32 +91,47 @@ public abstract class AbstractTestUdpPublicationAndSubscription extends TestCase
         assertEquals(o2, o1);
     }
 
+    @Test
     public void testSeriesDescriptionMessage() throws InterruptedException {
+        assumeNotWindows();
         final SeriesDescriptionMessage m = mf.createTimeSeriesDescriptionMessage("test.path", "My Description");
         sendAndCheckReceived(m);
     }
 
+    @Test
     public void testTimeSeriesValueMessage() throws InterruptedException {
+        assumeNotWindows();
         final TimeSeriesValueMessage m = mf.createTimeSeriesValueMessage("test.path", new Item(123456, 1.23456));
         sendAndCheckReceived(m);
     }
 
+    @Test
     public void testHttpServerAnnouncementMessage() throws InterruptedException {
+        assumeNotWindows();
         final HttpServerAnnouncementMessage m = mf.createHttpServerAnnouncementMessage(123456, "Test Server");
         sendAndCheckReceived(m);
     }
 
+    @Test
     public void testClientAnnouncementMessage() throws InterruptedException {
+        assumeNotWindows();
         final ClientAnnouncementMessage m = mf.createClientAnnouncementMessage(123456, "Test Client");
         sendAndCheckReceived(m);
     }
 
+    @Test
     public void testSendOneHundredMessages() throws InterruptedException {
+        assumeNotWindows();
         List<UdpMessage> l = new LinkedList<UdpMessage>();
         for (int loop=0; loop < 100; loop ++) {
             l.add(mf.createClientAnnouncementMessage(loop, "Test Client"));
         }
         sendAndCheckReceived(l);
+    }
+    
+    private void assumeNotWindows() {
+        //Suspected defendpoint issues affecting UDP packets on bank desktops, run linux only
+        assumeTrue(! System.getProperty("os.name").toLowerCase().contains("win"));
     }
 
     private void sendAndCheckReceived(final UdpMessage m) throws InterruptedException {

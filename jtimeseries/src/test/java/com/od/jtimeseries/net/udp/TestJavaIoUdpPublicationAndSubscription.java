@@ -2,6 +2,7 @@ package com.od.jtimeseries.net.udp;
 
 import com.od.jtimeseries.net.udp.message.UdpMessageFactory;
 import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
+import org.junit.Before;
 
 /**
  * Created by IntelliJ IDEA.
@@ -10,7 +11,7 @@ import com.od.jtimeseries.net.udp.message.javaio.JavaIOMessageFactory;
  * Time: 18:59
  */
 public class TestJavaIoUdpPublicationAndSubscription extends AbstractTestUdpPublicationAndSubscription {
-
+    
     @Override
     protected UdpMessageFactory createMessageFactory() {
         return new JavaIOMessageFactory();

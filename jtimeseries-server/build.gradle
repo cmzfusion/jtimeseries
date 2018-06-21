@@ -1,33 +1,33 @@
-apply plugin: 'java'
-apply plugin: 'maven'
+
+buildscript {
+
+    repositories {
+        maven {
+            //where to get the ebond gradle plugin from
+            url = 'http://ebond-artifactory.ib.internal:8081/artifactory/repo/'
+        }
+    }
+
+    dependencies {
+        classpath group: 'com.ib.fiflow', name: 'ebond-gradle-plugin', version: '1.7.3'
+    }
+
+}
+
+apply plugin: 'ebond-build-library'
+apply plugin: 'ebond-integration-build'
 
 group = 'od'
-version = '1.0.19'
+version = '1.0.19-CMZFORK'
 
-description = """jtimeseries-server"""
-
-sourceCompatibility = 1.5
-targetCompatibility = 1.5
-
-
-
-repositories {
-        
-     maven { url "http://repo.maven.apache.org/maven2" }
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
+
 dependencies {
-    compile group: 'od', name: 'jtimeseries', version:'1.0.19'
-    compile group: 'od', name: 'jtimeseries-component', version:'1.0.19'
-    compile group: 'jfree', name: 'jfreechart', version:'1.0.9'
-    compile group: 'com.sun.jdmk', name: 'jmxtools', version:'1.2.1'
-    compile group: 'org.springframework', name: 'spring-context', version:'2.5.6'
+    compile group: 'od', name: 'jtimeseries-component', version:'1.0.19-CMZFORK'
+    
     testCompile group: 'org.jmock', name: 'jmock-junit4', version:'2.6.0-RC2'
-    testCompile group: 'junit', name: 'junit', version:'4.5'
-    testCompile group: 'od', name: 'jtimeseries', version:'1.0.19', classifier:'tests'
+    testCompile group: 'junit', name: 'junit', version:'4.12'
 }
-//packaging tests
-task packageTests(type: Jar) {
-  from sourceSets.test.output
-  classifier = 'tests'
-}
-artifacts.archives packageTests

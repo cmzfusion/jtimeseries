@@ -1,12 +1,16 @@
 rootProject.name = 'od-jtimeseries-project'
 
-include 'jtimeseries'
-//        'jtimeseries-agent',
-//        'jtimeseries-component',
+include 'jtimeseries',
+        'jtimeseries-component',
+        'jtimeseries-agent',
+        'jtimeseries-server'
 //        'jtimeseries-demo',
-//        'jtimeseries-server',
 //        'jtimeseries-ui',
 //        'jtimeseries-ui-webapp',
 //        'jtimeseries-ui-webstart'
 
 project(':jtimeseries').projectDir = file("jtimeseries")
+project(':jtimeseries-component').projectDir = file("jtimeseries-component")
+project(':jtimeseries-agent').projectDir = file("jtimeseries-agent")
+project(':jtimeseries-server').projectDir = file("jtimeseries-server")
+

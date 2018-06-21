@@ -4,7 +4,6 @@ import com.od.jtimeseries.component.util.cache.LRUCache;
 import com.od.jtimeseries.context.TimeSeriesContext;
 import com.od.jtimeseries.context.impl.SeriesContext;
 import com.od.jtimeseries.server.serialization.*;
-import com.od.jtimeseries.timeseries.impl.TimeSeriesTestUtils;
 import com.od.jtimeseries.util.time.Time;
 import junit.framework.TestCase;
 import org.junit.Test;

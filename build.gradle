@@ -1,5 +1,27 @@
 
-subprojects {
-  apply plugin: 'java'
-  
+allprojects {
+    apply plugin: "java"
 }
+
+subprojects {
+    task allDeps(type: DependencyReportTask) {}
+}
+
+project(':jtimeseries-component') {
+    dependencies {
+      compile project(':jtimeseries')
+    }
+}
+
+project(':jtimeseries-agent') {
+    dependencies {
+        compile project(':jtimeseries-component')
+    }
+}
+
+project(':jtimeseries-server') {
+    dependencies {
+        compile project(':jtimeseries-component')
+    }
+}
+

@@ -69,6 +69,7 @@ public abstract class AbstractTestUdpPublicationAndSubscription {
     }
 
     //test messages generated from subtype factory are equal to properties messages
+    @Test
     public void testAllMessagesAreCreatedEqual() {
         PropertiesMessageFactory p = new PropertiesMessageFactory();
         assertEqualBothWays(
@@ -145,7 +146,7 @@ public abstract class AbstractTestUdpPublicationAndSubscription {
         }});
 
         client.sendMessage(m);
-        synchroniser.waitUntil(sendMessageState.is("finished"));
+        synchroniser.waitUntil(sendMessageState.is("finished"), 1000);
     }
 
     private void sendAndCheckReceived(final List<UdpMessage> l) throws InterruptedException {
@@ -162,6 +163,6 @@ public abstract class AbstractTestUdpPublicationAndSubscription {
         while(queue.size() > 0) {
             client.sendMessages(queue);
         }
-        synchroniser.waitUntil(sendMessageState.is("finished"));
+        synchroniser.waitUntil(sendMessageState.is("finished"), 1000);
     }
 }

@@ -8,6 +8,8 @@ import org.jmock.Mockery;
 import org.jmock.States;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.jmock.lib.concurrent.Synchroniser;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -42,6 +44,7 @@ public abstract class AbstractTestUdpPublicationAndSubscription {
 
     private static AtomicInteger serverPort = new AtomicInteger(25115);
 
+    @Before
     public void setUp() throws UnknownHostException {
         int port = serverPort.addAndGet(1);
         server = new UdpServer(port);
@@ -55,6 +58,7 @@ public abstract class AbstractTestUdpPublicationAndSubscription {
 
     protected abstract UdpMessageFactory createMessageFactory();
 
+    @After
     public void tearDown() {
         server.stop();
         server = null;

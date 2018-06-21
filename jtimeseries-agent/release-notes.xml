@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<release-notes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ivybuild-init/etc/release-notes.xsd">
+
+	<release version="1.0.19-CMZFORK" developer="GA2EBBK">
+		<change>An internal fork of the external github jtimeseries project</change>
+	</release>
+	
+</release-notes>

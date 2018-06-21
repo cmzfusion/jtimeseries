@@ -1,12 +1,19 @@
 package com.od.jtimeseries.server.util;
 
 import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,20 +22,23 @@ import java.util.List;
  * Time: 17:58:54
  * To change this template use File | Settings | File Templates.
  *
- * TODO - This test will probably fail on linux OS since the granularity of the file timestamps
- * appears to be 1000ms, which is less than Windows - not sure if this holds true for all linux
+ * TODO - This test will probably fail on linux OS since the granularity of the file timestamps on ext3 partitions is only 1s
  */
-public class TestFileReaper extends TestCase {
+public class TestFileReaper  {
 
     List<File> filesToCleanUp = new LinkedList<File>();
     public File reaperTestDir;
     public final String REAPER_FILE_PREFIX = "reaperTest.";
 
 
+    @Before
     public void setUp() throws IOException {
+         // TODO - This test will probably fail on linux OS since the granularity of the file timestamps on ext3 partitions is only 1s
+        assumeTrue(System.getProperty("os.name").toLowerCase().contains("win"));
         createFiles(1,10);
     }
 
+    @After
     public void tearDown() {
         for ( File f : filesToCleanUp) {
             f.delete();
@@ -36,32 +46,38 @@ public class TestFileReaper extends TestCase {
         filesToCleanUp.clear();
     }
 
+    @Test
     public void testReaperWithBadFilePattern() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTestBAD.*", 5, -1, -1);
         r.reap();
         assertEquals(10, getFileCount());
     }
 
+    @Test
     public void testReaperDeleteByFileCount() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", 5, -1, -1);
         checkReaping(r);
     }
 
+    @Test
     public void testReaperDeleteByFileCount2() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", 5, 1024 * 100, 10000);
         checkReaping(r);
     }
 
+    @Test
     public void testReaperDeleteBySize() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, 1024 * 5, -1);
         checkReaping(r);
     }
 
+    @Test
     public void testReaperDeleteBySize2() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", 15, 1024 * 5, 10000);
         checkReaping(r);
     }
 
+    @Test
     public void testOneLargeFileDoesNotCauseAllOthersToBeDeletedForCumulativeSize() throws IOException {
         assertTrue(getReaperTestFile(5).delete());
         createFiles(5, 5, 1024 * 10);
@@ -75,12 +91,14 @@ public class TestFileReaper extends TestCase {
 
     }
 
+    @Test
     public void testReaperDeleteByTimestampAllFilesNew() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 10000);
         r.reap();
         assertEquals(10, getFileCount());
     }
 
+    @Test
     public void testReaperDeleteByTimestampAllFilesOld() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 100);
         try {
@@ -92,11 +110,13 @@ public class TestFileReaper extends TestCase {
         assertEquals(0, getFileCount());
     }
 
+    @Test
     public void testReaperDeleteByTimestampOneFileNew() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", -1, -1, 100);
         oneFileWithUpdatedTimestamp(r);
     }
 
+    @Test
     public void testReaperDeleteByTimestampOneFileNew2() throws IOException {
         FileReaper r = new FileReaper("Test Reaper", reaperTestDir, "reaperTest.*", 20, 1024 * 100, 100);
         oneFileWithUpdatedTimestamp(r);

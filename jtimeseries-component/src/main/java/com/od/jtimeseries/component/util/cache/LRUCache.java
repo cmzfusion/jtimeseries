@@ -185,22 +185,25 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
 
         public void run() {
             synchronized(cache) {
-                double utilisationPercent = getMemoryUtilisationPercent();
-                if ( utilisationPercent > cacheShrinkThresholdPercent) {
-                    maxSize *= ( 100 - increaseDecreasePercent) / 100f;
-                    cacheSizeCounter.setCount(maxSize);
-                    logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " +
-                            increaseDecreasePercent + " percent to " + maxSize);
-                    int toRemove = cache.size() - maxSize;
-                    while ( toRemove > 0) {
-                        removeFromCacheAndResetUsageCounts(toRemove, false);
-                        toRemove = cache.size() - maxSize;
+                try {
+                    double utilisationPercent = getMemoryUtilisationPercent();
+                    if ( utilisationPercent > cacheShrinkThresholdPercent) {
+                        maxSize *= ( 100 - increaseDecreasePercent) / 100f;
+                        cacheSizeCounter.setCount(maxSize);
+                        logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " +
+                                increaseDecreasePercent + " percent to " + maxSize);
+                        int toRemove = cache.size() - maxSize;
+                        removeFromCache(toRemove);
+                    } else {
+                        logMethods.info("Used memory " + utilisationPercent + " no decrease in LRU cache size required");
                     }
+                } catch (Exception e) {
+                    logMethods.error("Failed while removing series from LRU cache", e);
                 }
             }
         }
 
-        private void removeFromCacheAndResetUsageCounts(int toRemove, boolean b) {
+        private void removeFromCache(int toRemove) {
             Iterator i = cache.entrySet().iterator();
             int removed = 0;
             while ( i.hasNext() && removed < toRemove) {

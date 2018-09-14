@@ -200,7 +200,7 @@ public class JmxMetric implements ManagedMetric {
             if ( ! queuedForProcessing.getAndSet(true)) {
                 TimeSeriesExecutorFactory.getJmxMetricExecutor(JmxMetric.this).execute(jmxMetricTask);
             } else {
-                logMethods.warn("Not running JMX Metric " + this + " last run did not complete, " +
+                logMethods.warn("Not running JMX Metric task " + this + " for metric " + JmxMetric.this + " last run did not complete, " +
                         "there is a problem with this metric or a backlog of queued jmx tasks?");
             }
         }

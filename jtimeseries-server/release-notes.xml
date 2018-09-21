@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <release-notes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ivybuild-init/etc/release-notes.xsd">
 
+	<release version="1.0.21-CMZFORK" developer="GA2EBBK">
+		<change>Use rolling average for memory size in LRU Cache and add a min size for cache</change>
+	</release>
+    
 	<release version="1.0.20-CMZFORK" developer="GA2EBBK">
 		<change>Improve logging in LRU Cache and for JMXMetric</change>
 	</release>

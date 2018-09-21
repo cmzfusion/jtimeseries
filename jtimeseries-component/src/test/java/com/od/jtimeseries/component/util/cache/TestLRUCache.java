@@ -17,7 +17,7 @@ public class TestLRUCache extends TestCase {
     private Counter removalCounter;
 
     public void testRemoval() {
-        LRUCache<String, Object> l = new LRUCache<String, Object>(10, 0, 0, Time.seconds(10), 99);
+        LRUCache<String, Object> l = new LRUCache<String, Object>(10, 10, 0, 0, Time.seconds(10), 99);
         addMetrics(l);
         addItems(l, 20, 0);
         assertEquals(sizeCounter.getCount(), 10);
@@ -42,7 +42,7 @@ public class TestLRUCache extends TestCase {
     }
 
     public void testExpansion() {
-        LRUCache<String, Object> l = new LRUCache<String, Object>(10, 20, 100, Time.seconds(0), 99);
+        LRUCache<String, Object> l = new LRUCache<String, Object>(10, 10, 20, 100, Time.seconds(0), 99);
         addMetrics(l);
 
         addItems(l, 10, 0);
@@ -61,6 +61,11 @@ public class TestLRUCache extends TestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    
+    public void testInitialSizeCannotBeLessThanMinSize() {
+        LRUCache<String, Object> l = new LRUCache<String, Object>(5, 10, 20, 100, Time.seconds(0), 99);
+        assertEquals(10, l.currentMaxSize);
     }
 
 }

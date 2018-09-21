@@ -36,12 +36,12 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     /**
      * Initial max size of cache
      */
-    private static final int CACHE_INITIAL_SIZE = Integer.parseInt(System.getProperty("JTS_INITIAL_LRU_CACHE_SIZE", "128"));
+    private static final int DEFAULT_INITIAL_SIZE = Integer.parseInt(System.getProperty("JTS_INITIAL_LRU_CACHE_SIZE", "128"));
 
     /**
      * Minimum size for cache
      */
-    private static final int MIN_CACHE_SIZE = Integer.parseInt(System.getProperty("JTS_MIN_LRU_CACHE_SIZE", "128"));
+    private static final int DEFAULT_MIN_CACHE_SIZE = Integer.parseInt(System.getProperty("JTS_MIN_LRU_CACHE_SIZE", "128"));
 
     /**
      * percentage by which to increase or decrease cache size when the cache is expanded / shrunk
@@ -51,15 +51,16 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     /**
      * percentage of max memory at which cache size will be reduced
      */
-    public final double cacheShrinkThresholdPercent;
+    private final double cacheShrinkThresholdPercent;
 
     /**
      * memory usage percentage after which cache expansions are denied
      */
-    public final int maxMemoryForCacheExpansionPercent;
+    private final int maxMemoryForCacheExpansionPercent;
 
 
-    private volatile int maxSize = CACHE_INITIAL_SIZE;
+    volatile int currentMaxSize;
+    private final int minSize;
 
     /**
      * Minimum intervals between cache size increases
@@ -74,9 +75,9 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     private long lastSizeCheck;
 
 
-    private final LinkedHashMap<K,E> cache = new LinkedHashMap<K,E>(CACHE_INITIAL_SIZE, 0.75f, true) {
+    private final LinkedHashMap<K,E> cache = new LinkedHashMap<K,E>(Math.max(DEFAULT_INITIAL_SIZE, DEFAULT_MIN_CACHE_SIZE), 0.75f, true) {
         protected boolean removeEldestEntry(Map.Entry eldest) {
-            boolean result = size() > maxSize;
+            boolean result = size() > currentMaxSize;
             if ( result ) {
                 cacheRemoves.incrementCount();
             }
@@ -87,15 +88,16 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     private ScheduledExecutorService cacheExecutorService = NamedExecutors.newSingleThreadScheduledExecutor(getClass().getSimpleName());
 
     public LRUCache() {
-        this(256, 20, 60, Time.seconds(10), 90);
+        this(DEFAULT_INITIAL_SIZE, DEFAULT_MIN_CACHE_SIZE, 20, 60, Time.seconds(10), 90);
     }
 
-    public LRUCache(int maxInitialSize) {
-        this(maxInitialSize, 20, 60, Time.seconds(10), 90);
+    public LRUCache(int initialMaxSize) {
+        this(initialMaxSize, DEFAULT_MIN_CACHE_SIZE, 20, 60, Time.seconds(10), 90);
     }
 
-    public LRUCache(int maxInitialSize, int increaseDecreasePercent, int maxMemoryForCacheExpansionPercent, TimePeriod minimumExpansionInterval, double cacheShrinkThresholdPercent) {
-        this.maxSize = maxInitialSize;
+    public LRUCache(int initialMaxSize, int minSize, int increaseDecreasePercent, int maxMemoryForCacheExpansionPercent, TimePeriod minimumExpansionInterval, double cacheShrinkThresholdPercent) {
+        this.currentMaxSize = Math.max(initialMaxSize, minSize);
+        this.minSize = minSize;
         this.increaseDecreasePercent = increaseDecreasePercent;
         this.maxMemoryForCacheExpansionPercent = maxMemoryForCacheExpansionPercent;
         this.minimumExpansionInterval = minimumExpansionInterval;
@@ -130,7 +132,7 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
             E result = cache.put(key, value);
 
             cacheItemCount.setCount(cache.size());
-            if ( cache.size() == maxSize) {
+            if ( cache.size() == currentMaxSize) {
                 scheduleCacheSizeIncrease();
             }
             return result;
@@ -144,7 +146,7 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     }
 
     public void setCacheSizeCounter(Counter cacheSizeCounter) {
-        cacheSizeCounter.setCount(maxSize);
+        cacheSizeCounter.setCount(currentMaxSize);
         this.cacheSizeCounter = cacheSizeCounter;
     }
 
@@ -182,10 +184,10 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
                 double utilisationPercent = getMemoryUtilisationPercent();
 
                 if ( utilisationPercent < maxMemoryForCacheExpansionPercent) {
-                    maxSize *= ( 100 + increaseDecreasePercent) / 100f;
+                    currentMaxSize *= ( 100 + increaseDecreasePercent) / 100f;
                     logMethods.info("Used memory " + utilisationPercent + " percent, max for increase " +
-                            maxMemoryForCacheExpansionPercent + ", will increase cache size to " + maxSize);
-                    cacheSizeCounter.setCount(maxSize);
+                            maxMemoryForCacheExpansionPercent + ", will increase cache size to " + currentMaxSize);
+                    cacheSizeCounter.setCount(currentMaxSize);
                 }
             }
         }
@@ -198,12 +200,12 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
                 try {
                     double utilisationPercent = getMemoryUtilisationPercent();
                     if ( utilisationPercent > cacheShrinkThresholdPercent) {
-                        maxSize *= ( 100 - increaseDecreasePercent) / 100f;
-                        maxSize = Math.max(maxSize, MIN_CACHE_SIZE);
-                        cacheSizeCounter.setCount(maxSize);
+                        int newSize = (int)(currentMaxSize * ( 100 - increaseDecreasePercent) / 100f);
+                        currentMaxSize = Math.max(newSize, minSize);
+                        cacheSizeCounter.setCount(currentMaxSize);
                         logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " +
-                                increaseDecreasePercent + " percent to " + maxSize);
-                        int toRemove = cache.size() - maxSize;
+                                increaseDecreasePercent + " percent to " + currentMaxSize);
+                        int toRemove = cache.size() - currentMaxSize;
                         removeFromCache(toRemove);
                     } else {
                         logMethods.info("Used memory " + utilisationPercent + " no decrease in LRU cache size required");

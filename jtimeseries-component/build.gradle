@@ -19,7 +19,7 @@ apply plugin: 'ebond-build-library'
 apply plugin: 'ebond-integration-build'
 
 group = 'od'
-version = '1.0.20-CMZFORK'
+version = '1.0.21-CMZFORK'
 
 compileJava {
     sourceCompatibility = 1.8

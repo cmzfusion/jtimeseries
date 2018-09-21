@@ -12,6 +12,7 @@ import com.od.jtimeseries.util.time.TimePeriod;
 import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +36,12 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     /**
      * Initial max size of cache
      */
-    private int DEFAULT_INITIAL_SIZE = 128;
+    private static final int CACHE_INITIAL_SIZE = Integer.parseInt(System.getProperty("JTS_INITIAL_LRU_CACHE_SIZE", "128"));
+
+    /**
+     * Minimum size for cache
+     */
+    private static final int MIN_CACHE_SIZE = Integer.parseInt(System.getProperty("JTS_MIN_LRU_CACHE_SIZE", "128"));
 
     /**
      * percentage by which to increase or decrease cache size when the cache is expanded / shrunk
@@ -53,7 +59,7 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     public final int maxMemoryForCacheExpansionPercent;
 
 
-    private volatile int maxSize = DEFAULT_INITIAL_SIZE;
+    private volatile int maxSize = CACHE_INITIAL_SIZE;
 
     /**
      * Minimum intervals between cache size increases
@@ -61,10 +67,14 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
     private TimePeriod minimumExpansionInterval = Time.milliseconds(1000);
 
 
+    private static final int ROLLING_AVERAGE_MEMORY_USE_MAX_SAMPLES = 8;
+    private final LinkedList<Double> memoryUseSamples = new LinkedList<>();
+
+
     private long lastSizeCheck;
 
 
-    private final LinkedHashMap<K,E> cache = new LinkedHashMap<K,E>(DEFAULT_INITIAL_SIZE, 0.75f, true) {
+    private final LinkedHashMap<K,E> cache = new LinkedHashMap<K,E>(CACHE_INITIAL_SIZE, 0.75f, true) {
         protected boolean removeEldestEntry(Map.Entry eldest) {
             boolean result = size() > maxSize;
             if ( result ) {
@@ -189,6 +199,7 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
                     double utilisationPercent = getMemoryUtilisationPercent();
                     if ( utilisationPercent > cacheShrinkThresholdPercent) {
                         maxSize *= ( 100 - increaseDecreasePercent) / 100f;
+                        maxSize = Math.max(maxSize, MIN_CACHE_SIZE);
                         cacheSizeCounter.setCount(maxSize);
                         logMethods.info("Used memory " + utilisationPercent + " percent, will decrease cache size by " +
                                 increaseDecreasePercent + " percent to " + maxSize);
@@ -221,7 +232,19 @@ public class LRUCache<K,E> implements TimeSeriesCache<K,E> {
 
         double utilisedMemory = total - free;
         double utilisationRatio = utilisedMemory / maxAvailable;
-        return utilisationRatio * 100;
+        double percentage = utilisationRatio * 100;
+
+        return getRollingAveragePercentage(percentage);
+    }
+
+    private double getRollingAveragePercentage(double percentage) {
+        memoryUseSamples.add(percentage);
+        if ( memoryUseSamples.size() > ROLLING_AVERAGE_MEMORY_USE_MAX_SAMPLES) {
+            memoryUseSamples.remove(0);
+        }
+
+        DoubleSummaryStatistics stats = memoryUseSamples.stream().collect(Collectors.summarizingDouble(Double::doubleValue));
+        return stats.getAverage();
     }
 
 

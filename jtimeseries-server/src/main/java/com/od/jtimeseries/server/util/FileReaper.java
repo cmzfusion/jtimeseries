@@ -50,7 +50,7 @@ public class FileReaper {
     private String name;
     private File parentDirectory;
     private int maxFileCount;
-    private int maxCumulativeSize;
+    private long maxCumulativeSize;
     private long maxAgeInMillis;
     private java.util.regex.Pattern pattern;
 
@@ -62,7 +62,7 @@ public class FileReaper {
      * @param maxCumulativeSize - maximum cumulative size in bytes of files to keep, zero or -1 = no maximum
      * @param maxAgeInMillis - maximum age of file in millis, zero or -1 = no maximum
      */
-    public FileReaper(String name, File parentDirectory, String fileSearchRegExp, int maxFileCount, int maxCumulativeSize, long maxAgeInMillis) {
+    public FileReaper(String name, File parentDirectory, String fileSearchRegExp, int maxFileCount, long maxCumulativeSize, long maxAgeInMillis) {
         this.name = name;
         this.parentDirectory = parentDirectory;
         this.maxFileCount = maxFileCount;

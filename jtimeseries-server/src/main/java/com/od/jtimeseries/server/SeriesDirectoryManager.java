@@ -50,12 +50,12 @@ public class SeriesDirectoryManager {
     private PathMapper pathMapper;
     private String seriesFileSuffix;
     private int maxFileCount;
-    private long maxDiskSpaceForSeriesMb;
+    private int maxDiskSpaceForSeriesMb;
     private int maxSeriesFileAgeDays;
     private int loadCount;
     private FileReaper reaper;
 
-    public SeriesDirectoryManager(File seriesDirectory, TimeSeriesSerializer timeseriesSerializer, TimeSeriesContext rootContext, PathMapper pathMapper, String seriesFileSuffix, int maxFileCount, long maxDiskSpaceForSeriesMb, int maxSeriesFileAgeDays) {
+    public SeriesDirectoryManager(File seriesDirectory, TimeSeriesSerializer timeseriesSerializer, TimeSeriesContext rootContext, PathMapper pathMapper, String seriesFileSuffix, int maxFileCount, int maxDiskSpaceForSeriesMb, int maxSeriesFileAgeDays) {
         this.seriesDirectory = seriesDirectory;
         this.timeseriesSerializer = timeseriesSerializer;
         this.rootContext = rootContext;
@@ -74,7 +74,7 @@ public class SeriesDirectoryManager {
             seriesDirectory,
             ".*" + seriesFileSuffix,
             maxFileCount,
-            maxDiskSpaceForSeriesMb * 1000000,
+            maxDiskSpaceForSeriesMb * 1000000L,
             Time.days(maxSeriesFileAgeDays).getLengthInMillis()
         );
     }

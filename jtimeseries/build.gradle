@@ -15,7 +15,6 @@ buildscript {
 }
 
 apply plugin: 'ebond-build-library'
-apply plugin: 'ebond-integration-build'
 
 group = 'od'
 version = '1.0.22-CMZFORK'
